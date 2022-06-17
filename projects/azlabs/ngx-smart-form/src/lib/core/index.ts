@@ -1,23 +1,20 @@
 // Type definitions
 export {
-  IDynamicForm,
+  FormConfigInterface,
   InputTypes,
   CheckboxItem,
   RadioItem,
-  SelectSourceInterface,
+  OptionsInputItem,
   FormsClient,
   FormsLoader,
-  SelectableControl,
-  ServerSideSelectableControl,
-  SelectableControlDataSource,
   CacheProvider,
   InputValidationRule,
-  InputInterface,
+  InputConfigInterface,
   InputRequireIfConfig,
-  SelectableControlItems,
+  OptionsInputItemsInterface,
   SelectOptionsClient,
   LazyBindingControl,
-  BindingControlInterface
+  OptionsInputConfigInterface
 } from './types';
 
 // Input types defintions

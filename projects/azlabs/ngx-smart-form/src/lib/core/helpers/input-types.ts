@@ -11,11 +11,11 @@ import { InputGroup } from '../input-types/input-group';
 import { buildNumberInput } from '../input-types/number';
 import { buildTextInput } from '../input-types/text';
 import { buildTextAreaInput } from '../input-types/textarea';
-import { InputInterface, InputTypes } from '../types';
+import { InputConfigInterface, InputTypes } from '../types';
 
-export function buildControl(
-  model: Partial<ControlInterface> | Partial<ControlGroupInterface>
-): InputInterface {
+type ControlType = Partial<ControlInterface> | Partial<ControlGroupInterface>;
+
+export function buildControl(model: ControlType): InputConfigInterface {
   switch (model.type) {
     case InputTypes.DATE_INPUT:
       return buildDateInput(model);

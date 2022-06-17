@@ -1,5 +1,5 @@
 import { InputValidationRule } from './input-rules';
-import { SelectableControlItems } from './items';
+import { OptionsInputItemsInterface } from './items';
 
 export interface LazyBindingControl {
   serverBindings?: string;
@@ -7,13 +7,13 @@ export interface LazyBindingControl {
 }
 
 // @internal
-export interface BindingControlInterface
-  extends InputInterface,
+export interface OptionsInputConfigInterface
+  extends InputConfigInterface,
     LazyBindingControl {
   groupfield: string;
   valuefield: string;
   keyfield: string;
-  items: SelectableControlItems;
+  items: OptionsInputItemsInterface;
 }
 
 /**
@@ -23,7 +23,7 @@ export interface BindingControlInterface
  * **Note**
  * This interface is subject to change because the package is under active development
  */
-export interface InputInterface {
+export interface InputConfigInterface {
   label: string;
   type: string;
   formControlName: string;

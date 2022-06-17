@@ -1,8 +1,8 @@
 import { getObjectProperty } from '@iazlabs/js-object';
 import {
-  BindingControlInterface,
+  OptionsInputConfigInterface,
   InputTypes,
-  SelectSourceInterface,
+  OptionsInputItem,
 } from '../types';
 
 /**
@@ -10,7 +10,7 @@ import {
  * @param control
  * @param values
  */
-export function setControlOptions<T extends BindingControlInterface>(
+export function setControlOptions<T extends OptionsInputConfigInterface>(
   control: Partial<T>,
   values: { [prop: string]: any }[]
 ) {
@@ -41,7 +41,7 @@ export function setControlOptions<T extends BindingControlInterface>(
               control.valuefield !== control.groupfield
                 ? v[control.groupfield]
                 : null,
-          } as SelectSourceInterface;
+          } as OptionsInputItem;
         })
       : [];
   }
@@ -112,13 +112,13 @@ function selectInputOptions(items: string[]) {
         value: idValueFields[0].trim(),
         name: idValueFields[1].trim(),
         description: idValueFields[1].trim(),
-      } as SelectSourceInterface;
+      } as OptionsInputItem;
     } else {
       return {
         value: isNaN(+current.trim()) ? current.trim() : +current.trim(),
         name: current.trim(),
         description: current.trim(),
-      } as SelectSourceInterface;
+      } as OptionsInputItem;
     }
   });
 }

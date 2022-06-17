@@ -23,7 +23,7 @@ export function buildRequiredIfConfig(str: string) {
 }
 
 /**
- * Creates an instance of {@see BindingControlInterface} interface
+ * Creates an instance of {@see OptionsInputConfigInterface} interface
  *
  * @param source
  */

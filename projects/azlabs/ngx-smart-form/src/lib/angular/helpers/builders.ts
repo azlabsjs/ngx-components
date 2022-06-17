@@ -9,10 +9,10 @@ import {
 } from '@angular/forms';
 import { CustomValidators } from '../validators';
 import {
-  BindingControlInterface,
+  OptionsInputConfigInterface,
   CheckboxItem,
-  IDynamicForm,
-  InputInterface,
+  FormConfigInterface,
+  InputConfigInterface,
   InputTypes,
 } from '../../core';
 import {
@@ -37,7 +37,7 @@ export class ComponentReactiveFormHelpers {
    */
   static buildFormGroupFromInputConfig(
     builder: FormBuilder,
-    inputs: (InputInterface | InputGroup)[]
+    inputs: (InputConfigInterface | InputGroup)[]
   ) {
     // Build the outer form group
     const group = builder.group({});
@@ -70,7 +70,7 @@ export class ComponentReactiveFormHelpers {
     return group;
   }
 
-  public static buildGroup(builder: FormBuilder, inputs: InputInterface[]) {
+  public static buildGroup(builder: FormBuilder, inputs: InputConfigInterface[]) {
     const group = builder.group({});
     for (const config of inputs) {
       if (config.type !== InputTypes.CHECKBOX_INPUT) {
@@ -88,7 +88,7 @@ export class ComponentReactiveFormHelpers {
     return group;
   }
 
-  public static buildControl(builder: FormBuilder, config: InputInterface) {
+  public static buildControl(builder: FormBuilder, config: InputConfigInterface) {
     const validators = [
       config.rules && config.rules.isRequired
         ? Validators.required
@@ -209,9 +209,9 @@ export class ComponentReactiveFormHelpers {
     return control;
   }
 
-  public static buildArray(builder: FormBuilder, config: InputInterface) {
+  public static buildArray(builder: FormBuilder, config: InputConfigInterface) {
     const array = new FormArray<any>([]);
-    of((config as BindingControlInterface).items)
+    of((config as OptionsInputConfigInterface).items)
       .pipe(
         tap((items) => {
           (items as any[] as CheckboxItem[]).map(
@@ -279,7 +279,7 @@ export class ComponentReactiveFormHelpers {
 
 export const createAngularAbstractControl = (
   builder: FormBuilder,
-  form?: IDynamicForm
+  form?: FormConfigInterface
 ) => {
   return form
     ? ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(builder, [

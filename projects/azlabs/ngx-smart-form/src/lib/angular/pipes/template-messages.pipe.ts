@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { getObjectProperty } from '@iazlabs/js-object';
 import { map, of } from 'rxjs';
-import { ValidationMessagesType, TRANSLATIONS } from '../types';
+import { ValidationMessagesType, TEMPLATE_DICTIONARY } from '../types';
 
 /**
  * Determines if two objects or two values are equivalent.
@@ -91,7 +91,7 @@ export class TemplateMessagesPipe implements PipeTransform {
 
   public constructor(
     private cdRef: ChangeDetectorRef,
-    @Inject(TRANSLATIONS)
+    @Inject(TEMPLATE_DICTIONARY)
     @Optional()
     private validationMessages: ValidationMessagesType = of({})
   ) {}

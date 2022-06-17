@@ -1,9 +1,9 @@
 import { ControlInterface } from '../compact/types';
-import { InputInterface, InputValidationRule, InputTypes } from '../types';
+import { InputConfigInterface, InputValidationRule, InputTypes } from '../types';
 import { buildRequiredIfConfig } from '../helpers/builders';
 
 // @internal
-export interface TextInput extends InputInterface {
+export interface TextInput extends InputConfigInterface {
   maxLength?: number;
   pattern?: string;
   minLength?: number;

@@ -1,6 +1,6 @@
-import { InputInterface } from '../types';
+import { InputConfigInterface } from '../types';
 
 // @internal
-export interface InputGroup extends InputInterface {
-  children: InputInterface[];
+export interface InputGroup extends InputConfigInterface {
+  children: InputConfigInterface[];
 }

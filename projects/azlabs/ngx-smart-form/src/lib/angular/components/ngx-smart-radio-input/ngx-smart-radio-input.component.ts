@@ -1,9 +1,9 @@
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import {
-  BindingControlInterface,
+  OptionsInputConfigInterface,
   InputTypes,
-  SelectableControlItems,
+  OptionsInputItemsInterface,
   setControlOptions,
 } from '../../../core';
 
@@ -15,7 +15,7 @@ export class NgxSmartRadioInputComponent implements OnInit {
   // tslint:disable-next-line: variable-name
   @Input() control!: AbstractControl;
   // tslint:disable-next-line: variable-name
-  @Input() inputConfig!: BindingControlInterface;
+  @Input() inputConfig!: OptionsInputConfigInterface;
   @Input() showLabelAndDescription = true;
 
   public inputTypes = InputTypes;
@@ -38,7 +38,7 @@ export class NgxSmartRadioInputComponent implements OnInit {
     return `${name}_${value}`;
   }
 
-  onItemsChange(state: SelectableControlItems) {
+  onItemsChange(state: OptionsInputItemsInterface) {
     this.loaded = true;
     this.inputConfig = setControlOptions(this.inputConfig, state);
     this.cdRef.detectChanges();

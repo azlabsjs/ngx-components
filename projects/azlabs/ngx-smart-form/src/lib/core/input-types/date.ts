@@ -1,9 +1,9 @@
 import { ControlInterface } from '../compact/types';
-import { InputInterface, InputValidationRule } from '../types';
+import { InputConfigInterface, InputValidationRule } from '../types';
 import { buildRequiredIfConfig } from '../helpers/builders';
 
 // @internal
-export interface DateInput extends InputInterface {
+export interface DateInput extends InputConfigInterface {
   minDate: string;
   maxDate: string;
   currentDate: string;

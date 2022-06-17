@@ -1,21 +1,21 @@
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { BindingInterface } from '../types';
 import { ComponentReactiveFormHelpers } from './builders';
-import { InputInterface } from '../../core';
+import { InputConfigInterface } from '../../core';
 import { isNumber } from '@iazlabs/utilities';
 
 type CreateControlAttributeSetterReturnType = (
   formgroup: AbstractControl
-) => [AbstractControl, InputInterface[]];
+) => [AbstractControl, InputConfigInterface[]];
 
 type CreateControlAttributeSetterType = (
-  controls: InputInterface[],
+  controls: InputConfigInterface[],
   bindings: BindingInterface,
   value: any
 ) => CreateControlAttributeSetterReturnType;
 
 export function createHiddenAttributeSetter(
-  controls: InputInterface[],
+  controls: InputConfigInterface[],
   bidings: BindingInterface,
   value: string | number
 ): CreateControlAttributeSetterReturnType {
@@ -61,7 +61,7 @@ export function createHiddenAttributeSetter(
 }
 
 // tslint:disable-next-line: typedef
-export function controlAttributesDataBindings(controls: InputInterface[]) {
+export function controlAttributesDataBindings(controls: InputConfigInterface[]) {
   return (formgroup: AbstractControl) => {
     const bindings: Map<string, BindingInterface> = new Map();
     if (Array.isArray(controls) && controls.length !== 0 && formgroup) {
@@ -106,7 +106,7 @@ export function controlAttributesDataBindings(controls: InputInterface[]) {
 
 // tslint:disable-next-line: typedef
 export function setControlsAttributes(
-  controls: InputInterface[],
+  controls: InputConfigInterface[],
   bindings: BindingInterface,
   value: any,
   callback: CreateControlAttributeSetterType

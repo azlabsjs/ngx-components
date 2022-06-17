@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormBuilder } from '@angular/forms';
-import { IDynamicForm, InputInterface } from '../../core';
+import { FormConfigInterface, InputConfigInterface } from '../../core';
 import { ComponentReactiveFormHelpers } from '../helpers';
 import { AngularReactiveFormBuilderBridge } from '../types';
 
@@ -16,11 +16,11 @@ export class ReactiveFormBuilderBrige
    *
    * @param source
    */
-  group(source: IDynamicForm | InputInterface[]): AbstractControl {
+  group(source: FormConfigInterface | InputConfigInterface[]): AbstractControl {
     if (source) {
       const source_ = !Array.isArray(source)
-        ? [...((source as IDynamicForm).controlConfigs as InputInterface[])]
-        : (source as InputInterface[]);
+        ? [...((source as FormConfigInterface).controlConfigs as InputConfigInterface[])]
+        : (source as InputConfigInterface[]);
       return ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(
         this.builder,
         source_

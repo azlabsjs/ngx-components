@@ -1,5 +1,5 @@
 import { ControlInterface } from '../compact/types';
-import { InputInterface } from '../types';
+import { InputConfigInterface } from '../types';
 
 /**
  * Build an instance of the {@see HTMLInput} interface
@@ -19,5 +19,5 @@ export function buildHTMLInput(source: Partial<ControlInterface>) {
     formControlIndex: source.controlIndex,
     formControlGroupKey: source.controlGroupKey,
     descriptionText: source.description,
-  } as InputInterface;
+  } as InputConfigInterface;
 }

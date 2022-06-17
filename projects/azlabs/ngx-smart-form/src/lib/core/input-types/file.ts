@@ -1,9 +1,9 @@
 import { ControlInterface } from '../compact/types';
 import { buildRequiredIfConfig } from '../helpers/builders';
-import { InputInterface, InputValidationRule } from '../types';
+import { InputConfigInterface, InputValidationRule } from '../types';
 
 // @internal
-export interface FileInput extends InputInterface {
+export interface FileInput extends InputConfigInterface {
   uploadUrl?: string;
   pattern?: string;
   multiple: boolean;

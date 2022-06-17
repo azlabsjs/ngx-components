@@ -1,12 +1,12 @@
 import { ControlInterface } from '../compact/types';
 import { InputValidationRule } from '../types';
-import { BindingControlInterface } from '../types';
+import { OptionsInputConfigInterface } from '../types';
 import { buildRequiredIfConfig } from '../helpers/builders';
 import { setControlOptions } from '../helpers/bindings';
 import { parseControlItemsConfigs } from '../helpers/parsers';
 
 // @internal
-export interface SelectInput extends BindingControlInterface {
+export interface SelectInput extends OptionsInputConfigInterface {
   optionsLabel?: string;
   optionsValueIndex?: string | number;
   multiple?: boolean;

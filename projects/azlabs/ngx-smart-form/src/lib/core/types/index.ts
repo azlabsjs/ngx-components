@@ -7,30 +7,23 @@ export { InputValidationRule } from './input-rules';
 export { SelectOptionsClient } from './client';
 
 // Form interface
-export { IDynamicForm, FormsClient } from './form';
+export { FormConfigInterface, FormsClient } from './form';
 
 //
 export {
   CheckboxItem,
   RadioItem,
-  SelectSourceInterface,
-  SelectableControlItems,
+  OptionsInputItem,
+  OptionsInputItemsInterface,
 } from './items';
 
 // Input interface
 export {
-  BindingControlInterface,
-  InputInterface,
+  OptionsInputConfigInterface,
+  InputConfigInterface,
   InputRequireIfConfig,
   LazyBindingControl,
 } from './input';
 
 // Forms provider
 export { FormsLoader, CacheProvider } from './providers';
-
-// Select input interfaces
-export {
-  SelectableControl,
-  ServerSideSelectableControl,
-  SelectableControlDataSource,
-} from './select';

@@ -1,7 +1,7 @@
 import { Component, Inject, Input, LOCALE_ID } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { JSDate } from '@iazlabs/js-datetime';
-import { DateInput, InputInterface } from '../../../core';
+import { DateInput } from '../../../core';
 
 @Component({
   selector: 'ngx-smart-date-input',

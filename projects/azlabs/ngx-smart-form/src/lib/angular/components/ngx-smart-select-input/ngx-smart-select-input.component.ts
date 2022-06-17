@@ -10,7 +10,7 @@ import {
 import { FormControl } from '@angular/forms';
 import { InputEventArgs } from '../../types/input';
 import {
-  SelectableControlItems,
+  OptionsInputItemsInterface,
   SelectInput,
   setControlOptions,
 } from '../../../core';
@@ -114,7 +114,7 @@ export class NgxSmartSelectInputComponent implements AfterViewInit {
     this._state$.next({ ...value, loaded });
   }
 
-  onItemsChange(state: SelectableControlItems) {
+  onItemsChange(state: OptionsInputItemsInterface) {
     this._inputConfig = setControlOptions(this._inputConfig, state);
     const value = this._state$.getValue();
     this._state$.next({ ...value, state: this._inputConfig.items ?? [] });

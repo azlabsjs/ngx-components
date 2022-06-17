@@ -1,4 +1,4 @@
-import { InputInterface } from '../../core';
+import { InputConfigInterface } from '../../core';
 
 /**
  * Defines the type of content published when dynamic input
@@ -11,5 +11,5 @@ export interface InputEventArgs {
 
 export interface MultiSelectItemRemoveEvent {
   event: any;
-  control: InputInterface;
+  control: InputConfigInterface;
 }

@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { getObjectProperty } from "@iazlabs/js-object";
-import { InputInterface, NumberInput } from "../../../core";
+import { NumberInput } from "../../../core";
 import { InputEventArgs } from "../../types/input";
 
 @Component({

@@ -1,9 +1,9 @@
 import { ControlInterface } from '../compact/types';
-import { InputInterface, InputValidationRule } from '../types';
+import { InputConfigInterface, InputValidationRule } from '../types';
 import { buildRequiredIfConfig } from '../helpers/builders';
 
 /**
- * Creates an instance of {@see InputInterface} interface
+ * Creates an instance of {@see InputConfigInterface} interface
  *
  * @param source
  */
@@ -22,5 +22,5 @@ export function buildHiddenInput(source: Partial<ControlInterface>) {
     } as InputValidationRule,
     disabled: true,
     readOnly: true,
-  } as InputInterface;
+  } as InputConfigInterface;
 }

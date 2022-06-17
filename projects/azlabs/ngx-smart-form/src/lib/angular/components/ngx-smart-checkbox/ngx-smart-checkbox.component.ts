@@ -15,9 +15,9 @@ import {
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import {
-  BindingControlInterface,
+  OptionsInputConfigInterface,
   InputTypes,
-  SelectableControlItems,
+  OptionsInputItemsInterface,
   setControlOptions,
 } from '../../../core';
 
@@ -30,7 +30,7 @@ export class NgxSmartCheckBoxComponent implements OnInit, OnDestroy {
   // tslint:disable-next-line: variable-name
   @Input() control!: AbstractControl;
   // tslint:disable-next-line: variable-name
-  @Input() inputConfig!: BindingControlInterface;
+  @Input() inputConfig!: OptionsInputConfigInterface;
   @Input() showLabelAndDescription = true;
 
   public inputTypes = InputTypes;
@@ -55,7 +55,7 @@ export class NgxSmartCheckBoxComponent implements OnInit, OnDestroy {
     this._destroy$.next();
   }
 
-  onItemsChange(state: SelectableControlItems) {
+  onItemsChange(state: OptionsInputItemsInterface) {
     this.loaded = true;
     this.inputConfig = setControlOptions(this.inputConfig, state);
     this.initializeFormArray();
@@ -98,7 +98,7 @@ export class NgxSmartCheckBoxComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
-  private getValue(items: SelectableControlItems, state: boolean[]) {
+  private getValue(items: OptionsInputItemsInterface, state: boolean[]) {
     if (items.length === 0) {
       return undefined;
     }

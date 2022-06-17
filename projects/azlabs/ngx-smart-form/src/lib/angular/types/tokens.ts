@@ -25,15 +25,15 @@ export const API_HOST = new InjectionToken<string>(
   'API HOST FOR FORM MANAGEMENT'
 );
 
-export const SELECT_CONTROL_OPTIONS_CLIENT =
+export const OPTIONS_INPUT_ITEMS_CLIENT =
   new InjectionToken<SelectOptionsClient>(
-    'CLIENT PROVIDER FOR SELETION OPTIONS'
+    'CLIENT PROVIDER FOR OPTIONS INPUT'
   );
 
 export const HTTP_REQUEST_CLIENT = new InjectionToken<RequestClient>(
   'CLIENT INSTANCE FOR HANDLING FORM SUBMISSION'
 );
 
-export const TRANSLATIONS = new InjectionToken<ValidationMessagesType>(
-  'TEMPLATE MESSAGES PROVIDER'
+export const TEMPLATE_DICTIONARY = new InjectionToken<ValidationMessagesType>(
+  'TEMPLATE DICTIONARY PROVIDER'
 );

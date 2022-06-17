@@ -7,9 +7,9 @@ import {
   TextAreaInput,
   NumberInput,
   FileInput,
-  InputInterface,
+  InputConfigInterface,
 } from '../../core';
-import { BindingControlInterface } from '../../core/types';
+import { OptionsInputConfigInterface } from '../../core';
 
 @Injectable({
   providedIn: 'root',
@@ -25,87 +25,87 @@ export class InputTypeHelper {
 
   /**
    * @description Returns a dynamic input configuration as a [[SelectInput]]
-   * @param input InputInterface Dynamic input configurations instance
+   * @param input InputConfigInterface Dynamic input configurations instance
    */
-  public asSelectInput(input?: InputInterface): SelectInput {
+  public asSelectInput(input?: InputConfigInterface): SelectInput {
     return input as SelectInput;
   }
   /**
    * @description Returns a dynamic input configuration as a [[DateInput]]
-   * @param input InputInterface Dynamic input configurations instance
+   * @param input InputConfigInterface Dynamic input configurations instance
    */
-  public asDateInput(input?: InputInterface): DateInput {
+  public asDateInput(input?: InputConfigInterface): DateInput {
     return input as DateInput;
   }
   /**
    * @description Returns a dynamic input configuration as a [[CheckBoxInput]]
-   * @param input InputInterface Dynamic input configurations instance
+   * @param input InputConfigInterface Dynamic input configurations instance
    */
-  public asCheckBoxInput(input?: InputInterface): BindingControlInterface {
-    return input as BindingControlInterface;
+  public asCheckBoxInput(input?: InputConfigInterface): OptionsInputConfigInterface {
+    return input as OptionsInputConfigInterface;
   }
 
   /**
    * @description Returns a dynamic input configuration as a [[RadioInput]]
-   * @param input InputInterface Dynamic input configurations instance
+   * @param input InputConfigInterface Dynamic input configurations instance
    */
-  public asRadioInput(input?: InputInterface): BindingControlInterface {
-    return input as BindingControlInterface;
+  public asRadioInput(input?: InputConfigInterface): OptionsInputConfigInterface {
+    return input as OptionsInputConfigInterface;
   }
   /**
    * @description Returns a dynamic input configuration as a [[TextInput]]
-   * @param input InputInterface Dynamic input configurations instance
+   * @param input InputConfigInterface Dynamic input configurations instance
    */
-  public asPasswordInput(input?: InputInterface): TextInput {
+  public asPasswordInput(input?: InputConfigInterface): TextInput {
     return input as TextInput;
   }
   /**
    * @description Returns a dynamic input configuration as a [[TextInput]]
-   * @param input InputInterface Dynamic input configurations instance
+   * @param input InputConfigInterface Dynamic input configurations instance
    */
-  public asTextInput(input?: InputInterface): TextInput {
+  public asTextInput(input?: InputConfigInterface): TextInput {
     return input as TextInput;
   }
   /**
    * @description Returns a dynamic input configuration as a [[TextAreaInput]]
-   * @param input InputInterface Dynamic input configurations instance
+   * @param input InputConfigInterface Dynamic input configurations instance
    */
-  public asTextAreaInput(input?: InputInterface): TextAreaInput {
+  public asTextAreaInput(input?: InputConfigInterface): TextAreaInput {
     return input as TextAreaInput;
   }
   /**
    * @description Returns a dynamic input configuration as a [[NumberInput]]
-   * @param input InputInterface Dynamic input configurations instance
+   * @param input InputConfigInterface Dynamic input configurations instance
    */
-  public asNumberInput(input?: InputInterface): NumberInput {
+  public asNumberInput(input?: InputConfigInterface): NumberInput {
     return input as NumberInput;
   }
   /**
    * @description Returns a dynamic input configuration as a [[TextInput]]
-   * @param input InputInterface Dynamic input configurations instance
+   * @param input InputConfigInterface Dynamic input configurations instance
    */
-  public asEmailInput(input?: InputInterface): TextInput {
+  public asEmailInput(input?: InputConfigInterface): TextInput {
     return input as TextInput;
   }
   /**
    * @description Returns a dynamic input configuration as a [[FileInput]]
-   * @param input InputInterface Dynamic input configurations instance
+   * @param input InputConfigInterface Dynamic input configurations instance
    */
-  public asFileInput(input?: InputInterface): FileInput {
+  public asFileInput(input?: InputConfigInterface): FileInput {
     return input as FileInput;
   }
   /**
    * @description Returns a dynamic input configuration as a [[HTMLInput]]
-   * @param input InputInterface Dynamic input configurations instance
+   * @param input InputConfigInterface Dynamic input configurations instance
    */
-  public asHtmlInput(input?: InputInterface): BindingControlInterface {
-    return input as BindingControlInterface;
+  public asHtmlInput(input?: InputConfigInterface): OptionsInputConfigInterface {
+    return input as OptionsInputConfigInterface;
   }
   /**
    * @description Returns a dynamic input configuration as a [[TextInput]]
-   * @param input InputInterface Dynamic input configurations instance
+   * @param input InputConfigInterface Dynamic input configurations instance
    */
-  public asPhoneInput(input?: InputInterface): TextInput {
+  public asPhoneInput(input?: InputConfigInterface): TextInput {
     return input as TextInput;
   }
 }

@@ -1,10 +1,9 @@
-
 /**
  * @description Abstract representation of item in option element, Radio
  * element or Checkbox element on the platform native form
  * element
  */
-export interface SelectSourceInterface {
+export interface OptionsInputItem {
   value: any;
   description?: string;
   name: string;
@@ -12,12 +11,12 @@ export interface SelectSourceInterface {
 }
 
 // @internal
-export interface CheckboxItem extends SelectSourceInterface {
+export interface CheckboxItem extends OptionsInputItem {
   checked?: boolean;
 }
 
 // @internal
-export interface RadioItem extends SelectSourceInterface {
+export interface RadioItem extends OptionsInputItem {
   checked?: boolean;
 }
 
@@ -26,6 +25,8 @@ export interface RadioItem extends SelectSourceInterface {
  * element or Checkbox element on the platform native form
  * element
  */
-export type SelectableControlItems = Array<
-  SelectSourceInterface | CheckboxItem | RadioItem
->;
+export type OptionsInputItemsInterface = (
+  | OptionsInputItem
+  | CheckboxItem
+  | RadioItem
+)[];

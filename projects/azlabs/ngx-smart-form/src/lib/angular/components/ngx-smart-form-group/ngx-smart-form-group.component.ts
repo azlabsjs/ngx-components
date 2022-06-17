@@ -12,7 +12,7 @@ import {
 import { FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { InputInterface } from '../../../core';
+import { InputConfigInterface } from '../../../core';
 import {
   controlAttributesDataBindings,
   createHiddenAttributeSetter,
@@ -30,7 +30,7 @@ export class NgxSmartFormGroupComponent
 {
   //#region Component inputs definitions
   @Input() formGroup!: FormGroup;
-  @Input() controls!: InputInterface[];
+  @Input() controls!: InputConfigInterface[];
   @Input() template!: TemplateRef<HTMLElement>;
   //#endregion Component inputs definitions
 
@@ -61,7 +61,7 @@ export class NgxSmartFormGroupComponent
       const [bindings, formgroup, controls] = controlAttributesDataBindings(
         this.controls
       )(this.formGroup);
-      this.controls = controls as InputInterface[];
+      this.controls = controls as InputConfigInterface[];
       this.formGroup = formgroup as FormGroup;
       // Get control entries from the formgroup
       const entries = Object.entries(this.formGroup.controls);

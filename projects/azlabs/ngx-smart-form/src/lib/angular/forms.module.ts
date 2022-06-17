@@ -28,9 +28,9 @@ import { SafeHTMLPipe, TemplateMessagesPipe } from './pipes';
 import {
   FORM_CLIENT,
   ANGULAR_REACTIVE_FORM_BRIDGE,
-  SELECT_CONTROL_OPTIONS_CLIENT,
+  OPTIONS_INPUT_ITEMS_CLIENT,
   HTTP_REQUEST_CLIENT,
-  TRANSLATIONS,
+  TEMPLATE_DICTIONARY,
 } from './types/tokens';
 import { JSONFormsClient } from './services/client';
 import { CacheProvider } from '../core';
@@ -185,7 +185,7 @@ export class NgxSmartFormModule {
         useValue: configs!.serverConfigs.api.uploadURL ?? 'http://localhost',
       },
       {
-        provide: SELECT_CONTROL_OPTIONS_CLIENT,
+        provide: OPTIONS_INPUT_ITEMS_CLIENT,
         useFactory: () => {
           return createSelectOptionsQuery(
             configs!.serverConfigs!.api.host,
@@ -237,7 +237,7 @@ export class NgxSmartFormModule {
     ];
     providers.push(
       configs.templateTextProvider ?? {
-        provide: TRANSLATIONS,
+        provide: TEMPLATE_DICTIONARY,
         useValue: of(useDefaultTemplateText()),
       }
     );

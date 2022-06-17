@@ -7,7 +7,7 @@ import {
   TemplateRef,
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { InputInterface } from '../../../core';
+import { InputConfigInterface } from '../../../core';
 
 @Component({
   selector: 'ngx-smart-form-array-child',
@@ -84,7 +84,7 @@ import { InputInterface } from '../../../core';
 export class NgxSmartFormArrayChildComponent {
   //#region Component inputs
   @Input() formGroup!: FormGroup;
-  @Input() controls!: InputInterface[];
+  @Input() controls!: InputConfigInterface[];
   @Input() template!: TemplateRef<HTMLElement>;
   //#endregion Component inputs
 

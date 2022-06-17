@@ -1,11 +1,11 @@
-import { InputInterface } from './input';
+import { InputConfigInterface } from './input';
 import { Observable } from 'rxjs';
 
-export interface IDynamicForm {
+export interface FormConfigInterface {
   id: number | string;
   title: string;
   description?: string;
-  controlConfigs: InputInterface[];
+  controlConfigs: InputConfigInterface[];
   endpointURL?: string;
   appcontext?: string;
 }
@@ -19,11 +19,11 @@ export interface FormsClient {
    * @description Get form definitions using the user provided id
    * @param id
    */
-  get(id: string | number): Observable<IDynamicForm>;
+  get(id: string | number): Observable<FormConfigInterface>;
 
   /**
    * @description Get form definitions using the list of user provided ids
    * @param id
    */
-  getAll(id: string[] | number[]): Observable<IDynamicForm[]>;
+  getAll(id: string[] | number[]): Observable<FormConfigInterface[]>;
 }

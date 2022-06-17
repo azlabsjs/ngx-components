@@ -9,9 +9,9 @@ import {
   Output,
 } from '@angular/core';
 import { first, tap } from 'rxjs/operators';
-import { SelectableControlItems, SelectOptionsClient } from '../../core';
+import { OptionsInputItemsInterface, SelectOptionsClient } from '../../core';
 import { createIntersectionObserver } from '../helpers';
-import { SELECT_CONTROL_OPTIONS_CLIENT } from '../types';
+import { OPTIONS_INPUT_ITEMS_CLIENT } from '../types';
 
 // TODO : Add an alternative if the intersection observer is not supported
 
@@ -26,7 +26,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
 
   //#region Directive outputs
   @Output() loadedChange = new EventEmitter<boolean>();
-  @Output() itemsChange = new EventEmitter<SelectableControlItems>();
+  @Output() itemsChange = new EventEmitter<OptionsInputItemsInterface>();
   @Output() loadingChange = new EventEmitter<boolean>();
   //#endregion Directive outputs
 
@@ -36,7 +36,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   // Directive constructor
   constructor(
     private elemRef: ElementRef,
-    @Inject(SELECT_CONTROL_OPTIONS_CLIENT) private client: SelectOptionsClient
+    @Inject(OPTIONS_INPUT_ITEMS_CLIENT) private client: SelectOptionsClient
   ) {}
 
   ngAfterViewInit() {

@@ -1,10 +1,10 @@
 import { ControlInterface } from "../compact/types";
-import { InputInterface } from "../types";
+import { InputConfigInterface } from "../types";
 import { InputValidationRule } from "../types/input-rules";
 import { buildRequiredIfConfig } from "../helpers/builders";
 
 // @internal
-export interface TextAreaInput extends InputInterface {
+export interface TextAreaInput extends InputConfigInterface {
   cols: number;
   rows: number;
   maxLength: number;

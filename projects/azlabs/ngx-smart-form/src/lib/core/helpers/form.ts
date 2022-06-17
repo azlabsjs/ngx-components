@@ -1,6 +1,6 @@
 import { JSObject } from '@iazlabs/js-object';
 import { ControlInterface, FormInterface } from '../compact/types';
-import { IDynamicForm, InputInterface } from '../types';
+import { FormConfigInterface, InputConfigInterface } from '../types';
 import { buildControl } from './input-types';
 import { JSArray } from '@iazlabs/collections';
 
@@ -25,12 +25,12 @@ export class DynamicFormHelpers {
                 ?.map((control) => {
                   const config = buildControl(control);
                   // tslint:disable-next-line: max-line-length
-                  return { ...config } as InputInterface;
+                  return { ...config } as InputConfigInterface;
                 })
                 .filter((value) => value ?? false),
               'formControlIndex',
               1
-            ) as InputInterface[])
+            ) as InputConfigInterface[])
           : [],
       });
     };
@@ -44,14 +44,14 @@ export class DynamicFormHelpers {
  * @description Creates a deep copy of the dynamic form object
  * @param form
  */
-export const cloneform = (form: IDynamicForm) =>
-  JSObject.cloneDeep(form) as IDynamicForm;
+export const cloneform = (form: FormConfigInterface) =>
+  JSObject.cloneDeep(form) as FormConfigInterface;
 
 /**
  * @description Helper method for creating a new dynmaic form
- * @param form Object with the shape of the IDynamicForm interface
+ * @param form Object with the shape of the FormConfigInterface interface
  */
-export const createform = (form: IDynamicForm) => ({ ...form } as IDynamicForm);
+export const createform = (form: FormConfigInterface) => ({ ...form } as FormConfigInterface);
 
 /**
  * Create a new dynamic form from a copy of the user provided parameter
@@ -59,7 +59,7 @@ export const createform = (form: IDynamicForm) => ({ ...form } as IDynamicForm);
  * @param form
  * @returns
  */
-export const copyform = (form: IDynamicForm) =>
+export const copyform = (form: FormConfigInterface) =>
   createform(JSObject.cloneDeep(form));
 
 // #Forms Soring function

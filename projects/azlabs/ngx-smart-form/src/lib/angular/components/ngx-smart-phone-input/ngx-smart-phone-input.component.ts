@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
-import { InputInterface } from '../../../core';
+import { InputConfigInterface } from '../../../core';
 
 @Component({
   selector: 'ngx-smart-phone-input',
@@ -11,5 +11,5 @@ export class PhoneInputComponent {
   @Input() control!: AbstractControl & FormControl;
   @Input() showLabelAndDescription = true;
   // Configuration parameters of the input
-  @Input() inputConfig!: InputInterface;
+  @Input() inputConfig!: InputConfigInterface;
 }

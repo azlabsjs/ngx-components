@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
-import { InputInterface, TextAreaInput } from '../../../core';
+import { TextAreaInput } from '../../../core';
 import { InputEventArgs } from '../../types/input';
 
 @Component({

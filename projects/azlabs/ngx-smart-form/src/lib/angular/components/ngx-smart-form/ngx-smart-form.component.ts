@@ -16,7 +16,7 @@ import {
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { EMPTY, from, Observable, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { IDynamicForm, InputGroup, InputInterface } from '../../../core';
+import { FormConfigInterface, InputGroup, InputConfigInterface } from '../../../core';
 import {
   AngularReactiveFormBuilderBridge,
   HTTP_REQUEST_CLIENT,
@@ -84,7 +84,6 @@ export class NgxSmartFormComponent
 {
   //#region Local properties
   formGroup!: FormGroup;
-  // internal!: IDynamicForm;
   //#endregion Local properties
 
   //#region Component inputs
@@ -93,7 +92,7 @@ export class NgxSmartFormComponent
   @Input() performingAction = false;
   @Input() disabled = false;
   @Input() submitable = false;
-  @Input() form!: IDynamicForm;
+  @Input() form!: FormConfigInterface;
   @Input() autoSubmit: boolean = false;
   @Input() path!: string;
   @Input() state!: { [index: string]: any };
@@ -208,7 +207,7 @@ export class NgxSmartFormComponent
     }
     event.preventDefault();
   }
-  setComponentForm(value: IDynamicForm): void {
+  setComponentForm(value: FormConfigInterface): void {
     if (value) {
       // We set the controls container class
       const controls = (value.controlConfigs ?? []).map((current) => ({
@@ -262,7 +261,7 @@ export class NgxSmartFormComponent
   }
   //#endregion FormComponent interface Methods definitions
 
-  setControlConfig(config?: InputInterface, name?: string) {
+  setControlConfig(config?: InputConfigInterface, name?: string) {
     if (config) {
       name = name ?? config.formControlName;
       const controls = [...(this.form.controlConfigs ?? [])];
@@ -284,7 +283,7 @@ export class NgxSmartFormComponent
       )(this.formGroup);
       this.form = {
         ...this.form,
-        controlConfigs: controls as InputInterface[],
+        controlConfigs: controls as InputConfigInterface[],
       };
       this.formGroup = formgroup as FormGroup;
       // Get control entries from the formgroup
@@ -331,7 +330,7 @@ export class NgxSmartFormComponent
   private setFormValue(
     formgroup: FormGroup,
     values: { [index: string]: any },
-    configs?: InputInterface[] | InputInterface
+    configs?: InputConfigInterface[] | InputConfigInterface
   ) {
     for (const [key, value] of Object.entries(values)) {
       const config_ = Array.isArray(configs)

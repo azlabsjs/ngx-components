@@ -1,7 +1,7 @@
 import {
-  InputInterface,
+  InputConfigInterface,
   InputTypes,
-  SelectableControlItems,
+  OptionsInputItemsInterface,
 } from '../../../core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import {
@@ -50,8 +50,8 @@ export class NgxSmartFormControlComponent implements OnDestroy, OnInit {
   @Input() class: string = 'clr-form-control';
   @Input() inline: boolean = false;
   @Input() showLabelAndDescription = true;
-  @Input() inputConfig!: InputInterface;
-  @Input() listItems!: SelectableControlItems;
+  @Input() inputConfig!: InputConfigInterface;
+  @Input() listItems!: OptionsInputItemsInterface;
   @Input() control!: AbstractControl & FormControl;
   //#endregion Component inputs
 
@@ -85,7 +85,7 @@ export class NgxSmartFormControlComponent implements OnDestroy, OnInit {
       .subscribe();
   }
 
-  getInlineTextAreaInput(input: InputInterface) {
+  getInlineTextAreaInput(input: InputConfigInterface) {
     return {
       ...input,
       classes: input.classes?.includes('clr-textarea')
