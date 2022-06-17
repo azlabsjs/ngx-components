@@ -1,0 +1,120 @@
+<ng-container *ngIf="formGroup">
+  <ng-container
+    *ngTemplateOutlet="
+      recursiveTemplate;
+      context: { group: formGroup, controls: form.controlConfigs }
+    "
+  ></ng-container>
+</ng-container>
+<ng-container *ngIf="submitable">
+  <ng-container
+    *ngTemplateOutlet="
+        submitButtonRef ? submitButtonRef : defaultSubmitButtonTemplate;
+        context: { $implicit:  onSubmit.bind(this)}
+      "
+  ></ng-container>
+</ng-container>
+
+<ng-template #recursiveTemplate let-controls="controls" let-group="group">
+  <div class="clr-row">
+    <ng-container *ngFor="let value of controls">
+      <!-- INPUT GROUP CONTAINER PART -->
+      <ng-container *ngIf="(value!.children || []).length > 0">
+        <div [class]="value.containerClass" [hidden]="value.hidden">
+          <div [innerHTML]="value.label | ngxGroupHeader | safeHtml"></div>
+          <!-- REPEATABLE INPUTS GROUP -->
+          <ng-container *ngIf="value!.isRepeatable === true">
+            <ngx-smart-form-array
+              [formArray]="group.get(value.formControlName)"
+              [controls]="value.children || []"
+              [template]="template ? template : defaultFormControl"
+              [addGroupRef]="addTemplate"
+              [name]="value.formControlName"
+            ></ngx-smart-form-array>
+          </ng-container>
+          <!--\ REPEATABLE INPUTS GROUP -->
+          <!-- INPUTS GROUP -->
+          <ng-container *ngIf="value!.isRepeatable === false">
+            <ng-container
+              *ngTemplateOutlet="
+                recursiveTemplate;
+                context: {
+                  controls: value!.children || [],
+                  group: group.get(value.formControlName)
+                }
+              "
+            ></ng-container>
+          </ng-container>
+          <!--\ INPUTS GROUP-->
+        </div>
+      </ng-container>
+      <!--\ INPUT GROUP CONTAINER PART -->
+      <!-- SIMPLE INPUT CONTAINER PART -->
+      <ng-container *ngIf="(value!.children || []).length === 0">
+        <div [class]="value.containerClass" [hidden]="value.hidden">
+          <ng-container
+            *ngTemplateOutlet="
+            formTemplate;
+            context: {
+              value,
+              group
+            }
+          "
+          ></ng-container>
+        </div>
+      </ng-container>
+      <!--\ SIMPLE INPUT CONTAINER PART -->
+    </ng-container>
+  </div>
+</ng-template>
+
+<ng-template #formTemplate let-group="group" let-value="value">
+  <!-- REPEATABLE INPUTS -->
+  <ng-container *ngIf="value!.isRepeatable === true">
+    <ngx-smart-form-array
+      [formArray]="group"
+      [controls]="value"
+      [template]="template ? template : defaultFormControl"
+      [addGroupRef]="addTemplate"
+      [name]="value.formControlName"
+    ></ngx-smart-form-array>
+  </ng-container>
+  <!--\ REPEATABLE INPUTS -->
+
+  <!-- NON REPEATABLE INPUTS -->
+  <ng-container *ngIf="value!.isRepeatable === false">
+    <ng-container *ngIf="group.get(value.formControlName) as control">
+      <ng-container
+        *ngTemplateOutlet="template ? template : defaultFormControl; context: { control, value }"
+      ></ng-container>
+    </ng-container>
+  </ng-container>
+  <!--\ NON REPEATABLE INPUTS -->
+</ng-template>
+
+<!-- DEFAULT SUMIT BUTTON -->
+<ng-template #defaultSubmitButtonTemplate let-handler>
+  <button
+    [disabled]="performingAction || disabled"
+    class="btn btn-primary"
+    (click)="handler($event)"
+  >
+    <clr-icon shape="circle-arrow" dir="up"></clr-icon>
+    SUBMIT
+  </button>
+</ng-template>
+<!--\ DEFAULT SUMIT BUTTON  -->
+
+<!-- DEFAULT FORM CONTROL COMPONENT -->
+<ng-template #defaultFormControl let-config="value" let-control="control">
+  <div class="ngx-smart-form-control">
+    <ngx-smart-form-control
+    [class]="config.containerClass"
+    [hidden]="config.hidden"
+    [control]="control"
+    [inputConfig]="config"
+    [listItems]="config.items"
+  ></ngx-smart-form-control>
+  </div>
+</ng-template>
+<!--\ DEFAULT FORM CONTROL COMPONENT -->

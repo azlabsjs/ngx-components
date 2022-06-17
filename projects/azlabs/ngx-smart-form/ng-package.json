@@ -1,0 +1,13 @@
+{
+  "$schema": "../../../node_modules/ng-packagr/ng-package.schema.json",
+  "dest": "../../../dist/azlabs/ngx-smart-form",
+  "lib": {
+    "entryFile": "src/public-api.ts"
+  },
+  "allowedNonPeerDependencies": [
+    "@iazlabs/built-value",
+    "@iazlabs/collections",
+    "@iazlabs/utilities",
+    "@iazlabs/functional"
+  ]
+}

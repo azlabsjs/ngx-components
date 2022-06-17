@@ -2,6 +2,17 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "paths": {
+      "@azlabs/ngx-dropzone": [
+        "dist/azlabs/ngx-dropzone"
+      ],
+      "@azlabs/ngx-intl-tel-input": [
+        "dist/azlabs/ngx-intl-tel-input"
+      ],
+      "@azlabs/ngx-smart-form": [
+        "dist/azlabs/ngx-smart-form"
+      ]
+    },
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
@@ -21,7 +32,8 @@
     "lib": [
       "es2020",
       "dom"
-    ]
+    ],
+    "allowSyntheticDefaultImports": true
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

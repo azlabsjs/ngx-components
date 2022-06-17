@@ -1,0 +1,18 @@
+<!-- <ngx-dropzone>
+  <ng-template #dzuploadbutton>
+    <cds-icon shape="upload-cloud"></cds-icon>
+  </ng-template>
+</ngx-dropzone>
+<ngx-intl-tel-input [control]="control">
+  <ng-template #toggleButton let-selected>
+    <cds-button action="outline" status="neutral" size="sm">
+      +{{ selected.dialCode }}
+    </cds-button>
+  </ng-template>
+</ngx-intl-tel-input> -->
+
+<div class="container">
+  <ng-container *ngIf="form$ | async as form">
+    <ngx-smart-form [form]="form"></ngx-smart-form>
+  </ng-container>
+</div>

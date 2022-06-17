@@ -1,0 +1,51 @@
+<label
+  class="clr-control-label"
+  *ngIf="showLabelAndDescription"
+  [for]="inputConfig.formControlName"
+>
+  {{ inputConfig.label }}
+  <span class="required-text" *ngIf="inputConfig.rules?.isRequired">
+    (*)
+  </span>
+</label>
+<div class="clr-control-container">
+  <div class="clr-input-wrapper">
+    <ngx-intl-tel-input
+      [label]="showLabelAndDescription ? inputConfig?.label : undefined"
+      [required]="inputConfig.rules?.isRequired || false"
+      [tabIndex]="inputConfig.formControlIndex"
+      [class]="inputConfig.classes"
+      [control]="control"
+      [preferredCountries]="['tg', 'bj', 'gh']"
+      [country]="'tg'"
+    >
+      <ng-template #toggleButton let-selected>
+        <button
+          [disabled]="control.disabled"
+          type="button"
+          class="btn btn-sm btn-outline-primary"
+        >
+          +{{ selected?.dialCode }}
+          <clr-icon shape="caret down"></clr-icon>
+        </button>
+      </ng-template>
+    </ngx-intl-tel-input>
+  </div>
+  <span
+    [class]="'input__subtext input__error_text'"
+    *ngIf="control.hasError('required') && control.touched"
+  >
+    {{ 'validation.required' | templateDict }}
+  </span>
+  <span
+    [class]="'input__subtext input__error_text'"
+    *ngIf="control.hasError('invalidPhoneNumber') && control.touched"
+  >
+    {{ 'validation.phone' | templateDict: { value: '(Ex: 228 90050505)' } }}
+  </span>
+  <span
+    [class]="'input__subtext'"
+    *ngIf="inputConfig.descriptionText && showLabelAndDescription"
+    [innerHTML]="inputConfig.descriptionText | safeHtml"
+  ></span>
+</div>

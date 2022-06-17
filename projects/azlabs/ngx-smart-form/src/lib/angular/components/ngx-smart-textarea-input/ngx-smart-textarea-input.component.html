@@ -1,0 +1,66 @@
+<label
+  class="clr-control-label"
+  *ngIf="showLabelAndDescription"
+  [for]="inputConfig.formControlName"
+>
+  {{ inputConfig.label }}
+  <span class="required-text" *ngIf="inputConfig.rules?.isRequired">
+    (*)
+  </span>
+</label>
+<div class="clr-control-container">
+  <div class="clr-textarea-wrapper">
+    <textarea
+      (keyup)="
+        keyup.emit({
+          name: inputConfig.formControlName,
+          value: $event
+        })
+      "
+      (keydown)="
+        keydown.emit({
+          name: inputConfig.formControlName,
+          value: $event
+        })
+      "
+      (keypress)="
+        keypress.emit({
+          name: inputConfig.formControlName,
+          value: $event
+        })
+      "
+      (blur)="
+        blur.emit({
+          name: inputConfig.formControlName,
+          value: $event
+        })
+      "
+      [class]="inputConfig.classes"
+      [formControl]="control"
+      placeholder="
+        {{ inputConfig.placeholder ? inputConfig.placeholder : '' }}
+      "
+      [rows]="inputConfig?.rows"
+    ></textarea>
+  </div>
+  <span *ngIf="control?.hasError('required') && control?.touched">
+    <span>{{ 'validation.required' | templateDict }}</span>
+  </span>
+  <span
+    [class]="'input__subtext input__error_text'"
+    *ngIf="control?.hasError('maxLength') && control?.touched"
+  >
+    {{
+      'validation.maxValue'
+        | templateDict
+          : {
+              value: inputConfig.maxLength
+            }
+    }}
+  </span>
+  <span
+    [class]="'input__subtext'"
+    *ngIf="inputConfig.descriptionText && showLabelAndDescription"
+    [innerHTML]="inputConfig.descriptionText | safeHtml"
+  ></span>
+</div>

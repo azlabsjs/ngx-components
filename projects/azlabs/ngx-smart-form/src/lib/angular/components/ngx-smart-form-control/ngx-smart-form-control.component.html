@@ -1,0 +1,209 @@
+<div class="ngx-smart-form-control">
+  <ng-container [ngSwitch]="inputConfig.type">
+    <ng-container *ngSwitchCase="inputTypes.FILE_INPUT">
+      <ngx-smart-file-input
+        (addedEvent)="fileAdded.emit($event)"
+        (removedEvent)="fileRemoved.emit($event)"
+        [control]="control"
+        [inputConfig]="inputType.asFileInput(inputConfig)"
+        [showLabelAndDescription]="showLabelAndDescription"
+      ></ngx-smart-file-input>
+    </ng-container>
+    <ng-container *ngSwitchCase="inputTypes.HTML_INPUT">
+      <div [innerHTML]="inputConfig.value | safeHtml"></div>
+    </ng-container>
+    <ng-container *ngSwitchCase="inputTypes.SELECT_INPUT">
+      <ngx-smart-select-input
+        [control]="control"
+        [inputConfig]="inputType.asSelectInput(inputConfig)"
+        [showLabelAndDescription]="showLabelAndDescription"
+        (remove)="remove.emit($event)"
+        (selected)="selected?.emit($event)"
+      ></ngx-smart-select-input>
+    </ng-container>
+    <ng-container *ngSwitchCase="inputTypes.PHONE_INPUT">
+      <ngx-smart-phone-input
+        [control]="control"
+        [inputConfig]="inputConfig"
+        [showLabelAndDescription]="showLabelAndDescription"
+      ></ngx-smart-phone-input>
+    </ng-container>
+    <ng-container *ngSwitchCase="inputTypes.DATE_INPUT">
+      <ngx-smart-date-input
+        [control]="control"
+        [inputConfig]="inputType.asDateInput(inputConfig)"
+        [showLabelAndDescription]="showLabelAndDescription"
+      ></ngx-smart-date-input>
+    </ng-container>
+    <ng-container *ngSwitchCase="inputTypes.TEXTAREA_INPUT">
+      <ngx-smart-textarea-input
+        *ngIf="!inline"
+        [control]="control"
+        [inputConfig]="inputType.asTextAreaInput(inputConfig)"
+        [showLabelAndDescription]="showLabelAndDescription"
+        (keyup)="
+          keyup.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+        (keydown)="
+          keydown.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+        (keypress)="
+          keypress.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+        (blur)="
+          blur.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+      ></ngx-smart-textarea-input>
+      <ngx-smart-text-input
+        *ngIf="inline"
+        [control]="control"
+        [inputConfig]="getInlineTextAreaInput(inputConfig)"
+        [showLabelAndDescription]="showLabelAndDescription"
+        (keyup)="
+          keyup.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+        (keydown)="
+          keydown.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+        (keypress)="
+          keypress.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+        (blur)="
+          blur.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+      ></ngx-smart-text-input>
+    </ng-container>
+    <ng-container *ngSwitchCase="inputTypes.NUMBER_INPUT">
+      <ngx-smart-number-input
+        [control]="control"
+        [showLabelAndDescription]="showLabelAndDescription"
+        [inputConfig]="inputType.asNumberInput(inputConfig)"
+        (keyup)="
+          keyup.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+        (keydown)="
+          keydown.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+        (keypress)="
+          keypress.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+        (blur)="
+          blur.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+      ></ngx-smart-number-input>
+    </ng-container>
+    <ng-container *ngSwitchCase="inputTypes.RADIO_INPUT">
+      <ngx-smart-radio-input
+        [control]="control"
+        [inputConfig]="inputType.asRadioInput(inputConfig)"
+        [showLabelAndDescription]="showLabelAndDescription"
+      ></ngx-smart-radio-input>
+    </ng-container>
+    <ng-container *ngSwitchCase="inputTypes.CHECKBOX_INPUT">
+      <ngx-smart-checkbox-input
+        [control]="control"
+        [inputConfig]="inputType.asCheckBoxInput(inputConfig)"
+        [showLabelAndDescription]="showLabelAndDescription"
+      ></ngx-smart-checkbox-input>
+    </ng-container>
+    <ng-container *ngSwitchCase="inputTypes.PASSWORD_INPUT">
+      <ngx-smart-password-input
+        [control]="control"
+        [inputConfig]="inputConfig"
+        [showLabelAndDescription]="showLabelAndDescription"
+        (keyup)="
+          keyup.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+        (keydown)="
+          keydown.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+        (keypress)="
+          keypress.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+        (blur)="
+          blur.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+      ></ngx-smart-password-input>
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+      <ngx-smart-text-input
+        [control]="control"
+        [inputConfig]="inputConfig"
+        [showLabelAndDescription]="showLabelAndDescription"
+        (keyup)="
+          keyup.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+        (keydown)="
+          keydown.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+        (keypress)="
+          keypress.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+        (blur)="
+          blur.emit({
+            name: inputConfig.formControlName,
+            value: $event
+          })
+        "
+      ></ngx-smart-text-input>
+    </ng-container>
+    <!-- Add controls for check boxes and radio -->
+  </ng-container>
+</div>

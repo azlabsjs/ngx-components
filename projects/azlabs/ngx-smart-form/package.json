@@ -1,0 +1,17 @@
+{
+  "name": "@azlabs/ngx-smart-form",
+  "version": "0.14.0",
+  "peerDependencies": {
+    "@angular/common": "^14.0.0",
+    "@angular/core": "^14.0.0",
+    "@angular/forms": "^14.0.0",
+    "@ng-select/ng-select": "^9.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0",
+    "@iazlabs/built-value": "^0.1.2",
+    "@iazlabs/collections": "^0.1.2",
+    "@iazlabs/utilities": "^0.1.8",
+    "@iazlabs/functional": "^0.1.8"
+  }
+}

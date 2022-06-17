@@ -1,0 +1,98 @@
+<label
+  class="clr-control-label"
+  *ngIf="showLabelAndDescription"
+  [for]="inputConfig.formControlName"
+>
+  {{ inputConfig.label }}
+  <span class="required-text" *ngIf="inputConfig.rules?.isRequired">
+    (*)
+  </span>
+</label>
+<div class="clr-control-container">
+  <div class="clr-input-wrapper">
+    <input
+      [tabIndex]="inputConfig.formControlIndex"
+      (keyup)="
+        keyup.emit({
+          name: inputConfig.formControlName,
+          value: $event
+        })
+      "
+      (keydown)="
+        keydown.emit({
+          name: inputConfig.formControlName,
+          value: $event
+        })
+      "
+      (keypress)="
+        keypress.emit({
+          name: inputConfig.formControlName,
+          value: $event
+        })
+      "
+      (blur)="
+        blur.emit({
+          name: inputConfig.formControlName,
+          value: $event
+        })
+      "
+      type="number"
+      [max]="inputConfig.max || maxNumberSize()"
+      [min]="inputConfig.min ? inputConfig.min : 0"
+      [class]="inputConfig.classes"
+      [formControl]="control"
+      placeholder="{{ inputConfig.placeholder ? inputConfig.placeholder : '' }}"
+    />
+  </div>
+  <span
+    [class]="'input__subtext input__error_text'"
+    *ngIf="control.hasError('required') && control.touched"
+  >
+    {{ 'validation.required' | templateDict }}
+  </span>
+  <span
+    [class]="'input__subtext input__error_text'"
+    *ngIf="control.hasError('min') && control.touched"
+  >
+    {{
+      'validation.min'
+        | templateDict
+          : {
+              value: getErrorAsNumber(
+                control.errors ? control.errors['min'] : '',
+                'min'
+              )
+                ? getErrorAsNumber(
+                    control.errors ? control.errors['min'] : '',
+                    'min'
+                  )
+                : inputConfig.min
+            }
+    }}
+  </span>
+  <span
+    [class]="'input__subtext input__error_text'"
+    *ngIf="control.hasError('max') && control.touched"
+  >
+    {{
+      'validation.max'
+        | templateDict
+          : {
+              value: getErrorAsNumber(
+                control.errors ? control.errors['max'] : '',
+                'max'
+              )
+                ? getErrorAsNumber(
+                    control.errors ? control.errors['max'] : '',
+                    'max'
+                  )
+                : inputConfig.min
+            }
+    }}
+  </span>
+  <span
+    [class]="'input__subtext'"
+    *ngIf="inputConfig.descriptionText && showLabelAndDescription"
+    [innerHTML]="inputConfig.descriptionText | safeHtml"
+  ></span>
+</div>
