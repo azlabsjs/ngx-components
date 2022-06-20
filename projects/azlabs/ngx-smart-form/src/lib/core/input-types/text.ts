@@ -23,7 +23,7 @@ export function buildTextInput(source: Partial<ControlInterface>) {
     classes: source.classes,
     uniqueCondition: source.uniqueOn,
     isRepeatable: Boolean(source.isRepeatable) ? true : false,
-    containerClass: source.dynamicControlContainerClass,
+    containerClass: source.containerClass,
     requiredIf: source.requiredIf
       ? source.requiredIf
         ? buildRequiredIfConfig(source.requiredIf)

@@ -53,7 +53,7 @@ export interface ControlInterface {
   isRepeatable?: number | boolean;
   children?: ControlInterface[];
   uniqueOn?: string;
-  dynamicControlContainerClass?: string;
+  containerClass?: string;
   // Added properties
   valuefield?: string;
   groupfield?: string;

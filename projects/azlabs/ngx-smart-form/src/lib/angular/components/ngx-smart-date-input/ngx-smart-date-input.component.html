@@ -1,25 +1,6 @@
-<clr-date-container>
-  <label
-    class="clr-control-label"
-    *ngIf="showLabelAndDescription"
-    [for]="inputConfig.formControlName"
-  >
-    {{ inputConfig.label }}
-    <span class="required-text" *ngIf="inputConfig.rules?.isRequired">
-      (*)
-    </span>
-  </label>
-  <input
-    placeholder="date"
-    [tabIndex]="inputConfig?.formControlIndex"
-    type="date"
-    (blur)="onDateInputBlur()"
-    [formControl]="control"
-    [min]="inputConfig.minDate"
-    [max]="inputConfig.maxDate"
-    clrDate
-  />
-</clr-date-container>
+<ng-container
+  *ngTemplateOutlet="inputRef; context: {control: control, onBlur: onBlur.bind(this), config: inputConfig}"
+></ng-container>
 <span
   [class]="'input__subtext input__error_text'"
   *ngIf="control.hasError('required') && control.touched"

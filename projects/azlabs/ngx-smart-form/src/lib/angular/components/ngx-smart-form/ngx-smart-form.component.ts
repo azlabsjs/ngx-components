@@ -157,15 +157,21 @@ export class NgxSmartFormComponent
       this.formGroup.get(key)?.enable(entry);
     }
   }
+
+  //
   addControl(name: string, control: AbstractControl): void {
     if (this.formGroup.get(name)) {
       return this.formGroup.get(name)?.setValue(control.value);
     }
     this.formGroup.addControl(name, control);
   }
+
+  //
   getControl(name: string): AbstractControl | undefined {
     return this.formGroup.get(name) ?? undefined;
   }
+
+  //
   onSubmit(event: Event): void | Observable<unknown> {
     // Validate the formgroup object to ensure it passes
     // validation before submitting
@@ -207,6 +213,8 @@ export class NgxSmartFormComponent
     }
     event.preventDefault();
   }
+
+  //
   setComponentForm(value: FormConfigInterface): void {
     if (value) {
       // We set the controls container class
@@ -250,9 +258,13 @@ export class NgxSmartFormComponent
       }, 20);
     }
   }
+
+  //
   validateForm(): void {
     ComponentReactiveFormHelpers.validateFormGroupFields(this.formGroup);
   }
+
+  //
   reset(): void {
     this.formGroup.reset();
     for (const control of this.form.controlConfigs ?? []) {

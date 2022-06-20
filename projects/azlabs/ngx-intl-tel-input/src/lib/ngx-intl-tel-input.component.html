@@ -1,6 +1,10 @@
 <div [class]="wrapperClass" *ngIf="disableState$ | async as state">
   <ngx-dropdown>
-    <div [dropdownTriggerFor]="dropdownMenu" dropdownToggle class="dropdown-toggle">
+    <div
+      [dropdownTriggerFor]="dropdownMenu"
+      dropdownToggle
+      class="dropdown-toggle"
+    >
       <ng-container
         *ngTemplateOutlet="toggleButtonRef; context: { $implicit: selected }"
       ></ng-container>
@@ -27,15 +31,19 @@
       </cdk-virtual-scroll-viewport>
     </ngx-dropdown-menu>
   </ngx-dropdown>
-  <input
-    [tabIndex]="index"
-    #phoneControlElement
-    type="tel"
-    [class]="'effect-24 ' + class"
-    autocomplete="off"
-    (keypress)="onInputKeyPress($event)"
-    [formControl]="phoneControl"
-    placeholder="{{ selected.placeHolder }}"
-    #focusable
-  />
+  <ng-container
+    *ngTemplateOutlet="inputTemplateRef ?? defaultInputElement; context: { phoneControl: phoneControl, keypress: onKeyPress.bind(this), selected: selected }"
+  ></ng-container>
+  <ng-template #defaultInputElement>
+    <input
+      [tabIndex]="index"
+      autocomplete="off"
+      type="tel"
+      [class]="'effect-24 ' + class"
+      (keypress)="onKeyPress($event)"
+      [formControl]="phoneControl"
+      placeholder="{{ selected!.placeHolder }}"
+      #focusable
+    />
+  </ng-template>
 </div>

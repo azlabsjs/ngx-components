@@ -67,10 +67,10 @@ function queryValidationMessage(
   key: string,
   interpolateParams: { [index: string]: any }
 ) {
-  console.log(state, key, interpolateParams);
   let value: string | undefined = getObjectProperty(state, key);
   if (value && interpolateParams) {
     for (const [prop, current] of Object.entries(interpolateParams)) {
+      console.log(prop);
       if (value.includes('{{' + prop + '}}')) {
         value = value.replace('{{' + prop + '}}', current);
       }
@@ -136,7 +136,7 @@ export class TemplateMessagesPipe implements PipeTransform {
       return this.value;
     }
     let interpolateParams: Object | undefined = undefined;
-    if ((typeof args[0] === 'undefined' || args[0] === null) && args.length) {
+    if (!(typeof args[0] === 'undefined' || args[0] === null) && args.length) {
       if (typeof args[0] === 'string' && args[0].length) {
         // we accept objects written in the template such as {n:1}, {'n':1}, {n:'v'}
         // which is why we might need to change it to real JSON objects such as {"n":1} or {"n":"v"}

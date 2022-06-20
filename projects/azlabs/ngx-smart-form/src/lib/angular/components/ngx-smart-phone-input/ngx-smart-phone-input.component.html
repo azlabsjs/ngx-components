@@ -11,14 +11,32 @@
 <div class="clr-control-container">
   <div class="clr-input-wrapper">
     <ngx-intl-tel-input
-      [label]="showLabelAndDescription ? inputConfig?.label : undefined"
+      [label]="showLabelAndDescription ? (inputConfig?.label ?? '') : ''"
       [required]="inputConfig.rules?.isRequired || false"
-      [tabIndex]="inputConfig.formControlIndex"
-      [class]="inputConfig.classes"
       [control]="control"
       [preferredCountries]="['tg', 'bj', 'gh']"
       [country]="'tg'"
     >
+      <ng-template
+        #input
+        let-keypress="keypress"
+        let-phoneControl="phoneControl"
+        let-selected="selected"
+      >
+        <input
+          [tabIndex]="inputConfig.formControlIndex"
+          [required]="inputConfig.rules?.isRequired || false"
+          autocomplete="off"
+          type="tel"
+          [class]="'effect-24 ' + inputConfig!.classes"
+          (blur)="onBlur($event)"
+          (focus)="onFocus($event)"
+          (keypress)="keypress($event)"
+          [formControl]="phoneControl"
+          placeholder="{{ selected!.placeHolder }}"
+          #focusable
+        />
+      </ng-template>
       <ng-template #toggleButton let-selected>
         <button
           [disabled]="control.disabled"

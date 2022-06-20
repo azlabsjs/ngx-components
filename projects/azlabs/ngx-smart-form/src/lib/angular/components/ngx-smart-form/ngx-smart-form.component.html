@@ -107,14 +107,12 @@
 
 <!-- DEFAULT FORM CONTROL COMPONENT -->
 <ng-template #defaultFormControl let-config="value" let-control="control">
-  <div class="ngx-smart-form-control">
-    <ngx-smart-form-control
-    [class]="config.containerClass"
+  <ngx-smart-form-control
+    [class]="'ngx-smart-form-control ' +  config.containerClass"
     [hidden]="config.hidden"
     [control]="control"
     [inputConfig]="config"
     [listItems]="config.items"
   ></ngx-smart-form-control>
-  </div>
 </ng-template>
 <!--\ DEFAULT FORM CONTROL COMPONENT -->

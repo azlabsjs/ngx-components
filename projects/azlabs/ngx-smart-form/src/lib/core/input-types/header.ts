@@ -15,7 +15,7 @@ export function buildHTMLInput(source: Partial<ControlInterface>) {
     value: source.value,
     classes: source.classes,
     isRepeatable: Boolean(source.isRepeatable),
-    containerClass: source.dynamicControlContainerClass,
+    containerClass: source.containerClass,
     formControlIndex: source.controlIndex,
     formControlGroupKey: source.controlGroupKey,
     descriptionText: source.description,

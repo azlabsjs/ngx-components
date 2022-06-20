@@ -1,4 +1,4 @@
-import { Component, Inject, Input, LOCALE_ID } from '@angular/core';
+import { Component, ContentChild, Inject, Input, LOCALE_ID, TemplateRef } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { JSDate } from '@iazlabs/js-datetime';
 import { DateInput } from '../../../core';
@@ -17,15 +17,14 @@ import { DateInput } from '../../../core';
 export class NgxSmartDateInputComponent {
   @Input() control!: FormControl;
   @Input() showLabelAndDescription = true;
-  // Configuration parameters of the input
   @Input() inputConfig!: DateInput;
-
   today = JSDate.format();
+  @ContentChild('input') inputRef!: TemplateRef<any>;
 
   constructor(@Inject(LOCALE_ID) private appLocalID: string) {}
 
   // tslint:disable-next-line: typedef
-  onDateInputBlur() {
+  onBlur() {
     const locale = this.appLocalID;
     if (this.control.value) {
       const value: string = this.control.value as string;

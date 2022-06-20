@@ -33,7 +33,37 @@
         [control]="control"
         [inputConfig]="inputType.asDateInput(inputConfig)"
         [showLabelAndDescription]="showLabelAndDescription"
-      ></ngx-smart-date-input>
+      >
+        <ng-template
+          #input
+          let-control="control"
+          let-onBlur="onBlur"
+          let-config="config"
+        >
+          <clr-date-container>
+            <label
+              class="clr-control-label"
+              *ngIf="showLabelAndDescription"
+              [for]="config.formControlName"
+            >
+              {{ config.label }}
+              <span class="required-text" *ngIf="config.rules!.isRequired">
+                (*)
+              </span>
+            </label>
+            <input
+              placeholder="''"
+              [tabIndex]="config!.formControlIndex"
+              type="date"
+              (blur)="onBlur($event)"
+              [formControl]="control"
+              [min]="config!.minDate"
+              [max]="config.maxDate"
+              clrDate
+            />
+          </clr-date-container>
+        </ng-template>
+      </ngx-smart-date-input>
     </ng-container>
     <ng-container *ngSwitchCase="inputTypes.TEXTAREA_INPUT">
       <ngx-smart-textarea-input

@@ -7,6 +7,8 @@ import {
   ElementRef,
   ContentChild,
   TemplateRef,
+  Output,
+  EventEmitter,
 } from '@angular/core';
 import { Country } from './core/model';
 import { IntlTelInput } from './core/intl-tel-input';
@@ -116,10 +118,11 @@ export class NgxIntlTelInputComponent implements OnInit, OnDestroy {
   @Input() preferredCountries: string[] = ['tg', 'bj', 'gh'];
   @ViewChild('phoneControlElement', { static: false })
   phoneControlElement!: ElementRef;
-  @ViewChild('dropdown', { static: true }) clrDropdown!: ElementRef;
-  @Input() index?: number;
-  @Input() label?: string;
+  @ContentChild('input') inputTemplateRef!: TemplateRef<any>;
+  @Input() index!: number;
+  @Input() label!: string;
 
+  //
   allCountries: Country[] = [];
   preferredCountriesInDropDown: Country[] = [];
   selected: Country = {} as Country;
@@ -186,7 +189,6 @@ export class NgxIntlTelInputComponent implements OnInit, OnDestroy {
       tap((state) => {
         if (JSObject.isEmpty(state)) {
           this.control!.setErrors({ invalidPhoneNumber: null });
-          // Set the control value to null
           this.control!.setValue(null);
         }
         if (state) {
@@ -215,6 +217,7 @@ export class NgxIntlTelInputComponent implements OnInit, OnDestroy {
     );
   }
 
+  //
   public onCountrySelect(country: Country): void {
     this.selected = country;
     const value = this.phoneControl.value ? this.phoneControl.value : '';
@@ -222,7 +225,8 @@ export class NgxIntlTelInputComponent implements OnInit, OnDestroy {
     this.phoneControlElement.nativeElement.focus();
   }
 
-  public onInputKeyPress(event: any): void {
+  //
+  onKeyPress(event: any): void {
     const pattern = /[0-9\+\-\ ]/;
     const inputChar = String.fromCharCode(event.charCode);
     if (!pattern.test(inputChar)) {
@@ -230,6 +234,7 @@ export class NgxIntlTelInputComponent implements OnInit, OnDestroy {
     }
   }
 
+  //
   private _initializePhoneNumberControl(disabled = false): void {
     this.phoneControl = new FormControl({ value: null, disabled });
     // Set the initial country to show
@@ -263,7 +268,11 @@ export class NgxIntlTelInputComponent implements OnInit, OnDestroy {
     this.control!.updateValueAndValidity({ onlySelf: true });
   }
 
+  //
   private setControlValue(code: string, phoneNumber: string): void {
+    this.control!.markAsTouched();
+    this.control!.markAsDirty();
+    this.control.updateValueAndValidity();
     if (this.control!.value === `${code}${phoneNumber}`) {
       return;
     }
@@ -272,6 +281,7 @@ export class NgxIntlTelInputComponent implements OnInit, OnDestroy {
     );
   }
 
+  //
   setPhoneControlValue(value: string): void {
     const tmpCode = this.service.getCountryCode(value);
     if (tmpCode) {
@@ -292,12 +302,19 @@ export class NgxIntlTelInputComponent implements OnInit, OnDestroy {
     }
   }
 
+  //
   isDefined(value: any) {
     return typeof value !== 'undefined' && value !== null;
   }
 
+  //
   ngOnDestroy() {
     this._destroy$.next();
     this.allCountries = [];
+  }
+
+  //
+  onInputFocus() {
+    this.control!.markAsTouched();
   }
 }

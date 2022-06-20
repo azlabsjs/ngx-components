@@ -36,7 +36,7 @@ export class Control implements ControlInterface {
   isRepeatable!: number;
   children!: ControlInterface[];
   uniqueOn!: string;
-  dynamicControlContainerClass!: string;
+  containerClass!: string;
   valuefield!: string;
   groupfield!: string;
   keyfield!: string;
@@ -79,7 +79,8 @@ export class Control implements ControlInterface {
       isRepeatable: 'isRepeatable',
       children: { name: 'children', type: Control },
       uniqueOn: 'uniqueOn',
-      containerClass: 'dynamicControlContainerClass',
+      containerClass: 'containerClass',
+      dynamicControlContainerClass: 'containerClass',
       valuefield: 'valuefield',
       groupfield: 'groupfield',
       keyfield: 'keyfield',

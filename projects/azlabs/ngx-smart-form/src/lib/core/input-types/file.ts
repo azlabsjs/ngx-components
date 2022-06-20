@@ -24,7 +24,7 @@ export function buildFileInput(source: Partial<ControlInterface>) {
     classes: source.classes,
     uniqueCondition: source.uniqueOn,
     isRepeatable: Boolean(source.isRepeatable),
-    containerClass: source.dynamicControlContainerClass,
+    containerClass: source.containerClass,
     requiredIf: source.requiredIf
       ? buildRequiredIfConfig(source.requiredIf)
       : undefined,
