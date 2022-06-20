@@ -163,7 +163,36 @@
         [control]="control"
         [inputConfig]="inputType.asRadioInput(inputConfig)"
         [showLabelAndDescription]="showLabelAndDescription"
-      ></ngx-smart-radio-input>
+      >
+        <ng-template #input let-items="items">
+          <clr-radio-container clrInline>
+            <label>
+              {{ inputConfig!.label }}
+              <span
+                class="required-text"
+                *ngIf="inputConfig!.rules!.isRequired"
+              >
+                (*)
+              </span>
+            </label>
+            <clr-radio-wrapper *ngFor="let item of items">
+              <input
+                placeholder="radio"
+                [tabIndex]="inputConfig!.formControlIndex"
+                clrRadio
+                type="radio"
+                required
+                [checked]="control.value == item.value"
+                [value]="
+                  radioBoxLabel(inputConfig.formControlName, item?.value)
+                "
+                (change)="control!.setValue(item.value)"
+              />
+              <label>{{ item.description }}</label>
+            </clr-radio-wrapper>
+          </clr-radio-container>
+        </ng-template>
+      </ngx-smart-radio-input>
     </ng-container>
     <ng-container *ngSwitchCase="inputTypes.CHECKBOX_INPUT">
       <ngx-smart-checkbox-input
@@ -177,31 +206,84 @@
         [control]="control"
         [inputConfig]="inputConfig"
         [showLabelAndDescription]="showLabelAndDescription"
-        (keyup)="
-          keyup.emit({
-            name: inputConfig.formControlName,
-            value: $event
-          })
-        "
-        (keydown)="
-          keydown.emit({
-            name: inputConfig.formControlName,
-            value: $event
-          })
-        "
-        (keypress)="
-          keypress.emit({
-            name: inputConfig.formControlName,
-            value: $event
-          })
-        "
-        (blur)="
-          blur.emit({
-            name: inputConfig.formControlName,
-            value: $event
-          })
-        "
-      ></ngx-smart-password-input>
+      >
+        <ng-template
+          #input
+          let-state="state"
+          let-config="config"
+          let-toggle="toggle"
+          let-defaultMaxLength="defaultMaxLength"
+        >
+          <div class="clr-control-container">
+            <div class="clr-input-wrapper password-clr-input-wrapper">
+              <label
+                [for]="inputConfig!.formControlName"
+                class="clr-control-label"
+                *ngIf="showLabelAndDescription"
+              >
+                {{ inputConfig!.label }}
+                <small
+                  class="required-text"
+                  *ngIf="inputConfig!.rules!.isRequired"
+                >
+                  (*)
+                </small>
+              </label>
+              <input
+                [tabIndex]="inputConfig.formControlIndex"
+                (keyup)="
+                  keyup.emit({
+                    name: inputConfig.formControlName,
+                    value: $event
+                  })
+                "
+                (keydown)="
+                  keydown.emit({
+                    name: inputConfig.formControlName,
+                    value: $event
+                  })
+                "
+                (keypress)="
+                  keypress.emit({
+                    name: inputConfig.formControlName,
+                    value: $event
+                  })
+                "
+                (blur)="
+                  blur.emit({
+                    name: inputConfig.formControlName,
+                    value: $event
+                  })
+                "
+                [autocomplete]="'off'"
+                [type]="!state.showPassword ? 'password' : 'text'"
+                autocomplete="off"
+                [maxLength]="
+                  config!.maxLength ? config!.maxLength : defaultMaxLength
+                "
+                [minLength]="config!.minLength ? config!.minLength : 0"
+                [class]="config!.classes + ' password-input'"
+                [formControl]="control"
+                placeholder="{{
+                  config!.placeholder ? config!.placeholder : ''
+                }}"
+              />
+              <clr-icon
+                shape="eye"
+                (click)="toggle($event)"
+                *ngIf="state.showPassword"
+                class="password-trigger"
+              ></clr-icon>
+              <clr-icon
+                shape="eye-hide"
+                (click)="toggle($event)"
+                *ngIf="!state.showPassword"
+                class="password-trigger"
+              ></clr-icon>
+            </div>
+          </div>
+        </ng-template>
+      </ngx-smart-password-input>
     </ng-container>
     <ng-container *ngSwitchDefault>
       <ngx-smart-text-input

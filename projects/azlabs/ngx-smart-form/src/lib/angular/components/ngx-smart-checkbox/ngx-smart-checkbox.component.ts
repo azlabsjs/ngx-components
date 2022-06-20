@@ -63,7 +63,7 @@ export class NgxSmartCheckBoxComponent implements OnInit, OnDestroy {
   }
 
   private initializeFormArray() {
-    const control = new FormArray<AbstractControl>([]);
+    const control = new FormArray([]);
     // We get the value of the injected control
     // if the value is not an array we wrap it as array
     const value = (

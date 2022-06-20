@@ -368,7 +368,7 @@ export class NgxSmartFormComponent
           // TODO : Create formgroup
           const group = this.builder.group(children) as FormGroup;
           const values_ = Array.isArray(value) ? value : [];
-          const array_ = new FormArray<AbstractControl>([]);
+          const array_ = new FormArray([]);
           for (const current of values_) {
             const tmp = cloneAbstractControl(group);
             this.setFormGroupValue(tmp, current);

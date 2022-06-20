@@ -210,7 +210,7 @@ export class ComponentReactiveFormHelpers {
   }
 
   public static buildArray(builder: FormBuilder, config: InputConfigInterface) {
-    const array = new FormArray<any>([]);
+    const array = new FormArray([]);
     of((config as OptionsInputConfigInterface).items)
       .pipe(
         tap((items) => {
