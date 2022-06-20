@@ -1,4 +1,11 @@
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ContentChild,
+  Input,
+  OnInit,
+  TemplateRef,
+} from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import {
   OptionsInputConfigInterface,
@@ -17,6 +24,7 @@ export class NgxSmartRadioInputComponent implements OnInit {
   // tslint:disable-next-line: variable-name
   @Input() inputConfig!: OptionsInputConfigInterface;
   @Input() showLabelAndDescription = true;
+  @ContentChild('input') inputRef!: TemplateRef<any>;
 
   public inputTypes = InputTypes;
   public loaded: boolean = false;
@@ -28,14 +36,6 @@ export class NgxSmartRadioInputComponent implements OnInit {
     if (this.inputConfig) {
       this.loaded = this.inputConfig.items!.length !== 0;
     }
-  }
-
-  onValueChanges(event: any) {
-    this.control.setValue(event);
-  }
-
-  inputValue(name: string, value: string) {
-    return `${name}_${value}`;
   }
 
   onItemsChange(state: OptionsInputItemsInterface) {

@@ -4,6 +4,8 @@ import {
   Output,
   EventEmitter,
   ChangeDetectionStrategy,
+  ContentChild,
+  TemplateRef,
 } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import { TextInput } from '../../../core';
@@ -35,6 +37,7 @@ export class NgxSmartPasswordInputComponent {
   @Input() showLabelAndDescription = true;
   // Configuration parameters of the input
   @Input() inputConfig!: TextInput;
+  @ContentChild('input') inputRef!: TemplateRef<any>;
 
   @Output() keyup = new EventEmitter<InputEventArgs>();
   @Output() keydown = new EventEmitter<InputEventArgs>();
@@ -49,7 +52,7 @@ export class NgxSmartPasswordInputComponent {
       .pipe(map((state) => ({ showPassword: state })));
   }
 
-  public togglePassWordInput() {
+  public toggle() {
     this._showPassword.next(!this._showPassword.getValue());
   }
 

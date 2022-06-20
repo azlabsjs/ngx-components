@@ -6,38 +6,20 @@
 >
   <ng-container *ngIf="inputConfig.items as items">
     <ng-container *ngIf="items!.length > 0">
-      <clr-radio-container clrInline>
-        <label>
-          {{ inputConfig.label }}
-          <span class="required-text" *ngIf="inputConfig.rules?.isRequired">
-            (*)
-          </span>
-        </label>
-        <clr-radio-wrapper *ngFor="let item of items">
-          <input
-            placeholder="radio"
-            [tabIndex]="inputConfig?.formControlIndex"
-            clrRadio
-            type="radio"
-            required
-            [checked]="control.value == item.value"
-            [value]="inputValue(inputConfig.formControlName, item?.value)"
-            (change)="onValueChanges(item.value)"
-          />
-          <label>{{ item.description }}</label>
-        </clr-radio-wrapper>
-        <span
-          [class]="'input__subtext input__error_text'"
-          *ngIf="control.hasError('required') && control.touched"
-        >
-          {{ 'validation.required' | templateDict }}
-        </span>
-        <span
-          [class]="'input__subtext'"
-          *ngIf="inputConfig.descriptionText && showLabelAndDescription"
-          [innerHTML]="inputConfig.descriptionText | safeHtml"
-        ></span>
-      </clr-radio-container>
+      <ng-container
+        *ngTemplateOutlet="inputRef; context: { items: items }"
+      ></ng-container>
+      <span
+        [class]="'input__subtext input__error_text'"
+        *ngIf="control.hasError('required') && control.touched"
+      >
+        {{ 'validation.required' | templateDict }}
+      </span>
+      <span
+        [class]="'input__subtext'"
+        *ngIf="inputConfig.descriptionText && showLabelAndDescription"
+        [innerHTML]="inputConfig.descriptionText | safeHtml"
+      ></span>
     </ng-container>
   </ng-container>
 </div>

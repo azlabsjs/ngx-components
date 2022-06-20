@@ -94,6 +94,10 @@ export class NgxSmartFormControlComponent implements OnDestroy, OnInit {
     };
   }
 
+  radioBoxLabel(name: string, value: string) {
+    return `${name}_${value}`;
+  }
+
   ngOnDestroy() {
     this._destroy$.next();
   }
