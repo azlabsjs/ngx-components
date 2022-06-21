@@ -50,7 +50,7 @@ export class NgxSmartSelectInputComponent implements AfterViewInit {
 
   //
   @Input() control!: FormControl;
-  @Input() showLabelAndDescription = true;
+  @Input() describe = true;
   // tslint:disable-next-line: variable-name
   _state$ = new BehaviorSubject<{
     performingAction: boolean;

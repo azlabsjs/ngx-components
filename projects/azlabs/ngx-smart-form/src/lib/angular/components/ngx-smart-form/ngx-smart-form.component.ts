@@ -16,7 +16,11 @@ import {
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { EMPTY, from, Observable, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { FormConfigInterface, InputGroup, InputConfigInterface } from '../../../core';
+import {
+  FormConfigInterface,
+  InputGroup,
+  InputConfigInterface,
+} from '../../../core';
 import {
   AngularReactiveFormBuilderBridge,
   HTTP_REQUEST_CLIENT,

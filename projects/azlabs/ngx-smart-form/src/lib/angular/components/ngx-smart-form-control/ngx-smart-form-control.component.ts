@@ -49,7 +49,7 @@ export class NgxSmartFormControlComponent implements OnDestroy, OnInit {
   //#region Component inputs
   @Input() class: string = 'clr-form-control';
   @Input() inline: boolean = false;
-  @Input() showLabelAndDescription = true;
+  @Input() describe = true;
   @Input() inputConfig!: InputConfigInterface;
   @Input() listItems!: OptionsInputItemsInterface;
   @Input() control!: AbstractControl & FormControl;

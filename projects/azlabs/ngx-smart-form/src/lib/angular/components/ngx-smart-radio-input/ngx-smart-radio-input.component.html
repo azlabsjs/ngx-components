@@ -7,7 +7,10 @@
   <ng-container *ngIf="inputConfig.items as items">
     <ng-container *ngIf="items!.length > 0">
       <ng-container
-        *ngTemplateOutlet="inputRef; context: { items: items }"
+        *ngTemplateOutlet="
+          inputRef;
+          context: { items: items, config: inputConfig }
+        "
       ></ng-container>
       <span
         [class]="'input__subtext input__error_text'"
@@ -17,8 +20,8 @@
       </span>
       <span
         [class]="'input__subtext'"
-        *ngIf="inputConfig.descriptionText && showLabelAndDescription"
-        [innerHTML]="inputConfig.descriptionText | safeHtml"
+        *ngIf="describe"
+        [innerHTML]="inputConfig.descriptionText || '' | safeHtml"
       ></span>
     </ng-container>
   </ng-container>

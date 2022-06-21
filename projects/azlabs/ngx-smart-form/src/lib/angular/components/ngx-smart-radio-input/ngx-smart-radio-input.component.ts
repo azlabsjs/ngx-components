@@ -23,7 +23,7 @@ export class NgxSmartRadioInputComponent implements OnInit {
   @Input() control!: AbstractControl;
   // tslint:disable-next-line: variable-name
   @Input() inputConfig!: OptionsInputConfigInterface;
-  @Input() showLabelAndDescription = true;
+  @Input() describe = true;
   @ContentChild('input') inputRef!: TemplateRef<any>;
 
   public inputTypes = InputTypes;

@@ -27,6 +27,6 @@
 </span>
 <span
   [class]="'input__subtext'"
-  *ngIf="inputConfig.descriptionText && showLabelAndDescription"
-  [innerHTML]="inputConfig.descriptionText | safeHtml"
+  *ngIf="describe"
+  [innerHTML]="inputConfig.descriptionText || '' | safeHtml"
 ></span>

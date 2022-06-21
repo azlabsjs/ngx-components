@@ -9,5 +9,6 @@
     "@iazlabs/collections",
     "@iazlabs/utilities",
     "@iazlabs/functional"
-  ]
+  ],
+  "assets": ["assets/**/*.*"]
 }

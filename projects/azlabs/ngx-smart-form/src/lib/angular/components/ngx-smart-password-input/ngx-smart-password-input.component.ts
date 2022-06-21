@@ -34,7 +34,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class NgxSmartPasswordInputComponent {
   @Input() control!: AbstractControl & FormControl;
-  @Input() showLabelAndDescription = true;
+  @Input() describe = true;
   // Configuration parameters of the input
   @Input() inputConfig!: TextInput;
   @ContentChild('input') inputRef!: TemplateRef<any>;
@@ -52,7 +52,7 @@ export class NgxSmartPasswordInputComponent {
       .pipe(map((state) => ({ showPassword: state })));
   }
 
-  public togglePassWordInput() {
+  public toggle() {
     this._showPassword.next(!this._showPassword.getValue());
   }
 
