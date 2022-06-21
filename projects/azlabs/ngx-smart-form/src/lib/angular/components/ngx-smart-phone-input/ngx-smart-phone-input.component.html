@@ -1,42 +1,22 @@
-<label
-  class="clr-control-label"
-  *ngIf="showLabelAndDescription"
-  [for]="inputConfig.formControlName"
->
-  {{ inputConfig.label }}
-  <span class="required-text" *ngIf="inputConfig.rules?.isRequired">
-    (*)
-  </span>
-</label>
 <div class="clr-control-container">
   <div class="clr-input-wrapper">
+    <label
+      class="clr-control-label"
+      *ngIf="describe"
+      [for]="config!.formControlName"
+    >
+      {{ config!.label }}
+      <span class="required-text" *ngIf="config!.rules?.isRequired">
+        (*)
+      </span>
+    </label>
     <ngx-intl-tel-input
-      [label]="showLabelAndDescription ? (inputConfig?.label ?? '') : ''"
-      [required]="inputConfig.rules?.isRequired || false"
+      [label]="describe ? (config?.label ?? '') : ''"
+      [required]="config!.rules?.isRequired || false"
       [control]="control"
       [preferredCountries]="['tg', 'bj', 'gh']"
       [country]="'tg'"
     >
-      <ng-template
-        #input
-        let-keypress="keypress"
-        let-phoneControl="phoneControl"
-        let-selected="selected"
-      >
-        <input
-          [tabIndex]="inputConfig.formControlIndex"
-          [required]="inputConfig.rules?.isRequired || false"
-          autocomplete="off"
-          type="tel"
-          [class]="'effect-24 ' + inputConfig!.classes"
-          (blur)="onBlur($event)"
-          (focus)="onFocus($event)"
-          (keypress)="keypress($event)"
-          [formControl]="phoneControl"
-          placeholder="{{ selected!.placeHolder }}"
-          #focusable
-        />
-      </ng-template>
       <ng-template #toggleButton let-selected>
         <button
           [disabled]="control.disabled"
@@ -47,23 +27,43 @@
           <clr-icon shape="caret down"></clr-icon>
         </button>
       </ng-template>
+      <ng-template
+        #input
+        let-keypress="keypress"
+        let-phoneControl="phoneControl"
+        let-selected="selected"
+      >
+        <ng-container
+          *ngTemplateOutlet="
+            inputRef;
+            context: {
+              keypress,
+              phoneControl,
+              selected,
+              config,
+              onBlur,
+              onFocus
+            }
+          "
+        ></ng-container>
+      </ng-template>
     </ngx-intl-tel-input>
   </div>
-  <span
-    [class]="'input__subtext input__error_text'"
-    *ngIf="control.hasError('required') && control.touched"
-  >
-    {{ 'validation.required' | templateDict }}
-  </span>
-  <span
-    [class]="'input__subtext input__error_text'"
-    *ngIf="control.hasError('invalidPhoneNumber') && control.touched"
-  >
-    {{ 'validation.phone' | templateDict: { value: '(Ex: 228 90050505)' } }}
-  </span>
-  <span
-    [class]="'input__subtext'"
-    *ngIf="inputConfig.descriptionText && showLabelAndDescription"
-    [innerHTML]="inputConfig.descriptionText | safeHtml"
-  ></span>
 </div>
+<span
+  [class]="'input__subtext input__error_text'"
+  *ngIf="control.hasError('required') && control.touched"
+>
+  {{ 'validation.required' | templateDict }}
+</span>
+<span
+  [class]="'input__subtext input__error_text'"
+  *ngIf="control.hasError('invalidPhoneNumber') && control.touched"
+>
+  {{ 'validation.phone' | templateDict: { value: '(Ex: 228 90050505)' } }}
+</span>
+<span
+  [class]="'input__subtext'"
+  *ngIf="describe"
+  [innerHTML]="config!.descriptionText || '' | safeHtml"
+></span>

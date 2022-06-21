@@ -1,4 +1,11 @@
-import { Component, ContentChild, Inject, Input, LOCALE_ID, TemplateRef } from '@angular/core';
+import {
+  Component,
+  ContentChild,
+  Inject,
+  Input,
+  LOCALE_ID,
+  TemplateRef,
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { JSDate } from '@iazlabs/js-datetime';
 import { DateInput } from '../../../core';
@@ -16,7 +23,7 @@ import { DateInput } from '../../../core';
 })
 export class NgxSmartDateInputComponent {
   @Input() control!: FormControl;
-  @Input() showLabelAndDescription = true;
+  @Input() describe = true;
   @Input() inputConfig!: DateInput;
   today = JSDate.format();
   @ContentChild('input') inputRef!: TemplateRef<any>;

@@ -1,9 +1,11 @@
 import {
   ChangeDetectorRef,
   Component,
+  ContentChild,
   Input,
   OnDestroy,
   OnInit,
+  TemplateRef,
 } from '@angular/core';
 import {
   FormGroup,
@@ -24,14 +26,15 @@ import {
 @Component({
   selector: 'ngx-smart-checkbox-input',
   templateUrl: './ngx-smart-checkbox.component.html',
-  styles: [],
 })
 export class NgxSmartCheckBoxComponent implements OnInit, OnDestroy {
-  // tslint:disable-next-line: variable-name
+
+  //#region Component inputs
   @Input() control!: AbstractControl;
-  // tslint:disable-next-line: variable-name
   @Input() inputConfig!: OptionsInputConfigInterface;
-  @Input() showLabelAndDescription = true;
+  @Input() describe = true;
+  @ContentChild('input') inputRef!: TemplateRef<any>;
+  //#endregion Component inputs
 
   public inputTypes = InputTypes;
   public formGroup!: FormGroup;
@@ -114,14 +117,6 @@ export class NgxSmartCheckBoxComponent implements OnInit, OnDestroy {
         return undefined;
       })
       .filter((current) => typeof current !== 'undefined' && current !== null);
-  }
-
-  isFormArray(control: AbstractControl) {
-    return control instanceof FormArray;
-  }
-
-  asFormArray(control?: AbstractControl) {
-    return control as FormArray;
   }
 
   asFormControl(control: AbstractControl) {

@@ -1,7 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, ContentChild, TemplateRef } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import { TextAreaInput } from '../../../core';
-import { InputEventArgs } from '../../types/input';
 
 @Component({
   selector: 'ngx-smart-textarea-input',
@@ -15,13 +14,10 @@ import { InputEventArgs } from '../../types/input';
   ],
 })
 export class DynamicTextAreaInputComponent {
+  //#region Component inputs
   @Input() control!: AbstractControl & FormControl;
-  @Input() showLabelAndDescription = true;
-  // Configuration parameters of the input
+  @Input() describe = true;
   @Input() inputConfig!: TextAreaInput;
-
-  @Output() keyup = new EventEmitter<InputEventArgs>();
-  @Output() keydown = new EventEmitter<InputEventArgs>();
-  @Output() keypress = new EventEmitter<InputEventArgs>();
-  @Output() blur = new EventEmitter<InputEventArgs>();
+  @ContentChild('input') inputRef!: TemplateRef<any>;
+  //#endregion Component inputs
 }

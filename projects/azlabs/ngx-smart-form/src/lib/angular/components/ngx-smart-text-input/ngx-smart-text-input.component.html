@@ -1,107 +1,64 @@
-<label
-  [for]="inputConfig.formControlName"
-  class="clr-control-label"
-  *ngIf="showLabelAndDescription"
+<ng-container
+  *ngTemplateOutlet="
+    inputRef;
+    context: { maxLength: maxNumberSize(), config: inputConfig }
+  "
+></ng-container>
+<span
+  [class]="'input__subtext input__error_text'"
+  *ngIf="control.hasError('required') && control.touched"
 >
-  {{ inputConfig.label }}
-  <small class="required-text" *ngIf="inputConfig.rules?.isRequired">
-    (*)
-  </small>
-</label>
-<div class="clr-control-container">
-  <div class="clr-input-wrapper">
-    <input
-      [tabIndex]="inputConfig.formControlIndex"
-      (keyup)="
-        keyup.emit({
-          name: inputConfig.formControlName,
-          value: $event
-        })
-      "
-      (keydown)="
-        keydown.emit({
-          name: inputConfig.formControlName,
-          value: $event
-        })
-      "
-      (keypress)="
-        keypress.emit({
-          name: inputConfig.formControlName,
-          value: $event
-        })
-      "
-      (blur)="
-        blur.emit({
-          name: inputConfig.formControlName,
-          value: $event
-        })
-      "
-      [type]="inputConfig.type === inputTypes.EMAIL_INPUT ? 'email' : 'text'"
-      [maxLength]="
-        inputConfig.maxLength ? inputConfig.maxLength : maxNumberSize()
-      "
-      [minLength]="inputConfig.minLength ? inputConfig.minLength : 0"
-      [class]="inputConfig.classes"
-      [formControl]="control"
-      placeholder="{{ inputConfig.placeholder ? inputConfig.placeholder : '' }}"
-    />
-  </div>
-  <span
-    [class]="'input__subtext input__error_text'"
-    *ngIf="control.hasError('required') && control.touched"
-  >
-    {{ 'validation.required' | templateDict }}
-  </span>
-  <span
-    [class]="'input__subtext input__error_text'"
-    *ngIf="control.hasError('maxLength') && control.touched"
-  >
-    {{
-      'validation.maxValue'
-        | templateDict
-          : {
-              value: inputConfig.maxLength
-            }
-    }}
-  </span>
-  <span
-    [class]="'input__subtext input__error_text'"
-    *ngIf="control.hasError('minLength') && control.touched"
-  >
-    {{
-      'validation.minValue'
-        | templateDict
-          : {
-              value: inputConfig.minLength
-                ? inputConfig.minLength
-                : getErrorAsNumber(
-                    control.errors ? control.errors['minLength'] : '',
-                    'minLength'
-                  )
-            }
-    }}
-  </span>
-  <span
-    [class]="'input__subtext input__error_text'"
-    *ngIf="control.hasError('pattern') && control.touched"
-  >
-    {{ 'validation.pattern' | templateDict }}
-  </span>
-  <span
-    [class]="'input__subtext input__error_text'"
-    *ngIf="control.hasError('email') && control.touched"
-  >
-    {{ 'validation.email' | templateDict }}
-  </span>
-  <span
-    [class]="'input__subtext input__error_text'"
-    *ngIf="control.hasError('notUnique') && control.touched"
-  >
-    {{ 'validation.unique' | templateDict }}
-  </span>
-  <span
-    [class]="'input__subtext'"
-    *ngIf="inputConfig.descriptionText && showLabelAndDescription"
-    [innerHTML]="inputConfig.descriptionText | safeHtml"
-  ></span>
-</div>
+  {{ 'validation.required' | templateDict }}
+</span>
+<span
+  [class]="'input__subtext input__error_text'"
+  *ngIf="control.hasError('maxLength') && control.touched"
+>
+  {{
+    'validation.maxValue'
+      | templateDict
+        : {
+            value: inputConfig.maxLength
+          }
+  }}
+</span>
+<span
+  [class]="'input__subtext input__error_text'"
+  *ngIf="control.hasError('minLength') && control.touched"
+>
+  {{
+    'validation.minValue'
+      | templateDict
+        : {
+            value: inputConfig.minLength
+              ? inputConfig.minLength
+              : getErrorAsNumber(
+                  control.errors ? control.errors['minLength'] : '',
+                  'minLength'
+                )
+          }
+  }}
+</span>
+<span
+  [class]="'input__subtext input__error_text'"
+  *ngIf="control.hasError('pattern') && control.touched"
+>
+  {{ 'validation.pattern' | templateDict }}
+</span>
+<span
+  [class]="'input__subtext input__error_text'"
+  *ngIf="control.hasError('email') && control.touched"
+>
+  {{ 'validation.email' | templateDict }}
+</span>
+<span
+  [class]="'input__subtext input__error_text'"
+  *ngIf="control.hasError('notUnique') && control.touched"
+>
+  {{ 'validation.unique' | templateDict }}
+</span>
+<span
+  [class]="'input__subtext'"
+  *ngIf="describe"
+  [innerHTML]="inputConfig.descriptionText || '' | safeHtml"
+></span>

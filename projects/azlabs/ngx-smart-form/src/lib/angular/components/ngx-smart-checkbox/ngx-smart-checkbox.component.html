@@ -5,36 +5,16 @@
   [params]="inputConfig.serverBindings"
 >
   <ng-container *ngIf="inputConfig.items!.length > 0">
-    <clr-checkbox-container clrInline [formGroup]="formGroup">
-      <label
-        *ngIf="showLabelAndDescription"
-        [for]="inputConfig.formControlName"
-      >
-        {{ inputConfig.label }}
-        <span class="required-text" *ngIf="inputConfig.rules?.isRequired">
-          (*)
-        </span>
-      </label>
-      <clr-checkbox-wrapper
-        *ngFor="
-          let item of asFormArray(formGroup.controls['items']).controls;
-          let index = index
-        "
-      >
-        <input
-          placeholder="checkbox"
-          [tabIndex]="inputConfig?.formControlIndex"
-          [id]="inputConfig.formControlName + '_' + index"
-          type="checkbox"
-          clrCheckbox
-          [value]="inputConfig.items[index].value"
-          [formControl]="asFormControl(item)"
-        />
-        <label>
-          {{ inputConfig.items[index].description }}
-        </label>
-      </clr-checkbox-wrapper>
-    </clr-checkbox-container>
+    <ng-container
+      *ngTemplateOutlet="
+        inputRef;
+        context: {
+          config: inputConfig,
+          group: formGroup,
+          items: inputConfig.items
+        }
+      "
+    ></ng-container>
     <span
       [class]="'input__subtext input__error_text'"
       *ngIf="control.hasError('required') && control.touched"
@@ -43,8 +23,8 @@
     </span>
     <span
       [class]="'input__subtext'"
-      *ngIf="inputConfig.descriptionText && showLabelAndDescription"
-      [innerHTML]="inputConfig.descriptionText | safeHtml"
+      *ngIf="describe"
+      [innerHTML]="inputConfig.descriptionText || '' | safeHtml"
     ></span>
   </ng-container>
 </div>

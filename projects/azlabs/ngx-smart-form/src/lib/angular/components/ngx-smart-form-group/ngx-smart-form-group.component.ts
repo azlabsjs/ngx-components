@@ -23,7 +23,7 @@ import { BindingInterface } from '../../types';
 @Component({
   selector: 'ngx-smart-form-group',
   templateUrl: './ngx-smart-form-group.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFormGroupComponent
   implements OnInit, AfterViewInit, OnDestroy

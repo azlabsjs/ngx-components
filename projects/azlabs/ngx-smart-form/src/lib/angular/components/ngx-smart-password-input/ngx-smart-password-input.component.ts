@@ -34,7 +34,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class NgxSmartPasswordInputComponent {
   @Input() control!: AbstractControl & FormControl;
-  @Input() showLabelAndDescription = true;
+  @Input() describe = true;
   // Configuration parameters of the input
   @Input() inputConfig!: TextInput;
   @ContentChild('input') inputRef!: TemplateRef<any>;

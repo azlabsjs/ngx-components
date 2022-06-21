@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ContentChild, TemplateRef } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import { InputTypes, TextInput } from '../../../core';
 import { getObjectProperty } from '@iazlabs/js-object';
@@ -9,18 +9,15 @@ import { InputEventArgs } from '../../types/input';
   templateUrl: './ngx-smart-text-input.component.html',
 })
 export class TextInputComponent {
-  @Input() control!: AbstractControl & FormControl;
-  @Input() showLabelAndDescription = true;
-  // Configuration parameters of the input
-  @Input() inputConfig!: TextInput;
 
-  @Output() keyup = new EventEmitter<InputEventArgs>();
-  @Output() keydown = new EventEmitter<InputEventArgs>();
-  @Output() keypress = new EventEmitter<InputEventArgs>();
-  @Output() blur = new EventEmitter<InputEventArgs>();
+  //#region Component inputs
+  @Input() control!: AbstractControl & FormControl;
+  @Input() describe = true;
+  @Input() inputConfig!: TextInput;
+  @ContentChild('input') inputRef!: TemplateRef<any>;
+  //#endregion Component inputs
 
   public inputTypes = InputTypes;
-
   maxNumberSize = () => Math.pow(2, 31) - 1;
 
   /**

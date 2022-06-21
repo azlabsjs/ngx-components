@@ -1,7 +1,7 @@
 <ng-container *ngIf="state$ | async as vm">
   <label
     class="clr-control-label"
-    *ngIf="showLabelAndDescription"
+    *ngIf="describe"
     [for]="inputConfig.formControlName"
   >
     {{ inputConfig.label }}
@@ -56,7 +56,7 @@
   {{ 'validation.required' | templateDict }}
 </span>
 <span
-  *ngIf="inputConfig.descriptionText && showLabelAndDescription"
+  *ngIf="describe"
   class="input__subtext"
-  [innerHTML]="inputConfig.descriptionText | safeHtml"
+  [innerHTML]="inputConfig.descriptionText || '' | safeHtml"
 ></span>

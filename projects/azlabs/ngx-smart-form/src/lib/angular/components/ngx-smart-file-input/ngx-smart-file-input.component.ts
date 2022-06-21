@@ -42,11 +42,10 @@ function fakeUUIDv4() {
 @Component({
   selector: 'ngx-smart-file-input',
   templateUrl: './ngx-smart-file-input.component.html',
-  styles: [],
 })
 export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
   @Input() control!: FormControl;
-  @Input() showLabelAndDescription = true;
+  @Input() describe = true;
 
   // Property for handling File Input types
   public dropzoneConfigs!: DropzoneConfig;
