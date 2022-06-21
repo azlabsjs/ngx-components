@@ -1,24 +1,14 @@
 # NgxDropzone
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.0.0.
+Angular dropzone component build on top of dropzone javascript library
 
-## Code scaffolding
+## Dependencies
 
-Run `ng generate component component-name --project ngx-dropzone` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project ngx-dropzone`.
-> Note: Don't forget to add `--project ngx-dropzone` or else it will be added to the default project in your `angular.json` file. 
+| @azlabs/ngx-dropzone | Angular | dropzone      |
+|----------------------|---------|---------------|
+| ^0.13.x              | ^13.0   | ^6.0.0.beta-2 |
+| ^0.14.x              | ^14.0   | ^6.0.0.beta-2 |
 
-## Build
+## Usage
 
-Run `ng build ngx-dropzone` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Publishing
-
-After building your library with `ng build ngx-dropzone`, go to the dist folder `cd dist/ngx-dropzone` and run `npm publish`.
-
-## Running unit tests
-
-Run `ng test ngx-dropzone` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Usage documentation is under development
