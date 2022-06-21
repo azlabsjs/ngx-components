@@ -1,5 +1,5 @@
 {
-  "name": "@azlabs/ngx-smart-form",
+  "name": "@azlabsjs/ngx-smart-form",
   "version": "0.14.0",
   "peerDependencies": {
     "@angular/common": "^14.0.0",
@@ -13,5 +13,13 @@
     "@iazlabs/collections": "^0.1.2",
     "@iazlabs/utilities": "^0.1.8",
     "@iazlabs/functional": "^0.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/azlabsjs/ngx-components.git",
+    "directory": "projects/azlabs/ngx-dropzone"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@azlabsjs"
   }
 }

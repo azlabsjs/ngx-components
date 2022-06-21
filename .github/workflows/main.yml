@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 12
           registry-url: https://npm.pkg.github.com/
-          scope: "@iazlabs"
+          scope: "@azlabsjs"
       - name: Check npm version
         run: npm -v
 
@@ -30,13 +30,13 @@ jobs:
           useLockFile: false
 
       - name: Build ngx-dropzone
-        run: npm run build @azlabs/ngx-dropzone
+        run: npm run build @azlabsjs/ngx-dropzone
 
       - name: Build ngx-intl-tel-input
-        run: npm run build @azlabs/ngx-intl-tel-input
+        run: npm run build @azlabsjs/ngx-intl-tel-input
 
       - name: Build ngx-smart-form
-        run: npm run build @azlabs/ngx-smart-form
+        run: npm run build @azlabsjs/ngx-smart-form
 
       - name: Publish ngx-dropzone
         run: cd dist/azlabs/ngx-dropzone && npm publish

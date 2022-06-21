@@ -12,7 +12,7 @@ To include the API in your angular project, you must import it module into the r
 
 // ...
 
-import {NgxSmartFormModule} from '@azlabs/ngx-smart-form';
+import {NgxSmartFormModule} from '@azlabsjs/ngx-smart-form';
 
 @NgModule({
   imports: [
@@ -80,7 +80,7 @@ As developper we are tend to provide our own custom implementation of HTML eleme
 
 ```ts
 // Custom smart input implementation
-import { InputInterface } from '@azlabs/ngx-smart-form';
+import { InputInterface } from '@azlabsjs/ngx-smart-form';
 
 @Component({
   selector: 'app-custom-smart-input'
