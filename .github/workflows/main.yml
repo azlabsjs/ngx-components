@@ -28,6 +28,7 @@ jobs:
         uses: bahmutov/npm-install@v1
         with:
           useLockFile: false
+          install-command: npm install --legacy-peer-deps
 
       - name: Build ngx-dropzone
         run: npm run build @azlabsjs/ngx-dropzone
