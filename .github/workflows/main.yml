@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 16
           registry-url: https://npm.pkg.github.com/
-          scope: "@iazlabs"
+          scope: "@azlabs"
       - name: Check npm version
         run: npm -v
 
