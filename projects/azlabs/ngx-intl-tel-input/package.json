@@ -11,5 +11,8 @@
     "tslib": "^2.3.0",
     "google-libphonenumber": "^3.2",
     "@iazlabs/js-object": "^0.1"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@iazlabs"
   }
 }

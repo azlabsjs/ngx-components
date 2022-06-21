@@ -13,5 +13,8 @@
     "@iazlabs/collections": "^0.1.2",
     "@iazlabs/utilities": "^0.1.8",
     "@iazlabs/functional": "^0.1.8"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@iazlabs"
   }
 }
