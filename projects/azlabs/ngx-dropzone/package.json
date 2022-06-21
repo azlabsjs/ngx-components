@@ -1,5 +1,5 @@
 {
-  "name": "@azlabs/ngx-dropzone",
+  "name": "@azlabsjs/ngx-dropzone",
   "version": "0.13.1",
   "peerDependencies": {
     "@angular/common": "^13.0.0",
@@ -11,10 +11,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/iazlabs/ngx-component.git",
+    "url": "https://github.com/azlabsjs/ngx-component.git",
     "directory": "projects/azlabs/ngx-dropzone"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/@azlabs"
+    "registry": "https://npm.pkg.github.com/@azlabsjs"
   }
 }

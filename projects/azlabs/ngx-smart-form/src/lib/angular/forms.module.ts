@@ -15,8 +15,8 @@ import {
   DROPZONE_DICT,
   NgxDropzoneModule,
   useDefaultDictionary,
-} from '@azlabs/ngx-dropzone';
-import { NgxIntlTelInputModule } from '@azlabs/ngx-intl-tel-input';
+} from '@azlabsjs/ngx-dropzone';
+import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
 import {
   CACHE_PROVIDER,
   DYNAMIC_FORM_LOADER,

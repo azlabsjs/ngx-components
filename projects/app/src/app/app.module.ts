@@ -5,9 +5,9 @@ import { AppComponent } from './app.component';
 import { CdsModule } from '@cds/angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClarityIcons, uploadCloudIcon } from '@cds/core/icon';
-import { NgxDropzoneModule } from '@azlabs/ngx-dropzone';
-import { NgxIntlTelInputModule } from '@azlabs/ngx-intl-tel-input';
-import { NgxSmartFormModule } from '@azlabs/ngx-smart-form';
+import { NgxDropzoneModule } from '@azlabsjs/ngx-dropzone';
+import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
+import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
 import { HttpClientModule } from '@angular/common/http';
 
 ClarityIcons.addIcons(uploadCloudIcon);
