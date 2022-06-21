@@ -5,7 +5,7 @@ The module also makes use of angular services injector to provide mechanism for 
 
 ## Dependencies
 
-| @iazlabs/ngx-smart-form | @iazlabs/ngx-dropzone | @iazlabs/ngx-intl-tel-input | Angular |
+| @azlabs/ngx-smart-form | @azlabs/ngx-dropzone | @azlabs/ngx-intl-tel-input | Angular |
 |------------------------|----------------------|----------------------------|---------|
 | ^0.13.x                | ^0.13.x              | ^0.13.x                    | ^13.0   |
 | ^0.14.x                | ^0.14.x              | ^0.14.x                    | ^14.0   |
@@ -19,7 +19,7 @@ To include the API in your angular project, you must import it module into the r
 
 // ...
 
-import {NgxSmartFormModule} from '@iazlabs/ngx-smart-form';
+import {NgxSmartFormModule} from '@azlabs/ngx-smart-form';
 
 @NgModule({
   imports: [
@@ -87,7 +87,7 @@ As developper we are tend to provide our own custom implementation of HTML eleme
 
 ```ts
 // Custom smart input implementation
-import { InputInterface } from '@iazlabs/ngx-smart-form';
+import { InputInterface } from '@azlabs/ngx-smart-form';
 
 @Component({
   selector: 'app-custom-smart-input'

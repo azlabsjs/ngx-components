@@ -16,7 +16,7 @@ import { Subject } from 'rxjs';
 import {
   DropzoneComponentInterface,
   DropzoneConfig,
-} from '@iazlabs/ngx-dropzone';
+} from '@azlabs/ngx-dropzone';
 
 function fakeUUIDv4() {
   const rand = Math.random;
