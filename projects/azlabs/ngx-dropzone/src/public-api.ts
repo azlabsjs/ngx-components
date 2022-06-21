@@ -1,4 +1,4 @@
 /*
- * Public API Surface of @azlabs/ngx-dropzone
+ * Public API Surface of @iazlabs/ngx-dropzone
  */
 export * from './lib';
