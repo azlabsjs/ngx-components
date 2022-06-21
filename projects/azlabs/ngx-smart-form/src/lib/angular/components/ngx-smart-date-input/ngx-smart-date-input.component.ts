@@ -7,7 +7,7 @@ import {
   TemplateRef,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { JSDate } from '@iazlabs/js-datetime';
+import { JSDate } from '@azlabsjs/js-datetime';
 import { DateInput } from '../../../core';
 
 @Component({

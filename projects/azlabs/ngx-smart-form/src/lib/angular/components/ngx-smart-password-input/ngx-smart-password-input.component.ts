@@ -10,7 +10,7 @@ import {
 import { AbstractControl, FormControl } from '@angular/forms';
 import { TextInput } from '../../../core';
 import { map } from 'rxjs/operators';
-import { getObjectProperty } from '@iazlabs/js-object';
+import { getObjectProperty } from '@azlabsjs/js-object';
 import { InputEventArgs } from '../../types/input';
 import { BehaviorSubject } from 'rxjs';
 

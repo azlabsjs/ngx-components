@@ -21,7 +21,7 @@ import {
 } from 'rxjs/operators';
 import { BehaviorSubject, merge, Subject } from 'rxjs';
 import { PhoneNumberValidator } from './core/validators';
-import { JSObject } from '@iazlabs/js-object';
+import { JSObject } from '@azlabsjs/js-object';
 
 @Component({
   selector: 'ngx-intl-tel-input',

@@ -1,4 +1,4 @@
-import { getObjectProperty } from '@iazlabs/js-object';
+import { getObjectProperty } from '@azlabsjs/js-object';
 import {
   OptionsInputConfigInterface,
   InputTypes,

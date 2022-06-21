@@ -1,6 +1,6 @@
 import { Component, Input, ContentChild, TemplateRef } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { getObjectProperty } from '@iazlabs/js-object';
+import { getObjectProperty } from '@azlabsjs/js-object';
 import { NumberInput } from '../../../core';
 
 @Component({

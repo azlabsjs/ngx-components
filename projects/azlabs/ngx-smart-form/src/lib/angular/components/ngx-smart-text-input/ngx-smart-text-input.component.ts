@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, ContentChild, TemplateRef } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import { InputTypes, TextInput } from '../../../core';
-import { getObjectProperty } from '@iazlabs/js-object';
+import { getObjectProperty } from '@azlabsjs/js-object';
 import { InputEventArgs } from '../../types/input';
 
 @Component({

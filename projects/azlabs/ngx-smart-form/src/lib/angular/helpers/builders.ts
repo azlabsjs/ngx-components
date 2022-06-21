@@ -23,7 +23,7 @@ import {
 } from '../../core';
 import { tap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { JSDate } from '@iazlabs/js-datetime';
+import { JSDate } from '@azlabsjs/js-datetime';
 
 /**
  * @description Helper class for generating angular reactive form controls with errors validation

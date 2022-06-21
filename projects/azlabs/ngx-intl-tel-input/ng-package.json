@@ -6,7 +6,7 @@
   },
   "allowedNonPeerDependencies": [
     "google-libphonenumber",
-    "@iazlabs/js-object"
+    "@azlabsjs/js-object"
   ],
   "assets": ["assets/**/*.*"]
 }
