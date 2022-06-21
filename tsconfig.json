@@ -3,13 +3,13 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
-      "@iazlabs/ngx-dropzone": [
+      "@azlabs/ngx-dropzone": [
         "dist/azlabs/ngx-dropzone"
       ],
-      "@iazlabs/ngx-intl-tel-input": [
+      "@azlabs/ngx-intl-tel-input": [
         "dist/azlabs/ngx-intl-tel-input"
       ],
-      "@iazlabs/ngx-smart-form": [
+      "@azlabs/ngx-smart-form": [
         "dist/azlabs/ngx-smart-form"
       ]
     },
