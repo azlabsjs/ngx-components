@@ -10,6 +10,6 @@
     "dropzone": "^6.0.0-beta.2"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/@iazlabs"
+    "registry": "https://npm.pkg.github.com/@azlabs"
   }
 }
