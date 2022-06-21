@@ -15,8 +15,8 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16
           registry-url: https://npm.pkg.github.com/
@@ -42,9 +42,9 @@ jobs:
         run: cd dist/azlabs/ngx-dropzone && npm publish --access public
 
       - name: Publish ngx-intl-tel-input
-        run: cd ../../../ && cd dist/azlabs/ngx-intl-tel-input && npm publish --access public
+        run: cd dist/azlabs/ngx-intl-tel-input && npm publish --access public
 
       - name: Publish ngx-smart-form
-        run: cd ../../../ && cd dist/azlabs/ngx-smart-form && npm publish --access public
+        run: cd dist/azlabs/ngx-smart-form && npm publish --access public
     env:
       NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
