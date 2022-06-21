@@ -1,5 +1,5 @@
 {
-  "name": "@azlabs/ngx-smart-form",
+  "name": "@iazlabs/ngx-smart-form",
   "version": "0.13.0",
   "peerDependencies": {
     "@angular/common": "^13.0.0",
@@ -15,6 +15,6 @@
     "@iazlabs/functional": "^0.1.8"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/@azlabs"
+    "registry": "https://npm.pkg.github.com/@iazlabs"
   }
 }

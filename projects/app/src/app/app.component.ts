@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { FormsClient, FORM_CLIENT } from '@azlabs/ngx-smart-form';
+import { FormsClient, FORM_CLIENT } from '@iazlabs/ngx-smart-form';
 
 @Component({
   selector: 'app-root',

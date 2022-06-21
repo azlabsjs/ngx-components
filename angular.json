@@ -104,7 +104,7 @@
         }
       }
     },
-    "@azlabs/ngx-dropzone": {
+    "@iazlabs/ngx-dropzone": {
       "projectType": "library",
       "root": "projects/azlabs/ngx-dropzone",
       "sourceRoot": "projects/azlabs/ngx-dropzone/src",
@@ -135,7 +135,7 @@
         }
       }
     },
-    "@azlabs/ngx-intl-tel-input": {
+    "@iazlabs/ngx-intl-tel-input": {
       "projectType": "library",
       "root": "projects/azlabs/ngx-intl-tel-input",
       "sourceRoot": "projects/azlabs/ngx-intl-tel-input/src",
@@ -166,7 +166,7 @@
         }
       }
     },
-    "@azlabs/ngx-smart-form": {
+    "@iazlabs/ngx-smart-form": {
       "projectType": "library",
       "root": "projects/azlabs/ngx-smart-form",
       "sourceRoot": "projects/azlabs/ngx-smart-form/src",
