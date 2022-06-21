@@ -9,6 +9,11 @@
     "tslib": "^2.3.0",
     "dropzone": "^6.0.0-beta.2"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iazlabs/ngx-component.git",
+    "directory": "projects/azlabs/ngx-dropzone"
+  },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/@azlabs"
   }

@@ -14,6 +14,11 @@
     "@iazlabs/utilities": "^0.1.8",
     "@iazlabs/functional": "^0.1.8"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iazlabs/ngx-component.git",
+    "directory": "projects/azlabs/ngx-smart-form"
+  },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/@azlabs"
   }

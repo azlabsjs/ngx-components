@@ -39,12 +39,12 @@ jobs:
         run: npm run build @azlabs/ngx-smart-form
 
       - name: Publish ngx-dropzone
-        run: cd dist/azlabs/ngx-dropzone && npm publish
+        run: cd dist/azlabs/ngx-dropzone && npm publish --access public
 
       - name: Publish ngx-intl-tel-input
-        run: cd ../../../ && cd dist/azlabs/ngx-intl-tel-input && npm publish
+        run: cd ../../../ && cd dist/azlabs/ngx-intl-tel-input && npm publish --access public
 
       - name: Publish ngx-smart-form
-        run: cd ../../../ && cd dist/azlabs/ngx-smart-form && npm publish
+        run: cd ../../../ && cd dist/azlabs/ngx-smart-form && npm publish --access public
     env:
       NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
