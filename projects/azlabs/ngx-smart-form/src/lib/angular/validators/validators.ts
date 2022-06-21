@@ -1,5 +1,5 @@
 import { AbstractControl, ValidatorFn } from '@angular/forms';
-import { JSDate } from '@iazlabs/js-datetime';
+import { JSDate } from '@azlabsjs/js-datetime';
 
 export class CustomValidators {
   static match(control: string, other: string) {

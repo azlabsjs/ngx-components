@@ -1,8 +1,8 @@
-import { JSObject } from '@iazlabs/js-object';
+import { JSObject } from '@azlabsjs/js-object';
 import { ControlInterface, FormInterface } from '../compact/types';
 import { FormConfigInterface, InputConfigInterface } from '../types';
 import { buildControl } from './input-types';
-import { JSArray } from '@iazlabs/collections';
+import { JSArray } from '@azlabsjs/collections';
 
 export class DynamicFormHelpers {
   /**

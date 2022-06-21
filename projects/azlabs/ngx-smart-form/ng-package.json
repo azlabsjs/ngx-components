@@ -5,10 +5,10 @@
     "entryFile": "src/public-api.ts"
   },
   "allowedNonPeerDependencies": [
-    "@iazlabs/built-value",
-    "@iazlabs/collections",
-    "@iazlabs/utilities",
-    "@iazlabs/functional"
+    "@azlabsjs/built-value",
+    "@azlabsjs/collections",
+    "@azlabsjs/utilities",
+    "@azlabsjs/functional"
   ],
   "assets": ["assets/**/*.*"]
 }

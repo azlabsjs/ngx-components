@@ -2,7 +2,7 @@ import { AbstractControl, FormGroup } from '@angular/forms';
 import { BindingInterface } from '../types';
 import { ComponentReactiveFormHelpers } from './builders';
 import { InputConfigInterface } from '../../core';
-import { isNumber } from '@iazlabs/utilities';
+import { isNumber } from '@azlabsjs/utilities';
 
 type CreateControlAttributeSetterReturnType = (
   formgroup: AbstractControl

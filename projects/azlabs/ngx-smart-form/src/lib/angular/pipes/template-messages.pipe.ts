@@ -5,7 +5,7 @@ import {
   Pipe,
   PipeTransform,
 } from '@angular/core';
-import { getObjectProperty } from '@iazlabs/js-object';
+import { getObjectProperty } from '@azlabsjs/js-object';
 import { map, of } from 'rxjs';
 import { ValidationMessagesType, TEMPLATE_DICTIONARY } from '../types';
 

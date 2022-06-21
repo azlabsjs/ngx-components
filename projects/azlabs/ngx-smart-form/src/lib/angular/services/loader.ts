@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, InjectionToken } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { Form, FormsLoader } from '../../core';
-import { DeserializeObject } from '@iazlabs/built-value';
+import { DeserializeObject } from '@azlabsjs/built-value';
 
 export const DYNAMIC_FORM_LOADER = new InjectionToken<FormsLoader>(
   'PROVIDE DYNAMIC FORM LOADER'
