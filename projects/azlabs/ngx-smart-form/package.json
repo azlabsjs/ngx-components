@@ -6,14 +6,16 @@
     "@angular/core": "^14.0.0",
     "@angular/forms": "^14.0.0",
     "@ng-select/ng-select": "^9.0",
-    "@clr/angular": "13.0"
+    "@clr/angular": "13.0",
+    "@azlabsjs/ngx-intl-tel-input": "0.13.15",
+    "@azlabsjs/ngx-dropzone": "0.13.15"
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "@azlabsjs/built-value": "^0.1.2",
-    "@azlabsjs/collections": "^0.1.2",
-    "@azlabsjs/utilities": "^0.1.8",
-    "@azlabsjs/functional": "^0.1.8"
+    "@azlabsjs/built-value": "^0.1.10",
+    "@azlabsjs/collections": "^0.1.10",
+    "@azlabsjs/utilities": "^0.1.10",
+    "@azlabsjs/functional": "^0.1.10"
   },
   "repository": {
     "type": "git",
