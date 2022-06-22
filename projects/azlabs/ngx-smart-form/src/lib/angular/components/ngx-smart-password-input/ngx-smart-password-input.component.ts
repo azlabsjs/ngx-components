@@ -19,14 +19,17 @@ import { BehaviorSubject } from 'rxjs';
   templateUrl: './ngx-smart-password-input.component.html',
   styles: [
     `
-      :host ::ng-deep .password-clr-input-wrapper, .password-clr-input-wrapper {
-        position: relative;
+      :host ::ng-deep .password-clr-input-wrapper,
+      .password-clr-input-wrapper,
+      :host ::ng-deep .password-wrapper,
+      .password-wrapper {
+        position: relative !important;
       }
-      :host ::ng-deep .password-trigger,  .password-trigger{
-        position: absolute;
-        top: 10px;
-        right: 13px;
-        cursor: pointer;
+      :host ::ng-deep .password-trigger,
+      .password-trigger {
+        position: absolute !important;
+        right: 10px !important;
+        cursor: pointer !important;
       }
     `,
   ],

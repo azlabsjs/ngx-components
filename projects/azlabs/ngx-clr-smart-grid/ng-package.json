@@ -1,0 +1,11 @@
+{
+  "$schema": "../../../node_modules/ng-packagr/ng-package.schema.json",
+  "dest": "../../../dist/azlabs/ngx-clr-smart-grid",
+  "lib": {
+    "entryFile": "src/public-api.ts"
+  },
+  "allowedNonPeerDependencies": [
+    "azlabsjs/strings",
+    "@azlabsjs/js-datetime"
+  ]
+}
