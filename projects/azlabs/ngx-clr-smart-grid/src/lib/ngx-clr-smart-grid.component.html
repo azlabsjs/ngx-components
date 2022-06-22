@@ -1,0 +1,134 @@
+<clr-datagrid
+  clrGridSelect
+  [selectionConfig]="{
+    selectable: config.selectable,
+    singleSelection: config.singleSelection
+  }"
+  [(selectState)]="selected"
+  [class]="config.class || ''"
+  (clrDgRefresh)="dgRefresh.emit($event)"
+  [clrDgPreserveSelection]="config.preserveSelection || false"
+  [clrDgLoading]="loading"
+  (selectStateChange)="onSelectedStateChanges($event)"
+>
+  <clr-dg-action-bar>
+    <ng-container
+      *ngTemplateOutlet="dgActionBarRef; context: { $implicit: selected }"
+    ></ng-container>
+  </clr-dg-action-bar>
+  <!-- DATA GRID COLUMNS -->
+  <ng-container *ngFor="let column of columns">
+    <clr-dg-column
+      [clrDgColType]="column.type"
+      [clrDgField]="column.field"
+      [clrDgSortBy]="column.sort || ''"
+    >
+      {{ column.title }}
+      <clr-dg-filter *ngIf="config.useCustomFilters">
+        <ng-content select=".dg-filter"></ng-content>
+      </clr-dg-filter>
+    </clr-dg-column>
+  </ng-container>
+  <!--\ DATA GRID COLUMNS -->
+
+  <!-- DATA GRID ROWS -->
+  <!-- IF USER SPECIFY TO SERVER SIDE PAGINATION WE USE DEFAULT *ngFor directive -->
+  <ng-container *ngIf="config.useServerPagination; else smart">
+    <ng-container *ngFor="let item of data || []">
+      <ng-container
+        *ngTemplateOutlet="rowTemplate; context: { $implicit: item }"
+        ngProjectAs="clr-dg-row"
+      ></ng-container>
+    </ng-container>
+  </ng-container>
+  <!-- ELSE WE FALL BACK TO *clrDgItems smart iterator directive directive -->
+  <ng-template #smart>
+    <ng-container *clrDgItems="let item of data || []">
+      <ng-container
+        *ngTemplateOutlet="rowTemplate; context: { $implicit: item }"
+        ngProjectAs="clr-dg-row"
+      ></ng-container>
+    </ng-container>
+  </ng-template>
+  <!-- DATA GRID ROWS -->
+  <ng-template #rowTemplate let-current>
+    <clr-dg-row
+      [clrDgItem]="current"
+      [clrDgSelectable]="current[config.selectableProp || ''] || true"
+    >
+      <clr-dg-action-overflow *ngIf="config.hasActionOverflow">
+        <!-- ACTION OVERFLOW BUTTON PROJECTION -->
+        <ng-container
+          *ngTemplateOutlet="
+            dgActionOverflowRef;
+            context: { $implicit: current }
+          "
+        ></ng-container>
+      </clr-dg-action-overflow>
+      <ng-container *ngFor="let column of columns">
+        <clr-dg-cell [class]="column.style.class" [style]="column.style.styles">
+          {{ current[column.label] | data: column.transform }}
+        </clr-dg-cell>
+      </ng-container>
+      <!-- USING ngProjectAs as recommended by the documentation -->
+      <ng-container
+        ngProjectAs="clr-dg-row-detail"
+        *ngIf="config.hasExpandableRows"
+      >
+        <clr-dg-row-detail *clrIfExpanded>
+          <ng-container
+            *ngTemplateOutlet="dgRowDetailRef; context: { $implicit: current }"
+          ></ng-container>
+        </clr-dg-row-detail>
+      </ng-container>
+      <!--\ USING ngProjectAs as recommended by the documentation -->
+    </clr-dg-row>
+  </ng-template>
+  <!--\ DATA GRID ROWS -->
+
+  <!-- DATAGRID PLACEHOLDER WHEN data IS EMPTY -->
+  <!-- DEFAULT -->
+  <ng-template #defaultPlaceHolder>
+    <clr-dg-placeholder>We couldn't find any data!</clr-dg-placeholder>
+  </ng-template>
+  <!-- DEFAULT -->
+  <ng-container
+    ngProjectAs="clr-dg-placeholder"
+    *ngTemplateOutlet="dgPlaceHolderRef || defaultPlaceHolder"
+  ></ng-container>
+  <!--\ DATAGRID PLACEHOLDER WHEN data IS EMPTY -->
+
+  <!-- DATAGRID PANE -->
+  <ng-container ngProjectAs="clr-dg-detail" *ngIf="config.hasDetails">
+    <ng-template
+      clrIfDetail
+      let-detail
+      (clrIfDetailChange)="detailChange.emit($event)"
+    >
+      <clr-dg-detail>
+        <clr-dg-detail-header>
+          <ng-content select=".dg-detail-header"></ng-content>
+        </clr-dg-detail-header>
+        <clr-dg-detail-body>
+          <ng-container
+            *ngTemplateOutlet="dgDetailBodyRef; context: { $implicit: detail }"
+          ></ng-container>
+        </clr-dg-detail-body>
+      </clr-dg-detail>
+    </ng-template>
+  </ng-container>
+
+  <!-- Data grid footer definitions -->
+  <clr-dg-footer>
+    {{ total || data.length }} {{ config.totalItemLabel }}
+    <clr-dg-pagination
+      [clrDgPageSize]="config.pageSize"
+      #pagination
+      [clrDgTotalItems]="total || data.length"
+    >
+      <clr-dg-page-size
+        [clrPageSizeOptions]="config.sizeOptions"
+      ></clr-dg-page-size>
+    </clr-dg-pagination>
+  </clr-dg-footer>
+</clr-datagrid>

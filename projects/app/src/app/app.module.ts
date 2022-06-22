@@ -9,6 +9,7 @@ import { NgxDropzoneModule } from '@azlabsjs/ngx-dropzone';
 import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
 import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
 import { HttpClientModule } from '@angular/common/http';
+import { NgxClrSmartGridModule } from '@azlabsjs/ngx-clr-smart-grid';
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
@@ -37,6 +38,7 @@ ClarityIcons.addIcons(uploadCloudIcon);
       // This path will be used the http handler to load the forms in cache
       formsAssets: '/assets/forms.json',
     }),
+    NgxClrSmartGridModule,
   ],
   bootstrap: [AppComponent],
 })

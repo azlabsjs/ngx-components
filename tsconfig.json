@@ -3,6 +3,9 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
+      "@azlabsjs/ngx-clr-smart-grid": [
+        "dist/azlabs/ngx-clr-smart-grid"
+      ],
       "@azlabsjs/ngx-dropzone": [
         "dist/azlabs/ngx-dropzone"
       ],
