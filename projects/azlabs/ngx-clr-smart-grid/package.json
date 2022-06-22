@@ -1,6 +1,6 @@
 {
   "name": "@azlabsjs/ngx-clr-smart-grid",
-  "version": "0.14.3",
+  "version": "0.14.4",
   "peerDependencies": {
     "@angular/common": "^14.0.0",
     "@angular/core": "^14.0.0",
@@ -10,5 +10,13 @@
     "tslib": "^2.3.0",
     "azlabsjs/strings": "^0.1.10",
     "@azlabsjs/js-datetime": "^0.1.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/azlabsjs/ngx-components.git",
+    "directory": "projects/azlabs/ngx-clr-smart-grid"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@azlabsjs"
   }
 }
