@@ -39,6 +39,9 @@ jobs:
       - name: Build ngx-smart-form
         run: npm run build @azlabsjs/ngx-smart-form
 
+      - name: Build ngx-clr-smart-grid
+        run: npm run build @azlabsjs/ngx-clr-smart-grid
+
       - name: Publish ngx-dropzone
         run: cd dist/azlabs/ngx-dropzone && npm publish --access public
 
@@ -47,5 +50,8 @@ jobs:
 
       - name: Publish ngx-smart-form
         run: cd dist/azlabs/ngx-smart-form && npm publish --access public
+
+      - name: Publish ngx-clr-smart-grid
+        run: cd dist/azlabs/ngx-clr-smart-grid && npm publish --access public
     env:
       NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
