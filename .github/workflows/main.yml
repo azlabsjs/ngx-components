@@ -44,5 +44,8 @@ jobs:
 
       - name: Publish ngx-clr-smart-grid
         run: cd dist/azlabs/ngx-clr-smart-grid && npm publish --access public
+
+      - name: Publish ngx-slides
+        run: cd dist/azlabs/ngx-slides && npm publish --access public
     env:
       NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
