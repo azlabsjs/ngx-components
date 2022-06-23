@@ -3,7 +3,15 @@
 Smart form component is an angular component that abstract native platform form element configuration and create operations using javascript object.
 The module also makes use of angular services injector to provide mechanism for loading and building javascript form objects.
 
-* Basic usage
+## Dependencies
+
+| @azlabsjs/ngx-smart-form | Angular |
+|--------------------------|---------|
+| ^0.13.x                  | ^13.x   |
+|--------------------------|---------|
+| ^0.14.x                  | ^14.x   |
+
+## Usage
 
 To include the API in your angular project, you must import it module into the root of your application.
 
@@ -127,8 +135,7 @@ As mentionned above, the smart form component comes with services for loading fo
 ```ts
 
 // ...
-import { FORM_CLIENT } from "path/smart-forms/angular";
-import { FormsClient } from "path/smart-forms/core";
+import { FORM_CLIENT, FormsClient } from "@azlabsjs/ngx-smart-form";
 
 export class MyFormComponent {
     // Get the form with the id 65 from the cache object
