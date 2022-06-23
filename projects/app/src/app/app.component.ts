@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { GridColumnType } from '@azlabsjs/ngx-clr-smart-grid';
 import { FormsClient, FORM_CLIENT } from '@azlabsjs/ngx-smart-form';
+import { createSlide } from '@azlabsjs/ngx-slides';
 
 @Component({
   selector: 'app-root',
@@ -71,6 +72,13 @@ export class AppComponent {
       sex: 'F',
       nationality: 'TG',
     },
+  ];
+
+  slides = [
+    createSlide(1, 'https://picsum.photos/id/1/200/300'),
+    createSlide(2, 'https://picsum.photos/id/1000/200/300'),
+    createSlide(3, 'https://picsum.photos/id/1001/200/300'),
+    createSlide(4, 'https://picsum.photos/id/1002/200/300')
   ];
 
   public constructor(@Inject(FORM_CLIENT) private client: FormsClient) {}
