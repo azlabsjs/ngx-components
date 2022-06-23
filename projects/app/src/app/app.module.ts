@@ -10,6 +10,8 @@ import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
 import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
 import { HttpClientModule } from '@angular/common/http';
 import { NgxClrSmartGridModule } from '@azlabsjs/ngx-clr-smart-grid';
+import { NgxSlidesModule } from '@azlabsjs/ngx-slides';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
@@ -17,6 +19,7 @@ ClarityIcons.addIcons(uploadCloudIcon);
   declarations: [AppComponent],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
@@ -39,6 +42,7 @@ ClarityIcons.addIcons(uploadCloudIcon);
       formsAssets: '/assets/forms.json',
     }),
     NgxClrSmartGridModule,
+    NgxSlidesModule.forRoot()
   ],
   bootstrap: [AppComponent],
 })

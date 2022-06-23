@@ -5,10 +5,10 @@ The module also makes use of angular services injector to provide mechanism for 
 
 ## Dependencies
 
-| @azlabsjs/ngx-smart-form | @azlabsjs/ngx-dropzone | @azlabsjs/ngx-intl-tel-input | Angular |
-|------------------------|----------------------|----------------------------|---------|
-| ^0.13.x                | ^0.13.x              | ^0.13.x                    | ^13.0   |
-| ^0.14.x                | ^0.14.x              | ^0.14.x                    | ^14.0   |
+| @azlabsjs/ngx-smart-form | @azlabsjs/ngx-dropzone   | @azlabsjs/ngx-intl-tel-input | Angular |
+|--------------------------|--------------------------|------------------------------|---------|
+| ^0.13.x                  | ^0.13.x                  | ^0.13.x                      | ^13.0   |
+| ^0.14.x                  | ^0.14.x                  | ^0.14.x                      | ^14.0   |
 
 * Basic usage
 
@@ -134,8 +134,7 @@ As mentionned above, the smart form component comes with services for loading fo
 ```ts
 
 // ...
-import { FORM_CLIENT } from "path/smart-forms/angular";
-import { FormsClient } from "path/smart-forms/core";
+import { FORM_CLIENT, FormsClient } from "@azlabsjs/ngx-smart-form";
 
 export class MyFormComponent {
     // Get the form with the id 65 from the cache object

@@ -12,6 +12,9 @@
       "@azlabsjs/ngx-intl-tel-input": [
         "dist/azlabs/ngx-intl-tel-input"
       ],
+      "@azlabsjs/ngx-slides": [
+        "dist/azlabs/ngx-slides"
+      ],
       "@azlabsjs/ngx-smart-form": [
         "dist/azlabs/ngx-smart-form"
       ]
