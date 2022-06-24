@@ -1,14 +1,14 @@
 {
   "name": "@azlabsjs/ngx-smart-form",
-  "version": "0.13.9",
+  "version": "0.13.10",
   "peerDependencies": {
     "@angular/common": "^13.0.0",
     "@angular/core": "^13.0.0",
     "@angular/forms": "^13.0.0",
     "@ng-select/ng-select": "^8.0",
     "@clr/angular": "13.0",
-    "@azlabsjs/ngx-intl-tel-input": "0.13.7",
-    "@azlabsjs/ngx-dropzone": "0.13.7"
+    "@azlabsjs/ngx-intl-tel-input": "0.13.10",
+    "@azlabsjs/ngx-dropzone": "0.13.10"
   },
   "dependencies": {
     "tslib": "^2.3.0",
