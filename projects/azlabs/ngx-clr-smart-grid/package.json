@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "azlabsjs/strings": "^0.1.10",
+    "azlabsjs/str": "^0.1.10",
     "@azlabsjs/js-datetime": "^0.1.10"
   },
   "repository": {

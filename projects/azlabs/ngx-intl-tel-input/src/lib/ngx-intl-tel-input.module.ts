@@ -8,12 +8,10 @@ import { PhoneNumberFormat } from 'google-libphonenumber';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
-import { CdsModule } from '@cds/angular';
 
 @NgModule({
   declarations: [NgxIntlTelInputComponent],
   imports: [
-    CdsModule,
     DropdownModule,
     CommonModule,
     FormsModule,
