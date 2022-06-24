@@ -10,7 +10,6 @@ import {
   AsyncPipe,
 } from '@angular/common';
 import { after, before } from '@azlabsjs/str';
-import { DomSanitizer } from '@angular/platform-browser';
 import { GetTimeAgo, JSDate, ParseMonth } from '@azlabsjs/js-datetime';
 
 function substr(value: string, start: number, length?: number) {
@@ -39,8 +38,7 @@ export class NgxGridDataPipe implements PipeTransform {
     private jsonPipe: JsonPipe,
     private percentPipe: PercentPipe,
     private slicePipe: SlicePipe,
-    private asyncPipe: AsyncPipe,
-    private sanitized: DomSanitizer
+    private asyncPipe: AsyncPipe
   ) {}
 
   /**
@@ -78,10 +76,6 @@ export class NgxGridDataPipe implements PipeTransform {
         return this.getMonth(value);
       case 'masked':
         return this.mask(value, ...params.map((x) => Number(x)));
-      case 'safecontent':
-        return this.sanitized.bypassSecurityTrustHtml(value);
-      case 'saferesource':
-        return this.sanitized.bypassSecurityTrustResourceUrl(value);
       case 'uppercase':
         return this.uppercasePipe.transform(value);
       case 'lowercase':
