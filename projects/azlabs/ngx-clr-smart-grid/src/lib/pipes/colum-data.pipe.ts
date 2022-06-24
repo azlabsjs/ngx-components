@@ -9,7 +9,7 @@ import {
   SlicePipe,
   AsyncPipe,
 } from '@angular/common';
-import { after, before } from '@azlabsjs/strings';
+import { after, before } from '@azlabsjs/str';
 import { DomSanitizer } from '@angular/platform-browser';
 import { GetTimeAgo, JSDate, ParseMonth } from '@azlabsjs/js-datetime';
 

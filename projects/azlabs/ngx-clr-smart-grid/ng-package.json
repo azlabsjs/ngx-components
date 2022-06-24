@@ -5,7 +5,7 @@
     "entryFile": "src/public-api.ts"
   },
   "allowedNonPeerDependencies": [
-    "azlabsjs/strings",
+    "azlabsjs/str",
     "@azlabsjs/js-datetime"
   ]
 }

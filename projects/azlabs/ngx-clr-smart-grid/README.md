@@ -203,15 +203,15 @@ Part of the datagrid such as action bar, action button, expandable row space, de
         <ng-template #dgActionBar let-selected>
             <div class="btn-group">
                 <button type="button" class="btn btn-sm btn-outline">
-                    <cds-icon shape="plus"></cds-icon>
+                    <clr-icon shape="plus"></clr-icon>
                     Add to group
                 </button>
                 <button type="button" class="btn btn-sm btn-outline">
-                    <cds-icon shape="close"></cds-icon>
+                    <clr-icon shape="close"></clr-icon>
                     Delete
                 </button>
                 <button type="button" class="btn btn-sm btn-outline" *ngIf="selected">
-                    <cds-icon shape="pencil"></cds-icon>
+                    <clr-icon shape="pencil"></clr-icon>
                     Edit
                 </button>
             </div>
