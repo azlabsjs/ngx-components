@@ -1,6 +1,6 @@
 {
   "name": "@azlabsjs/ngx-slides",
-  "version": "0.14.10",
+  "version": "0.14.11",
   "peerDependencies": {
     "@angular/common": "^14.0.0",
     "@angular/core": "^14.0.0",
