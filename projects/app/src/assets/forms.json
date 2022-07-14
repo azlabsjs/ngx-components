@@ -19,7 +19,7 @@
       "placeholder": "...",
       "type": "select",
       "classes": "clr-input",
-      "optionsConfig": "table:https://auth.lik.tg/api/v2/users|keyfield:id|groupfield:id|valuefield:label",
+      "selectableModel": "table:https://auth.lik.tg/api/v2/users|keyfield:id|groupfield:id|valuefield:label",
       "multiple": false,
       "options": []
     },
