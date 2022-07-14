@@ -10,9 +10,8 @@ import { AbstractControl } from '@angular/forms';
 import {
   OptionsInputConfigInterface,
   InputTypes,
-  OptionsInputItemsInterface,
-  setControlOptions,
-} from '../../../core';
+  InputOptionsInterface,
+} from '@azlabsjs/smart-form-core';
 
 @Component({
   selector: 'ngx-smart-radio-input',
@@ -34,13 +33,13 @@ export class NgxSmartRadioInputComponent implements OnInit {
   //
   ngOnInit(): void {
     if (this.inputConfig) {
-      this.loaded = this.inputConfig.items!.length !== 0;
+      this.loaded = this.inputConfig.options!.length !== 0;
     }
   }
 
-  onItemsChange(state: OptionsInputItemsInterface) {
+  onOptionsChange(state: InputOptionsInterface) {
     this.loaded = true;
-    this.inputConfig = setControlOptions(this.inputConfig, state);
+    this.inputConfig = { ...this.inputConfig, options: state };
     this.cdRef.detectChanges();
   }
 }

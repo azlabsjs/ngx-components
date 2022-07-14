@@ -15,7 +15,7 @@ import {
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { InputConfigInterface } from '../../../core';
+import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { cloneAbstractControl } from '../../helpers';
 import {
   AngularReactiveFormBuilderBridge,

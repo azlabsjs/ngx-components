@@ -70,7 +70,6 @@ function queryValidationMessage(
   let value: string | undefined = getObjectProperty(state, key);
   if (value && interpolateParams) {
     for (const [prop, current] of Object.entries(interpolateParams)) {
-      console.log(prop);
       if (value.includes('{{' + prop + '}}')) {
         value = value.replace('{{' + prop + '}}', current);
       }

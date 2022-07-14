@@ -12,7 +12,7 @@ import {
 import { FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { InputConfigInterface } from '../../../core';
+import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import {
   controlAttributesDataBindings,
   createHiddenAttributeSetter,
@@ -90,7 +90,7 @@ export class NgxSmartFormGroupComponent
     bindings: Map<string, BindingInterface>
   ) {
     for (const current of bindings.values()) {
-      if (current.binding?.formControlName.toString() === name.toString()) {
+      if (current.binding?.name.toString() === name.toString()) {
         const [control, controls] = setControlsAttributes(
           this.controls,
           current,

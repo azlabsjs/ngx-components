@@ -1,28 +1,2 @@
 export * from './http';
 export * from './angular';
-export {
-  FormConfigInterface,
-  InputTypes,
-  CheckboxItem,
-  RadioItem,
-  OptionsInputItem,
-  FormsClient,
-  FormsLoader,
-  CacheProvider,
-  InputValidationRule,
-  InputConfigInterface,
-  InputRequireIfConfig,
-  OptionsInputItemsInterface,
-  SelectOptionsClient,
-  LazyBindingControl,
-  OptionsInputConfigInterface,
-  TextInput,
-  DateInput,
-  NumberInput,
-  SelectInput,
-  TextAreaInput,
-  FileInput,
-  InputGroup,
-  Control,
-  Form,
-} from './core';

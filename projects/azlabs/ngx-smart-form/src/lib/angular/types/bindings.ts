@@ -1,5 +1,5 @@
 import { AsyncValidatorFn, ValidatorFn } from '@angular/forms';
-import { InputRequireIfConfig } from '../../core';
+import { InputRequireIfConfig } from '@azlabsjs/smart-form-core';
 
 // @internal
 export interface BindingInterface {

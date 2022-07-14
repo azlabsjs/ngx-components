@@ -1,5 +1,6 @@
+import { isValidHttpUrl, OptionsConfig } from '@azlabsjs/smart-form-core';
 import { Observable, ObservableInput } from 'rxjs';
-import { SelectOptionsClient } from '../core';
+import { InputOptionsClient } from '../angular/types/options';
 import { getHost, rxRequest } from './helpers';
 
 type _OptionsRequestFunction = <T>(
@@ -7,38 +8,65 @@ type _OptionsRequestFunction = <T>(
   url?: string
 ) => ObservableInput<T>;
 
-export function createSelectOptionsQuery(endpoint?: string, path?: string) {
-  if (endpoint === null && typeof endpoint === 'undefined') {
-    endpoint = path;
-    path = undefined;
-  }
-  if (typeof endpoint === 'undefined' || endpoint === null) {
-    throw new Error('Query endpoint must be a valid http host or url!');
-  }
-  endpoint = path
-    ? `${getHost(endpoint)}/${
-        path.startsWith('/') ? path.slice(0, path.length - 1) : path
-      }`
-    : endpoint;
+type OptionsQueryParams = OptionsConfig & { url: string };
 
-  const _request = queryOptions;
-  return Object.defineProperty(_request, 'request', {
-    value: <T>(param: string, path?: string) => {
-      return _request<T>(path ? `${endpoint}/${path}` : `${endpoint}`, param);
+function createQueryURL(optionsConfig: OptionsConfig) {
+  return `${optionsConfig.source.resource}${
+    optionsConfig.params?.filters
+      ? `?${optionsConfig.params?.filters
+          .replace('[[', '')
+          .replace(']]', '')
+          .replace('|', '&')}`
+      : ''
+  }`;
+}
+
+export function createSelectOptionsQuery(endpoint?: string, path?: string) {
+  let _endpoint!: string;
+  let _path!: string | undefined;
+  if (endpoint === null && typeof endpoint === 'undefined') {
+    _endpoint = path ?? 'http://localhost';
+    _path = undefined;
+  } else {
+    _path = path;
+  }
+  _endpoint = _path
+    ? `${getHost(_endpoint)}/${
+        _path.startsWith('/') ? _path.slice(0, _path.length - 1) : _path
+      }`
+    : _endpoint;
+
+  const _requestClient = queryOptions;
+  Object.defineProperty(_requestClient, 'request', {
+    value: <T>(optionsConfig: OptionsConfig) => {
+      // We build the request query
+      const url = isValidHttpUrl(optionsConfig.source.resource)
+        ? createQueryURL(optionsConfig)
+        : _path
+        ? `${_endpoint}/${_path}`
+        : `${_endpoint}`;
+      const request = { ...optionsConfig, url };
+      return _requestClient<T>(request);
     },
-  }) as any as _OptionsRequestFunction & SelectOptionsClient;
+  });
+  return _requestClient as any as _OptionsRequestFunction & InputOptionsClient;
 }
 
 export function queryOptions<T = Observable<{ [prop: string]: any }[]>>(
-  endpoint: string,
-  param: string
+  optionsConfig: OptionsQueryParams
 ) {
+  // We provides a request body only if the resource object is not a valid
+  // HTTP URI because in such case the request is being send to form API server
+  // instead of any resource server
+  const body = isValidHttpUrl(optionsConfig.source.resource)
+    ? undefined
+    : {
+        table_config: optionsConfig.source.raw,
+      };
   return rxRequest<T>({
-    url: endpoint,
+    url: optionsConfig.url,
     method: 'GET',
-    body: {
-      table_config: param,
-    },
+    body,
     headers: {
       'Content-Type': 'application/json;charset=UTF-8',
     },

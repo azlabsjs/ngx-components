@@ -15,7 +15,9 @@
     "@azlabsjs/built-value": "^0.1.10",
     "@azlabsjs/collections": "^0.1.10",
     "@azlabsjs/utilities": "^0.1.10",
-    "@azlabsjs/functional": "^0.1.10"
+    "@azlabsjs/functional": "^0.1.10",
+    "@azlabsjs/smart-form-core": "^0.1.18"
+
   },
   "repository": {
     "type": "git",

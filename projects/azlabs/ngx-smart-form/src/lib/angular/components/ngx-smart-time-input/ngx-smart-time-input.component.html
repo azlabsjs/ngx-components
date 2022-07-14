@@ -1,7 +1,7 @@
 <ng-container
   *ngTemplateOutlet="
     inputRef;
-    context: { max: maxNumberSize(), config: inputConfig }
+    context: { max: inputConfig.max, min: inputConfig.min, config: inputConfig }
   "
 ></ng-container>
 <span
@@ -18,15 +18,7 @@
     'validation.min'
       | templateDict
         : {
-            value: getErrorAsNumber(
-              control.errors ? control.errors['min'] : '',
-              'min'
-            )
-              ? getErrorAsNumber(
-                  control.errors ? control.errors['min'] : '',
-                  'min'
-                )
-              : inputConfig.min
+            value: inputConfig.min
           }
   }}
 </span>
@@ -38,15 +30,7 @@
     'validation.max'
       | templateDict
         : {
-            value: getErrorAsNumber(
-              control.errors ? control.errors['max'] : '',
-              'max'
-            )
-              ? getErrorAsNumber(
-                  control.errors ? control.errors['max'] : '',
-                  'max'
-                )
-              : inputConfig.min
+            value: inputConfig.max
           }
   }}
 </span>

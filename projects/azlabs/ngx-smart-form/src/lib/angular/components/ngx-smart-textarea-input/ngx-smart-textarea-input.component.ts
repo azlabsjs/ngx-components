@@ -1,6 +1,6 @@
 import { Component, Input, ContentChild, TemplateRef } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
-import { TextAreaInput } from '../../../core';
+import { TextAreaInput } from '@azlabsjs/smart-form-core';
 
 @Component({
   selector: 'ngx-smart-textarea-input',

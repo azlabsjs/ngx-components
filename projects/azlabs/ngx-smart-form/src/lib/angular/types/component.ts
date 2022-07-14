@@ -1,6 +1,6 @@
 import { AbstractControl } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { FormConfigInterface, InputConfigInterface } from '../../core';
+import { FormConfigInterface, InputConfigInterface } from '@azlabsjs/smart-form-core';
 
 export type ControlsStateMap = {
   [index: string]: { onlySelf: boolean; emitEvent: boolean } | undefined;

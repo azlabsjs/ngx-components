@@ -2,7 +2,7 @@
   <label
     class="clr-control-label"
     *ngIf="describe"
-    [for]="inputConfig.formControlName"
+    [for]="inputConfig.name"
   >
     {{ inputConfig.label }}
     <small class="required-text" *ngIf="inputConfig.rules?.isRequired">
@@ -46,7 +46,7 @@
     <span
       [class]="'input__subtext'"
       *ngIf="describe"
-      [innerHTML]="inputConfig.descriptionText || '' | safeHtml"
+      [innerHTML]="inputConfig.description || '' | safeHtml"
     ></span>
   </ng-container>
 </ng-container>

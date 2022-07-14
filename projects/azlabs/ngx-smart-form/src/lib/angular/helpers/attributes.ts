@@ -1,7 +1,7 @@
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { BindingInterface } from '../types';
 import { ComponentReactiveFormHelpers } from './builders';
-import { InputConfigInterface } from '../../core';
+import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { isNumber } from '@azlabsjs/utilities';
 
 type CreateControlAttributeSetterReturnType = (
@@ -23,12 +23,12 @@ export function createHiddenAttributeSetter(
     const hasControls = Array.isArray(controls) && controls.length !== 0;
     if (hasControls) {
       controls = controls.map((_control) => {
-        if (_control.formControlName === bidings.key) {
+        if (_control.name === bidings.key) {
           value = isNaN(value as any) ? value : +value;
           const requiredIfValues = isNumber(value)
             ? _control.requiredIf
-              ? _control.requiredIf.values.map((item) => {
-                  return isNaN(item) ? item : +item;
+              ? _control.requiredIf.values.map((value) => {
+                  return isNaN(value) ? value : +value;
                 })
               : []
             : _control.requiredIf?.values || [];
@@ -61,7 +61,9 @@ export function createHiddenAttributeSetter(
 }
 
 // tslint:disable-next-line: typedef
-export function controlAttributesDataBindings(controls: InputConfigInterface[]) {
+export function controlAttributesDataBindings(
+  controls: InputConfigInterface[]
+) {
   return (formgroup: AbstractControl) => {
     const bindings: Map<string, BindingInterface> = new Map();
     if (Array.isArray(controls) && controls.length !== 0 && formgroup) {
@@ -71,10 +73,10 @@ export function controlAttributesDataBindings(controls: InputConfigInterface[]) 
           typeof current.requiredIf !== 'undefined'
       );
       for (const config of mathes) {
-        const { requiredIf, formControlName } = config;
-        const control_ = formgroup.get(formControlName);
-        bindings.set(formControlName, {
-          key: formControlName,
+        const { requiredIf, name } = config;
+        const control_ = formgroup.get(name);
+        bindings.set(name, {
+          key: name,
           binding: requiredIf,
           validators: control_?.validator ?? undefined,
           asyncValidators: control_?.asyncValidator ?? undefined,
@@ -83,10 +85,10 @@ export function controlAttributesDataBindings(controls: InputConfigInterface[]) 
       for (const value of bindings.values()) {
         const binding = value.binding ?? undefined;
         const hasControl = binding
-          ? false !== (formgroup.get(binding.formControlName) ?? false)
+          ? false !== (formgroup.get(binding.name) ?? false)
           : false;
         const controlValue = value.binding
-          ? formgroup.get(value.binding?.formControlName)?.value
+          ? formgroup.get(value.binding?.name)?.value
           : undefined;
         if (binding && hasControl) {
           const [control, _controls] = setControlsAttributes(

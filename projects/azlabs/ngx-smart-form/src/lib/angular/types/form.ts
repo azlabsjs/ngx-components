@@ -1,11 +1,30 @@
-import { Observable } from "rxjs";
-import { FormInterface } from "../compact";
+import { FormConfigInterface, FormInterface } from '@azlabsjs/smart-form-core';
+import { Observable } from 'rxjs';
+
+/**
+ * @description Form client type definition. Implementation class must provide
+ * functionality to load the form using form id from a given data source
+ */
+export interface FormsClient {
+  /**
+   * @description Get form definitions using the user provided id
+   * @param id
+   */
+  get(id: string | number): Observable<FormConfigInterface>;
+
+  /**
+   * @description Get form definitions using the list of user provided ids
+   * @param id
+   */
+  getAll(id: string[] | number[]): Observable<FormConfigInterface[]>;
+}
+
 
 /**
  * @description Provide implementation for preloading application form
  * into developper defined cache
  */
-export interface FormsLoader {
+ export interface FormsLoader {
   /**
    * @descritpion Provides an abstraction for loading dynamic form definitions
    * from an asset configuration file, a remote server
@@ -24,18 +43,17 @@ export interface FormsLoader {
  * and managed by the cache provider
  */
 export interface CacheProvider {
-
   /**
    *
    * @param id
    */
-  get(id: string|number): Observable<FormInterface>;
+  get(id: string | number): Observable<FormInterface>;
 
   /**
    *
    * @param values
    */
-  getList(values: (string|number)[]): Observable<FormInterface[]>;
+  getList(values: (string | number)[]): Observable<FormInterface[]>;
 
   /**
    * Provides predefined dynamic forms loader implementation

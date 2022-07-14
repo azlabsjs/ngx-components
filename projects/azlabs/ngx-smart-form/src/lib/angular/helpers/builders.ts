@@ -9,18 +9,17 @@ import {
 } from '@angular/forms';
 import { CustomValidators } from '../validators';
 import {
+  DateInput,
+  NumberInput,
+  TextInput,
   OptionsInputConfigInterface,
-  CheckboxItem,
   FormConfigInterface,
   InputConfigInterface,
   InputTypes,
-} from '../../core';
-import {
-  DateInput,
   InputGroup,
-  NumberInput,
-  TextInput,
-} from '../../core';
+  InputOptionsInterface,
+  InputOption,
+} from '@azlabsjs/smart-form-core';
 import { tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { JSDate } from '@azlabsjs/js-datetime';
@@ -43,7 +42,7 @@ export class ComponentReactiveFormHelpers {
     const group = builder.group({});
     for (const input of inputs) {
       if (input.isRepeatable) {
-        group.addControl(input.formControlName, new FormArray([]));
+        group.addControl(input.name, new FormArray([]));
         continue;
       }
       const config = input as InputGroup;
@@ -59,28 +58,31 @@ export class ComponentReactiveFormHelpers {
         if (input?.rules?.isRequired) {
           formgroup.addValidators(Validators.required);
         }
-        group.addControl(input.formControlName, formgroup);
+        group.addControl(input.name, formgroup);
         continue;
       }
       group.addControl(
-        config.formControlName,
+        config.name,
         ComponentReactiveFormHelpers.buildControl(builder, config)
       );
     }
     return group;
   }
 
-  public static buildGroup(builder: FormBuilder, inputs: InputConfigInterface[]) {
+  public static buildGroup(
+    builder: FormBuilder,
+    inputs: InputConfigInterface[]
+  ) {
     const group = builder.group({});
     for (const config of inputs) {
       if (config.type !== InputTypes.CHECKBOX_INPUT) {
         group.addControl(
-          config.formControlName,
+          config.name,
           ComponentReactiveFormHelpers.buildControl(builder, config)
         );
       } else {
         group.addControl(
-          config.formControlName,
+          config.name,
           ComponentReactiveFormHelpers.buildArray(builder, config)
         );
       }
@@ -88,7 +90,10 @@ export class ComponentReactiveFormHelpers {
     return group;
   }
 
-  public static buildControl(builder: FormBuilder, config: InputConfigInterface) {
+  public static buildControl(
+    builder: FormBuilder,
+    config: InputConfigInterface
+  ) {
     const validators = [
       config.rules && config.rules.isRequired
         ? Validators.required
@@ -211,13 +216,13 @@ export class ComponentReactiveFormHelpers {
 
   public static buildArray(builder: FormBuilder, config: InputConfigInterface) {
     const array = new FormArray([]);
-    of((config as OptionsInputConfigInterface).items)
+    of((config as OptionsInputConfigInterface).options)
       .pipe(
-        tap((items) => {
-          (items as any[] as CheckboxItem[]).map(
-            (current: CheckboxItem, index: number) => {
+        tap((options) => {
+          (options as InputOptionsInterface).map(
+            (current: InputOption, index: number) => {
               // Added validation rule to checkbox array
-              (array as FormArray).push(builder.control(current.checked));
+              (array as FormArray).push(builder.control(current.selected));
             }
           );
         })

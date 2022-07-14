@@ -10,10 +10,9 @@ import {
 import { FormControl } from '@angular/forms';
 import { InputEventArgs } from '../../types/input';
 import {
-  OptionsInputItemsInterface,
-  SelectInput,
-  setControlOptions,
-} from '../../../core';
+  OptionsInputConfigInterface,
+  InputOptionsInterface,
+} from '@azlabsjs/smart-form-core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
 import { FetchOptionsDirective } from '../../directives';
@@ -47,7 +46,6 @@ import { FetchOptionsDirective } from '../../directives';
   ],
 })
 export class NgxSmartSelectInputComponent implements AfterViewInit {
-
   //
   @Input() control!: FormControl;
   @Input() describe = true;
@@ -64,9 +62,9 @@ export class NgxSmartSelectInputComponent implements AfterViewInit {
   state$ = this._state$.asObservable();
 
   // tslint:disable-next-line: variable-name
-  private _inputConfig!: SelectInput;
-  @Input() set inputConfig(value: SelectInput) {
-    this._inputConfig = value as SelectInput;
+  private _inputConfig!: OptionsInputConfigInterface;
+  @Input() set inputConfig(value: OptionsInputConfigInterface) {
+    this._inputConfig = value as OptionsInputConfigInterface;
   }
   // tslint:disable-next-line: typedef
   get inputConfig() {
@@ -94,7 +92,7 @@ export class NgxSmartSelectInputComponent implements AfterViewInit {
   }
   ngAfterViewInit(): void {
     if (this._inputConfig) {
-      const values = this._inputConfig.items;
+      const values = this._inputConfig.options;
       this._state$.next({
         ...this._state$.getValue(),
         state: values,
@@ -114,10 +112,10 @@ export class NgxSmartSelectInputComponent implements AfterViewInit {
     this._state$.next({ ...value, loaded });
   }
 
-  onItemsChange(state: OptionsInputItemsInterface) {
-    this._inputConfig = setControlOptions(this._inputConfig, state);
+  onOptionsChange(state: InputOptionsInterface) {
+    this._inputConfig = { ...this._inputConfig, options: state };
     const value = this._state$.getValue();
-    this._state$.next({ ...value, state: this._inputConfig.items ?? [] });
+    this._state$.next({ ...value, state: this._inputConfig.options ?? [] });
   }
 
   onLoadingChange(value: boolean) {

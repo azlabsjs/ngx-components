@@ -20,7 +20,7 @@ import {
   FormConfigInterface,
   InputGroup,
   InputConfigInterface,
-} from '../../../core';
+} from '@azlabsjs/smart-form-core';
 import {
   AngularReactiveFormBuilderBridge,
   HTTP_REQUEST_CLIENT,
@@ -272,17 +272,17 @@ export class NgxSmartFormComponent
   reset(): void {
     this.formGroup.reset();
     for (const control of this.form.controlConfigs ?? []) {
-      this.formGroup.get(control.formControlName)?.setValue(control.value);
+      this.formGroup.get(control.name)?.setValue(control.value);
     }
   }
   //#endregion FormComponent interface Methods definitions
 
   setControlConfig(config?: InputConfigInterface, name?: string) {
     if (config) {
-      name = name ?? config.formControlName;
+      name = name ?? config.name;
       const controls = [...(this.form.controlConfigs ?? [])];
       const index = controls.findIndex(
-        (current) => current.formControlName === name
+        (current) => current.name === name
       );
       controls.splice(index, 1, config);
       this.form = { ...this.form, controlConfigs: controls };
@@ -329,7 +329,7 @@ export class NgxSmartFormComponent
     bindings: Map<string, BindingInterface>
   ) {
     for (const current of bindings.values()) {
-      if (current.binding?.formControlName.toString() === name.toString()) {
+      if (current.binding?.name.toString() === name.toString()) {
         const [control, controls] = setControlsAttributes(
           this.form.controlConfigs ?? [],
           current,
@@ -350,7 +350,7 @@ export class NgxSmartFormComponent
   ) {
     for (const [key, value] of Object.entries(values)) {
       const config_ = Array.isArray(configs)
-        ? configs?.find((config) => config.formControlName === key)
+        ? configs?.find((config) => config.name === key)
         : configs;
       if (formgroup.controls[key] && value) {
         if (formgroup.controls[key] instanceof FormGroup) {

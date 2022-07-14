@@ -7,7 +7,7 @@ import {
   TemplateRef,
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { InputConfigInterface } from '../../../core';
+import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 
 @Component({
   selector: 'ngx-smart-form-array-child',

@@ -18,6 +18,10 @@ export {
   InputEventArgs,
   API_BINDINGS_ENDPOINT,
   API_HOST,
+  FormsClient,
+  FormsLoader,
+  CacheProvider,
+  InputOptionsClient,
 } from './types';
 // Ng Services
 export { DYNAMIC_FORM_LOADER, FormHttpLoader } from './services';

@@ -10,13 +10,13 @@ import {
   Optional,
 } from '@angular/core';
 import { map } from 'rxjs/operators';
-import { FileInput } from '../../../core';
 import { FormControl } from '@angular/forms';
 import { Subject } from 'rxjs';
 import {
   DropzoneComponentInterface,
   DropzoneConfig,
 } from '@azlabsjs/ngx-dropzone';
+import { FileInput } from '@azlabsjs/smart-form-core';
 
 function fakeUUIDv4() {
   const rand = Math.random;

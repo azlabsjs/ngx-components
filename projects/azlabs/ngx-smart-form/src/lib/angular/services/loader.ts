@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, InjectionToken } from '@angular/core';
 import { map } from 'rxjs/operators';
-import { Form, FormsLoader } from '../../core';
+import { Form, FormsLoader } from '@azlabsjs/smart-form-core';
 import { DeserializeObject } from '@azlabsjs/built-value';
 
 export const DYNAMIC_FORM_LOADER = new InjectionToken<FormsLoader>(

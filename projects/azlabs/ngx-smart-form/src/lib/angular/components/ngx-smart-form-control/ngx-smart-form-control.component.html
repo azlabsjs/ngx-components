@@ -38,7 +38,7 @@
         >
           <input
             #focusable
-            [tabIndex]="config!.formControlIndex"
+            [tabIndex]="config!.index"
             [required]="config!.rules!.isRequired || false"
             [class]="'effect-24 ' + config!.classes"
             (blur)="onBlur($event)"
@@ -52,6 +52,7 @@
         </ng-template>
       </ngx-smart-phone-input>
     </ng-container>
+    <!-- Smart date Input -->
     <ng-container *ngSwitchCase="inputTypes.DATE_INPUT">
       <ngx-smart-date-input
         [control]="control"
@@ -68,7 +69,7 @@
             <label
               class="clr-control-label"
               *ngIf="describe"
-              [for]="config.formControlName"
+              [for]="config.name"
             >
               {{ config.label }}
               <span class="required-text" *ngIf="config.rules!.isRequired">
@@ -76,7 +77,8 @@
               </span>
             </label>
             <input
-              [tabIndex]="config!.formControlIndex"
+              title="{{ config!.label }}"
+              [tabIndex]="config!.index"
               type="date"
               (blur)="onBlur($event)"
               [formControl]="control"
@@ -88,6 +90,69 @@
         </ng-template>
       </ngx-smart-date-input>
     </ng-container>
+    <!--\ Smart date Input -->
+    <!-- Smart time input -->
+    <ng-container *ngSwitchCase="inputTypes.TIME_INPUT">
+      <ngx-smart-time-input
+      [control]="control"
+      [inputConfig]="inputType.asTimeInput(inputConfig)"
+      [describe]="describe"
+      >
+      <ng-template #input let-max="max" let-config="config">
+        <pre>{{ config | json }}</pre>
+        <div class="clr-control-container">
+          <div class="clr-input-wrapper">
+            <label
+              class="clr-control-label"
+              *ngIf="describe"
+              [for]="config!.name"
+            >
+              {{ config!.label }}
+              <span class="required-text" *ngIf="config!.rules?.isRequired">
+                (*)
+              </span>
+            </label>
+            <input
+              [tabIndex]="config!.index"
+              (keyup)="
+                keyup.emit({
+                  name: config!.name,
+                  value: $event
+                })
+              "
+              (keydown)="
+                keydown.emit({
+                  name: config!.name,
+                  value: $event
+                })
+              "
+              (keypress)="
+                keypress.emit({
+                  name: config!.name,
+                  value: $event
+                })
+              "
+              (blur)="
+                blur.emit({
+                  name: config!.name,
+                  value: $event
+                })
+              "
+              type="time"
+              [max]="config!.max || max"
+              [min]="config!.min ? config!.min : 0"
+              [class]="config!.classes"
+              [formControl]="control"
+              placeholder="{{
+                config!.placeholder ? config!.placeholder : ''
+              }}"
+            />
+          </div>
+        </div>
+      </ng-template>
+    </ngx-smart-time-input>
+    </ng-container>
+    <!--\ Smart time Input -->
     <ng-container *ngSwitchCase="inputTypes.TEXTAREA_INPUT">
       <ng-container *ngIf="!inline; else textInput">
         <ng-container
@@ -113,7 +178,7 @@
               <label
                 class="clr-control-label"
                 *ngIf="describe"
-                [for]="config!.formControlName"
+                [for]="config!.name"
               >
                 {{ config!.label }}
                 <span class="required-text" *ngIf="config!.rules?.isRequired">
@@ -121,28 +186,28 @@
                 </span>
               </label>
               <input
-                [tabIndex]="config!.formControlIndex"
+                [tabIndex]="config!.index"
                 (keyup)="
                   keyup.emit({
-                    name: config!.formControlName,
+                    name: config!.name,
                     value: $event
                   })
                 "
                 (keydown)="
                   keydown.emit({
-                    name: config!.formControlName,
+                    name: config!.name,
                     value: $event
                   })
                 "
                 (keypress)="
                   keypress.emit({
-                    name: config!.formControlName,
+                    name: config!.name,
                     value: $event
                   })
                 "
                 (blur)="
                   blur.emit({
-                    name: config!.formControlName,
+                    name: config!.name,
                     value: $event
                   })
                 "
@@ -166,7 +231,7 @@
         [inputConfig]="inputType.asRadioInput(inputConfig)"
         [describe]="describe"
       >
-        <ng-template #input let-items="items" let-config="config">
+        <ng-template #input let-options="options" let-config="config">
           <clr-radio-container clrInline>
             <label>
               {{ config!.label }}
@@ -174,18 +239,18 @@
                 (*)
               </span>
             </label>
-            <clr-radio-wrapper *ngFor="let item of items">
+            <clr-radio-wrapper *ngFor="let option of options">
               <input
                 placeholder="radio"
-                [tabIndex]="config!.formControlIndex"
+                [tabIndex]="config!.index"
                 clrRadio
                 type="radio"
                 required
-                [checked]="control.value == item.value"
-                [value]="radioBoxLabel(config!.formControlName, item?.value)"
-                (change)="control!.setValue(item.value)"
+                [checked]="control.value == option.value"
+                [value]="radioBoxLabel(config!.name, option?.value)"
+                (change)="control!.setValue(option.value)"
               />
-              <label>{{ item.description }}</label>
+              <label>{{ option.description }}</label>
             </clr-radio-wrapper>
           </clr-radio-container>
         </ng-template>
@@ -199,7 +264,7 @@
       >
         <ng-template #input let-group="group" let-config="config">
           <clr-checkbox-container clrInline [formGroup]="group">
-            <label *ngIf="describe" [for]="config!.formControlName">
+            <label *ngIf="describe" [for]="config!.name">
               {{ config!.label }}
               <span class="required-text" *ngIf="config!.rules!.isRequired">
                 (*)
@@ -207,21 +272,21 @@
             </label>
             <clr-checkbox-wrapper
               *ngFor="
-                let item of group.controls['items']!.controls;
+                let item of group.controls['options']!.controls;
                 let index = index
               "
             >
               <input
                 placeholder="checkbox"
-                [tabIndex]="config!.formControlIndex"
-                [id]="config!.formControlName + '_' + index"
+                [tabIndex]="config!.index"
+                [id]="config!.name + '_' + index"
                 type="checkbox"
                 clrCheckbox
-                [value]="config!.items[index]!.value"
+                [value]="config!.options[index]!.value"
                 [formControl]="item"
               />
               <label>
-                {{ config!.items[index]!.description }}
+                {{ config!.options[index]!.description }}
               </label>
             </clr-checkbox-wrapper>
           </clr-checkbox-container>
@@ -242,9 +307,11 @@
           let-defaultMaxLength="defaultMaxLength"
         >
           <div class="clr-control-container">
-            <div class="clr-input-wrapper password-clr-input-wrapper password-wrapper">
+            <div
+              class="clr-input-wrapper password-clr-input-wrapper password-wrapper"
+            >
               <label
-                [for]="inputConfig!.formControlName"
+                [for]="inputConfig!.name"
                 class="clr-control-label"
                 *ngIf="describe"
               >
@@ -257,28 +324,28 @@
                 </small>
               </label>
               <input
-                [tabIndex]="inputConfig.formControlIndex"
+                [tabIndex]="inputConfig.index"
                 (keyup)="
                   keyup.emit({
-                    name: inputConfig.formControlName,
+                    name: inputConfig.name,
                     value: $event
                   })
                 "
                 (keydown)="
                   keydown.emit({
-                    name: inputConfig.formControlName,
+                    name: inputConfig.name,
                     value: $event
                   })
                 "
                 (keypress)="
                   keypress.emit({
-                    name: inputConfig.formControlName,
+                    name: inputConfig.name,
                     value: $event
                   })
                 "
                 (blur)="
                   blur.emit({
-                    name: inputConfig.formControlName,
+                    name: inputConfig.name,
                     value: $event
                   })
                 "
@@ -336,7 +403,7 @@
       <div class="clr-control-container">
         <div class="clr-input-wrapper">
           <label
-            [for]="config!.formControlName"
+            [for]="config!.name"
             class="clr-control-label"
             *ngIf="describe"
           >
@@ -346,28 +413,28 @@
             </small>
           </label>
           <input
-            [tabIndex]="config!.formControlIndex"
+            [tabIndex]="config!.index"
             (keyup)="
               keyup.emit({
-                name: config!.formControlName,
+                name: config!.name,
                 value: $event
               })
             "
             (keydown)="
               keydown.emit({
-                name: config!.formControlName,
+                name: config!.name,
                 value: $event
               })
             "
             (keypress)="
               keypress.emit({
-                name: config!.formControlName,
+                name: config!.name,
                 value: $event
               })
             "
             (blur)="
               blur.emit({
-                name: config!.formControlName,
+                name: config!.name,
                 value: $event
               })
             "
@@ -397,7 +464,7 @@
           <label
             class="clr-control-label"
             *ngIf="describe"
-            [for]="config!.formControlName"
+            [for]="config!.name"
           >
             {{ config!.label }}
             <span class="required-text" *ngIf="config!.rules?.isRequired">
@@ -407,25 +474,25 @@
           <textarea
             (keyup)="
               keyup.emit({
-                name: config!.formControlName,
+                name: config!.name,
                 value: $event
               })
             "
             (keydown)="
               keydown.emit({
-                name: config!.formControlName,
+                name: config!.name,
                 value: $event
               })
             "
             (keypress)="
               keypress.emit({
-                name: config!.formControlName,
+                name: config!.name,
                 value: $event
               })
             "
             (blur)="
               blur.emit({
-                name: config!.formControlName,
+                name: config!.name,
                 value: $event
               })
             "

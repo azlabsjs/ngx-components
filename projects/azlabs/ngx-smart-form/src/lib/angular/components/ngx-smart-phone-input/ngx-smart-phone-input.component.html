@@ -3,7 +3,7 @@
     <label
       class="clr-control-label"
       *ngIf="describe"
-      [for]="config!.formControlName"
+      [for]="config!.name"
     >
       {{ config!.label }}
       <span class="required-text" *ngIf="config!.rules?.isRequired">
@@ -65,5 +65,5 @@
 <span
   [class]="'input__subtext'"
   *ngIf="describe"
-  [innerHTML]="config!.descriptionText || '' | safeHtml"
+  [innerHTML]="config!.description || '' | safeHtml"
 ></span>

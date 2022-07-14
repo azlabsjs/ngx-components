@@ -1,6 +1,6 @@
 import { Component, ContentChild, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
-import { InputConfigInterface } from '../../../core';
+import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 
 @Component({
   selector: 'ngx-smart-phone-input',

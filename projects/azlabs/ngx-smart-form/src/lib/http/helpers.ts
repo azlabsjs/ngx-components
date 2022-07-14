@@ -73,7 +73,7 @@ export function rxRequest<T>(
     _headers = new Headers(headers);
   }
   if (['GET', 'HEAD', 'OPTION'].includes(method.toUpperCase())) {
-    const _query = body ?? {};
+    const _query = body ?? undefined;
     if (_query) {
       url = `${url.includes('?') ? url : `${url}?`}${new URLSearchParams(
         body as Record<string, string>

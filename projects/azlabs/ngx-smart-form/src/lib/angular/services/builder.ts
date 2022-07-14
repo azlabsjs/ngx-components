@@ -1,13 +1,16 @@
-import { Injectable } from "@angular/core";
-import { FormBuilder, FormGroup } from "@angular/forms";
-import { FormConfigInterface, InputConfigInterface } from "../../core";
-import { ComponentReactiveFormHelpers } from "../helpers";
+import { Injectable } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import {
+  FormConfigInterface,
+  InputConfigInterface,
+} from '@azlabsjs/smart-form-core';
+import { ComponentReactiveFormHelpers } from '../helpers';
 
 /**
  * @deprecated
  */
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class DynamicFormBuilder {
   // Creates an instance of the class
@@ -34,7 +37,7 @@ export class DynamicFormBuilder {
    * @param form
    */
   buildFormGroupFromDynamicForm(form: FormConfigInterface) {
-    if (typeof form === "undefined" || form === null) {
+    if (typeof form === 'undefined' || form === null) {
       return undefined;
     }
     const configs = [...(form.controlConfigs as InputConfigInterface[])];

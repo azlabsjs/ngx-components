@@ -14,3 +14,4 @@ export { NgxSmartFormArrayComponent } from './ngx-smart-form-array/ngx-smart-for
 export { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array/ngx-smart-form-array-child.component';
 export { NgxSmartFormControlComponent } from './ngx-smart-form-control/ngx-smart-form-control.component';
 export { NgxSmartFormGroupHeaderPipe } from './ngx-smart-form-group/ngx-smart-form-group-header.pipe';
+export { NgxSmartTimeInputComponent } from './ngx-smart-time-input/ngx-smart-time-input.component';

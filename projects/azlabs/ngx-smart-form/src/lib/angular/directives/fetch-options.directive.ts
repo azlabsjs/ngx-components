@@ -9,11 +9,64 @@ import {
   Output,
 } from '@angular/core';
 import { first, tap } from 'rxjs/operators';
-import { OptionsInputItemsInterface, SelectOptionsClient } from '../../core';
+import {
+  InputOption,
+  InputOptionsInterface,
+  isValidHttpUrl,
+  OptionsConfig,
+} from '@azlabsjs/smart-form-core';
 import { createIntersectionObserver } from '../helpers';
-import { OPTIONS_INPUT_ITEMS_CLIENT } from '../types';
+import { INPUT_OPTIONS_CLIENT } from '../types';
+import { InputOptionsClient } from '../types/options';
+import { lastValueFrom } from 'rxjs';
+import { getObjectProperty } from '@azlabsjs/js-object';
 
-// TODO : Add an alternative if the intersection observer is not supported
+// @internal
+export function basicInputOptions(values: string[] | string) {
+  const _values =
+    typeof values === 'string' ? values.split('|') : (values as string[]);
+  return _values?.map((current) => {
+    if (current.indexOf(':') !== -1) {
+      const state = current.split(':');
+      return {
+        value: state[0].trim(),
+        description: state[1].trim(),
+        name: state[1].trim(),
+      } as InputOption;
+    } else {
+      return {
+        value: isNaN(+current.trim()) ? current.trim() : +current.trim(),
+        description: current.trim(),
+        name: current.trim(),
+      } as InputOption;
+    }
+  });
+}
+
+// @internal
+export function mapIntoInputOptions(
+  optionsConfig: OptionsConfig,
+  values: Record<string, any>[]
+) {
+  return values
+    ? values.map((current) => {
+        return {
+          value: getObjectProperty(current, optionsConfig.params?.keyBy || ''),
+          description: getObjectProperty(
+            current,
+            optionsConfig.params?.valueBy || ''
+          ),
+          name: getObjectProperty(current, optionsConfig.params?.valueBy || ''),
+          type:
+            optionsConfig.params?.groupBy &&
+            optionsConfig.params?.keyBy !== optionsConfig.params?.groupBy &&
+            optionsConfig.params?.valueBy !== optionsConfig.params?.groupBy
+              ? current[optionsConfig.params?.groupBy]
+              : undefined,
+        } as InputOption;
+      })
+    : [];
+}
 
 @Directive({
   selector: '[prefetchOptions]',
@@ -21,12 +74,12 @@ import { OPTIONS_INPUT_ITEMS_CLIENT } from '../types';
 export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   //#region Directive inputs
   @Input() loaded!: boolean;
-  @Input() params!: string | any[] | undefined;
+  @Input() optionsConfig!: OptionsConfig | undefined;
   //#endregion Directive inputs
 
   //#region Directive outputs
   @Output() loadedChange = new EventEmitter<boolean>();
-  @Output() itemsChange = new EventEmitter<OptionsInputItemsInterface>();
+  @Output() optionsChange = new EventEmitter<InputOptionsInterface>();
   @Output() loadingChange = new EventEmitter<boolean>();
   //#endregion Directive outputs
 
@@ -36,7 +89,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   // Directive constructor
   constructor(
     private elemRef: ElementRef,
-    @Inject(OPTIONS_INPUT_ITEMS_CLIENT) private client: SelectOptionsClient
+    @Inject(INPUT_OPTIONS_CLIENT) private client: InputOptionsClient
   ) {}
 
   ngAfterViewInit() {
@@ -65,21 +118,43 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     }
   }
 
-  executeQuery() {
-    if (!this.loaded && this.params) {
-      this.loadingChange.emit(true);
-      // Query select options
-      this.client
-        .request(this.params)
-        .pipe(
-          first(),
-          tap((state) => {
-            this.loadingChange.emit(false);
-            this.itemsChange.emit(state);
-          })
-        )
-        .subscribe();
+  async executeQuery() {
+    if (
+      this.loaded ||
+      typeof this.optionsConfig === 'undefined' ||
+      this.optionsConfig === null
+    ) {
+      return;
     }
+    this.loadingChange.emit(true);
+    if (
+      isValidHttpUrl(this.optionsConfig.source.resource) ||
+      (this.optionsConfig.source.raw.match(/table:/) &&
+        this.optionsConfig.source.raw.match(/keyfield:/))
+    ) {
+      return this.asyncFetch(this.optionsConfig);
+    }
+    return this.syncFetch(this.optionsConfig);
+  }
+
+  private syncFetch(optionsConfig: OptionsConfig) {
+    const options = basicInputOptions(optionsConfig.source.raw);
+    this.loadingChange.emit(false);
+    this.optionsChange.emit(options);
+  }
+
+  private async asyncFetch(optionsConfig: OptionsConfig) {
+    await lastValueFrom(
+      this.client.request(optionsConfig).pipe(
+        first(),
+        tap((state) => {
+          this.loadingChange.emit(false);
+          if (state) {
+            this.optionsChange.emit(mapIntoInputOptions(optionsConfig, state));
+          }
+        })
+      )
+    );
   }
 
   ngOnDestroy(): void {

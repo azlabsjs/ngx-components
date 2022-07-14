@@ -28,12 +28,11 @@ import { SafeHTMLPipe, TemplateMessagesPipe } from './pipes';
 import {
   FORM_CLIENT,
   ANGULAR_REACTIVE_FORM_BRIDGE,
-  OPTIONS_INPUT_ITEMS_CLIENT,
+  INPUT_OPTIONS_CLIENT,
   HTTP_REQUEST_CLIENT,
   TEMPLATE_DICTIONARY,
 } from './types/tokens';
 import { JSONFormsClient } from './services/client';
-import { CacheProvider } from '../core';
 import { API_BINDINGS_ENDPOINT, API_HOST } from './types/tokens';
 import {
   DynamicTextAreaInputComponent,
@@ -52,11 +51,13 @@ import {
   NgxSmartSelectInputComponent,
   PhoneInputComponent,
   TextInputComponent,
+  NgxSmartTimeInputComponent,
 } from './components';
 import { FetchOptionsDirective, HTMLFileInputDirective } from './directives';
 import { createSelectOptionsQuery, createSubmitHttpHandler } from '../http';
-import { lastValueFrom, of } from 'rxjs';
+import { from, lastValueFrom, ObservableInput, of } from 'rxjs';
 import { useDefaultTemplateText } from './helpers';
+import { CacheProvider } from '@azlabsjs/smart-form-core';
 
 type FormApiServerConfigs = {
   api: {
@@ -77,7 +78,11 @@ export type ModuleConfigs = {
 export function preloadAppForms(service: CacheProvider, assetsURL: string) {
   return async () => {
     return await lastValueFrom(
-      service.cache(assetsURL || '/assets/resources/forms.json')
+      from(
+        service.cache(
+          assetsURL || '/assets/resources/forms.json'
+        ) as ObservableInput<unknown>
+      )
     );
   };
 }
@@ -119,6 +124,7 @@ export function createDictionary(dzConfig: { [index: string]: any }) {
     NgxSmartFormArrayChildComponent,
     NgxSmartFormControlComponent,
     NgxSmartFormGroupHeaderPipe,
+    NgxSmartTimeInputComponent,
     SafeHTMLPipe,
     TemplateMessagesPipe,
     FetchOptionsDirective,
@@ -143,21 +149,21 @@ export class NgxSmartFormModule {
   ): ModuleWithProviders<NgxSmartFormModule> {
     const providers: Provider[] = [
       FormHttpLoader,
+      FormsCacheProvider,
+      JSONFormsClient,
+      ReactiveFormBuilderBrige,
       {
         provide: DYNAMIC_FORM_LOADER,
         useClass: FormHttpLoader,
       },
-      FormsCacheProvider,
       {
         provide: CACHE_PROVIDER,
         useClass: FormsCacheProvider,
       },
-      JSONFormsClient,
       {
         provide: FORM_CLIENT,
         useClass: JSONFormsClient,
       },
-      ReactiveFormBuilderBrige,
       {
         provide: API_HOST,
         useValue: configs!.serverConfigs!.api.host || undefined,
@@ -185,7 +191,7 @@ export class NgxSmartFormModule {
         useValue: configs!.serverConfigs.api.uploadURL ?? 'http://localhost',
       },
       {
-        provide: OPTIONS_INPUT_ITEMS_CLIENT,
+        provide: INPUT_OPTIONS_CLIENT,
         useFactory: () => {
           return createSelectOptionsQuery(
             configs!.serverConfigs!.api.host,

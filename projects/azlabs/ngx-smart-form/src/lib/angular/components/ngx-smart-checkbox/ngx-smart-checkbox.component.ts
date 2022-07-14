@@ -14,21 +14,20 @@ import {
   FormArray,
   AbstractControl,
 } from '@angular/forms';
+import {
+  InputOptionsInterface,
+  InputTypes,
+  mapIntoInputOptions,
+  OptionsInputConfigInterface,
+} from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import {
-  OptionsInputConfigInterface,
-  InputTypes,
-  OptionsInputItemsInterface,
-  setControlOptions,
-} from '../../../core';
 
 @Component({
   selector: 'ngx-smart-checkbox-input',
   templateUrl: './ngx-smart-checkbox.component.html',
 })
 export class NgxSmartCheckBoxComponent implements OnInit, OnDestroy {
-
   //#region Component inputs
   @Input() control!: AbstractControl;
   @Input() inputConfig!: OptionsInputConfigInterface;
@@ -47,9 +46,9 @@ export class NgxSmartCheckBoxComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.formGroup = this.builder.group({});
     if (this.inputConfig) {
-      this.loaded = this.inputConfig.items!.length !== 0;
+      this.loaded = this.inputConfig.options!.length !== 0;
     }
-    if ((this.inputConfig!.items ?? []).length !== 0) {
+    if ((this.inputConfig!.options ?? []).length !== 0) {
       this.initializeFormArray();
     }
   }
@@ -58,9 +57,9 @@ export class NgxSmartCheckBoxComponent implements OnInit, OnDestroy {
     this._destroy$.next();
   }
 
-  onItemsChange(state: OptionsInputItemsInterface) {
+  onOptionsChange(state: InputOptionsInterface) {
     this.loaded = true;
-    this.inputConfig = setControlOptions(this.inputConfig, state);
+    this.inputConfig = { ...this.inputConfig, options: state };
     this.initializeFormArray();
     this.cdRef.detectChanges();
   }
@@ -76,43 +75,43 @@ export class NgxSmartCheckBoxComponent implements OnInit, OnDestroy {
     ).filter((current) => typeof current !== 'undefined' && current !== null);
 
     // We add controls to the form array element
-    if ((this.inputConfig!.items ?? []).length === 1) {
+    if ((this.inputConfig!.options ?? []).length === 1) {
       control.push(new FormControl(value.length === 0 ? false : true));
-    } else if ((this.inputConfig!.items ?? []).length !== 0) {
-      for (const item of this.inputConfig.items) {
-        const index = value.find((current) => current == item.value);
+    } else if ((this.inputConfig!.options ?? []).length !== 0) {
+      for (const option of this.inputConfig.options) {
+        const index = value.find((current) => current == option.value);
         control.push(new FormControl(index ? true : false));
       }
     }
-    this.formGroup.addControl('items', control);
+    this.formGroup.addControl('options', control);
     this.subscribeToFormArrayChange();
   }
 
   private subscribeToFormArrayChange() {
-    this.formGroup.controls['items'].valueChanges
+    this.formGroup.controls['options'].valueChanges
       .pipe(
         takeUntil(this._destroy$),
         tap((state: boolean[]) => {
           this.control.setValue(
-            this.getValue(this.inputConfig.items ?? [], state)
+            this.getValue(this.inputConfig.options ?? [], state)
           );
         })
       )
       .subscribe();
   }
 
-  private getValue(items: OptionsInputItemsInterface, state: boolean[]) {
-    if (items.length === 0) {
+  private getValue(options: InputOptionsInterface, state: boolean[]) {
+    if (options.length === 0) {
       return undefined;
     }
-    if (items.length === 1) {
+    if (options.length === 1) {
       return state[0];
     }
     return state
       .filter((current) => current === true)
       .map((current, index) => {
-        if (this.inputConfig.items[index]) {
-          return this.inputConfig.items[index].value;
+        if (this.inputConfig.options[index]) {
+          return this.inputConfig.options[index].value;
         }
         return undefined;
       })
