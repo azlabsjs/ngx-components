@@ -92,4 +92,8 @@ export class AppComponent {
   onSelectedChanges(event: unknown | unknown[]) {
     console.log(event);
   }
+
+  ngxFormSubmit(event: Record<string,any>) {
+    console.log(event);
+  }
 }

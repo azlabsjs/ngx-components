@@ -21,12 +21,12 @@ export class PhoneInputComponent {
   //#endregion Component event emitter
 
   onBlur(event: FocusEvent) {
-    this.control!.markAsTouched();
+    this.control?.markAsTouched();
     this.blur.emit(event);
   }
 
   onFocus(event: FocusEvent) {
-    this.control!.markAsTouched();
+    this.control?.markAsTouched();
     this.focus.emit(event);
   }
 }

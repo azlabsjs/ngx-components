@@ -108,13 +108,13 @@ export class NgxSmartCheckBoxComponent implements OnInit, OnDestroy {
       return state[0];
     }
     return state
-      .filter((current) => current === true)
-      .map((current, index) => {
-        if (this.inputConfig.options[index]) {
-          return this.inputConfig.options[index].value;
-        }
-        return undefined;
-      })
+      .map((current, index) =>
+        current === false
+          ? undefined
+          : options[index]
+          ? options[index].value
+          : undefined
+      )
       .filter((current) => typeof current !== 'undefined' && current !== null);
   }
 

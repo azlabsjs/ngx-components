@@ -19,7 +19,7 @@
       "placeholder": "...",
       "type": "select",
       "classes": "clr-input",
-      "selectableModel": "table:https://auth.lik.tg/api/v2/users|keyfield:id|groupfield:id|valuefield:label",
+      "selectableModel": "table:http://localhost:4200/assets/testing/users.json|keyfield:id|groupfield:id|valuefield:name",
       "multiple": false,
       "options": []
     },
@@ -38,7 +38,7 @@
       "placeholder": "...",
       "type": "select",
       "classes": "clr-input",
-      "optionsConfig": "table:https://auth.lik.tg/api/v2/authorizations|keyfield:id|groupfield:id|valuefield:label",
+      "optionsConfig": "http://localhost:4200/assets/testing/authorizations.json",
       "multiple": true,
       "options": []
     },
@@ -147,7 +147,7 @@
       "disabled": false,
       "readonly": false,
       "unique": false,
-      "pattern": "\\W{8,32}",
+      "pattern": "\\w{8,32}",
       "isRepeatable": false,
       "containerClass": "clr-col-sm-12 clr-col-md-6",
       "id": 9,
@@ -195,7 +195,7 @@
       "placeholder": "...",
       "type": "email",
       "classes": "clr-input",
-      "min": "20",
+      "min": "5",
       "max": "199",
       "multiple": false,
       "options": []

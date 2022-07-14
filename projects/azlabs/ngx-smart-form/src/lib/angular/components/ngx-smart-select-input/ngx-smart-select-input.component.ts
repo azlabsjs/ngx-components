@@ -112,8 +112,17 @@ export class NgxSmartSelectInputComponent implements AfterViewInit {
     this._state$.next({ ...value, loaded });
   }
 
-  onOptionsChange(state: InputOptionsInterface) {
-    this._inputConfig = { ...this._inputConfig, options: state };
+  onOptionsChange(options: InputOptionsInterface) {
+    this._inputConfig = {
+      ...this._inputConfig,
+      options: options.map((state) => ({
+        ...state,
+        // We convert the select values to uppercase
+        // for UI consistency
+        name: state?.name.toUpperCase(),
+        description: state.description?.toUpperCase(),
+      })),
+    };
     const value = this._state$.getValue();
     this._state$.next({ ...value, state: this._inputConfig.options ?? [] });
   }

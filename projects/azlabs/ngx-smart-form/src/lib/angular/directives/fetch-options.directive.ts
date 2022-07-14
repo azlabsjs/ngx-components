@@ -10,63 +10,16 @@ import {
 } from '@angular/core';
 import { first, tap } from 'rxjs/operators';
 import {
-  InputOption,
   InputOptionsInterface,
   isValidHttpUrl,
+  mapIntoInputOptions,
+  mapStringListToInputOptions,
   OptionsConfig,
 } from '@azlabsjs/smart-form-core';
 import { createIntersectionObserver } from '../helpers';
 import { INPUT_OPTIONS_CLIENT } from '../types';
 import { InputOptionsClient } from '../types/options';
 import { lastValueFrom } from 'rxjs';
-import { getObjectProperty } from '@azlabsjs/js-object';
-
-// @internal
-export function basicInputOptions(values: string[] | string) {
-  const _values =
-    typeof values === 'string' ? values.split('|') : (values as string[]);
-  return _values?.map((current) => {
-    if (current.indexOf(':') !== -1) {
-      const state = current.split(':');
-      return {
-        value: state[0].trim(),
-        description: state[1].trim(),
-        name: state[1].trim(),
-      } as InputOption;
-    } else {
-      return {
-        value: isNaN(+current.trim()) ? current.trim() : +current.trim(),
-        description: current.trim(),
-        name: current.trim(),
-      } as InputOption;
-    }
-  });
-}
-
-// @internal
-export function mapIntoInputOptions(
-  optionsConfig: OptionsConfig,
-  values: Record<string, any>[]
-) {
-  return values
-    ? values.map((current) => {
-        return {
-          value: getObjectProperty(current, optionsConfig.params?.keyBy || ''),
-          description: getObjectProperty(
-            current,
-            optionsConfig.params?.valueBy || ''
-          ),
-          name: getObjectProperty(current, optionsConfig.params?.valueBy || ''),
-          type:
-            optionsConfig.params?.groupBy &&
-            optionsConfig.params?.keyBy !== optionsConfig.params?.groupBy &&
-            optionsConfig.params?.valueBy !== optionsConfig.params?.groupBy
-              ? current[optionsConfig.params?.groupBy]
-              : undefined,
-        } as InputOption;
-      })
-    : [];
-}
 
 @Directive({
   selector: '[prefetchOptions]',
@@ -138,7 +91,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   }
 
   private syncFetch(optionsConfig: OptionsConfig) {
-    const options = basicInputOptions(optionsConfig.source.raw);
+    const options = mapStringListToInputOptions(optionsConfig.source.raw);
     this.loadingChange.emit(false);
     this.optionsChange.emit(options);
   }
