@@ -4,6 +4,8 @@ import { RequestClient } from '../../http';
 import { Observable } from 'rxjs';
 import { InputOptionsClient } from './options';
 import { FormsClient } from './form';
+import { UploadOptions } from '@azlabsjs/uploader';
+import { HttpRequest, HttpResponse } from '@azlabsjs/requests';
 
 export type ValidationMessagesType = Observable<
   { [index: string]: any } | Record<string, any>
@@ -36,3 +38,7 @@ export const HTTP_REQUEST_CLIENT = new InjectionToken<RequestClient>(
 export const TEMPLATE_DICTIONARY = new InjectionToken<ValidationMessagesType>(
   'TEMPLATE DICTIONARY PROVIDER'
 );
+
+export const UPLOADER_OPTIONS = new InjectionToken<UploadOptions<HttpRequest, HttpResponse>>(
+  'OPTIONS TO PASS TO THE UPLOADER BY DEFAULT'
+)

@@ -3,6 +3,7 @@ import {
   APP_INITIALIZER,
   ModuleWithProviders,
   Provider,
+  Injector,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -31,9 +32,11 @@ import {
   INPUT_OPTIONS_CLIENT,
   HTTP_REQUEST_CLIENT,
   TEMPLATE_DICTIONARY,
-} from './types/tokens';
+  UPLOADER_OPTIONS,
+  API_BINDINGS_ENDPOINT,
+  API_HOST,
+} from './types';
 import { JSONFormsClient } from './services/client';
-import { API_BINDINGS_ENDPOINT, API_HOST } from './types/tokens';
 import {
   DynamicTextAreaInputComponent,
   NgxSmartCheckBoxComponent,
@@ -52,12 +55,20 @@ import {
   PhoneInputComponent,
   TextInputComponent,
   NgxSmartTimeInputComponent,
+  NgxSmartDzComponent,
 } from './components';
 import { FetchOptionsDirective, HTMLFileInputDirective } from './directives';
 import { createSelectOptionsQuery, createSubmitHttpHandler } from '../http';
 import { from, lastValueFrom, ObservableInput, of } from 'rxjs';
 import { useDefaultTemplateText } from './helpers';
 import { CacheProvider } from '@azlabsjs/smart-form-core';
+import { UploadOptions } from '@azlabsjs/uploader';
+import {
+  HttpRequest,
+  HttpResponse,
+  Interceptor,
+  RequestClient,
+} from '@azlabsjs/requests';
 
 type FormApiServerConfigs = {
   api: {
@@ -73,6 +84,15 @@ export type ModuleConfigs = {
   formsAssets?: string;
   clientFactory?: Function;
   templateTextProvider?: Provider;
+  uploadOptions: Omit<
+    UploadOptions<HttpRequest, HttpResponse>,
+    'interceptor'
+  > & {
+    createInterceptor?: (injector: Injector) => Interceptor<HttpRequest>;
+    createBackend?: (
+      injector: Injector
+    ) => RequestClient<HttpRequest, HttpResponse>;
+  };
 };
 
 export function preloadAppForms(service: CacheProvider, assetsURL: string) {
@@ -129,6 +149,7 @@ export function createDictionary(dzConfig: { [index: string]: any }) {
     TemplateMessagesPipe,
     FetchOptionsDirective,
     HTMLFileInputDirective,
+    NgxSmartDzComponent,
   ],
   exports: [
     NgxSmartFormComponent,
@@ -187,10 +208,6 @@ export class NgxSmartFormModule {
         useClass: ReactiveFormBuilderBrige,
       },
       {
-        provide: 'FILE_STORE_PATH',
-        useValue: configs!.serverConfigs.api.uploadURL ?? 'http://localhost',
-      },
-      {
         provide: INPUT_OPTIONS_CLIENT,
         useFactory: () => {
           return createSelectOptionsQuery(
@@ -220,13 +237,12 @@ export class NgxSmartFormModule {
           const dzConfig = (configs?.dropzoneConfigs || {
             url: configs!.serverConfigs!.api.host ?? 'http://localhost',
             maxFilesize: 10,
-            acceptedFiles: 'image/*',
+            acceptedFiles: '*/*',
             autoProcessQueue: false,
             uploadMultiple: false,
             maxFiles: 1,
             addRemoveLinks: true,
           }) as any;
-
           for (const [prop, value] of Object.entries(dictionary)) {
             if (
               !(prop in dzConfig) ||
@@ -239,6 +255,38 @@ export class NgxSmartFormModule {
           return dzConfig as DropzoneConfig;
         },
         deps: [DROPZONE_DICT],
+      },
+      {
+        provide: UPLOADER_OPTIONS,
+        useFactory: (injector: Injector) => {
+          if (
+            typeof configs.uploadOptions === 'undefined' ||
+            configs.uploadOptions === null
+          ) {
+            return {
+              path: configs.serverConfigs.api.uploadURL,
+            };
+          }
+          let interceptor!: Interceptor<HttpRequest>;
+          let backend!: RequestClient<HttpRequest, HttpResponse>;
+          const path =
+            configs.uploadOptions.path || configs.serverConfigs.api.uploadURL;
+          if (typeof configs.uploadOptions.createInterceptor === 'function') {
+            interceptor = configs.uploadOptions.createInterceptor(injector);
+            delete configs.uploadOptions['createInterceptor'];
+          } //
+          if (typeof configs.uploadOptions.createBackend === 'function') {
+            backend = configs.uploadOptions.createBackend(injector);
+            delete configs.uploadOptions['createBackend'];
+          }
+          return {
+            ...configs.uploadOptions,
+            interceptor,
+            backend,
+            path,
+          } as UploadOptions<HttpRequest, HttpResponse>;
+        },
+        deps: [Injector],
       },
     ];
     providers.push(

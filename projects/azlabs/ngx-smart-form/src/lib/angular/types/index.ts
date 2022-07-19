@@ -12,6 +12,7 @@ export {
   HTTP_REQUEST_CLIENT,
   TEMPLATE_DICTIONARY,
   ValidationMessagesType,
+  UPLOADER_OPTIONS
 } from './tokens';
 //
 export { ControlsStateMap, FormComponentInterface } from './component';

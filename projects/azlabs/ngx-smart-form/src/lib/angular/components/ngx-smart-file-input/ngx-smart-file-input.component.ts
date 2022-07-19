@@ -2,23 +2,21 @@ import {
   Component,
   OnInit,
   Input,
-  ViewChild,
   Inject,
   Output,
   EventEmitter,
   OnDestroy,
-  Optional,
 } from '@angular/core';
-import { map } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { Subject } from 'rxjs';
-import {
-  DropzoneComponentInterface,
-  DropzoneConfig,
-} from '@azlabsjs/ngx-dropzone';
+import { DropzoneConfig } from '@azlabsjs/ngx-dropzone';
 import { FileInput } from '@azlabsjs/smart-form-core';
+import { UPLOADER_OPTIONS } from '../../types';
+import { Uploader, UploadOptions } from '@azlabsjs/uploader';
+import { HttpRequest, HttpResponse } from '@azlabsjs/requests';
+import { NgxUploadsSubjectService } from './ngx-uploads-subject.service';
 
-function fakeUUIDv4() {
+function uuidv4() {
   const rand = Math.random;
   function substr(str: string, offset: number, length: number) {
     return str.substring(offset, Math.min(str.length, offset + length));
@@ -44,23 +42,29 @@ function fakeUUIDv4() {
   templateUrl: './ngx-smart-file-input.component.html',
 })
 export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
+  //#region Component inputs
   @Input() control!: FormControl;
   @Input() describe = true;
-
-  // Property for handling File Input types
-  public dropzoneConfigs!: DropzoneConfig;
-  // public dropzoneConfig!: DropzoneConfig;
-  @ViewChild('dropzoneContainer')
-  dropzoneContainer!: DropzoneComponentInterface;
-  // Configuration parameters of the input
   @Input() inputConfig!: FileInput;
+  @Input() uploadAs!: string;
+  @Input() autoupload: boolean = false;
+  @Input() url!: string | undefined;
+  //#endregion Component inputs
 
+  //#region Component outputs
   @Output() addedEvent = new EventEmitter<any>();
   @Output() removedEvent = new EventEmitter<any>();
+  //#endregion Component outputs
 
   private _destroy$ = new Subject<void>();
+  // Property for handling File Input types
+  public dropzoneConfigs!: DropzoneConfig;
 
-  constructor(@Inject('FILE_STORE_PATH') @Optional() private path: string) {}
+  constructor(
+    @Inject(UPLOADER_OPTIONS)
+    private uploadOptions: UploadOptions<HttpRequest, HttpResponse>,
+    private uploadEvents: NgxUploadsSubjectService
+  ) {}
 
   ngOnInit(): void {
     const config = this.inputConfig;
@@ -73,127 +77,119 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
         config !== null &&
         config.uploadUrl !== ''
           ? config.uploadUrl
-          : this.path ?? '',
+          : this.uploadOptions.path ?? '',
       uploadMultiple: config.multiple ? config.multiple : false,
       acceptedFiles: config.pattern,
     } as DropzoneConfig;
-    //#region Set the dropzone configurations
-    this.control.valueChanges.pipe(
-      map((state) => {
-        if (this.control.status.toLowerCase() === 'disabled') {
-          this.dropzoneContainer.disabled = true;
+  }
+
+  dzOnAdd(event?: any) {
+    // Handle the add event on the dz component
+  }
+
+  // tslint:disable-next-line: typedef
+  dzOnRemove(event: any, multiple: boolean = false) {
+    if (
+      typeof this.control.value === 'undefined' ||
+      this.control.value === null
+    ) {
+      return;
+    }
+    // Notify the parent component of the remove event
+    this.removedEvent.emit();
+
+    // Then if supporting multiple files upload, remove the deleted file from the list
+    if (multiple) {
+      return this.control.setValue(
+        (this.control.value as File[]).filter((file) => {
+          return file !== event;
+        })
+      );
+    }
+    // Reset the input control
+    this.onReset();
+  }
+
+  onTooLargeFilesEvent(event: File[]) {
+    // TODO: Add error to control
+  }
+
+  async onAcceptedFiles(
+    event: File[],
+    multiple: boolean = false,
+    autoupload: boolean = false,
+    uploadAs: string = 'file'
+  ) {
+    return !autoupload
+      ? this.control.setValue(multiple ? event : event[0])
+      : this.processUploads(event, multiple, autoupload, uploadAs);
+  }
+
+  private async processUploads(
+    event: File[],
+    multiple: boolean = false,
+    autoupload: boolean = false,
+    uploadAs: string = 'file'
+  ) {
+    // When the autoupload is set on the current component, we send an upload request
+    // to configured url or server url for each accepted files
+    const _files = (multiple ? [event[0]] : event).map((file) => ({
+      content: file,
+      uuid: uuidv4(),
+    }));
+    const uploader = Uploader({
+      ...this.uploadOptions,
+      // By the default, the url passed in the HTML template, takes preceedence on inputConfig uploadURL, which
+      // in turn takes precedence over the globally configured upload path
+      path: this.url ?? this.inputConfig.uploadUrl ?? this.uploadOptions.path,
+      // We use the name provided in the input configuration or fallback to gloabbly configured name
+      name: uploadAs ?? this.uploadOptions.name ?? 'file',
+      // We use the default specified responseType else we fallback to 'json' response type
+      responseType: this.uploadOptions.responseType ?? 'json',
+    });
+    let results = await Promise.all(
+      _files.map(async (file) => {
+        this.uploadEvents.startUpload({
+          id: file.uuid,
+          processing: true,
+          file: file.content,
+        });
+        const result = (await uploader.upload(file.content)) as Record<
+          string,
+          any
+        >;
+        let _result!: Record<string, any>;
+        if (typeof result === 'string') {
+          try {
+            // If parsing the string throws an error, then request may have
+            // failed
+            _result = JSON.parse(result);
+          } catch (error) {
+            _result = {} as Record<string, any>;
+            _result['error'] = error;
+          }
         } else {
-          this.dropzoneContainer.disabled = false;
+          _result = result;
         }
-        if (typeof state !== 'undefined') {
-          this.dropzoneContainer.reset();
-        }
+        this.uploadEvents.completeUpload(file.uuid, _result);
+        return _result;
       })
+    );
+    // We filter the result array and remove all result objects that
+    // has been marked errored
+    results = results.filter(
+      (result) =>
+        typeof result['error'] !== 'undefined' && result['error'] !== null
+    );
+    // After all files has been uploaded, we set the form control value to
+    // ids returned by the uploader request
+    this.control.setValue(
+      multiple ? results[0]['id'] : results.map((result) => result['id'])
     );
   }
 
-  // tslint:disable-next-line: typedef
-  async onDropzoneFileAdded() {
-    const timeout = setTimeout(async () => {
-      const files = this.dropzoneContainer.dropzone().getAcceptedFiles();
-      if ((this.inputConfig as FileInput).multiple) {
-        this.control.setValue(
-          await Promise.all(
-            (files as any[]).map(async (current) => {
-              return {
-                uuid: current.upload.uuid,
-                dataURL: await this.readBlobAsDataURL(current),
-                extension:
-                  current.name.split('.')[current.name.split('.').length - 1],
-              };
-            })
-          )
-        );
-      } else {
-        const file = files[0];
-        if (file) {
-          this.control.setValue({
-            uuid: files[0].upload!.uuid,
-            dataURL: await this.readBlobAsDataURL(files[0]),
-            extension: (files[0].name as string).split('.')[
-              (files[0].name as string).split('.').length - 1
-            ],
-          });
-          this.dropzoneContainer.disabled = true;
-        }
-      }
-      this.addedEvent.emit(this.control.value);
-      clearTimeout(timeout);
-    }, 50);
-  }
-
-  // tslint:disable-next-line: typedef
-  onDropzoneFileRemoved(event: any) {
-    if ((this.inputConfig as FileInput).multiple) {
-      if (
-        typeof this.control.value !== 'undefined' &&
-        this.control.value !== null
-      ) {
-        this.control.setValue(
-          (this.control.value as { [prop: string]: any }[]).filter((v) => {
-            return v['uuid'] !== event.upload.uuid;
-          })
-        );
-      }
-    } else {
-      this.onResetControlValue();
-    }
-    // Enable the dropzpone if an item is removed from the dropzone and not supporting multiple upload
-    if (!(this.inputConfig as FileInput).multiple) {
-      this.dropzoneContainer.disabled = false;
-    }
-    this.removedEvent.emit();
-  }
-
-  onHTMLInputLargeFileEvent(event: File | File[]) {
-    // TODO: Add error to formcontrol
-  }
-
-  async onHTMLInputAcceptFilesChange(event: File | File[]) {
-    if (Array.isArray(event)) {
-      this.control!.setValue(
-        await Promise.all(
-          event.map(async (state) => await this.createControlValue(state))
-        )
-      );
-    } else {
-      this.control!.setValue(await this.createControlValue(event));
-    }
-    this.addedEvent.emit(this.control.value);
-  }
-
-  onResetControlValue() {
+  onReset() {
     this.control.reset();
-  }
-
-  private readBlobAsDataURL(content: Blob) {
-    return new Promise<string | undefined>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = async (e: ProgressEvent<any>) => {
-        if (e.target) {
-          return resolve(e.target.result.toString());
-        }
-        resolve(undefined);
-      };
-      reader.readAsDataURL(content);
-    });
-  }
-
-  private async createControlValue(state: File) {
-    return {
-      uuid: fakeUUIDv4(),
-      dataURL: await this.readBlobAsDataURL(state),
-      extension: (state.name as string).split('.')[
-        state.name.split('.').length - 1
-      ],
-      size: state.size,
-      lastModified: state.lastModified,
-    };
   }
 
   ngOnDestroy() {
