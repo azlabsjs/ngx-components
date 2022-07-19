@@ -1,29 +1,27 @@
 <ng-container *ngIf="inputConfig">
-  <label
-    class="clr-control-label"
-    *ngIf="describe"
-    [for]="inputConfig.name"
-  >
+  <label class="clr-control-label" *ngIf="describe" [for]="inputConfig.name">
     {{ inputConfig.label }}
     <small class="required-text" *ngIf="inputConfig.rules?.isRequired">
       (*)
     </small>
   </label>
-  <ng-container *ngIf="inputConfig.multiple">
-    <ngx-dropzone
-      #dropzoneContainer
-      *ngIf="dropzoneConfigs"
+  <ng-container *ngIf="inputConfig.multiple && dropzoneConfigs">
+    <ngx-smart-dz
       [config]="dropzoneConfigs"
-      (removedFile)="onDropzoneFileRemoved($event)"
-      (addedFile)="onDropzoneFileAdded()"
-      [uploadFileText]="'uploadFileLabel' | templateDict"
-      [dragFileText]="'dragFileLabel' | templateDict"
-      [defaultMessage]="'clickUploadButtonLabel' | templateDict"
-    >
-      <ng-template #dzuploadbutton>
-        <clr-icon shape="upload-cloud"></clr-icon>
-      </ng-template>
-    </ngx-dropzone>
+      (removed)="dzOnRemove($event, inputConfig.multiple)"
+      (added)="dzOnAdd()"
+      [disabled]="control.status.toLowerCase() === 'disabled'"
+      [multiple]="inputConfig.multiple"
+      (acceptedFiles)="
+        onAcceptedFiles(
+          $event,
+          inputConfig.multiple,
+          inputConfig.autoupload,
+          inputConfig.uploadAs
+        )
+      "
+      (reset)="onReset()"
+    ></ngx-smart-dz>
   </ng-container>
   <ng-container *ngIf="!inputConfig.multiple">
     <input
@@ -33,20 +31,27 @@
       [class]="inputConfig.classes"
       [maxFileSize]="dropzoneConfigs.maxFilesize || 10"
       [maxFiles]="1"
-      (sizeError)="onHTMLInputLargeFileEvent($event)"
-      (acceptedFilesChange)="onHTMLInputAcceptFilesChange($event)"
-      (reset)="onResetControlValue()"
+      (sizeError)="onTooLargeFilesEvent($event)"
+      (acceptedFiles)="
+        onAcceptedFiles(
+          $event,
+          inputConfig.multiple,
+          inputConfig.autoupload,
+          inputConfig.uploadAs
+        )
+      "
+      (reset)="onReset()"
     />
-    <span
-      [class]="'input__subtext input__error_text'"
-      *ngIf="control.hasError('required') && control.touched"
-    >
-      {{ 'validation.required' | templateDict }}
-    </span>
-    <span
-      [class]="'input__subtext'"
-      *ngIf="describe"
-      [innerHTML]="inputConfig.description || '' | safeHtml"
-    ></span>
   </ng-container>
+  <span
+    [class]="'input__subtext input__error_text'"
+    *ngIf="control.hasError('required') && control.touched"
+  >
+    {{ 'validation.required' | templateDict }}
+  </span>
+  <span
+    [class]="'input__subtext'"
+    *ngIf="describe"
+    [innerHTML]="inputConfig.description || '' | safeHtml"
+  ></span>
 </ng-container>

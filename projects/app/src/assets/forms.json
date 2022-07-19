@@ -255,6 +255,23 @@
       "optionsConfig": "2:ADMIN|3:STANDARD|4:OPÉRATEUR",
       "multiple": true,
       "options": []
+    },
+    {
+      "formId": 1,
+      "controlName": "attachments",
+      "controlIndex": 15,
+      "required": true,
+      "disabled": false,
+      "readonly": false,
+      "unique": false,
+      "isRepeatable": false,
+      "containerClass": "clr-col-sm-12 clr-col-md-12",
+      "id": 15,
+      "label": "FICHIER ATTACHÉS",
+      "placeholder": "...",
+      "type": "file",
+      "classes": "clr-input",
+      "multiple": true
     }
   ]
 }]

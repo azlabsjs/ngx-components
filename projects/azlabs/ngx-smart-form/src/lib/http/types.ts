@@ -1,13 +1,5 @@
+import { HTTPRequestMethods, HttpResponseType } from '@azlabsjs/requests';
 import { ObservableInput } from 'rxjs';
-
-export type HTTPStatefulMethod = 'POST' | 'PUT' | 'PATH';
-export type HTTPRequestMethods =
-  | 'GET'
-  | 'DELETE'
-  | 'OPTION'
-  | 'HEAD'
-  | HTTPStatefulMethod;
-export type HTTPResponseType = 'text' | 'blob' | 'array' | 'json';
 
 export interface RequestClient {
   /**
@@ -21,11 +13,11 @@ export interface RequestClient {
    */
   request<T>(
     path: string,
-    method: HTTPStatefulMethod,
+    method: HTTPRequestMethods,
     body: unknown,
     options?: {
       headers?: HeadersInit;
-      responseType?: HTTPResponseType;
+      responseType?: HttpResponseType;
     }
   ): ObservableInput<T>;
 }

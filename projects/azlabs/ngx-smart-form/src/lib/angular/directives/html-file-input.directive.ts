@@ -33,6 +33,7 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
       ? value
       : '';
   }
+  @Input() acceptCallback!: (value: File) => boolean;
   get accept() {
     return this._accept;
   }
@@ -41,14 +42,13 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
     this._class =
       typeof value === 'string' ? [value] : Array.isArray(value) ? value : [];
   }
-  @Input() acceptCallback!: (value: File) => boolean;
   //#endregion Directive inputs
 
   //#region Directive outputs
   @Output() sizeError = new EventEmitter<File[]>();
-  @Output() addedFile = new EventEmitter<File>();
+  @Output() unAcceptedFiles = new EventEmitter<File[]>();
+  @Output() acceptedFiles = new EventEmitter<File[]>();
   @Output() removed = new EventEmitter();
-  @Output() acceptedFilesChange = new EventEmitter<File | File[]>();
   @Output() reset = new EventEmitter<void>();
   //#endregion Directive outputs
 
@@ -79,7 +79,6 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
       );
       this._elements.push(...[_element]);
     }
-
     _element.addEventListener('click', (event: Event) => {
       const _event = event as unknown as EventType<HTMLInputElement>;
       if (_event.target) {
@@ -117,27 +116,17 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
       parent.appendChild(element);
       return element;
     }
-    throw new Error('Platform document is not defined');
+    throw new Error('platform document is not defined');
   }
 
   onInputChange(target: HTMLInputElement) {
     if (target.files) {
-      const length = target.files.length;
-      const sizedErrored = [];
-      const unAcceptedFiles = [];
-      const acceptedFiles = [];
-      const files =
-        this.maxFiles === 1
-          ? [target.files[0]]
-          : Array.from(
-              (function* () {
-                for (let index = 0; index < length; index++) {
-                  yield target.files![index];
-                }
-              })()
-            ).filter(
-              (current) => current !== null && typeof current !== 'undefined'
-            );
+      const {
+        sizedErrored = [],
+        unAcceptedFiles = [],
+        acceptedFiles = [],
+      } = {} as Record<string, File[]>;
+      const files = this.getDroppedFiles(target.files);
       for (const file of files) {
         if (!this.inSizeRange(file)) {
           sizedErrored.push(file);
@@ -154,15 +143,31 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
         }
         acceptedFiles.push(file);
       }
-
       if (sizedErrored.length !== 0) {
         target.value = '';
         return this.sizeError.emit(sizedErrored);
       }
-      this.acceptedFilesChange.emit(
-        this.maxFiles === 1 ? acceptedFiles[0] : acceptedFiles
-      );
+      if (unAcceptedFiles.length !== 0) {
+        target.value = '';
+        return this.unAcceptedFiles.emit(unAcceptedFiles);
+      }
+      this.acceptedFiles.emit(acceptedFiles);
     }
+  }
+
+  private getDroppedFiles(files: FileList) {
+    return this.maxFiles === 1
+      ? [files[0]]
+      : Array.from(
+          (function* () {
+            for (let index = 0; index < files.length; index++) {
+              const item = files![index];
+              if (item !== null && typeof item !== 'undefined') {
+                yield item;
+              }
+            }
+          })()
+        );
   }
 
   isAccepted(file: File) {

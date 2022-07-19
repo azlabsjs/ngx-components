@@ -1,14 +1,20 @@
+import {
+  getHttpHost,
+  HTTPRequestMethods,
+  HttpResponseType,
+} from '@azlabsjs/requests';
 import { ObservableInput } from 'rxjs';
-import { getHost, rxRequest } from './helpers';
-import { HTTPResponseType, HTTPStatefulMethod, RequestClient } from './types';
+import { map } from 'rxjs/operators';
+import { rxRequest } from './helpers';
+import { RequestClient } from './types';
 
 type _RequestFunction = <T>(
   path: string,
-  method: HTTPStatefulMethod,
+  method: HTTPRequestMethods,
   body: unknown,
   options?: {
     headers?: HeadersInit;
-    responseType?: HTTPResponseType;
+    responseType?: HttpResponseType;
   }
 ) => ObservableInput<T>;
 
@@ -26,14 +32,14 @@ type _RequestFunction = <T>(
  * @returns
  */
 export function createSubmitHttpHandler(host?: string) {
-  host = host ? getHost(host) : host;
+  host = host ? getHttpHost(host) : host;
   const _request = function <T>(
     path: string,
-    method: HTTPStatefulMethod,
+    method: 'POST' | 'PUT' | 'PATCH',
     body: unknown,
     options?: {
       headers?: HeadersInit;
-      responseType?: HTTPResponseType;
+      responseType?: HttpResponseType;
     }
   ) {
     const url = host
@@ -44,16 +50,16 @@ export function createSubmitHttpHandler(host?: string) {
       method,
       body,
       ...options,
-    });
+    }).pipe(map((state) => state.response));
   };
   return Object.defineProperty(_request, 'request', {
     value: <T>(
       path: string,
-      method: HTTPStatefulMethod,
+      method: 'POST' | 'PUT' | 'PATCH',
       body: unknown,
       options?: {
         headers?: HeadersInit;
-        responseType?: HTTPResponseType;
+        responseType?: HttpResponseType;
       }
     ) => {
       return _request<T>(path, method, body, options);

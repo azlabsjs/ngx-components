@@ -5,3 +5,12 @@ export {
   createDefaultPreviewTemplate,
   useDefaultDictionary,
 } from './dz-core';
+
+export { coerceBooleanProperty, coerceNumberProperty } from './vendor';
+
+export { recursiveReaddir, getTransferredFileEntries } from './filesystem';
+
+export {
+  createFileInputElement,
+  setFileInputElementProperties,
+} from './browser';

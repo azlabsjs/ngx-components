@@ -1,7 +1,8 @@
+import { getHttpHost } from '@azlabsjs/requests';
 import { isValidHttpUrl, OptionsConfig } from '@azlabsjs/smart-form-core';
-import { Observable, ObservableInput } from 'rxjs';
+import { map, Observable, ObservableInput, tap } from 'rxjs';
 import { InputOptionsClient } from '../angular/types/options';
-import { getHost, rxRequest } from './helpers';
+import { rxRequest } from './helpers';
 
 type _OptionsRequestFunction = <T>(
   param: string,
@@ -31,7 +32,7 @@ export function createSelectOptionsQuery(endpoint?: string, path?: string) {
     _path = path;
   }
   _endpoint = _path
-    ? `${getHost(_endpoint)}/${
+    ? `${getHttpHost(_endpoint)}/${
         _path.startsWith('/') ? _path.slice(0, _path.length - 1) : _path
       }`
     : _endpoint;
@@ -71,5 +72,5 @@ export function queryOptions<T = Observable<{ [prop: string]: any }[]>>(
       'Content-Type': 'application/json;charset=UTF-8',
     },
     responseType: 'json',
-  });
+  }).pipe(map((state) => state.response));
 }

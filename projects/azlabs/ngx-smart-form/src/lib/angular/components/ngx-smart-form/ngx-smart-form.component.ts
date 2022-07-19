@@ -196,7 +196,7 @@ export class NgxSmartFormComponent
     ) {
       from(
         this.client.request(
-          path || 'http://127.0.0.1', // The path will never be equal to 'http://127.0.0.1' because of the if branch on this.form.endpointURL
+          path || 'http://localhost',
           'POST',
           this.formGroup.getRawValue()
         )
@@ -281,9 +281,7 @@ export class NgxSmartFormComponent
     if (config) {
       name = name ?? config.name;
       const controls = [...(this.form.controlConfigs ?? [])];
-      const index = controls.findIndex(
-        (current) => current.name === name
-      );
+      const index = controls.findIndex((current) => current.name === name);
       controls.splice(index, 1, config);
       this.form = { ...this.form, controlConfigs: controls };
       // We trigger the change detector to detect changes after updating

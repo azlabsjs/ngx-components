@@ -25,7 +25,6 @@ ClarityIcons.addIcons(uploadCloudIcon);
     HttpClientModule,
     CdsModule,
     NgxIntlTelInputModule.forRoot(),
-    NgxDropzoneModule.forRoot(),
     NgxSmartFormModule.forRoot({
       // Optional : Required only to get data dynamically from the server
       // Server configuration for dynamically loading

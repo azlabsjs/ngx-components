@@ -106,7 +106,6 @@ export class NgxSlidesComponent implements OnInit, OnDestroy {
     // Load the slides only if not set by the parent component
     if (this.slides.length === 0) {
       const contents = this.contentLoader!.contents;
-      console.log(contents);
       if (contents) {
         this.timer = contents.timer;
         this.slides = contents.slides.map((value, index: number) =>
