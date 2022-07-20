@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { Injector, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
@@ -34,6 +34,27 @@ ClarityIcons.addIcons(uploadCloudIcon);
           host: 'http://localhost:4200',
           // Custom path on the server else the default is used
           bindings: 'api/v2/bindings',
+          // Files upload url
+          uploadURL: 'https://storage.lik.tg/api/storage/object/upload',
+        },
+      },
+      uploadOptions: {
+        createInterceptor: (injector: Injector) => {
+          // Replace the interceptor function by using the injector
+          return (request, next) => {
+            request = request.clone({
+              options: {
+                ...request.options,
+                headers: {
+                  ...request.options.headers,
+                  'x-client-id': '96a6bba2-73e4-404c-9bb3-0d61c31bba44',
+                  'x-client-secret':
+                    '9NYHbYhzNXX2AbrxHs4H0cTmM7udeKEdqfwyTCXGLjnaU2IhmVldNwAknIpysbx5QZ8KBytvw1hW7qQE6iA',
+                },
+              },
+            });
+            return next(request);
+          };
         },
       },
       // Path to the form assets
@@ -41,7 +62,7 @@ ClarityIcons.addIcons(uploadCloudIcon);
       formsAssets: '/assets/forms.json',
     }),
     NgxClrSmartGridModule,
-    NgxSlidesModule.forRoot()
+    NgxSlidesModule.forRoot(),
   ],
   bootstrap: [AppComponent],
 })

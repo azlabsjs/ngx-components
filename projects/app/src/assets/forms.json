@@ -216,7 +216,7 @@
       "type": "file",
       "classes": "clr-input",
       "multiple": false,
-      "options": []
+      "uploadAs": "content"
     },
     {
       "formId": 1,
@@ -265,13 +265,14 @@
       "readonly": false,
       "unique": false,
       "isRepeatable": false,
-      "containerClass": "clr-col-sm-12 clr-col-md-12",
+      "containerClass": "clr-col-sm-12 clr-col-md-6",
       "id": 15,
       "label": "FICHIER ATTACHÉS",
       "placeholder": "...",
       "type": "file",
       "classes": "clr-input",
-      "multiple": true
+      "multiple": true,
+      "uploadAs": "content"
     }
   ]
 }]

@@ -18,7 +18,7 @@ export class NgxUploadsSubjectService {
   private _events$ = new BehaviorSubject<UploadEvent[]>([]);
 
   //
-  public readonly events$ = this._events$.asObservable().pipe(tap(console.log));
+  public readonly events$ = this._events$.asObservable();
 
   /**
    * Signal an upload start event

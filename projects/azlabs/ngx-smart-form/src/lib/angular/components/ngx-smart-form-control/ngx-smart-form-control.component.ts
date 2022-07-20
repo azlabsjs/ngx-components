@@ -69,6 +69,8 @@ export class NgxSmartFormControlComponent implements OnDestroy, OnInit {
   @Output('blur') blur = new EventEmitter<InputEventArgs>();
   // Value changes emitters
   @Output() valueChange = new EventEmitter<InputEventArgs>();
+  @Input() autoupload: boolean = false;
+  @Input() submitupload: boolean = false;
   //#endregion Component outputs
 
   constructor(public readonly inputType: InputTypeHelper) {}

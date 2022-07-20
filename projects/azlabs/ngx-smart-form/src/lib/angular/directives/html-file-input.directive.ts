@@ -23,6 +23,7 @@ type EventType<T = EventTarget> = Omit<Event, 'target'> & {
 })
 export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
   //#region Directive inputs
+  @Input() multiple: boolean = false;
   @Input() maxFiles = 1;
   @Input() maxFileSize = 10; // MB
   private _accept!: string;
@@ -102,7 +103,7 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
   private setRequiredHTMLElementAttributes(element: HTMLInputElement) {
     //#region Bind HTML attributes to file input
     element.accept = this._accept;
-    element.multiple = false;
+    element.multiple = this.multiple;
     element.classList.add(...(this._class ?? []));
     //#endregion Bind HTML attributes to file input
     return element;

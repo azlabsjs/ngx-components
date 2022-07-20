@@ -70,6 +70,19 @@ export class NgxSmartFormArrayComponent implements OnInit, OnDestroy {
   @Input() template!: TemplateRef<any>;
   @Input() addGroupRef!: TemplateRef<Node>;
   @Input() name!: string;
+  private _autoupload: boolean = false;
+  @Input() set autoupload(value: boolean) {
+    this._autoupload = !!value;
+
+    // update child component instance autoupload values
+    this.componentRefs.forEach(ref => ref.instance.autoupload = this._autoupload);
+  }
+  private _submitupload: boolean = false;
+  @Input() set submitupload(value: boolean) {
+    this._submitupload = !!value;
+    // update child component instance submitupload values
+    this.componentRefs.forEach(ref => ref.instance.submitupload = this._submitupload);
+  }
   //#endregion Component inputs definitions
 
   //@internal
@@ -78,8 +91,8 @@ export class NgxSmartFormArrayComponent implements OnInit, OnDestroy {
   viewContainerRef!: ViewContainerRef;
 
   private _destroy$ = new Subject<void>();
-  private childCount = 0;
-  private children: ComponentRef<NgxSmartFormArrayChildComponent>[] = [];
+  private componentRefCount = 0;
+  private componentRefs: ComponentRef<NgxSmartFormArrayChildComponent>[] = [];
 
   //#region Component outputs
   @Output() listChange = new EventEmitter<number>();
@@ -95,7 +108,7 @@ export class NgxSmartFormArrayComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.formGroup = this.builder.group(this._controls) as FormGroup;
     if (this.formArray.getRawValue().length === 0) {
-      this.addNewComponent(this.childCount);
+      this.addNewComponent(this.componentRefCount);
     } else {
       // Add elements
       let index = 0;
@@ -112,8 +125,8 @@ export class NgxSmartFormArrayComponent implements OnInit, OnDestroy {
   }
 
   onTemplateButtonClicked(event: Event) {
-    this.childCount++;
-    this.addNewComponent(this.childCount);
+    this.componentRefCount++;
+    this.addNewComponent(this.componentRefCount);
     event.preventDefault();
   }
 
@@ -134,16 +147,18 @@ export class NgxSmartFormArrayComponent implements OnInit, OnDestroy {
     componentRef.instance.formGroup = formGroup;
     componentRef.instance.template = this.template;
     componentRef.instance.formGroup.addControl('index', new FormControl(index));
+    componentRef.instance.autoupload = this._autoupload;
+    componentRef.instance.submitupload = this._submitupload;
     // Ends child component properties initialization
 
     componentRef.instance.componentDestroyer
       .pipe(takeUntil(this._destroy$))
       .subscribe(() => {
-        if (this.childCount > 0) {
+        if (this.componentRefCount > 0) {
           componentRef.destroy();
-          this.childCount -= 1;
+          this.componentRefCount -= 1;
           // Remove the elment from the list of reference components
-          this.children = this.children.filter(
+          this.componentRefs = this.componentRefs.filter(
             (component: ComponentRef<NgxSmartFormArrayChildComponent>) => {
               return component.instance === componentRef.instance
                 ? false
@@ -155,13 +170,13 @@ export class NgxSmartFormArrayComponent implements OnInit, OnDestroy {
               '__FORM_ARRAY__INDEX__'
             ]
           );
-          this.listChange.emit(this.childCount);
+          this.listChange.emit(this.componentRefCount);
         } else {
           componentRef.instance.formGroup.reset();
           this.formArray.updateValueAndValidity();
         }
       });
-    this.children.push(componentRef);
+    this.componentRefs.push(componentRef);
   }
 
   ngOnDestroy(): void {

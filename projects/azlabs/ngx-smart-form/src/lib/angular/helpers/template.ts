@@ -7,6 +7,8 @@ export function useDefaultTemplateText() {
     uploadFileLabel: 'to upload',
     dragFileLabel: 'Drag file(s) here or',
     clickUploadButtonLabel: 'Click',
+    fileUploadError: 'Error while uploading file to server',
+    fileSizeError: 'File size must be less than or equal to {{maxFilesize}}Mo.',
     validation: {
       maxValue: 'The maximum number of characters for this field is {{value}}',
       minValue: 'This field must contain at least {{value}} characters',

@@ -2,7 +2,7 @@
   <ng-container
     *ngTemplateOutlet="
       recursiveTemplate;
-      context: { group: formGroup, controls: form.controlConfigs }
+      context: { group: formGroup, controls: form.controlConfigs, submitupload, autoupload }
     "
   ></ng-container>
 </ng-container>
@@ -15,7 +15,13 @@
   ></ng-container>
 </ng-container>
 
-<ng-template #recursiveTemplate let-controls="controls" let-group="group">
+<ng-template
+  #recursiveTemplate
+  let-controls="controls"
+  let-group="group"
+  let-autoupload="autoupload"
+  let-submitupload="submitupload"
+>
   <div class="clr-row">
     <ng-container *ngFor="let value of controls">
       <!-- INPUT GROUP CONTAINER PART -->
@@ -30,6 +36,8 @@
               [template]="template ? template : defaultFormControl"
               [addGroupRef]="addTemplate"
               [name]="value.name"
+              [autoupload]="autoupload"
+              [submitupload]="submitupload"
             ></ngx-smart-form-array>
           </ng-container>
           <!--\ REPEATABLE INPUTS GROUP -->
@@ -40,7 +48,8 @@
                 recursiveTemplate;
                 context: {
                   controls: value!.children || [],
-                  group: group.get(value.name)
+                  group: group.get(value.name),
+                  submitupload, autoupload
                 }
               "
             ></ng-container>
@@ -57,7 +66,8 @@
             formTemplate;
             context: {
               value,
-              group
+              group,
+              submitupload, autoupload
             }
           "
           ></ng-container>
@@ -77,6 +87,8 @@
       [template]="template ? template : defaultFormControl"
       [addGroupRef]="addTemplate"
       [name]="value.name"
+      [autoupload]="autoupload"
+      [submitupload]="submitupload"
     ></ngx-smart-form-array>
   </ng-container>
   <!--\ REPEATABLE INPUTS -->
@@ -113,6 +125,8 @@
     [control]="control"
     [inputConfig]="config"
     [options]="config.options"
+    [autoupload]="autoupload"
+    [submitupload]="submitupload"
   ></ngx-smart-form-control>
 </ng-template>
 <!--\ DEFAULT FORM CONTROL COMPONENT -->

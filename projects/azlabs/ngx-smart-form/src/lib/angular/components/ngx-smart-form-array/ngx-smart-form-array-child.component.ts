@@ -40,6 +40,8 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
             [formGroup]="formGroup"
             [controls]="controls"
             [template]="template"
+            [autoupload]="autoupload"
+            [submitupload]="submitupload"
           ></ngx-smart-form-group>
         </ng-container>
       </div>
@@ -86,6 +88,8 @@ export class NgxSmartFormArrayChildComponent {
   @Input() formGroup!: FormGroup;
   @Input() controls!: InputConfigInterface[];
   @Input() template!: TemplateRef<HTMLElement>;
+  @Input() autoupload: boolean = false;
+  @Input() submitupload: boolean = false;
   //#endregion Component inputs
 
   // #region Component outputs

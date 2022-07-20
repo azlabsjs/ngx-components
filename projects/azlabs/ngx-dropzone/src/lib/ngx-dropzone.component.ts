@@ -157,7 +157,7 @@ export class NgxDropzoneComponent
 
   // tslint:disable-next-line: variable-name
   private config$ = new BehaviorSubject<DropzoneConfig>({} as DropzoneConfig);
-  defaults$ = this.config$.asObservable().pipe(tap(console.log));
+  defaults$ = this.config$.asObservable();
   // tslint:disable-next-line: variable-name
   private _destroy$ = new Subject<void>();
 

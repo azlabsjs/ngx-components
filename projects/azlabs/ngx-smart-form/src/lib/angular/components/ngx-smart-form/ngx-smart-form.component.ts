@@ -100,6 +100,8 @@ export class NgxSmartFormComponent
   @Input() autoSubmit: boolean = false;
   @Input() path!: string;
   @Input() state!: { [index: string]: any };
+  @Input() autoupload: boolean = false;
+  @Input() submitupload: boolean = false;
   //#endregion Component inputs
 
   //#region Component outputs
@@ -183,9 +185,11 @@ export class NgxSmartFormComponent
     this.cdRef.detectChanges();
     // We simply return without performing any further action
     // if the validation fails
+    console.log('Before validation', this.formGroup.getRawValue());
     if (!this.formGroup.valid) {
       return;
     }
+    console.log('After validation validation', this.formGroup.getRawValue());
     const path = this.path || this.form.endpointURL;
     if (
       this.autoSubmit &&

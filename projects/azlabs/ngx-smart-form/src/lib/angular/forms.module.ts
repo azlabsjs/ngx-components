@@ -69,6 +69,7 @@ import {
   Interceptor,
   RequestClient,
 } from '@azlabsjs/requests';
+import { NgxUploadsSubjectService } from './components/ngx-smart-file-input/ngx-uploads-subject.service';
 
 type FormApiServerConfigs = {
   api: {
@@ -84,7 +85,7 @@ export type ModuleConfigs = {
   formsAssets?: string;
   clientFactory?: Function;
   templateTextProvider?: Provider;
-  uploadOptions: Omit<
+  uploadOptions?: Omit<
     UploadOptions<HttpRequest, HttpResponse>,
     'interceptor'
   > & {
@@ -173,6 +174,7 @@ export class NgxSmartFormModule {
       FormsCacheProvider,
       JSONFormsClient,
       ReactiveFormBuilderBrige,
+      NgxUploadsSubjectService,
       {
         provide: DYNAMIC_FORM_LOADER,
         useClass: FormHttpLoader,

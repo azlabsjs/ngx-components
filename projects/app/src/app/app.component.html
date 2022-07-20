@@ -6,7 +6,12 @@
     (selectedChange)="onSelectedChanges($event)"
   ></ngx-clr-smart-grid> -->
   <ng-container *ngIf="form$ | async as form">
-    <ngx-smart-form [submitable]="true" (submit)="ngxFormSubmit($event)" [form]="form"></ngx-smart-form>
+    <ngx-smart-form
+      [submitable]="true"
+      [autoupload]="true"
+      (submit)="ngxFormSubmit($event)"
+      [form]="form"
+    ></ngx-smart-form>
   </ng-container>
 </div>
 

@@ -32,6 +32,8 @@ export class NgxSmartFormGroupComponent
   @Input() formGroup!: FormGroup;
   @Input() controls!: InputConfigInterface[];
   @Input() template!: TemplateRef<HTMLElement>;
+  @Input() autoupload: boolean = false;
+  @Input() submitupload: boolean = false;
   //#endregion Component inputs definitions
 
   //#region Component internal properties

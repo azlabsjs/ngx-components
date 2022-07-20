@@ -8,9 +8,9 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { DropzoneConfig } from '@azlabsjs/ngx-dropzone';
-import { FileInput } from '@azlabsjs/smart-form-core';
+import { FileInput, isValidHttpUrl } from '@azlabsjs/smart-form-core';
 import { UPLOADER_OPTIONS } from '../../types';
 import { Uploader, UploadOptions } from '@azlabsjs/uploader';
 import { HttpRequest, HttpResponse } from '@azlabsjs/requests';
@@ -40,6 +40,28 @@ function uuidv4() {
 @Component({
   selector: 'ngx-smart-file-input',
   templateUrl: './ngx-smart-file-input.component.html',
+  styles: [
+    `
+      .flex-files-input {
+        display: flex;
+      }
+
+      .flex-files-input > input[type='file'] {
+        flex-grow: 1;
+      }
+      .tooltip .tooltip-content.error {
+        background-color: #ff494f !important;
+      }
+      .tooltip > .tooltip-content::before {
+        border-left: 0.3rem solid #ff494f !important;
+        border-left-color: #ff494f !important;
+        border-top: 0.25rem solid #ff494f !important;
+        border-top-color: #ff494f !important;
+        border-right: 0.3rem solid transparent;
+        border-bottom: 0.25rem solid transparent;
+      }
+    `,
+  ],
 })
 export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
   //#region Component inputs
@@ -47,7 +69,24 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
   @Input() describe = true;
   @Input() inputConfig!: FileInput;
   @Input() uploadAs!: string;
+
+  /**
+   * Ng Input attribute that defines whether files must
+   * automatically be uploaded when the get accepted by the
+   * component
+   *
+   * @property
+   */
   @Input() autoupload: boolean = false;
+  /**
+   *
+   * Ng Input attribute that defines whether files must
+   * be uploaded during submit stage
+   *
+   * @property
+   */
+  @Input() submitupload: boolean = false;
+
   @Input() url!: string | undefined;
   //#endregion Component inputs
 
@@ -59,6 +98,17 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
   private _destroy$ = new Subject<void>();
   // Property for handling File Input types
   public dropzoneConfigs!: DropzoneConfig;
+
+  // Control HTML uploading indicator
+  public uploading: boolean = false;
+  public hasUploadError: boolean = false;
+
+  _inputState$ = new BehaviorSubject({
+    uploading: false,
+    hasError: false,
+    tooLargeFiles: [] as File[],
+  });
+  inputState$ = this._inputState$.asObservable();
 
   constructor(
     @Inject(UPLOADER_OPTIONS)
@@ -77,7 +127,7 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
         config !== null &&
         config.uploadUrl !== ''
           ? config.uploadUrl
-          : this.uploadOptions.path ?? '',
+          : this.uploadOptions.path ?? 'http://localhost',
       uploadMultiple: config.multiple ? config.multiple : false,
       acceptedFiles: config.pattern,
     } as DropzoneConfig;
@@ -111,7 +161,10 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
   }
 
   onTooLargeFilesEvent(event: File[]) {
-    // TODO: Add error to control
+    this._inputState$.next({
+      ...this._inputState$.getValue(),
+      tooLargeFiles: event,
+    });
   }
 
   async onAcceptedFiles(
@@ -120,72 +173,111 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
     autoupload: boolean = false,
     uploadAs: string = 'file'
   ) {
-    return !autoupload
-      ? this.control.setValue(multiple ? event : event[0])
-      : this.processUploads(event, multiple, autoupload, uploadAs);
+    autoupload || this.autoupload
+      ? this.processUploads(event, multiple, uploadAs)
+      : this.control.setValue(multiple ? event : event[0]);
   }
 
   private async processUploads(
     event: File[],
     multiple: boolean = false,
-    autoupload: boolean = false,
     uploadAs: string = 'file'
   ) {
     // When the autoupload is set on the current component, we send an upload request
     // to configured url or server url for each accepted files
-    const _files = (multiple ? [event[0]] : event).map((file) => ({
-      content: file,
-      uuid: uuidv4(),
-    }));
-    const uploader = Uploader({
-      ...this.uploadOptions,
-      // By the default, the url passed in the HTML template, takes preceedence on inputConfig uploadURL, which
-      // in turn takes precedence over the globally configured upload path
-      path: this.url ?? this.inputConfig.uploadUrl ?? this.uploadOptions.path,
-      // We use the name provided in the input configuration or fallback to gloabbly configured name
-      name: uploadAs ?? this.uploadOptions.name ?? 'file',
-      // We use the default specified responseType else we fallback to 'json' response type
-      responseType: this.uploadOptions.responseType ?? 'json',
-    });
-    let results = await Promise.all(
-      _files.map(async (file) => {
-        this.uploadEvents.startUpload({
-          id: file.uuid,
-          processing: true,
-          file: file.content,
-        });
-        const result = (await uploader.upload(file.content)) as Record<
-          string,
-          any
-        >;
-        let _result!: Record<string, any>;
-        if (typeof result === 'string') {
-          try {
-            // If parsing the string throws an error, then request may have
-            // failed
-            _result = JSON.parse(result);
-          } catch (error) {
-            _result = {} as Record<string, any>;
-            _result['error'] = error;
+    try {
+      const path =
+        this.url ?? this.inputConfig.uploadUrl ?? this.uploadOptions.path;
+
+      if (
+        typeof path === 'undefined' ||
+        path === null ||
+        !isValidHttpUrl(path)
+      ) {
+        throw new Error('Failed processing upload, Invalid URL .');
+      }
+      // Process to files upload
+      const _files = (multiple ? [event[0]] : event).map((file) => ({
+        content: file,
+        uuid: uuidv4(),
+      }));
+      const uploader = Uploader({
+        ...this.uploadOptions,
+        // By the default, the url passed in the HTML template, takes preceedence on inputConfig uploadURL, which
+        // in turn takes precedence over the globally configured upload path
+        path,
+        // We use the name provided in the input configuration or fallback to gloabbly configured name
+        name: uploadAs ?? this.uploadOptions.name ?? 'file',
+        // We use the default specified responseType else we fallback to 'json' response type
+        responseType: this.uploadOptions.responseType ?? 'text',
+      } as UploadOptions<HttpRequest, HttpResponse>);
+
+      // Set the uploading state of the current component
+      this._inputState$.next({
+        ...this._inputState$.getValue(),
+        uploading: true,
+        hasError: false,
+      });
+      let results = await Promise.all(
+        _files.map(async (file) => {
+          this.uploadEvents.startUpload({
+            id: file.uuid,
+            processing: true,
+            file: file.content,
+          });
+          const result = (await uploader.upload(file.content)) as Record<
+            string,
+            any
+          >;
+          let _result!: Record<string, any>;
+          if (typeof result === 'string') {
+            try {
+              // If parsing the string throws an error, then request may have
+              // failed
+              _result = JSON.parse(result);
+            } catch (error) {
+              _result = {} as Record<string, any>;
+              _result['error'] = error;
+            }
+          } else {
+            _result = result;
           }
-        } else {
-          _result = result;
-        }
-        this.uploadEvents.completeUpload(file.uuid, _result);
-        return _result;
-      })
-    );
-    // We filter the result array and remove all result objects that
-    // has been marked errored
-    results = results.filter(
-      (result) =>
-        typeof result['error'] !== 'undefined' && result['error'] !== null
-    );
-    // After all files has been uploaded, we set the form control value to
-    // ids returned by the uploader request
-    this.control.setValue(
-      multiple ? results[0]['id'] : results.map((result) => result['id'])
-    );
+          this.uploadEvents.completeUpload(file.uuid, _result);
+          return _result;
+        })
+      );
+      // We filter the result array and remove all result objects that
+      // has been marked errored
+      results = results.filter(
+        (result) =>
+          typeof result['error'] === 'undefined' || result['error'] === null
+      );
+      // Set the uploading state of the current component
+      this._inputState$.next({
+        ...this._inputState$.getValue(),
+        uploading: false,
+        hasError: false,
+      });
+      // After all files has been uploaded, we set the form control value to
+      // ids returned by the uploader request
+      this.control.setValue(
+        multiple
+          ? results.map((result) =>
+              typeof result['id'] === 'undefined' || result['id'] === null
+                ? result
+                : result['id']
+            )
+          : typeof results[0]['id'] === 'undefined' || results[0]['id'] === null
+          ? results[0]
+          : results[0]['id']
+      );
+    } catch (error) {
+      this._inputState$.next({
+        ...this._inputState$.getValue(),
+        uploading: false,
+        hasError: true,
+      });
+    }
   }
 
   onReset() {
