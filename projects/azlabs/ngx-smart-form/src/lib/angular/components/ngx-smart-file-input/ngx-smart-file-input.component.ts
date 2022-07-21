@@ -197,11 +197,11 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
         throw new Error('Failed processing upload, Invalid URL .');
       }
       // Process to files upload
-      const _files = (multiple ? [event[0]] : event).map((file) => ({
+      const _files = (multiple ? event : [event[0]]).map((file) => ({
         content: file,
         uuid: uuidv4(),
       }));
-      const uploader = Uploader({
+      const options = {
         ...this.uploadOptions,
         // By the default, the url passed in the HTML template, takes preceedence on inputConfig uploadURL, which
         // in turn takes precedence over the globally configured upload path
@@ -210,8 +210,7 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
         name: uploadAs ?? this.uploadOptions.name ?? 'file',
         // We use the default specified responseType else we fallback to 'json' response type
         responseType: this.uploadOptions.responseType ?? 'text',
-      } as UploadOptions<HttpRequest, HttpResponse>);
-
+      } as UploadOptions<HttpRequest, HttpResponse>;
       // Set the uploading state of the current component
       this._inputState$.next({
         ...this._inputState$.getValue(),
@@ -225,10 +224,9 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
             processing: true,
             file: file.content,
           });
-          const result = (await uploader.upload(file.content)) as Record<
-            string,
-            any
-          >;
+          // Creating a new uploader instance each time for bug in current version of the uploader
+          const uploader = Uploader(options);
+          const result = (await uploader.upload(file.content));
           let _result!: Record<string, any>;
           if (typeof result === 'string') {
             try {
@@ -240,7 +238,7 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
               _result['error'] = error;
             }
           } else {
-            _result = result;
+            _result = result as any;
           }
           this.uploadEvents.completeUpload(file.uuid, _result);
           return _result;

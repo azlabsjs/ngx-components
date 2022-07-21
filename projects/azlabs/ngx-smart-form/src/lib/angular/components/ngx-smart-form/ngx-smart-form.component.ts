@@ -14,7 +14,7 @@ import {
   TemplateRef,
 } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
-import { EMPTY, from, Observable, Subject } from 'rxjs';
+import { EMPTY, from, lastValueFrom, Observable, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import {
   FormConfigInterface,
@@ -109,6 +109,7 @@ export class NgxSmartFormComponent
   @Output() readyState = new EventEmitter();
   @Output() formGroupChange = new EventEmitter<FormGroup>();
   @Output() complete = new EventEmitter<unknown>();
+  @Output() performingRequest = new EventEmitter<boolean>();
   //#endregion Component outputs
 
   // @internal
@@ -178,39 +179,36 @@ export class NgxSmartFormComponent
   }
 
   //
-  onSubmit(event: Event): void | Observable<unknown> {
+  async onSubmit(event: Event) {
     // Validate the formgroup object to ensure it passes
     // validation before submitting
     this.validateForm();
     this.cdRef.detectChanges();
     // We simply return without performing any further action
     // if the validation fails
-    console.log('Before validation', this.formGroup.getRawValue());
     if (!this.formGroup.valid) {
       return;
     }
-    console.log('After validation validation', this.formGroup.getRawValue());
     const path = this.path || this.form.endpointURL;
-    if (
-      this.autoSubmit &&
-      typeof this.client !== 'undefined' &&
-      this.client !== null &&
-      path !== null &&
-      path !== 'undefined'
-    ) {
-      from(
-        this.client.request(
-          path || 'http://localhost',
-          'POST',
-          this.formGroup.getRawValue()
+    const clientIsDefined =
+      typeof this.client !== 'undefined' && this.client !== null;
+    const pathIsDefined = path !== null && path !== 'undefined';
+    if (this.autoSubmit && clientIsDefined && pathIsDefined) {
+      this.performingRequest.emit(true);
+      const response = await lastValueFrom(
+        from(
+          (this.client as RequestClient).request(
+            path || 'http://localhost',
+            'POST',
+            this.formGroup.getRawValue()
+          )
         )
-      )
-        // Here we notify parent component of completed state
-        .subscribe((response) => this.complete.emit(response));
+      );
+      this.performingRequest.emit(false);
+      this.complete.emit(response);
     } else if (
-      (this.autoSubmit &&
-        (typeof this.client === 'undefined' || this.client === null)) ||
-      (this.autoSubmit && (path !== null || path !== 'undefined'))
+      (this.autoSubmit && !clientIsDefined) ||
+      (this.autoSubmit && !pathIsDefined)
     ) {
       // We throw an error if developper misconfigured the smart form component
       throw new Error(

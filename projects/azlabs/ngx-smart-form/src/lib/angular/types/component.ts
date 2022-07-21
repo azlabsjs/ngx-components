@@ -1,6 +1,9 @@
 import { AbstractControl } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { FormConfigInterface, InputConfigInterface } from '@azlabsjs/smart-form-core';
+import { Observable, ObservableInput } from 'rxjs';
+import {
+  FormConfigInterface,
+  InputConfigInterface,
+} from '@azlabsjs/smart-form-core';
 
 export type ControlsStateMap = {
   [index: string]: { onlySelf: boolean; emitEvent: boolean } | undefined;
@@ -83,7 +86,7 @@ export interface FormComponentInterface {
    *
    * @param event
    */
-  onSubmit(event: Event): void | Observable<unknown>;
+  onSubmit(event: Event): void | Observable<void> | ObservableInput<void>;
 
   /**
    * Form value setter function

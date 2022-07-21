@@ -8,7 +8,8 @@
     "build:all": "ng build --configuration production @azlabsjs/ngx-dropzone && ng build --configuration production @azlabsjs/ngx-intl-tel-input && ng build --configuration production @azlabsjs/ngx-smart-form && ng build --configuration production @azlabsjs/ngx-clr-smart-grid && ng build --configuration production @azlabsjs/ngx-slides",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "build:sass": "sass ./projects/azlabs/ngx-intl-tel-input/styles/styles.scss ./projects/azlabs/ngx-intl-tel-input/assets/styles.css"
+    "build:sass": "sass ./projects/azlabs/ngx-intl-tel-input/styles/styles.scss ./projects/azlabs/ngx-intl-tel-input/assets/styles.css",
+    "start:server": "json-server --watch db.json"
   },
   "private": true,
   "dependencies": {
@@ -26,7 +27,7 @@
     "@azlabsjs/functional": "^0.1.10",
     "@azlabsjs/js-datetime": "^0.1.10",
     "@azlabsjs/js-object": "^0.1.10",
-    "@azlabsjs/requests": "^0.1.12",
+    "@azlabsjs/requests": "^0.1.15",
     "@azlabsjs/smart-form-core": "^0.1.21",
     "@azlabsjs/str": "^0.1.10",
     "@azlabsjs/uploader": "^0.1.11",
@@ -51,6 +52,7 @@
     "@types/google-libphonenumber": "^7.4.23",
     "@types/jasmine": "~4.0.0",
     "jasmine-core": "~4.1.0",
+    "json-server": "^0.17.0",
     "karma": "~6.3.0",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage": "~2.2.0",

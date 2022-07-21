@@ -31,7 +31,7 @@ ClarityIcons.addIcons(uploadCloudIcon);
       // Select, Checkbox and Radio button from server
       serverConfigs: {
         api: {
-          host: 'http://localhost:4200',
+          host: 'http://localhost:3000',
           // Custom path on the server else the default is used
           bindings: 'api/v2/bindings',
           // Files upload url

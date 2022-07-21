@@ -1,7 +1,9 @@
 import {
   getHttpHost,
+  HttpRequest,
   HTTPRequestMethods,
   HttpResponseType,
+  Interceptor,
 } from '@azlabsjs/requests';
 import { ObservableInput } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -31,7 +33,10 @@ type _RequestFunction = <T>(
  * @param host
  * @returns
  */
-export function createSubmitHttpHandler(host?: string) {
+export function createSubmitHttpHandler(
+  host?: string,
+  interceptors: Interceptor<HttpRequest>[] = []
+) {
   host = host ? getHttpHost(host) : host;
   const _request = function <T>(
     path: string,
@@ -45,13 +50,21 @@ export function createSubmitHttpHandler(host?: string) {
     const url = host
       ? `${host}/${path.startsWith('/') ? path.slice(1) : path}`
       : path;
-    return rxRequest<T>({
+    options = options || {
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      responseType: 'json',
+    };
+    return rxRequest({
       url,
       method,
       body,
       ...options,
+      interceptors,
     }).pipe(map((state) => state.response));
   };
+
   return Object.defineProperty(_request, 'request', {
     value: <T>(
       path: string,

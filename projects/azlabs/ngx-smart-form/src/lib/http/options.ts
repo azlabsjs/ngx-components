@@ -1,4 +1,4 @@
-import { getHttpHost } from '@azlabsjs/requests';
+import { getHttpHost, HttpRequest, Interceptor } from '@azlabsjs/requests';
 import { isValidHttpUrl, OptionsConfig } from '@azlabsjs/smart-form-core';
 import { map, Observable, ObservableInput, tap } from 'rxjs';
 import { InputOptionsClient } from '../angular/types/options';
@@ -22,7 +22,12 @@ function createQueryURL(optionsConfig: OptionsConfig) {
   }`;
 }
 
-export function createSelectOptionsQuery(endpoint?: string, path?: string) {
+// @internal
+export function createSelectOptionsQuery(
+  endpoint?: string,
+  path?: string,
+  interceptors: Interceptor<HttpRequest>[] = []
+) {
   let _endpoint!: string;
   let _path!: string | undefined;
   if (endpoint === null && typeof endpoint === 'undefined') {
@@ -39,7 +44,7 @@ export function createSelectOptionsQuery(endpoint?: string, path?: string) {
 
   const _requestClient = queryOptions;
   Object.defineProperty(_requestClient, 'request', {
-    value: <T>(optionsConfig: OptionsConfig) => {
+    value: (optionsConfig: OptionsConfig) => {
       // We build the request query
       const url = isValidHttpUrl(optionsConfig.source.resource)
         ? createQueryURL(optionsConfig)
@@ -47,14 +52,15 @@ export function createSelectOptionsQuery(endpoint?: string, path?: string) {
         ? `${_endpoint}/${_path}`
         : `${_endpoint}`;
       const request = { ...optionsConfig, url };
-      return _requestClient<T>(request);
+      return _requestClient(request, interceptors);
     },
   });
   return _requestClient as any as _OptionsRequestFunction & InputOptionsClient;
 }
 
-export function queryOptions<T = Observable<{ [prop: string]: any }[]>>(
-  optionsConfig: OptionsQueryParams
+export function queryOptions(
+  optionsConfig: OptionsQueryParams,
+  interceptors: Interceptor<HttpRequest>[] = []
 ) {
   // We provides a request body only if the resource object is not a valid
   // HTTP URI because in such case the request is being send to form API server
@@ -64,7 +70,7 @@ export function queryOptions<T = Observable<{ [prop: string]: any }[]>>(
     : {
         table_config: optionsConfig.source.raw,
       };
-  return rxRequest<T>({
+  return rxRequest({
     url: optionsConfig.url,
     method: 'GET',
     body,
@@ -72,5 +78,6 @@ export function queryOptions<T = Observable<{ [prop: string]: any }[]>>(
       'Content-Type': 'application/json;charset=UTF-8',
     },
     responseType: 'json',
+    interceptors,
   }).pipe(map((state) => state.response));
 }

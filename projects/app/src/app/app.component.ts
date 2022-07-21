@@ -1,7 +1,10 @@
 import { Component, Inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { GridColumnType } from '@azlabsjs/ngx-clr-smart-grid';
-import { FormsClient, FORM_CLIENT } from '@azlabsjs/ngx-smart-form';
+import {
+  FormsClient,
+  FORM_CLIENT,
+} from '@azlabsjs/ngx-smart-form';
 import { createSlide } from '@azlabsjs/ngx-slides';
 
 @Component({
@@ -36,12 +39,12 @@ export class AppComponent {
     },
     {
       title: 'Genre',
-      label: 'sex'
+      label: 'sex',
     },
     {
       title: 'Nationalité',
-      label: 'nationality'
-    }
+      label: 'nationality',
+    },
   ];
   // Test data
   public data = [
@@ -78,7 +81,7 @@ export class AppComponent {
     createSlide(1, 'https://picsum.photos/id/1/200/300'),
     createSlide(2, 'https://picsum.photos/id/1000/200/300'),
     createSlide(3, 'https://picsum.photos/id/1001/200/300'),
-    createSlide(4, 'https://picsum.photos/id/1002/200/300')
+    createSlide(4, 'https://picsum.photos/id/1002/200/300'),
   ];
 
   public constructor(@Inject(FORM_CLIENT) private client: FormsClient) {}
@@ -93,7 +96,7 @@ export class AppComponent {
     console.log(event);
   }
 
-  ngxFormSubmit(event: Record<string,any>) {
+  ngxFormSubmit(event: Record<string, any>) {
     console.log(event);
   }
 }

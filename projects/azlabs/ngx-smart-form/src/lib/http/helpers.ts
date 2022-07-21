@@ -2,16 +2,22 @@ import {
   useRequestClient,
   HTTPRequestMethods,
   HttpResponseType,
+  Interceptor,
+  HttpRequest,
 } from '@azlabsjs/requests';
 import { from } from 'rxjs';
 
 /**
  * Makes an http request using rxjs fetch wrapper
  *
+ * **Note**
+ * If no Content-Type header is provided to the request client
+ * a default application/json content type is internally used
+ *
  * @param request
  * @returns
  */
-export function rxRequest<T>(
+export function rxRequest(
   request:
     | {
         url: string;
@@ -19,6 +25,7 @@ export function rxRequest<T>(
         body?: any;
         headers?: HeadersInit;
         responseType?: HttpResponseType;
+        interceptors?: Interceptor<HttpRequest>[];
       }
     | string
 ) {
@@ -32,16 +39,38 @@ export function rxRequest<T>(
       responseType: 'json',
     };
   }
-  let { headers, responseType = 'json', body, method, url } = request;
-  const client = useRequestClient();
-  let _headers: Headers;
-  if (typeof headers === 'undefined' || headers == null) {
-    _headers = new Headers({
-      'Content-Type': 'application/json;charset=UTF-8',
+  let {
+    headers,
+    responseType = 'json',
+    body,
+    method,
+    url,
+    interceptors,
+  } = request;
+  let _headers: Record<string, any> = {};
+  if (headers instanceof Headers) {
+    headers.forEach((value, name) => {
+      _headers[name] = value;
     });
+  } else if (Array.isArray(headers)) {
+    for (const [key, value] of headers) {
+      if (Object.prototype.hasOwnProperty.call(headers, key)) {
+        _headers[key] = value;
+      }
+    }
+  } else if (typeof headers === 'object') {
+    for (const key in headers) {
+      if (Object.prototype.hasOwnProperty.call(headers, key)) {
+        _headers[key] = headers[key];
+      }
+    }
   } else {
-    _headers = new Headers(headers);
+    // By default request are send as JSON request
+    _headers = {
+      'Content-Type': 'application/json;charset=UTF-8',
+    };
   }
+  const client = useRequestClient();
   return from(
     client.request({
       url,
@@ -51,6 +80,7 @@ export function rxRequest<T>(
         headers: _headers,
         withCredentials: true,
         responseType,
+        interceptors,
       },
     })
   );
