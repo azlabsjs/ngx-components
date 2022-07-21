@@ -24,6 +24,8 @@ import { tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { JSDate } from '@azlabsjs/js-datetime';
 
+type InputConfigType = InputConfigInterface | InputGroup;
+
 /**
  * @description Helper class for generating angular reactive form controls with errors validation
  */
@@ -36,7 +38,7 @@ export class ComponentReactiveFormHelpers {
    */
   static buildFormGroupFromInputConfig(
     builder: FormBuilder,
-    inputs: (InputConfigInterface | InputGroup)[]
+    inputs: InputConfigType[]
   ) {
     // Build the outer form group
     const group = builder.group({});

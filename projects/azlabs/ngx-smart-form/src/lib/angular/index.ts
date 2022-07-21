@@ -4,7 +4,7 @@ export {
   createAngularAbstractControl,
 } from './helpers';
 // Module & component & services exports
-export { NgxSmartFormModule } from './forms.module';
+export { NgxSmartFormModule } from './ngx-smart-form.module';
 // Type helper export
 export { InputTypeHelper } from './services/input-type';
 

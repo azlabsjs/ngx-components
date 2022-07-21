@@ -35,6 +35,7 @@ import {
   UPLOADER_OPTIONS,
   API_BINDINGS_ENDPOINT,
   API_HOST,
+  InterceptorFactory,
 } from './types';
 import { JSONFormsClient } from './services/client';
 import {
@@ -56,6 +57,10 @@ import {
   TextInputComponent,
   NgxSmartTimeInputComponent,
   NgxSmartDzComponent,
+  NgxSmartArrayCloseButtonComponent,
+  NgxSmartArrayAddButtonComponent,
+  NgxSmartFormControlArrayChildComponent,
+  NgxSmartFormControlArrayComponent,
 } from './components';
 import { FetchOptionsDirective, HTMLFileInputDirective } from './directives';
 import { createSelectOptionsQuery, createSubmitHttpHandler } from '../http';
@@ -89,10 +94,16 @@ export type ModuleConfigs = {
     UploadOptions<HttpRequest, HttpResponse>,
     'interceptor'
   > & {
-    createInterceptor?: (injector: Injector) => Interceptor<HttpRequest>;
+    createInterceptor?: InterceptorFactory<HttpRequest>;
     createBackend?: (
       injector: Injector
     ) => RequestClient<HttpRequest, HttpResponse>;
+  };
+  optionsRequest?: {
+    createInterceptor?: InterceptorFactory<HttpRequest>;
+  };
+  submitRequest?: {
+    createInterceptor?: InterceptorFactory<HttpRequest>;
   };
 };
 
@@ -151,6 +162,10 @@ export function createDictionary(dzConfig: { [index: string]: any }) {
     FetchOptionsDirective,
     HTMLFileInputDirective,
     NgxSmartDzComponent,
+    NgxSmartArrayCloseButtonComponent,
+    NgxSmartArrayAddButtonComponent,
+    NgxSmartFormControlArrayChildComponent,
+    NgxSmartFormControlArrayComponent,
   ],
   exports: [
     NgxSmartFormComponent,
@@ -211,18 +226,26 @@ export class NgxSmartFormModule {
       },
       {
         provide: INPUT_OPTIONS_CLIENT,
-        useFactory: () => {
+        useFactory: (injector: Injector) => {
           return createSelectOptionsQuery(
+            injector,
             configs!.serverConfigs!.api.host,
-            configs!.serverConfigs!.api.bindings
+            configs!.serverConfigs!.api.bindings,
+            configs.optionsRequest?.createInterceptor
           );
         },
+        deps: [Injector],
       },
       {
         provide: HTTP_REQUEST_CLIENT,
-        useFactory: () => {
-          return createSubmitHttpHandler(configs!.serverConfigs!.api.host);
+        useFactory: (injector: Injector) => {
+          return createSubmitHttpHandler(
+            injector,
+            configs!.serverConfigs!.api.host,
+            configs.submitRequest?.createInterceptor
+          );
         },
+        deps: [Injector],
       },
       {
         provide: DROPZONE_DICT,

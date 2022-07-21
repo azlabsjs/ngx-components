@@ -81,15 +81,16 @@
 <ng-template #formTemplate let-group="group" let-value="value">
   <!-- REPEATABLE INPUTS -->
   <ng-container *ngIf="value!.isRepeatable === true">
-    <ngx-smart-form-array
-      [formArray]="group"
-      [controls]="value"
+    <ngx-smart-form-control-array
+      [formArray]="group.get(value.name)"
+      [inputConfig]="value"
       [template]="template ? template : defaultFormControl"
-      [addGroupRef]="addTemplate"
+      [addButtonRef]="addTemplate"
       [name]="value.name"
       [autoupload]="autoupload"
       [submitupload]="submitupload"
-    ></ngx-smart-form-array>
+    ></ngx-smart-form-control-array>
+    <!-- </ng-container> -->
   </ng-container>
   <!--\ REPEATABLE INPUTS -->
 

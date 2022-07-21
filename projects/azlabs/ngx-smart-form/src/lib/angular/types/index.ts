@@ -12,7 +12,7 @@ export {
   HTTP_REQUEST_CLIENT,
   TEMPLATE_DICTIONARY,
   ValidationMessagesType,
-  UPLOADER_OPTIONS
+  UPLOADER_OPTIONS,
 } from './tokens';
 //
 export { ControlsStateMap, FormComponentInterface } from './component';
@@ -20,3 +20,6 @@ export { ControlsStateMap, FormComponentInterface } from './component';
 export { FormsClient, FormsLoader, CacheProvider } from './form';
 //
 export { InputOptionsClient } from './options';
+
+//
+export { InterceptorFactory } from './interceptors';

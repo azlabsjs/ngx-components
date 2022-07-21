@@ -8,7 +8,7 @@ import { ClarityIcons, uploadCloudIcon } from '@cds/core/icon';
 import { NgxDropzoneModule } from '@azlabsjs/ngx-dropzone';
 import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
 import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NgxClrSmartGridModule } from '@azlabsjs/ngx-clr-smart-grid';
 import { NgxSlidesModule } from '@azlabsjs/ngx-slides';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -35,7 +35,7 @@ ClarityIcons.addIcons(uploadCloudIcon);
           // Custom path on the server else the default is used
           bindings: 'api/v2/bindings',
           // Files upload url
-          uploadURL: 'https://storage.lik.tg/api/storage/object/upload',
+          uploadURL: 'https://storage.lik.tg/api/storage/object',
         },
       },
       uploadOptions: {
@@ -50,6 +50,23 @@ ClarityIcons.addIcons(uploadCloudIcon);
                   'x-client-id': '96a6bba2-73e4-404c-9bb3-0d61c31bba44',
                   'x-client-secret':
                     '9NYHbYhzNXX2AbrxHs4H0cTmM7udeKEdqfwyTCXGLjnaU2IhmVldNwAknIpysbx5QZ8KBytvw1hW7qQE6iA',
+                },
+              },
+            });
+            return next(request);
+          };
+        },
+      },
+      submitRequest: {
+        createInterceptor: (injector: Injector) => {
+          // Replace the interceptor function by using the injector
+          return (request, next) => {
+            request = request.clone({
+              options: {
+                ...request.options,
+                headers: {
+                  ...request.options.headers,
+                  Authorization: `Basic ${btoa('user:password')}`,
                 },
               },
             });

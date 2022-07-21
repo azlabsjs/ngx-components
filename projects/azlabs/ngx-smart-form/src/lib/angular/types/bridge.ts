@@ -15,4 +15,11 @@ export interface AngularReactiveFormBuilderBridge {
    * @param source
    */
   group(source: FormConfigInterface | InputConfigInterface[]): AbstractControl;
+
+  /**
+   * Creates a form control instance from form configuration interface
+   *
+   * @param state
+   */
+  control(state: InputConfigInterface): AbstractControl;
 }

@@ -13,27 +13,9 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
   selector: 'ngx-smart-form-array-child',
   template: `
     <div class="ngx__form_array__card">
-      <a
-        href="#"
-        class="ngx__form_array__card__close_btn"
+      <ngx-smart-array-close-button
         (click)="onCloseButtonClicked($event)"
-      >
-        <svg
-          version="1.1"
-          width="24"
-          height="24"
-          viewBox="0 0 36 36"
-          preserveAspectRatio="xMidYMid meet"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-        >
-          <title>window-close-line</title>
-          <path
-            d="M19.41,18l7.29-7.29a1,1,0,0,0-1.41-1.41L18,16.59,10.71,9.29a1,1,0,0,0-1.41,1.41L16.59,18,9.29,25.29a1,1,0,1,0,1.41,1.41L18,19.41l7.29,7.29a1,1,0,0,0,1.41-1.41Z"
-          ></path>
-          <rect x="0" y="0" width="36" height="36" fill-opacity="0" />
-        </svg>
-      </a>
+      ></ngx-smart-array-close-button>
       <div class="ngx__form_array__card__card_block">
         <ng-container *ngIf="formGroup">
           <ngx-smart-form-group
@@ -71,13 +53,10 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
         border-bottom-color: #dedede;
       }
 
-      .ngx__form_array__card__close_btn {
+      :host ::ng-deep .ngx__form_array__card__close_btn {
         position: absolute;
         top: 4px;
         right: 4px;
-      }
-      .ngx__form_array__card__close_btn svg path {
-        fill: #707070;
       }
     `,
   ],
@@ -90,6 +69,7 @@ export class NgxSmartFormArrayChildComponent {
   @Input() template!: TemplateRef<HTMLElement>;
   @Input() autoupload: boolean = false;
   @Input() submitupload: boolean = false;
+  @Input() index!: number;
   //#endregion Component inputs
 
   // #region Component outputs

@@ -1,3 +1,4 @@
+export { NgxSmartFormControlArrayComponent } from './ngx-smart-form-control-array/ngx-smart-form-control-array.component';
 export { NgxSmartFileInputComponent } from './ngx-smart-file-input/ngx-smart-file-input.component';
 export { NgxSmartSelectInputComponent } from './ngx-smart-select-input/ngx-smart-select-input.component';
 export { PhoneInputComponent } from './ngx-smart-phone-input/ngx-smart-phone-input.component';
@@ -16,3 +17,8 @@ export { NgxSmartFormControlComponent } from './ngx-smart-form-control/ngx-smart
 export { NgxSmartFormGroupHeaderPipe } from './ngx-smart-form-group/ngx-smart-form-group-header.pipe';
 export { NgxSmartTimeInputComponent } from './ngx-smart-time-input/ngx-smart-time-input.component';
 export { NgxSmartDzComponent } from './ngx-smart-file-input/ngx-smart-dz-component';
+export {
+  NgxSmartArrayCloseButtonComponent,
+  NgxSmartArrayAddButtonComponent,
+} from './partials';
+export { NgxSmartFormControlArrayChildComponent } from './ngx-smart-form-control-array/ngx-smart-form-control-array-child.component';

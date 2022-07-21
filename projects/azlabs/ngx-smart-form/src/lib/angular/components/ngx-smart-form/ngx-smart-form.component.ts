@@ -1,4 +1,5 @@
 import {
+  AfterContentInit,
   AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -242,7 +243,7 @@ export class NgxSmartFormComponent
       // Set input bindings
       this.setBindings();
       // Subscribe to formgroup changes
-      this.formGroup.valueChanges
+      this.formGroup?.valueChanges
         .pipe(
           tap((state) => this.formGroupChange.emit(state)),
           takeUntil(this._destroy$)
@@ -401,7 +402,9 @@ export class NgxSmartFormComponent
     }
   }
 
-  private createFormGroupOnFly() {}
+  getTypeof(value: any) {
+    return typeof value;
+  }
 
   ngOnDestroy(): void {
     this._destroy$.next();

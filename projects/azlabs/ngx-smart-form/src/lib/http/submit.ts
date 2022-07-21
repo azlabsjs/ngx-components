@@ -1,14 +1,14 @@
+import { Injector } from '@angular/core';
 import {
   getHttpHost,
   HttpRequest,
   HTTPRequestMethods,
   HttpResponseType,
-  Interceptor,
 } from '@azlabsjs/requests';
 import { ObservableInput } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { rxRequest } from './helpers';
-import { RequestClient } from './types';
+import { InterceptorFactory, RequestClient } from './types';
 
 type _RequestFunction = <T>(
   path: string,
@@ -34,8 +34,9 @@ type _RequestFunction = <T>(
  * @returns
  */
 export function createSubmitHttpHandler(
+  injector: Injector,
   host?: string,
-  interceptors: Interceptor<HttpRequest>[] = []
+  interceptorFactory?: InterceptorFactory<HttpRequest>
 ) {
   host = host ? getHttpHost(host) : host;
   const _request = function <T>(
@@ -61,7 +62,7 @@ export function createSubmitHttpHandler(
       method,
       body,
       ...options,
-      interceptors,
+      interceptors: interceptorFactory ? [interceptorFactory(injector)] : [],
     }).pipe(map((state) => state.response));
   };
 
