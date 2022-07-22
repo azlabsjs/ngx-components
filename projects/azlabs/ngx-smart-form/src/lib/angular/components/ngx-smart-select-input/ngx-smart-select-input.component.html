@@ -14,7 +14,7 @@
     (loadingChange)="onLoadingChange($event)"
   >
     <ng-select
-      [class]="inputConfig?.multiple ? '' : 'not-multiple'"
+      [class]="inputConfig.multiple ? '' : 'not-multiple'"
       [virtualScroll]="true"
       [items]="vm?.state ?? []"
       [bindLabel]="'name'"

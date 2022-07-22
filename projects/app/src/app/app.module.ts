@@ -35,11 +35,11 @@ ClarityIcons.addIcons(uploadCloudIcon);
           // Custom path on the server else the default is used
           bindings: 'api/v2/bindings',
           // Files upload url
-          uploadURL: 'https://storage.lik.tg/api/storage/object',
+          uploadURL: 'https://storage.lik.tg/api/storage/object/upload',
         },
       },
       uploadOptions: {
-        createInterceptor: (injector: Injector) => {
+        interceptorFactory: (injector: Injector) => {
           // Replace the interceptor function by using the injector
           return (request, next) => {
             request = request.clone({
@@ -58,7 +58,24 @@ ClarityIcons.addIcons(uploadCloudIcon);
         },
       },
       submitRequest: {
-        createInterceptor: (injector: Injector) => {
+        interceptorFactory: (injector: Injector) => {
+          // Replace the interceptor function by using the injector
+          return (request, next) => {
+            request = request.clone({
+              options: {
+                ...request.options,
+                headers: {
+                  ...request.options.headers,
+                  Authorization: `Basic ${btoa('user:password')}`,
+                },
+              },
+            });
+            return next(request);
+          };
+        },
+      },
+      optionsRequest: {
+        interceptorFactory: (injector: Injector) => {
           // Replace the interceptor function by using the injector
           return (request, next) => {
             request = request.clone({

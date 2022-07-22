@@ -3,6 +3,8 @@ export { InputEventArgs } from './input';
 export { BindingInterface } from './bindings';
 //
 export { AngularReactiveFormBuilderBridge, Builder } from './bridge';
+
+//
 export {
   FORM_CLIENT,
   ANGULAR_REACTIVE_FORM_BRIDGE,
@@ -23,3 +25,4 @@ export { InputOptionsClient } from './options';
 
 //
 export { InterceptorFactory } from './interceptors';
+export { UploadOptionsType } from './upload';

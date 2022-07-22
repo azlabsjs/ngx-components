@@ -36,6 +36,7 @@ import {
   API_BINDINGS_ENDPOINT,
   API_HOST,
   InterceptorFactory,
+  UploadOptionsType,
 } from './types';
 import { JSONFormsClient } from './services/client';
 import {
@@ -67,12 +68,9 @@ import { createSelectOptionsQuery, createSubmitHttpHandler } from '../http';
 import { from, lastValueFrom, ObservableInput, of } from 'rxjs';
 import { useDefaultTemplateText } from './helpers';
 import { CacheProvider } from '@azlabsjs/smart-form-core';
-import { UploadOptions } from '@azlabsjs/uploader';
 import {
   HttpRequest,
   HttpResponse,
-  Interceptor,
-  RequestClient,
 } from '@azlabsjs/requests';
 import { NgxUploadsSubjectService } from './components/ngx-smart-file-input/ngx-uploads-subject.service';
 
@@ -90,20 +88,12 @@ export type ModuleConfigs = {
   formsAssets?: string;
   clientFactory?: Function;
   templateTextProvider?: Provider;
-  uploadOptions?: Omit<
-    UploadOptions<HttpRequest, HttpResponse>,
-    'interceptor'
-  > & {
-    createInterceptor?: InterceptorFactory<HttpRequest>;
-    createBackend?: (
-      injector: Injector
-    ) => RequestClient<HttpRequest, HttpResponse>;
-  };
+  uploadOptions?: UploadOptionsType<HttpRequest, HttpResponse>;
   optionsRequest?: {
-    createInterceptor?: InterceptorFactory<HttpRequest>;
+    interceptorFactory?: InterceptorFactory<HttpRequest>;
   };
   submitRequest?: {
-    createInterceptor?: InterceptorFactory<HttpRequest>;
+    interceptorFactory?: InterceptorFactory<HttpRequest>;
   };
 };
 
@@ -231,7 +221,7 @@ export class NgxSmartFormModule {
             injector,
             configs!.serverConfigs!.api.host,
             configs!.serverConfigs!.api.bindings,
-            configs.optionsRequest?.createInterceptor
+            configs.optionsRequest?.interceptorFactory
           );
         },
         deps: [Injector],
@@ -242,7 +232,7 @@ export class NgxSmartFormModule {
           return createSubmitHttpHandler(
             injector,
             configs!.serverConfigs!.api.host,
-            configs.submitRequest?.createInterceptor
+            configs.submitRequest?.interceptorFactory
           );
         },
         deps: [Injector],
@@ -292,24 +282,12 @@ export class NgxSmartFormModule {
               path: configs.serverConfigs.api.uploadURL,
             };
           }
-          let interceptor!: Interceptor<HttpRequest>;
-          let backend!: RequestClient<HttpRequest, HttpResponse>;
-          const path =
-            configs.uploadOptions.path || configs.serverConfigs.api.uploadURL;
-          if (typeof configs.uploadOptions.createInterceptor === 'function') {
-            interceptor = configs.uploadOptions.createInterceptor(injector);
-            delete configs.uploadOptions['createInterceptor'];
-          } //
-          if (typeof configs.uploadOptions.createBackend === 'function') {
-            backend = configs.uploadOptions.createBackend(injector);
-            delete configs.uploadOptions['createBackend'];
-          }
           return {
             ...configs.uploadOptions,
-            interceptor,
-            backend,
-            path,
-          } as UploadOptions<HttpRequest, HttpResponse>;
+            injector,
+            path:
+              configs.uploadOptions.path || configs.serverConfigs.api.uploadURL,
+          } as UploadOptionsType<HttpRequest, HttpResponse>;
         },
         deps: [Injector],
       },

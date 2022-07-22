@@ -6,14 +6,20 @@ import {
   Output,
   EventEmitter,
   OnDestroy,
+  Injector,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { DropzoneConfig } from '@azlabsjs/ngx-dropzone';
 import { FileInput, isValidHttpUrl } from '@azlabsjs/smart-form-core';
-import { UPLOADER_OPTIONS } from '../../types';
+import { UPLOADER_OPTIONS, UploadOptionsType } from '../../types';
 import { Uploader, UploadOptions } from '@azlabsjs/uploader';
-import { HttpRequest, HttpResponse } from '@azlabsjs/requests';
+import {
+  HttpRequest,
+  HttpResponse,
+  Interceptor,
+  RequestClient,
+} from '@azlabsjs/requests';
 import { NgxUploadsSubjectService } from './ngx-uploads-subject.service';
 
 function uuidv4() {
@@ -112,8 +118,9 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
 
   constructor(
     @Inject(UPLOADER_OPTIONS)
-    private uploadOptions: UploadOptions<HttpRequest, HttpResponse>,
-    private uploadEvents: NgxUploadsSubjectService
+    private uploadOptions: UploadOptionsType<HttpRequest, HttpResponse>,
+    private uploadEvents: NgxUploadsSubjectService,
+    private injector: Injector
   ) {}
 
   ngOnInit(): void {
@@ -201,8 +208,24 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
         content: file,
         uuid: uuidv4(),
       }));
+
+      //#region execute the interceptor factory and backend factory function
+      let interceptor!: Interceptor<HttpRequest>;
+      let backend!: RequestClient<HttpRequest, HttpResponse>;
+      if (typeof this.uploadOptions.interceptorFactory === 'function') {
+        interceptor = this.uploadOptions.interceptorFactory(this.injector);
+      }
+      if (typeof this.uploadOptions.backendFactory === 'function') {
+        backend = this.uploadOptions.backendFactory(this.injector);
+      }
+      //#endregion execute the interceptor factory and backend factory function
       const options = {
-        ...this.uploadOptions,
+        ...{
+          ...this.uploadOptions,
+          // Set the backend and interceptor factory functions to undefined
+          interceptorFactory: undefined,
+          backendFactory: undefined,
+        },
         // By the default, the url passed in the HTML template, takes preceedence on inputConfig uploadURL, which
         // in turn takes precedence over the globally configured upload path
         path,
@@ -210,6 +233,8 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
         name: uploadAs ?? this.uploadOptions.name ?? 'file',
         // We use the default specified responseType else we fallback to 'json' response type
         responseType: this.uploadOptions.responseType ?? 'text',
+        interceptor,
+        backend,
       } as UploadOptions<HttpRequest, HttpResponse>;
       // Set the uploading state of the current component
       this._inputState$.next({
@@ -226,7 +251,7 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
           });
           // Creating a new uploader instance each time for bug in current version of the uploader
           const uploader = Uploader(options);
-          const result = (await uploader.upload(file.content));
+          const result = await uploader.upload(file.content);
           let _result!: Record<string, any>;
           if (typeof result === 'string') {
             try {

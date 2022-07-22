@@ -8,7 +8,7 @@
     </label>
     <ngx-intl-tel-input
       *ngIf="control"
-      [label]="describe ? (config?.label ?? '') : ''"
+      [label]="describe ? (config.label || '') : ''"
       [required]="config!.rules?.isRequired || false"
       [control]="control"
       [preferredCountries]="['tg', 'bj', 'gh']"
