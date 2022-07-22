@@ -157,3 +157,89 @@ The html template will be as follow:
     </ngx-smart-form>
 </ng-container>
 ```
+
+* File upload handler
+
+The package provides services & component for uploading files to a remote files server automatically.
+
+**Note**
+File upload response must contain an `id` attribute which is used to set the value of the control binded to the form input, else the entire response object is set as the form input control value.
+
+In order to enable the auto uploading on the smart form component:
+
+```html
+<!-- At the template level -->
+<ng-container *ngIf="form$ | async as vm">
+    <ngx-smart-form [form]="vm" [autoupload]="true">
+    </ngx-smart-form>
+</ng-container>
+```
+
+```ts
+// At the typescript level
+// app.module.ts
+import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
+
+@NgModule({
+  imports: [
+    NgxSmartFormModule.forRoot({
+      // ... other configuration
+      uploadOptions: {
+        interceptorFactory: (injector: Injector) => {
+          // Replace the interceptor function by using the injector
+          return (request, next) => {
+            // Interact with request object before being send
+            // to file(s) server(s)
+            return next(request);
+          };
+        },
+      },
+    })
+  ]
+})
+```
+
+* Form auto submission
+
+Sometimes based systems requirements, developpers might not need to handle form submission manually. Therefore the smart form package implementation offers the ability to automatically submit form without the needs of a dedicated http service implementation.
+
+At the template level, in order to use the auto submit functionnality developpers must configure the `autosubmit` and `path` input properties.
+
+```html
+<ngx-smart-form
+  [submitable]="true"
+  [autoupload]="true"
+  [form]="form"
+  [autoSubmit]="true"
+  [path]="'api/v1/customers'"
+></ngx-smart-form>
+```
+
+**Note**
+To intercept the submit request and modify the request body or headers, developpers must provide an interceptor factory function at the root level of the angular application:
+
+```ts
+// app.module.ts
+import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
+
+@NgModule({
+  imports: [
+    NgxSmartFormModule.forRoot({
+      // ... other configuration
+      submitRequest: {
+        interceptorFactory: (injector: Injector) => {
+          // Replace the interceptor function by using the injector
+          return (request, next) => {
+            // Interact with request object before being send
+            // to file(s) server(s)
+            return next(request);
+          };
+        },
+      },
+    })
+  ]
+})
+```
+
+**Warning**
+The package is still under development therefore the API is subject to change. Any update to the package api will be mentionned in the current documentation if required.

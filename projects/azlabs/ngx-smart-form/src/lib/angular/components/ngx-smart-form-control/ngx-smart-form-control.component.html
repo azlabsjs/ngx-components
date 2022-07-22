@@ -20,7 +20,7 @@
         [inputConfig]="inputType.asSelectInput(inputConfig)"
         [describe]="describe"
         (remove)="remove.emit($event)"
-        (selected)="selected?.emit($event)"
+        (selected)="selected.emit($event)"
       ></ngx-smart-select-input>
     </ng-container>
     <ng-container *ngSwitchCase="inputTypes.PHONE_INPUT">
