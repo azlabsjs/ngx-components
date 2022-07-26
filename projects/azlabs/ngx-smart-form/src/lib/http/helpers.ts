@@ -78,7 +78,7 @@ export function rxRequest(
       body,
       options: {
         headers: _headers,
-        withCredentials: true,
+        // withCredentials: true,
         responseType,
         interceptors,
       },
