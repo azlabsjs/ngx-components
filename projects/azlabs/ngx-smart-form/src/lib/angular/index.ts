@@ -13,16 +13,19 @@ export {
   AngularReactiveFormBuilderBridge,
   FormComponentInterface,
   Builder,
-  FORM_CLIENT,
-  ANGULAR_REACTIVE_FORM_BRIDGE,
   InputEventArgs,
-  API_BINDINGS_ENDPOINT,
-  API_HOST,
   FormsClient,
   FormsLoader,
   CacheProvider,
   InputOptionsClient,
+  UploadOptionsType,
+  API_BINDINGS_ENDPOINT,
+  API_HOST,
+  FORM_CLIENT,
+  ANGULAR_REACTIVE_FORM_BRIDGE,
+  TEMPLATE_DICTIONARY,
 } from './types';
+
 // Ng Services
 export { DYNAMIC_FORM_LOADER, FormHttpLoader } from './services';
 
@@ -37,6 +40,8 @@ export {
   NgxSmartFormControlComponent,
 } from './components';
 
+// Fetch and HTML File directive exports
 export { FetchOptionsDirective, HTMLFileInputDirective } from './directives';
 
+// Pipes exports
 export { SafeHTMLPipe, TemplateMessagesPipe } from './pipes';
