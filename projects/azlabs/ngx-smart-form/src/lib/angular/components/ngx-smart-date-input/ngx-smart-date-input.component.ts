@@ -18,6 +18,16 @@ import { DateInput } from '@azlabsjs/smart-form-core';
       :host ::ng-deep .clr-validate-icon.ng-star-inserted {
         display: none;
       }
+      :host ::ng-deep .clr-date-container .clr-input-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      :host ::ng-deep .clr-input-group {
+        width: 100% !important;
+        max-width: 100% !important;
+
+      }
     `,
   ],
 })

@@ -80,6 +80,10 @@ import { RequestClient } from '../../../http';
       :host ::ng-deep .ngx-smart-form-control {
         padding: 0.3rem;
       }
+
+      :host ::ng-deep .clr-form-control {
+        margin-top: 0rem !important;
+      }
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -282,7 +282,7 @@
       "disabled": false,
       "readonly": false,
       "unique": false,
-      "isRepeatable": true,
+      "isRepeatable": false,
       "dynamicControlContainerClass": "clr-col-12",
       "id": 16,
       "label": "BÉNÉFICIAIRES",

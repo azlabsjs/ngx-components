@@ -5,7 +5,13 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 @Component({
   selector: 'ngx-smart-phone-input',
   templateUrl: './ngx-smart-phone-input.component.html',
-  styles: [],
+  styles: [
+    `
+      :host ::ng-deep .btn {
+        margin-top: .05rem !important;
+      }
+    `
+  ],
 })
 export class PhoneInputComponent {
   //#region Component inputs
