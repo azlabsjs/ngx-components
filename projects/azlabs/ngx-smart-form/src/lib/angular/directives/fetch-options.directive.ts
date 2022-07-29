@@ -28,6 +28,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   //#region Directive inputs
   @Input() loaded!: boolean;
   @Input() optionsConfig!: OptionsConfig | undefined;
+  @Input() name!: string;
   //#endregion Directive inputs
 
   //#region Directive outputs

@@ -24,7 +24,7 @@ export class JSONFormsClient implements FormsClient {
 
   get(id: string | number): Observable<FormConfigInterface> {
     return from(this.provider.get(id) as ObservableInput<FormInterface>).pipe(
-      map((state) => buildFormSync(state) as FormConfigInterface)
+      map((state) => buildFormSync(state) as FormConfigInterface),
     );
   }
 

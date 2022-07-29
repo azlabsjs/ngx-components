@@ -5,13 +5,13 @@ import { AppComponent } from './app.component';
 import { CdsModule } from '@cds/angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ClarityIcons, uploadCloudIcon } from '@cds/core/icon';
-import { NgxDropzoneModule } from '@azlabsjs/ngx-dropzone';
 import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
 import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { NgxClrSmartGridModule } from '@azlabsjs/ngx-clr-smart-grid';
 import { NgxSlidesModule } from '@azlabsjs/ngx-slides';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpResponse } from '@azlabsjs/requests';
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
@@ -77,17 +77,23 @@ ClarityIcons.addIcons(uploadCloudIcon);
       optionsRequest: {
         interceptorFactory: (injector: Injector) => {
           // Replace the interceptor function by using the injector
-          return (request, next) => {
-            request = request.clone({
-              options: {
-                ...request.options,
-                headers: {
-                  ...request.options.headers,
-                  Authorization: `Basic ${btoa('user:password')}`,
-                },
-              },
-            });
-            return next(request);
+          return async (request, next) => {
+            // request = request.clone({
+            //   options: {
+            //     ...request.options,
+            //     headers: {
+            //       ...request.options.headers,
+            //       Authorization: `Basic ${btoa('user:password')}`,
+            //     },
+            //   },
+            // });
+            const response = await (next(request) as Promise<HttpResponse>);
+            let res = response['response'] as Record<string, any>;
+            response['response'] =
+              typeof res['data'] !== 'undefined' && res['data'] !== null
+                ? res['data']
+                : res;
+            return response;
           };
         },
       },

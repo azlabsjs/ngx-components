@@ -12,6 +12,7 @@
     [loaded]="vm.loaded"
     (optionsChange)="onOptionsChange($event)"
     (loadingChange)="onLoadingChange($event)"
+    [name]="inputConfig.name"
   >
     <ng-select
       [class]="inputConfig.multiple ? '' : 'not-multiple'"
@@ -27,10 +28,12 @@
       [formControl]="control"
       [groupBy]="'type'"
       [clearable]="true"
-      (remove)="remove.emit({
-        name: inputConfig.name,
-        event: $event
-      })"
+      (remove)="
+        remove.emit({
+          name: inputConfig.name,
+          event: $event
+        })
+      "
       (change)="
         selected.emit({
           name: inputConfig.name,
