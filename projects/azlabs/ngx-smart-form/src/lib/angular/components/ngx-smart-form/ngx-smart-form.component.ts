@@ -30,7 +30,7 @@ import {
   cloneAbstractControl,
   ComponentReactiveFormHelpers,
   controlAttributesDataBindings,
-  createHiddenAttributeSetter,
+  useHiddenAttributeSetter,
   setControlsAttributes,
 } from '../../helpers';
 import {
@@ -60,7 +60,6 @@ import { RequestClient } from '../../../http';
         margin-top: 1.2rem;
         margin-bottom: 0;
         font-weight: var(--clr-h3-font-weight, 200);
-        color: var(--clr-h3-color, black);
       }
       :host ::ng-deep .required-text,
       :host ::ng-deep .field-has-error {
@@ -307,11 +306,8 @@ export class NgxSmartFormComponent
         controlConfigs: controls as InputConfigInterface[],
       };
       this.formGroup = formgroup as FormGroup;
-      // Get control entries from the formgroup
-      const entries = Object.entries(this.formGroup.controls);
-      // Handle form control value changes
-      for (const [name, abstractControl] of entries) {
-        abstractControl.valueChanges
+      for (const name in this.formGroup.controls) {
+        this.formGroup.get(name)?.valueChanges
           .pipe(
             tap((state) =>
               this.handleControlChanges(
@@ -339,7 +335,7 @@ export class NgxSmartFormComponent
           this.form.controlConfigs ?? [],
           current,
           event,
-          createHiddenAttributeSetter
+          useHiddenAttributeSetter
         )(this.formGroup);
         this.formGroup = control as FormGroup;
         this.form = { ...this.form, controlConfigs: controls };

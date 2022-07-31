@@ -1,6 +1,6 @@
 [{
   "controls": [{
-    "formId": 219,
+    "formId": 1,
     "controlName": "member",
     "controlIndex": 1,
     "required": true,
@@ -17,7 +17,7 @@
     "multiple": 0,
     "options": [],
     "children": [{
-      "formId": 219,
+      "formId": 1,
       "controlName": "category_id",
       "controlGroupKey": 1236,
       "controlIndex": 1,
@@ -32,7 +32,7 @@
       "placeholder": "...",
       "type": "select",
       "classes": "clr-input",
-      "selectableModel": "http://127.0.0.1:8899/api/v1/member-categorie",
+      "selectableModel": "http://127.0.0.1:8899/api/v1/member-categories",
       "multiple": 0,
       "children": [],
       "keyfield": "",
@@ -40,7 +40,7 @@
       "groupfield": "",
       "filters": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "business_link_id",
       "controlGroupKey": 1236,
       "controlIndex": 2,
@@ -63,7 +63,7 @@
       "groupfield": "",
       "filters": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "zone_id",
       "controlGroupKey": 1236,
       "controlIndex": 3,
@@ -86,7 +86,7 @@
       "groupfield": "",
       "filters": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "activity_sector_id",
       "controlGroupKey": 1236,
       "controlIndex": 4,
@@ -101,7 +101,7 @@
       "placeholder": "...",
       "type": "select",
       "classes": "clr-input",
-      "selectableModel": "table:cu_activity_sectors|model:cu_activity_sectors|keyfield:id|groupfield:id|valuefield:label",
+      "selectableModel": "table:http://127.0.0.1:8899/api/v1/activity-sectors|model:http://127.0.0.1:8899/api/v1/activity-sectors|keyfield:id|groupfield:id|valuefield:label",
       "multiple": 0,
       "options": [],
       "children": [],
@@ -110,7 +110,7 @@
       "groupfield": "id",
       "filters": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "activity",
       "controlGroupKey": 1236,
       "controlIndex": 5,
@@ -131,7 +131,7 @@
       "children": []
     }]
   }, {
-    "formId": 219,
+    "formId": 1,
     "controlName": "social_reason",
     "controlIndex": 2,
     "required": true,
@@ -151,7 +151,7 @@
     "options": [],
     "children": []
   }, {
-    "formId": 219,
+    "formId": 1,
     "controlName": "legal_form",
     "controlIndex": 3,
     "required": true,
@@ -171,7 +171,7 @@
     "options": [],
     "children": []
   }, {
-    "formId": 219,
+    "formId": 1,
     "controlName": "receipt_number",
     "controlIndex": 4,
     "required": true,
@@ -191,7 +191,7 @@
     "options": [],
     "children": []
   }, {
-    "formId": 219,
+    "formId": 1,
     "controlName": "approval_number",
     "controlIndex": 5,
     "required": true,
@@ -211,7 +211,7 @@
     "options": [],
     "children": []
   }, {
-    "formId": 219,
+    "formId": 1,
     "controlName": "address",
     "controlIndex": 6,
     "required": true,
@@ -228,7 +228,7 @@
     "multiple": 0,
     "options": [],
     "children": [{
-      "formId": 219,
+      "formId": 1,
       "controlName": "country",
       "controlGroupKey": 1230,
       "controlIndex": 1,
@@ -249,7 +249,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "city",
       "controlGroupKey": 1230,
       "controlIndex": 2,
@@ -269,7 +269,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "district",
       "controlGroupKey": 1230,
       "controlIndex": 3,
@@ -290,7 +290,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "phone_number",
       "controlGroupKey": 1230,
       "controlIndex": 4,
@@ -310,7 +310,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "other_phone_number",
       "controlGroupKey": 1230,
       "controlIndex": 5,
@@ -335,7 +335,7 @@
       "groupfield": "id",
       "filters": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "email",
       "controlGroupKey": 1230,
       "controlIndex": 6,
@@ -355,7 +355,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "address",
       "controlGroupKey": 1230,
       "controlIndex": 7,
@@ -375,7 +375,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "postal_box",
       "controlGroupKey": 1230,
       "controlIndex": 8,
@@ -396,7 +396,7 @@
       "children": []
     }]
   }, {
-    "formId": 219,
+    "formId": 1,
     "controlName": "by",
     "controlIndex": 7,
     "required": true,
@@ -413,7 +413,7 @@
     "multiple": 0,
     "options": [],
     "children": [{
-      "formId": 219,
+      "formId": 1,
       "controlName": "lastname",
       "controlGroupKey": 1251,
       "controlIndex": 1,
@@ -433,7 +433,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "firstname",
       "controlGroupKey": 1251,
       "controlIndex": 2,
@@ -453,7 +453,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "gender_id",
       "controlGroupKey": 1251,
       "controlIndex": 3,
@@ -478,7 +478,7 @@
       "groupfield": "id",
       "filters": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "civil_state_id",
       "controlGroupKey": 1251,
       "controlIndex": 4,
@@ -502,7 +502,7 @@
       "groupfield": "",
       "filters": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "marital_status_id",
       "controlGroupKey": 1251,
       "controlIndex": 5,
@@ -527,7 +527,7 @@
       "groupfield": "id",
       "filters": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "birthdate",
       "controlGroupKey": 1251,
       "controlIndex": 6,
@@ -546,7 +546,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "birthplace",
       "controlGroupKey": 1251,
       "controlIndex": 8,
@@ -566,7 +566,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "nationality",
       "controlGroupKey": 1251,
       "controlIndex": 9,
@@ -588,7 +588,7 @@
       "children": []
     }]
   }, {
-    "formId": 219,
+    "formId": 1,
     "controlName": "requires_files",
     "controlIndex": 8,
     "value": "0",
@@ -609,7 +609,7 @@
     "options": [],
     "children": []
   }, {
-    "formId": 219,
+    "formId": 1,
     "controlName": "files",
     "controlIndex": 9,
     "required": true,
@@ -627,7 +627,7 @@
     "multiple": 0,
     "options": [],
     "children": [{
-      "formId": 219,
+      "formId": 1,
       "controlName": "file_type_id",
       "controlGroupKey": 1263,
       "controlIndex": 1,
@@ -650,7 +650,7 @@
       "groupfield": "",
       "filters": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "reference",
       "controlGroupKey": 1263,
       "controlIndex": 2,
@@ -670,7 +670,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "expired_at",
       "controlGroupKey": 1263,
       "controlIndex": 3,
@@ -688,7 +688,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "file_id",
       "controlGroupKey": 1263,
       "controlIndex": 4,
@@ -708,7 +708,7 @@
       "children": []
     }]
   }, {
-    "formId": 219,
+    "formId": 1,
     "controlName": "requires_stake_holders",
     "controlIndex": 10,
     "value": "0",
@@ -729,7 +729,7 @@
     "options": [],
     "children": []
   }, {
-    "formId": 219,
+    "formId": 1,
     "controlName": "stakeholders",
     "controlIndex": 11,
     "required": true,
@@ -747,7 +747,7 @@
     "multiple": 0,
     "options": [],
     "children": [{
-      "formId": 219,
+      "formId": 1,
       "controlName": "lastname",
       "controlGroupKey": 1277,
       "controlIndex": 1,
@@ -767,7 +767,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "firstname",
       "controlGroupKey": 1277,
       "controlIndex": 2,
@@ -787,7 +787,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "gender_id",
       "controlGroupKey": 1277,
       "controlIndex": 3,
@@ -810,7 +810,7 @@
       "groupfield": "",
       "filters": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "civil_state_id",
       "controlGroupKey": 1277,
       "controlIndex": 4,
@@ -833,7 +833,7 @@
       "groupfield": "",
       "filters": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "birthdate",
       "controlGroupKey": 1277,
       "controlIndex": 5,
@@ -852,7 +852,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "birthplace",
       "controlGroupKey": 1277,
       "controlIndex": 6,
@@ -872,7 +872,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "nationality",
       "controlGroupKey": 1277,
       "controlIndex": 7,
@@ -892,7 +892,7 @@
       "options": [],
       "children": []
     }, {
-      "formId": 219,
+      "formId": 1,
       "controlName": "profession",
       "controlGroupKey": 1277,
       "controlIndex": 8,
@@ -913,7 +913,7 @@
       "children": []
     }]
   }],
-  "id": 219,
+  "id": 1,
   "title": "NOUVEAU MEMBRE MORAL",
   "description": "AJOUT D'UN MEMBRE MORAL",
   "url": "api/v1/morals",
@@ -954,7 +954,7 @@
       "type": "select",
       "classes": "clr-input",
       "description": "Sélectionnez la catégorie du membre",
-      "selectableModel": "table:http://127.0.0.1:8899/api/v1/member-categorie|model:http://127.0.0.1:8899/api/v1/member-categorie|keyfield:id|groupfield:id|valuefield:label",
+      "selectableModel": "table:http://127.0.0.1:8899/api/v1/member-categories|model:http://127.0.0.1:8899/api/v1/member-categories|keyfield:id|groupfield:id|valuefield:label",
       "multiple": 0,
       "options": [],
       "children": [],
@@ -1610,6 +1610,7 @@
     "formId": 218,
     "controlName": "requires_stake_holders",
     "controlIndex": 6,
+    "value": "0",
     "required": true,
     "disabled": false,
     "readonly": false,

@@ -3,6 +3,7 @@ import { BindingInterface } from '../types';
 import { ComponentReactiveFormHelpers } from './builders';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { isNumber } from '@azlabsjs/utilities';
+import { cloneAbstractControl } from './clone';
 
 type CreateControlAttributeSetterReturnType = (
   formgroup: AbstractControl
@@ -14,7 +15,7 @@ type CreateControlAttributeSetterType = (
   value: any
 ) => CreateControlAttributeSetterReturnType;
 
-export function createHiddenAttributeSetter(
+export function useHiddenAttributeSetter(
   controls: InputConfigInterface[],
   bidings: BindingInterface,
   value: string | number
@@ -34,24 +35,31 @@ export function createHiddenAttributeSetter(
             : _control.requiredIf?.values || [];
           _control.hidden = !requiredIfValues.includes(value) ? true : false;
           if (_control.hidden) {
-            const current = formgroup.get(bidings.key);
-            if (current) {
-              current.reset();
-            }
-            ComponentReactiveFormHelpers.clearControlValidators(
-              formgroup.get(bidings.key) || undefined
-            );
-            ComponentReactiveFormHelpers.clearAsyncValidators(
-              formgroup.get(bidings.key) || undefined
-            );
+            (formgroup as FormGroup).removeControl(bidings.key);
+            console.log(formgroup);
           } else {
-            formgroup
-              .get(bidings.key)
-              ?.setValidators(bidings.validators || null);
-            formgroup
-              .get(bidings.key)
-              ?.setAsyncValidators(bidings.asyncValidators || null);
+            (formgroup as FormGroup).addControl(bidings.key, cloneAbstractControl(bidings.abstractControl));
+            console.log(formgroup);
           }
+          // if (_control.hidden) {
+          //   const current = formgroup.get(bidings.key);
+          //   if (current) {
+          //     current.reset();
+          //   }
+          //   ComponentReactiveFormHelpers.clearControlValidators(
+          //     formgroup.get(bidings.key) || undefined
+          //   );
+          //   ComponentReactiveFormHelpers.clearAsyncValidators(
+          //     formgroup.get(bidings.key) || undefined
+          //   );
+          // } else {
+          //   formgroup
+          //     .get(bidings.key)
+          //     ?.setValidators(bidings.validators || null);
+          //   formgroup
+          //     .get(bidings.key)
+          //     ?.setAsyncValidators(bidings.asyncValidators || null);
+          // }
         }
         return _control;
       });
@@ -67,35 +75,34 @@ export function controlAttributesDataBindings(
   return (formgroup: AbstractControl) => {
     const bindings: Map<string, BindingInterface> = new Map();
     if (Array.isArray(controls) && controls.length !== 0 && formgroup) {
+      // First we retrieve input config having requiredIf property
+      // definition 
       const mathes = controls.filter(
         (current) =>
           current.requiredIf !== null &&
           typeof current.requiredIf !== 'undefined'
       );
+      // For each matches found, we build the binding map
       for (const config of mathes) {
         const { requiredIf, name } = config;
-        const control_ = formgroup.get(name);
-        bindings.set(name, {
-          key: name,
-          binding: requiredIf,
-          validators: control_?.validator ?? undefined,
-          asyncValidators: control_?.asyncValidator ?? undefined,
-        });
+        const abstractControl = formgroup.get(name);
+        if (abstractControl) {
+          bindings.set(name, {
+            key: name,
+            binding: requiredIf,
+            abstractControl: abstractControl,
+            validators: abstractControl?.validator ?? undefined,
+            asyncValidators: abstractControl?.asyncValidator ?? undefined,
+          });
+        }
       }
       for (const value of bindings.values()) {
-        const binding = value.binding ?? undefined;
-        const hasControl = binding
-          ? false !== (formgroup.get(binding.name) ?? false)
-          : false;
-        const controlValue = value.binding
-          ? formgroup.get(value.binding?.name)?.value
-          : undefined;
-        if (binding && hasControl) {
+        if (value.binding) {
           const [control, _controls] = setControlsAttributes(
             controls,
             value,
-            controlValue,
-            createHiddenAttributeSetter
+            value.abstractControl.value,
+            useHiddenAttributeSetter
           )(formgroup);
           formgroup = control as FormGroup;
           controls = _controls;

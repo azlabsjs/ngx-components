@@ -38,9 +38,6 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
         display: inline-block;
         margin-top: 0.8rem;
         display: block;
-        background-color: white;
-        background-color: white;
-        background-color: var(--clr-card-bg-color, white);
         width: 100%;
         margin-top: 1.2rem;
         border-bottom: 1px solid #f3f3f3;
@@ -50,7 +47,6 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
         padding: 0.6rem 0.9rem;
         border-bottom-width: 0.05rem;
         border-bottom-style: solid;
-        border-bottom-color: #dedede;
       }
 
       :host ::ng-deep .ngx__form_array__card__close_btn {

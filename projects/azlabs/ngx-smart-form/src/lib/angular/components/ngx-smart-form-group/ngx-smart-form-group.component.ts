@@ -15,7 +15,7 @@ import { takeUntil, tap } from 'rxjs/operators';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import {
   controlAttributesDataBindings,
-  createHiddenAttributeSetter,
+  useHiddenAttributeSetter,
   setControlsAttributes,
 } from '../../helpers';
 import { BindingInterface } from '../../types';
@@ -97,7 +97,7 @@ export class NgxSmartFormGroupComponent
           this.controls,
           current,
           event,
-          createHiddenAttributeSetter
+          useHiddenAttributeSetter
         )(this.formGroup);
         this.formGroup = control as FormGroup;
         this.controls = controls;

@@ -239,7 +239,7 @@ export class ComponentReactiveFormHelpers {
 
   public static validateFormGroupFields(control: FormGroup | FormArray): void {
     for (const value of Object.values(control.controls)) {
-      if (value instanceof FormGroup || value instanceof FormArray) {
+      if ((value instanceof FormGroup || value instanceof FormArray) && (!value.valid)) {
         ComponentReactiveFormHelpers.validateFormGroupFields(value);
       } else {
         ComponentReactiveFormHelpers.markControlAsTouched(value);
@@ -260,14 +260,30 @@ export class ComponentReactiveFormHelpers {
   }
 
   public static clearControlValidators(control?: AbstractControl): void {
-    if (control) {
+    if (control instanceof FormGroup) {
+      for (const prop in control.controls) {
+        ComponentReactiveFormHelpers.clearControlValidators(control.get(prop) || undefined);
+      }
+    } else if (control instanceof FormArray) {
+      for (const item of control.controls) {
+        ComponentReactiveFormHelpers.clearControlValidators(item);
+      }
+    } else if (control) {
       control.clearValidators();
       control.updateValueAndValidity();
     }
   }
 
   public static clearAsyncValidators(control?: AbstractControl): void {
-    if (control) {
+    if (control instanceof FormGroup) {
+      for (const prop in control.controls) {
+        ComponentReactiveFormHelpers.clearAsyncValidators(control.get(prop) || undefined);
+      }
+    } else if (control instanceof FormArray) {
+      for (const item of control.controls) {
+        ComponentReactiveFormHelpers.clearAsyncValidators(item);
+      }
+    } else if (control) {
       control.clearAsyncValidators();
       control.updateValueAndValidity();
     }

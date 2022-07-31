@@ -9,7 +9,7 @@ export {
 // Attributes builder helper functions
 export {
   controlAttributesDataBindings,
-  createHiddenAttributeSetter,
+  useHiddenAttributeSetter,
   setControlsAttributes,
 } from './attributes';
 

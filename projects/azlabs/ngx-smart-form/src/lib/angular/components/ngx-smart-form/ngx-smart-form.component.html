@@ -31,6 +31,7 @@
           <!-- REPEATABLE INPUTS GROUP -->
           <ng-container *ngIf="value!.isRepeatable === true">
             <ngx-smart-form-array
+              *ngIf="group.get(value.name)"
               [formArray]="group.get(value.name)"
               [controls]="value.children || []"
               [template]="template ? template : defaultFormControl"
@@ -82,6 +83,7 @@
   <!-- REPEATABLE INPUTS -->
   <ng-container *ngIf="value!.isRepeatable === true">
     <ngx-smart-form-control-array
+      *ngIf="group.get(value.name)"
       [formArray]="group.get(value.name)"
       [inputConfig]="value"
       [template]="template ? template : defaultFormControl"
@@ -121,6 +123,7 @@
 <!-- DEFAULT FORM CONTROL COMPONENT -->
 <ng-template #defaultFormControl let-config="value" let-control="control">
   <ngx-smart-form-control
+    *ngIf="control"
     [class]="'ngx-smart-form-control ' + config.containerClass"
     [hidden]="config.hidden"
     [control]="control"
