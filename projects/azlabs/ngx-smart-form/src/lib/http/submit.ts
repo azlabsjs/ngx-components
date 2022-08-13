@@ -1,9 +1,9 @@
 import { Injector } from '@angular/core';
 import {
   getHttpHost,
-  HttpRequest,
+  HTTPRequest,
   HTTPRequestMethods,
-  HttpResponseType,
+  HTTPResponseType,
 } from '@azlabsjs/requests';
 import { ObservableInput } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -16,7 +16,7 @@ type _RequestFunction = <T>(
   body: unknown,
   options?: {
     headers?: HeadersInit;
-    responseType?: HttpResponseType;
+    responseType?: HTTPResponseType;
   }
 ) => ObservableInput<T>;
 
@@ -36,7 +36,7 @@ type _RequestFunction = <T>(
 export function createSubmitHttpHandler(
   injector: Injector,
   host?: string,
-  interceptorFactory?: InterceptorFactory<HttpRequest>
+  interceptorFactory?: InterceptorFactory<HTTPRequest>
 ) {
   host = host ? getHttpHost(host) : host;
   const _request = function <T>(
@@ -45,7 +45,7 @@ export function createSubmitHttpHandler(
     body: unknown,
     options?: {
       headers?: HeadersInit;
-      responseType?: HttpResponseType;
+      responseType?: HTTPResponseType;
     }
   ) {
     const url = host
@@ -63,7 +63,7 @@ export function createSubmitHttpHandler(
       body,
       ...options,
       interceptors: interceptorFactory ? [interceptorFactory(injector)] : [],
-    }).pipe(map((state) => state.response));
+    }).pipe(map((state) => state.body));
   };
 
   return Object.defineProperty(_request, 'request', {
@@ -73,7 +73,7 @@ export function createSubmitHttpHandler(
       body: unknown,
       options?: {
         headers?: HeadersInit;
-        responseType?: HttpResponseType;
+        responseType?: HTTPResponseType;
       }
     ) => {
       return _request<T>(path, method, body, options);

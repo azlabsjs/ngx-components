@@ -1,7 +1,10 @@
-import { HTTPRequestMethods, HttpResponseType } from '@azlabsjs/requests';
 import { ObservableInput } from 'rxjs';
-import { Injector } from "@angular/core";
-import { Interceptor } from "@azlabsjs/requests";
+import { Injector } from '@angular/core';
+import {
+  Interceptor,
+  HTTPRequestMethods,
+  HTTPResponseType,
+} from '@azlabsjs/requests';
 
 export type InterceptorFactory<T> = (injector: Injector) => Interceptor<T>;
 
@@ -21,7 +24,7 @@ export interface RequestClient {
     body: unknown,
     options?: {
       headers?: HeadersInit;
-      responseType?: HttpResponseType;
+      responseType?: HTTPResponseType;
     }
   ): ObservableInput<T>;
 }

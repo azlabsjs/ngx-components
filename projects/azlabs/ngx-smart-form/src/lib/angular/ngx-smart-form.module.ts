@@ -69,8 +69,8 @@ import { from, lastValueFrom, ObservableInput, of } from 'rxjs';
 import { useDefaultTemplateText } from './helpers';
 import { CacheProvider } from '@azlabsjs/smart-form-core';
 import {
-  HttpRequest,
-  HttpResponse,
+  HTTPRequest,
+  HTTPResponse,
 } from '@azlabsjs/requests';
 import { NgxUploadsSubjectService } from './components/ngx-smart-file-input/ngx-uploads-subject.service';
 
@@ -88,12 +88,12 @@ export type ModuleConfigs = {
   formsAssets?: string;
   clientFactory?: Function;
   templateTextProvider?: Provider;
-  uploadOptions?: UploadOptionsType<HttpRequest, HttpResponse>;
+  uploadOptions?: UploadOptionsType<HTTPRequest, HTTPResponse>;
   optionsRequest?: {
-    interceptorFactory?: InterceptorFactory<HttpRequest>;
+    interceptorFactory?: InterceptorFactory<HTTPRequest>;
   };
   submitRequest?: {
-    interceptorFactory?: InterceptorFactory<HttpRequest>;
+    interceptorFactory?: InterceptorFactory<HTTPRequest>;
   };
 };
 
@@ -287,7 +287,7 @@ export class NgxSmartFormModule {
             injector,
             path:
               configs.uploadOptions.path || configs.serverConfigs.api.uploadURL,
-          } as UploadOptionsType<HttpRequest, HttpResponse>;
+          } as UploadOptionsType<HTTPRequest, HTTPResponse>;
         },
         deps: [Injector],
       },

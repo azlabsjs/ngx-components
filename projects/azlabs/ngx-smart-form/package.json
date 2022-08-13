@@ -8,7 +8,9 @@
     "@ng-select/ng-select": "^8.0",
     "@clr/angular": "^13.0",
     "@azlabsjs/ngx-intl-tel-input": "^0.13.11",
-    "@azlabsjs/ngx-dropzone": "^0.13.11"
+    "@azlabsjs/ngx-dropzone": "^0.13.11",
+    "@azlabsjs/requests": "^0.2.0",
+    "@azlabsjs/uploader": "^0.2.1"
   },
   "dependencies": {
     "tslib": "^2.3.0",
@@ -17,8 +19,8 @@
     "@azlabsjs/utilities": "^0.1.10",
     "@azlabsjs/functional": "^0.1.10",
     "@azlabsjs/smart-form-core": "^0.1.18",
-    "@azlabsjs/requests": "^0.1.15",
-    "@azlabsjs/uploader": "^0.1.12"
+    "@azlabsjs/requests": "^0.2.0",
+    "@azlabsjs/uploader": "^0.2.1"
   },
   "repository": {
     "type": "git",

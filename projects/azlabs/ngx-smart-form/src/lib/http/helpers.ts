@@ -1,9 +1,9 @@
 import {
   useRequestClient,
   HTTPRequestMethods,
-  HttpResponseType,
+  HTTPResponseType,
   Interceptor,
-  HttpRequest,
+  HTTPRequest,
 } from '@azlabsjs/requests';
 import { from } from 'rxjs';
 
@@ -24,8 +24,8 @@ export function rxRequest(
         method: HTTPRequestMethods;
         body?: any;
         headers?: HeadersInit;
-        responseType?: HttpResponseType;
-        interceptors?: Interceptor<HttpRequest>[];
+        responseType?: HTTPResponseType;
+        interceptors?: Interceptor<HTTPRequest>[];
       }
     | string
 ) {

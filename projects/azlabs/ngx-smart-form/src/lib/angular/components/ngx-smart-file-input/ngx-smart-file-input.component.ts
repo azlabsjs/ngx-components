@@ -15,8 +15,8 @@ import { FileInput, isValidHttpUrl } from '@azlabsjs/smart-form-core';
 import { UPLOADER_OPTIONS, UploadOptionsType } from '../../types';
 import { Uploader, UploadOptions } from '@azlabsjs/uploader';
 import {
-  HttpRequest,
-  HttpResponse,
+  HTTPRequest,
+  HTTPResponse,
   Interceptor,
   RequestClient,
 } from '@azlabsjs/requests';
@@ -118,7 +118,7 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
 
   constructor(
     @Inject(UPLOADER_OPTIONS)
-    private uploadOptions: UploadOptionsType<HttpRequest, HttpResponse>,
+    private uploadOptions: UploadOptionsType<HTTPRequest, HTTPResponse>,
     private uploadEvents: NgxUploadsSubjectService,
     private injector: Injector
   ) {}
@@ -210,8 +210,8 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
       }));
 
       //#region execute the interceptor factory and backend factory function
-      let interceptor!: Interceptor<HttpRequest>;
-      let backend!: RequestClient<HttpRequest, HttpResponse>;
+      let interceptor!: Interceptor<HTTPRequest>;
+      let backend!: RequestClient<HTTPRequest, HTTPResponse>;
       if (typeof this.uploadOptions.interceptorFactory === 'function') {
         interceptor = this.uploadOptions.interceptorFactory(this.injector);
       }
@@ -235,7 +235,7 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
         responseType: this.uploadOptions.responseType ?? 'text',
         interceptor,
         backend,
-      } as UploadOptions<HttpRequest, HttpResponse>;
+      } as UploadOptions<HTTPRequest, HTTPResponse>;
       // Set the uploading state of the current component
       this._inputState$.next({
         ...this._inputState$.getValue(),

@@ -1,7 +1,7 @@
 import { Injector } from '@angular/core';
-import { getHttpHost, HttpRequest, Interceptor } from '@azlabsjs/requests';
+import { getHttpHost, HTTPRequest } from '@azlabsjs/requests';
 import { isValidHttpUrl, OptionsConfig } from '@azlabsjs/smart-form-core';
-import { map, Observable, ObservableInput, tap } from 'rxjs';
+import { map, ObservableInput, tap } from 'rxjs';
 import { InputOptionsClient } from '../angular/types/options';
 import { rxRequest } from './helpers';
 import { InterceptorFactory } from './types';
@@ -29,7 +29,7 @@ export function createSelectOptionsQuery(
   injector: Injector,
   endpoint?: string,
   path?: string,
-  interceptorFactory?: InterceptorFactory<HttpRequest>
+  interceptorFactory?: InterceptorFactory<HTTPRequest>
 ) {
   let _endpoint!: string;
   let _path!: string | undefined;
@@ -64,7 +64,7 @@ export function createSelectOptionsQuery(
 export function queryOptions(
   optionsConfig: OptionsQueryParams,
   injector: Injector,
-  interceptorFactory?: InterceptorFactory<HttpRequest>
+  interceptorFactory?: InterceptorFactory<HTTPRequest>
 ) {
   // We provides a request body only if the resource object is not a valid
   // HTTP URI because in such case the request is being send to form API server
@@ -83,5 +83,5 @@ export function queryOptions(
     },
     responseType: 'json',
     interceptors: interceptorFactory ? [interceptorFactory(injector)] : [],
-  }).pipe(map((state) => state.response));
+  }).pipe(map((state) => state.body));
 }

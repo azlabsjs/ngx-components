@@ -36,30 +36,12 @@ export function useHiddenAttributeSetter(
           _control.hidden = !requiredIfValues.includes(value) ? true : false;
           if (_control.hidden) {
             (formgroup as FormGroup).removeControl(bidings.key);
-            console.log(formgroup);
           } else {
-            (formgroup as FormGroup).addControl(bidings.key, cloneAbstractControl(bidings.abstractControl));
-            console.log(formgroup);
+            (formgroup as FormGroup).addControl(
+              bidings.key,
+              cloneAbstractControl(bidings.abstractControl)
+            );
           }
-          // if (_control.hidden) {
-          //   const current = formgroup.get(bidings.key);
-          //   if (current) {
-          //     current.reset();
-          //   }
-          //   ComponentReactiveFormHelpers.clearControlValidators(
-          //     formgroup.get(bidings.key) || undefined
-          //   );
-          //   ComponentReactiveFormHelpers.clearAsyncValidators(
-          //     formgroup.get(bidings.key) || undefined
-          //   );
-          // } else {
-          //   formgroup
-          //     .get(bidings.key)
-          //     ?.setValidators(bidings.validators || null);
-          //   formgroup
-          //     .get(bidings.key)
-          //     ?.setAsyncValidators(bidings.asyncValidators || null);
-          // }
         }
         return _control;
       });
@@ -76,7 +58,7 @@ export function controlAttributesDataBindings(
     const bindings: Map<string, BindingInterface> = new Map();
     if (Array.isArray(controls) && controls.length !== 0 && formgroup) {
       // First we retrieve input config having requiredIf property
-      // definition 
+      // definition
       const mathes = controls.filter(
         (current) =>
           current.requiredIf !== null &&
