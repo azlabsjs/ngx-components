@@ -11,6 +11,7 @@ import {
 import { first, tap } from 'rxjs/operators';
 import {
   InputOptionsInterface,
+  isCustomURL,
   isValidHttpUrl,
   mapIntoInputOptions,
   mapStringListToInputOptions,
@@ -82,6 +83,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     }
     this.loadingChange.emit(true);
     if (
+      isCustomURL(this.optionsConfig.source.resource) ||
       isValidHttpUrl(this.optionsConfig.source.resource) ||
       (this.optionsConfig.source.raw.match(/table:/) &&
         this.optionsConfig.source.raw.match(/keyfield:/))

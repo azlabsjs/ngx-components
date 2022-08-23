@@ -9,6 +9,7 @@
     "@clr/angular": "^13.0",
     "@azlabsjs/ngx-intl-tel-input": "^0.13.11",
     "@azlabsjs/ngx-dropzone": "^0.13.11",
+    "@azlabsjs/smart-form-core": "^0.1.21",
     "@azlabsjs/requests": "^0.2.0",
     "@azlabsjs/uploader": "^0.2.1"
   },
@@ -18,7 +19,7 @@
     "@azlabsjs/collections": "^0.1.10",
     "@azlabsjs/utilities": "^0.1.10",
     "@azlabsjs/functional": "^0.1.10",
-    "@azlabsjs/smart-form-core": "^0.1.18",
+    "@azlabsjs/smart-form-core": "^0.1.21",
     "@azlabsjs/requests": "^0.2.0",
     "@azlabsjs/uploader": "^0.2.1"
   },

@@ -1,7 +1,12 @@
 import { Injector } from '@angular/core';
 import { getHttpHost, HTTPRequest } from '@azlabsjs/requests';
-import { isValidHttpUrl, OptionsConfig } from '@azlabsjs/smart-form-core';
-import { map, ObservableInput, tap } from 'rxjs';
+import {
+  customToResourceURL,
+  isCustomURL,
+  isValidHttpUrl,
+  OptionsConfig,
+} from '@azlabsjs/smart-form-core';
+import { map, ObservableInput } from 'rxjs';
 import { InputOptionsClient } from '../angular/types/options';
 import { rxRequest } from './helpers';
 import { InterceptorFactory } from './types';
@@ -13,8 +18,14 @@ type _OptionsRequestFunction = <T>(
 
 type OptionsQueryParams = OptionsConfig & { url: string };
 
-function createQueryURL(optionsConfig: OptionsConfig) {
-  return `${optionsConfig.source.resource}${
+/**
+ * @internal
+ *
+ * @param url
+ * @param optionsConfig
+ */
+function createQueryURL(url: string, optionsConfig: OptionsConfig) {
+  return `${url}${
     optionsConfig.params?.filters
       ? `?${optionsConfig.params?.filters
           .replace('[[', '')
@@ -24,6 +35,24 @@ function createQueryURL(optionsConfig: OptionsConfig) {
   }`;
 }
 
+/**
+ *
+ * @internal
+ *
+ * @param value
+ * @param host
+ */
+function createRequestURL(value: OptionsConfig, host: string, path?: string) {
+  const url = value.source.resource;
+  return isValidHttpUrl(url)
+    ? createQueryURL(url, value)
+    : url
+    ? url
+    : path
+    ? `${host}/${path}`
+    : `${host}`;
+}
+
 // @internal
 export function createSelectOptionsQuery(
   injector: Injector,
@@ -31,30 +60,48 @@ export function createSelectOptionsQuery(
   path?: string,
   interceptorFactory?: InterceptorFactory<HTTPRequest>
 ) {
-  let _endpoint!: string;
-  let _path!: string | undefined;
-  if (endpoint === null && typeof endpoint === 'undefined') {
-    _endpoint = path ?? 'http://localhost';
-    _path = undefined;
+  let _endpoint!: string | undefined;
+  let _path!: string;
+  if (endpoint === null || typeof endpoint === 'undefined') {
+    _endpoint =
+      typeof path !== 'undefined' && path !== null && isValidHttpUrl(path)
+        ? path
+        : undefined;
+    _path = '';
   } else {
-    _path = path;
+    _path = path ?? '';
+    _endpoint = endpoint;
   }
-  _endpoint = _path
-    ? `${getHttpHost(_endpoint)}/${
-        _path.startsWith('/') ? _path.slice(0, _path.length - 1) : _path
-      }`
-    : _endpoint;
-
+  _endpoint =
+    _path && _endpoint
+      ? `${getHttpHost(_endpoint)}/${
+          _path.startsWith('/') ? _path.slice(0, _path.length - 1) : _path
+        }`
+      : _endpoint;
   const _requestClient = queryOptions;
   Object.defineProperty(_requestClient, 'request', {
     value: (optionsConfig: OptionsConfig) => {
       // We build the request query
-      const url = isValidHttpUrl(optionsConfig.source.resource)
-        ? createQueryURL(optionsConfig)
-        : _path
-        ? `${_endpoint}/${_path}`
-        : `${_endpoint}`;
-      const request = { ...optionsConfig, url };
+      //#region For custom URL configurations, we attempt to build the final URL and update the
+      // the resource entry if source property of the option configurations
+      let url = optionsConfig.source.resource;
+      if (isCustomURL(url ?? '')) {
+        url = customToResourceURL(url, _endpoint ?? '');
+        url = url[0] === '/' ? url.substring(1) : url;
+        optionsConfig = {
+          ...optionsConfig,
+          source: { ...(optionsConfig.source ?? {}), resource: url },
+        };
+      }
+      //#endregion
+      const request = {
+        ...optionsConfig,
+        url: createRequestURL(
+          optionsConfig,
+          _endpoint ?? '',
+          _path[0] === '/' ? _path?.substring(1) : _path
+        ),
+      };
       return _requestClient(request, injector, interceptorFactory);
     },
   });

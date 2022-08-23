@@ -28,7 +28,7 @@
     "@azlabsjs/js-datetime": "^0.1.10",
     "@azlabsjs/js-object": "^0.1.10",
     "@azlabsjs/requests": "^0.2.0",
-    "@azlabsjs/smart-form-core": "^0.1.21",
+    "@azlabsjs/smart-form-core": "^0.1.22",
     "@azlabsjs/str": "^0.1.10",
     "@azlabsjs/uploader": "^0.2.1",
     "@azlabsjs/utilities": "^0.1.10",
