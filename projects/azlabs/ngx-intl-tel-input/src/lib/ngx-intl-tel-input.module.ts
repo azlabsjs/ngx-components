@@ -4,7 +4,6 @@ import { Country, IntlTelInput, ISO3166 } from './core';
 import { NgxIntlTelInputComponent } from './ngx-intl-tel-input.component';
 import { COUNTRIES } from './core/types';
 import { getPhoneNumberPlaceholder } from './core/internal';
-import { PhoneNumberFormat } from 'google-libphonenumber';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
@@ -55,7 +54,7 @@ export class NgxIntlTelInputModule {
               flagClass: country[1].toString().toLocaleLowerCase(),
               placeHolder: `${getPhoneNumberPlaceholder(
                 country[1].toString().toUpperCase(),
-                PhoneNumberFormat.NATIONAL
+                'national'
               )}`,
             }));
           },

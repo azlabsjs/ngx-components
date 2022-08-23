@@ -1,8 +1,4 @@
-import {
-  PhoneNumber,
-  PhoneNumberFormat,
-  PhoneNumberUtil,
-} from 'google-libphonenumber';
+import {parsePhoneNumber, PhoneNumber, PhoneNumberFormat} from 'awesome-phonenumber';
 
 // @internal
 export function sanitize(value: string) {
@@ -20,10 +16,10 @@ export function getPhoneNumberPlaceholder(
   region: string,
   format: PhoneNumberFormat
 ) {
-  const instance = PhoneNumberUtil.getInstance();
+  // const instance = PhoneNumberUtil.getInstance();
   try {
-    const phoneNumber = instance.parse('90000505', region);
-    return phoneNumberAsString(instance, phoneNumber, format);
+    const phoneNumber = parsePhoneNumber('90000505', region);
+    return phoneNumberAsString(phoneNumber, format);
   } catch (e) {
     return e;
   }
@@ -31,25 +27,26 @@ export function getPhoneNumberPlaceholder(
 
 // @internal
 export function phoneNumberAsString(
-  instance: PhoneNumberUtil,
   number: PhoneNumber,
   format: PhoneNumberFormat
 ) {
-  instance = instance || PhoneNumberUtil.getInstance();
-  return instance.format(number, format);
+  // instance = instance || PhoneNumberUtil.getInstance();
+  // return instance.format(number, format);
+  return number.getNumber(format);
 }
 
 // @internal
 export function safeValidatePhoneNumber(
-  instance: PhoneNumberUtil,
+  // instance: PhoneNumberUtil,
   phoneNumber: string
 ) {
   try {
-    return !instance.isValidNumber(
-      instance.parseAndKeepRawInput(sanitize(String(phoneNumber) as string))
-    )
-      ? false
-      : true;
+    // return !instance.isValidNumber(
+    //   instance.parseAndKeepRawInput(sanitize(String(phoneNumber) as string))
+    // )
+    //   ? false
+    //   : true;
+    return parsePhoneNumber(phoneNumber).isValid();
   } catch (e) {
     return false;
   }
