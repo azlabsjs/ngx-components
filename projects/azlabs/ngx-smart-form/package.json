@@ -5,10 +5,13 @@
     "@angular/common": "^14.0.0",
     "@angular/core": "^14.0.0",
     "@angular/forms": "^14.0.0",
-    "@ng-select/ng-select": "^9.0",
     "@clr/angular": "^13.0",
-    "@azlabsjs/ngx-intl-tel-input": "^0.14.10",
-    "@azlabsjs/ngx-dropzone": "^0.14.10"
+    "@ng-select/ng-select": "^9.0",
+    "@azlabsjs/ngx-intl-tel-input": "^0.14.12",
+    "@azlabsjs/ngx-dropzone": "^0.14.12",
+    "@azlabsjs/smart-form-core": "^0.1.21",
+    "@azlabsjs/requests": "^0.2.0",
+    "@azlabsjs/uploader": "^0.2.1"
   },
   "dependencies": {
     "tslib": "^2.3.0",
