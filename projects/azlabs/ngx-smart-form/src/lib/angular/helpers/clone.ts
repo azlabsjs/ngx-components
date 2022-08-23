@@ -6,12 +6,16 @@ import {
 } from '@angular/forms';
 
 /**
- * Deep clones the given AbstractControl, preserving values, validators, async validators, and disabled status.
+ * Deep clones the given AbstractControl, preserving values, validators,
+ * async validators, and disabled status.
+ *
  * @param control AbstractControl
  *
  * @returns {AbstractControl}
  */
-export function cloneAbstractControl<T extends AbstractControl>(control: T): T {
+export function cloneAbstractControl<
+  T extends AbstractControl | FormGroup | FormArray | FormControl
+>(control: T): T {
   let newControl: T;
 
   if (control instanceof FormGroup) {
@@ -21,23 +25,20 @@ export function cloneAbstractControl<T extends AbstractControl>(control: T): T {
       control.asyncValidator
     );
     const controls = control.controls;
-
     Object.keys(controls).forEach((key) => {
       formGroup.addControl(key, cloneAbstractControl(controls[key]));
     });
 
     newControl = formGroup as any;
   } else if (control instanceof FormArray) {
-    const formArray = new FormArray(
+    const formArray = new FormArray<any>(
       [],
       control.validator,
       control.asyncValidator
     );
-
     control.controls.forEach((formControl) =>
       formArray.push(cloneAbstractControl(formControl))
     );
-
     newControl = formArray as any;
   } else if (control instanceof FormControl) {
     newControl = new FormControl(

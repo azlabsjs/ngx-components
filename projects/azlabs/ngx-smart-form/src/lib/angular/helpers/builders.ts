@@ -3,6 +3,7 @@ import {
   AsyncValidatorFn,
   FormArray,
   FormBuilder,
+  FormControl,
   FormGroup,
   ValidatorFn,
   Validators,
@@ -217,7 +218,7 @@ export class ComponentReactiveFormHelpers {
   }
 
   public static buildArray(builder: FormBuilder, config: InputConfigInterface) {
-    const array = new FormArray([]);
+    const array = new FormArray<FormControl>([]);
     of((config as OptionsInputConfigInterface).options)
       .pipe(
         tap((options) => {
@@ -239,7 +240,10 @@ export class ComponentReactiveFormHelpers {
 
   public static validateFormGroupFields(control: FormGroup | FormArray): void {
     for (const value of Object.values(control.controls)) {
-      if ((value instanceof FormGroup || value instanceof FormArray) && (!value.valid)) {
+      if (
+        (value instanceof FormGroup || value instanceof FormArray) &&
+        !value.valid
+      ) {
         ComponentReactiveFormHelpers.validateFormGroupFields(value);
       } else {
         ComponentReactiveFormHelpers.markControlAsTouched(value);
@@ -262,7 +266,9 @@ export class ComponentReactiveFormHelpers {
   public static clearControlValidators(control?: AbstractControl): void {
     if (control instanceof FormGroup) {
       for (const prop in control.controls) {
-        ComponentReactiveFormHelpers.clearControlValidators(control.get(prop) || undefined);
+        ComponentReactiveFormHelpers.clearControlValidators(
+          control.get(prop) || undefined
+        );
       }
     } else if (control instanceof FormArray) {
       for (const item of control.controls) {
@@ -277,7 +283,9 @@ export class ComponentReactiveFormHelpers {
   public static clearAsyncValidators(control?: AbstractControl): void {
     if (control instanceof FormGroup) {
       for (const prop in control.controls) {
-        ComponentReactiveFormHelpers.clearAsyncValidators(control.get(prop) || undefined);
+        ComponentReactiveFormHelpers.clearAsyncValidators(
+          control.get(prop) || undefined
+        );
       }
     } else if (control instanceof FormArray) {
       for (const item of control.controls) {

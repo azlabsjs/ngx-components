@@ -307,8 +307,9 @@ export class NgxSmartFormComponent
       };
       this.formGroup = formgroup as FormGroup;
       for (const name in this.formGroup.controls) {
-        this.formGroup.get(name)?.valueChanges
-          .pipe(
+        this.formGroup
+          .get(name)
+          ?.valueChanges.pipe(
             tap((state) =>
               this.handleControlChanges(
                 state,
@@ -373,7 +374,7 @@ export class NgxSmartFormComponent
           // TODO : Create formgroup
           const group = this.builder.group(children) as FormGroup;
           const values_ = Array.isArray(value) ? value : [];
-          const array_ = new FormArray([]);
+          const array_ = new FormArray<FormGroup>([]);
           for (const current of values_) {
             const tmp = cloneAbstractControl(group);
             this.setFormGroupValue(tmp, current);
