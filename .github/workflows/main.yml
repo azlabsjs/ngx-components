@@ -6,7 +6,7 @@ name: Ngx-components packages deployment on github packages
 on:
   push:
     branches:
-      - ng-v13
+      - master
 
 jobs:
   publish-gpr:
