@@ -1,0 +1,9 @@
+[{
+    "id": 3,
+    "label": "WRITE TO STORAGE OBJECT"
+  },
+  {
+    "id": 4,
+    "label": "READ FROM STORAGE OBJECT"
+  }
+]

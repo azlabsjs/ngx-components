@@ -1,17 +1,14 @@
 <div class="clr-control-container">
   <div class="clr-input-wrapper">
-    <label
-      class="clr-control-label"
-      *ngIf="describe"
-      [for]="config!.formControlName"
-    >
+    <label class="clr-control-label" *ngIf="describe" [for]="config!.name">
       {{ config!.label }}
       <span class="required-text" *ngIf="config!.rules?.isRequired">
         (*)
       </span>
     </label>
     <ngx-intl-tel-input
-      [label]="describe ? (config?.label ?? '') : ''"
+      *ngIf="control"
+      [label]="describe ? (config.label || '') : ''"
       [required]="config!.rules?.isRequired || false"
       [control]="control"
       [preferredCountries]="['tg', 'bj', 'gh']"
@@ -41,8 +38,8 @@
               phoneControl,
               selected,
               config,
-              onBlur,
-              onFocus
+              onBlur: onBlur.bind(this),
+              onFocus: onFocus.bind(this)
             }
           "
         ></ng-container>
@@ -65,5 +62,5 @@
 <span
   [class]="'input__subtext'"
   *ngIf="describe"
-  [innerHTML]="config!.descriptionText || '' | safeHtml"
+  [innerHTML]="config!.description || '' | safeHtml"
 ></span>

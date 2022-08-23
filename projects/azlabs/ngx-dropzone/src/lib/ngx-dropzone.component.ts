@@ -13,10 +13,15 @@ import {
   TemplateRef,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { DropzoneEvents, DropzoneEvent, DROPZONE_CONFIG, DropzoneComponentInterface } from './types';
+import {
+  DropzoneEvents,
+  DropzoneEvent,
+  DROPZONE_CONFIG,
+  DropzoneComponentInterface,
+} from './types';
 import { NgxDropzoneDirective } from './ngx-dropzone.directive';
 import { DropzoneConfig } from './types';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Subject, tap } from 'rxjs';
 import { mergeDzAcceptFiles, createDefaultPreviewTemplate } from './helpers';
 
 @Component({
@@ -61,7 +66,9 @@ import { mergeDzAcceptFiles, createDefaultPreviewTemplate } from './helpers';
   `,
   styleUrls: ['./ngx-dropzone.component.scss'],
 })
-export class NgxDropzoneComponent implements OnInit, AfterViewInit, OnDestroy, DropzoneComponentInterface {
+export class NgxDropzoneComponent
+  implements OnInit, AfterViewInit, OnDestroy, DropzoneComponentInterface
+{
   @ViewChild(NgxDropzoneDirective, { static: false })
   dropzoneDirective!: NgxDropzoneDirective;
   @Input() defaultMessage!: string;
@@ -176,7 +183,6 @@ export class NgxDropzoneComponent implements OnInit, AfterViewInit, OnDestroy, D
       this.accepted
     );
     this.setDzConfig();
-    console.log(this.config);
   }
 
   ngAfterViewInit(): void {
@@ -192,9 +198,8 @@ export class NgxDropzoneComponent implements OnInit, AfterViewInit, OnDestroy, D
         previewTemplate: createDefaultPreviewTemplate(this.filePreview),
       } as DropzoneConfig);
     }
-
     if (
-      typeof this.config!.previewTemplate === 'undefined' &&
+      typeof this.config!.previewTemplate === 'undefined' ||
       this.config!.previewTemplate === null
     ) {
       return this.config$.next({

@@ -1,10 +1,18 @@
+import { Injector } from '@angular/core';
+import {
+  getHttpHost,
+  HTTPRequest,
+  HTTPRequestMethods,
+  HTTPResponseType,
+} from '@azlabsjs/requests';
 import { ObservableInput } from 'rxjs';
-import { getHost, rxRequest } from './helpers';
-import { HTTPResponseType, HTTPStatefulMethod, RequestClient } from './types';
+import { map } from 'rxjs/operators';
+import { rxRequest } from './helpers';
+import { InterceptorFactory, RequestClient } from './types';
 
 type _RequestFunction = <T>(
   path: string,
-  method: HTTPStatefulMethod,
+  method: HTTPRequestMethods,
   body: unknown,
   options?: {
     headers?: HeadersInit;
@@ -25,11 +33,15 @@ type _RequestFunction = <T>(
  * @param host
  * @returns
  */
-export function createSubmitHttpHandler(host?: string) {
-  host = host ? getHost(host) : host;
+export function createSubmitHttpHandler(
+  injector: Injector,
+  host?: string,
+  interceptorFactory?: InterceptorFactory<HTTPRequest>
+) {
+  host = host ? getHttpHost(host) : host;
   const _request = function <T>(
     path: string,
-    method: HTTPStatefulMethod,
+    method: 'POST' | 'PUT' | 'PATCH',
     body: unknown,
     options?: {
       headers?: HeadersInit;
@@ -39,17 +51,25 @@ export function createSubmitHttpHandler(host?: string) {
     const url = host
       ? `${host}/${path.startsWith('/') ? path.slice(1) : path}`
       : path;
-    return rxRequest<T>({
+    options = options || {
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      responseType: 'json',
+    };
+    return rxRequest({
       url,
       method,
       body,
       ...options,
-    });
+      interceptors: interceptorFactory ? [interceptorFactory(injector)] : [],
+    }).pipe(map((state) => state.body));
   };
+
   return Object.defineProperty(_request, 'request', {
     value: <T>(
       path: string,
-      method: HTTPStatefulMethod,
+      method: 'POST' | 'PUT' | 'PATCH',
       body: unknown,
       options?: {
         headers?: HeadersInit;

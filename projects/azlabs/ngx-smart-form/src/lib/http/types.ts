@@ -1,13 +1,12 @@
 import { ObservableInput } from 'rxjs';
+import { Injector } from '@angular/core';
+import {
+  Interceptor,
+  HTTPRequestMethods,
+  HTTPResponseType,
+} from '@azlabsjs/requests';
 
-export type HTTPStatefulMethod = 'POST' | 'PUT' | 'PATH';
-export type HTTPRequestMethods =
-  | 'GET'
-  | 'DELETE'
-  | 'OPTION'
-  | 'HEAD'
-  | HTTPStatefulMethod;
-export type HTTPResponseType = 'text' | 'blob' | 'array' | 'json';
+export type InterceptorFactory<T> = (injector: Injector) => Interceptor<T>;
 
 export interface RequestClient {
   /**
@@ -21,7 +20,7 @@ export interface RequestClient {
    */
   request<T>(
     path: string,
-    method: HTTPStatefulMethod,
+    method: HTTPRequestMethods,
     body: unknown,
     options?: {
       headers?: HeadersInit;

@@ -4,7 +4,7 @@ export {
   createAngularAbstractControl,
 } from './helpers';
 // Module & component & services exports
-export { NgxSmartFormModule } from './forms.module';
+export { NgxSmartFormModule } from './ngx-smart-form.module';
 // Type helper export
 export { InputTypeHelper } from './services/input-type';
 
@@ -13,12 +13,19 @@ export {
   AngularReactiveFormBuilderBridge,
   FormComponentInterface,
   Builder,
-  FORM_CLIENT,
-  ANGULAR_REACTIVE_FORM_BRIDGE,
   InputEventArgs,
+  FormsClient,
+  FormsLoader,
+  CacheProvider,
+  InputOptionsClient,
+  UploadOptionsType,
   API_BINDINGS_ENDPOINT,
   API_HOST,
+  FORM_CLIENT,
+  ANGULAR_REACTIVE_FORM_BRIDGE,
+  TEMPLATE_DICTIONARY,
 } from './types';
+
 // Ng Services
 export { DYNAMIC_FORM_LOADER, FormHttpLoader } from './services';
 
@@ -33,6 +40,8 @@ export {
   NgxSmartFormControlComponent,
 } from './components';
 
+// Fetch and HTML File directive exports
 export { FetchOptionsDirective, HTMLFileInputDirective } from './directives';
 
+// Pipes exports
 export { SafeHTMLPipe, TemplateMessagesPipe } from './pipes';

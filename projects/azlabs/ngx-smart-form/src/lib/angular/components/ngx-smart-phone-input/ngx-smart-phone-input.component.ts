@@ -1,11 +1,17 @@
 import { Component, ContentChild, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
-import { InputConfigInterface } from '../../../core';
+import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 
 @Component({
   selector: 'ngx-smart-phone-input',
   templateUrl: './ngx-smart-phone-input.component.html',
-  styles: [],
+  styles: [
+    `
+      :host ::ng-deep .btn {
+        margin-top: .05rem !important;
+      }
+    `
+  ],
 })
 export class PhoneInputComponent {
   //#region Component inputs
@@ -21,12 +27,12 @@ export class PhoneInputComponent {
   //#endregion Component event emitter
 
   onBlur(event: FocusEvent) {
-    this.control!.markAsTouched();
+    this.control?.markAsTouched();
     this.blur.emit(event);
   }
 
   onFocus(event: FocusEvent) {
-    this.control!.markAsTouched();
+    this.control?.markAsTouched();
     this.focus.emit(event);
   }
 }

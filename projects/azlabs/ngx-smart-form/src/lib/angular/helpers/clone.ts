@@ -28,7 +28,7 @@ export function cloneAbstractControl<T extends AbstractControl>(control: T): T {
 
     newControl = formGroup as any;
   } else if (control instanceof FormArray) {
-    const formArray = new FormArray<any>(
+    const formArray = new FormArray(
       [],
       control.validator,
       control.asyncValidator

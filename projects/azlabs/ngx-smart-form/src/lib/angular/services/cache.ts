@@ -1,15 +1,15 @@
 import { Inject, Injectable, InjectionToken, Optional } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, from, Observable, ObservableInput } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import {
-  CacheProvider,
   FormsLoader,
   groupControlsBy,
   setControlChildren,
   sortRawFormControls,
-} from '../../core';
-import { FormInterface } from '../../core/compact';
+} from '@azlabsjs/smart-form-core';
+import { FormInterface } from '@azlabsjs/smart-form-core';
 import { DYNAMIC_FORM_LOADER } from './loader';
+import { CacheProvider } from '../types';
 
 /**
  * @description Cache provider injection token
@@ -58,7 +58,9 @@ export class FormsCacheProvider implements CacheProvider {
 
   // Cache handler method
   cache = (endpoint: string, options: { [index: string]: any } = {}) => {
-    return this.loader.load(endpoint, options).pipe(
+    return from(
+      this.loader.load(endpoint, options) as ObservableInput<FormInterface[]>
+    ).pipe(
       tap((state) => {
         // TODO : Add the list of
         this._cache.next(

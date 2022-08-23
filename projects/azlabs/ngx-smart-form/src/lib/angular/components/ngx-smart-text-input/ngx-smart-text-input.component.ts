@@ -1,8 +1,7 @@
-import { Component, Input, Output, EventEmitter, ContentChild, TemplateRef } from '@angular/core';
+import { Component, Input, ContentChild, TemplateRef } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
-import { InputTypes, TextInput } from '../../../core';
+import { InputTypes, TextInput } from '@azlabsjs/smart-form-core';
 import { getObjectProperty } from '@azlabsjs/js-object';
-import { InputEventArgs } from '../../types/input';
 
 @Component({
   selector: 'ngx-smart-text-input',

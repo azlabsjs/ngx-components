@@ -1,5 +1,5 @@
 import { AbstractControl, FormBuilder } from "@angular/forms";
-import { FormConfigInterface, InputConfigInterface } from "../../core";
+import { FormConfigInterface, InputConfigInterface } from "@azlabsjs/smart-form-core";
 
 export type Builder = FormBuilder;
 
@@ -15,4 +15,11 @@ export interface AngularReactiveFormBuilderBridge {
    * @param source
    */
   group(source: FormConfigInterface | InputConfigInterface[]): AbstractControl;
+
+  /**
+   * Creates a form control instance from form configuration interface
+   *
+   * @param state
+   */
+  control(state: InputConfigInterface): AbstractControl;
 }

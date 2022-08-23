@@ -1,17 +1,17 @@
 <div
   prefetchOptions
-  (itemsChange)="onItemsChange($event)"
+  (optionsChange)="onOptionsChange($event)"
   [loaded]="loaded"
-  [params]="inputConfig.serverBindings"
+  [optionsConfig]="inputConfig.optionsConfig"
 >
-  <ng-container *ngIf="inputConfig.items!.length > 0">
+  <ng-container *ngIf="inputConfig.options!.length > 0">
     <ng-container
       *ngTemplateOutlet="
         inputRef;
         context: {
           config: inputConfig,
           group: formGroup,
-          items: inputConfig.items
+          options: inputConfig.options
         }
       "
     ></ng-container>
@@ -24,7 +24,7 @@
     <span
       [class]="'input__subtext'"
       *ngIf="describe"
-      [innerHTML]="inputConfig.descriptionText || '' | safeHtml"
+      [innerHTML]="inputConfig.description || '' | safeHtml"
     ></span>
   </ng-container>
 </div>

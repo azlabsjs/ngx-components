@@ -3,6 +3,7 @@ import {
   APP_INITIALIZER,
   ModuleWithProviders,
   Provider,
+  Injector,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -28,13 +29,16 @@ import { SafeHTMLPipe, TemplateMessagesPipe } from './pipes';
 import {
   FORM_CLIENT,
   ANGULAR_REACTIVE_FORM_BRIDGE,
-  OPTIONS_INPUT_ITEMS_CLIENT,
+  INPUT_OPTIONS_CLIENT,
   HTTP_REQUEST_CLIENT,
   TEMPLATE_DICTIONARY,
-} from './types/tokens';
+  UPLOADER_OPTIONS,
+  API_BINDINGS_ENDPOINT,
+  API_HOST,
+  InterceptorFactory,
+  UploadOptionsType,
+} from './types';
 import { JSONFormsClient } from './services/client';
-import { CacheProvider } from '../core';
-import { API_BINDINGS_ENDPOINT, API_HOST } from './types/tokens';
 import {
   DynamicTextAreaInputComponent,
   NgxSmartCheckBoxComponent,
@@ -52,11 +56,23 @@ import {
   NgxSmartSelectInputComponent,
   PhoneInputComponent,
   TextInputComponent,
+  NgxSmartTimeInputComponent,
+  NgxSmartDzComponent,
+  NgxSmartArrayCloseButtonComponent,
+  NgxSmartArrayAddButtonComponent,
+  NgxSmartFormControlArrayChildComponent,
+  NgxSmartFormControlArrayComponent,
 } from './components';
 import { FetchOptionsDirective, HTMLFileInputDirective } from './directives';
 import { createSelectOptionsQuery, createSubmitHttpHandler } from '../http';
-import { lastValueFrom, of } from 'rxjs';
+import { from, lastValueFrom, ObservableInput, of } from 'rxjs';
 import { useDefaultTemplateText } from './helpers';
+import { CacheProvider } from '@azlabsjs/smart-form-core';
+import {
+  HTTPRequest,
+  HTTPResponse,
+} from '@azlabsjs/requests';
+import { NgxUploadsSubjectService } from './components/ngx-smart-file-input/ngx-uploads-subject.service';
 
 type FormApiServerConfigs = {
   api: {
@@ -72,12 +88,23 @@ export type ModuleConfigs = {
   formsAssets?: string;
   clientFactory?: Function;
   templateTextProvider?: Provider;
+  uploadOptions?: UploadOptionsType<HTTPRequest, HTTPResponse>;
+  optionsRequest?: {
+    interceptorFactory?: InterceptorFactory<HTTPRequest>;
+  };
+  submitRequest?: {
+    interceptorFactory?: InterceptorFactory<HTTPRequest>;
+  };
 };
 
 export function preloadAppForms(service: CacheProvider, assetsURL: string) {
   return async () => {
     return await lastValueFrom(
-      service.cache(assetsURL || '/assets/resources/forms.json')
+      from(
+        service.cache(
+          assetsURL || '/assets/resources/forms.json'
+        ) as ObservableInput<unknown>
+      )
     );
   };
 }
@@ -119,10 +146,16 @@ export function createDictionary(dzConfig: { [index: string]: any }) {
     NgxSmartFormArrayChildComponent,
     NgxSmartFormControlComponent,
     NgxSmartFormGroupHeaderPipe,
+    NgxSmartTimeInputComponent,
     SafeHTMLPipe,
     TemplateMessagesPipe,
     FetchOptionsDirective,
     HTMLFileInputDirective,
+    NgxSmartDzComponent,
+    NgxSmartArrayCloseButtonComponent,
+    NgxSmartArrayAddButtonComponent,
+    NgxSmartFormControlArrayChildComponent,
+    NgxSmartFormControlArrayComponent,
   ],
   exports: [
     NgxSmartFormComponent,
@@ -143,21 +176,22 @@ export class NgxSmartFormModule {
   ): ModuleWithProviders<NgxSmartFormModule> {
     const providers: Provider[] = [
       FormHttpLoader,
+      FormsCacheProvider,
+      JSONFormsClient,
+      ReactiveFormBuilderBrige,
+      NgxUploadsSubjectService,
       {
         provide: DYNAMIC_FORM_LOADER,
         useClass: FormHttpLoader,
       },
-      FormsCacheProvider,
       {
         provide: CACHE_PROVIDER,
         useClass: FormsCacheProvider,
       },
-      JSONFormsClient,
       {
         provide: FORM_CLIENT,
         useClass: JSONFormsClient,
       },
-      ReactiveFormBuilderBrige,
       {
         provide: API_HOST,
         useValue: configs!.serverConfigs!.api.host || undefined,
@@ -181,23 +215,27 @@ export class NgxSmartFormModule {
         useClass: ReactiveFormBuilderBrige,
       },
       {
-        provide: 'FILE_STORE_PATH',
-        useValue: configs!.serverConfigs.api.uploadURL ?? 'http://localhost',
-      },
-      {
-        provide: OPTIONS_INPUT_ITEMS_CLIENT,
-        useFactory: () => {
+        provide: INPUT_OPTIONS_CLIENT,
+        useFactory: (injector: Injector) => {
           return createSelectOptionsQuery(
+            injector,
             configs!.serverConfigs!.api.host,
-            configs!.serverConfigs!.api.bindings
+            configs!.serverConfigs!.api.bindings,
+            configs.optionsRequest?.interceptorFactory
           );
         },
+        deps: [Injector],
       },
       {
         provide: HTTP_REQUEST_CLIENT,
-        useFactory: () => {
-          return createSubmitHttpHandler(configs!.serverConfigs!.api.host);
+        useFactory: (injector: Injector) => {
+          return createSubmitHttpHandler(
+            injector,
+            configs!.serverConfigs!.api.host,
+            configs.submitRequest?.interceptorFactory
+          );
         },
+        deps: [Injector],
       },
       {
         provide: DROPZONE_DICT,
@@ -214,13 +252,12 @@ export class NgxSmartFormModule {
           const dzConfig = (configs?.dropzoneConfigs || {
             url: configs!.serverConfigs!.api.host ?? 'http://localhost',
             maxFilesize: 10,
-            acceptedFiles: 'image/*',
+            acceptedFiles: '*/*',
             autoProcessQueue: false,
             uploadMultiple: false,
             maxFiles: 1,
             addRemoveLinks: true,
           }) as any;
-
           for (const [prop, value] of Object.entries(dictionary)) {
             if (
               !(prop in dzConfig) ||
@@ -233,6 +270,26 @@ export class NgxSmartFormModule {
           return dzConfig as DropzoneConfig;
         },
         deps: [DROPZONE_DICT],
+      },
+      {
+        provide: UPLOADER_OPTIONS,
+        useFactory: (injector: Injector) => {
+          if (
+            typeof configs.uploadOptions === 'undefined' ||
+            configs.uploadOptions === null
+          ) {
+            return {
+              path: configs.serverConfigs.api.uploadURL,
+            };
+          }
+          return {
+            ...configs.uploadOptions,
+            injector,
+            path:
+              configs.uploadOptions.path || configs.serverConfigs.api.uploadURL,
+          } as UploadOptionsType<HTTPRequest, HTTPResponse>;
+        },
+        deps: [Injector],
       },
     ];
     providers.push(

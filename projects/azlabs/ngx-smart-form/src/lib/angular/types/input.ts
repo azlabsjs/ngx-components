@@ -1,5 +1,3 @@
-import { InputConfigInterface } from '../../core';
-
 /**
  * Defines the type of content published when dynamic input
  * DOM event occurs
@@ -7,9 +5,4 @@ import { InputConfigInterface } from '../../core';
 export interface InputEventArgs {
   name: string;
   value: any;
-}
-
-export interface MultiSelectItemRemoveEvent {
-  event: any;
-  control: InputConfigInterface;
 }

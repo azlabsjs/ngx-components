@@ -4,21 +4,14 @@ dropzone {
   height: auto;
 }
 
-dropzone[fxflex] {
-  display: flex;
-  flex-direction: inherit;
-  min-width: 0;
-  min-height: 0;
 
-  -webkit-box-direction: inherit;
-  -webkit-box-orient: inherit;
-}
-
-dropzone[fxflex] > .dropzone.dropzone-wrapper {
+.dropzone.dropzone-wrapper {
   flex: 1 1 auto;
   min-width: 0;
   min-height: 0;
   -webkit-box-flex: 1;
+  -webkit-box-direction: inherit;
+  -webkit-box-orient: inherit;
 }
 
 dropzone[fxlayout] {

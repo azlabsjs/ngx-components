@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray } from '@angular/forms';
 import {
-  SelectInput,
+  OptionsInputConfigInterface,
   DateInput,
   TextInput,
   TextAreaInput,
   NumberInput,
   FileInput,
   InputConfigInterface,
-} from '../../core';
-import { OptionsInputConfigInterface } from '../../core';
+  TimeInput,
+} from '@azlabsjs/smart-form-core';
 
 @Injectable({
   providedIn: 'root',
@@ -24,11 +24,12 @@ export class InputTypeHelper {
   }
 
   /**
-   * @description Returns a dynamic input configuration as a [[SelectInput]]
    * @param input InputConfigInterface Dynamic input configurations instance
    */
-  public asSelectInput(input?: InputConfigInterface): SelectInput {
-    return input as SelectInput;
+  public asSelectInput(
+    input?: InputConfigInterface
+  ): OptionsInputConfigInterface {
+    return input as OptionsInputConfigInterface;
   }
   /**
    * @description Returns a dynamic input configuration as a [[DateInput]]
@@ -41,7 +42,9 @@ export class InputTypeHelper {
    * @description Returns a dynamic input configuration as a [[CheckBoxInput]]
    * @param input InputConfigInterface Dynamic input configurations instance
    */
-  public asCheckBoxInput(input?: InputConfigInterface): OptionsInputConfigInterface {
+  public asCheckBoxInput(
+    input?: InputConfigInterface
+  ): OptionsInputConfigInterface {
     return input as OptionsInputConfigInterface;
   }
 
@@ -49,7 +52,9 @@ export class InputTypeHelper {
    * @description Returns a dynamic input configuration as a [[RadioInput]]
    * @param input InputConfigInterface Dynamic input configurations instance
    */
-  public asRadioInput(input?: InputConfigInterface): OptionsInputConfigInterface {
+  public asRadioInput(
+    input?: InputConfigInterface
+  ): OptionsInputConfigInterface {
     return input as OptionsInputConfigInterface;
   }
   /**
@@ -98,7 +103,9 @@ export class InputTypeHelper {
    * @description Returns a dynamic input configuration as a [[HTMLInput]]
    * @param input InputConfigInterface Dynamic input configurations instance
    */
-  public asHtmlInput(input?: InputConfigInterface): OptionsInputConfigInterface {
+  public asHtmlInput(
+    input?: InputConfigInterface
+  ): OptionsInputConfigInterface {
     return input as OptionsInputConfigInterface;
   }
   /**
@@ -107,5 +114,9 @@ export class InputTypeHelper {
    */
   public asPhoneInput(input?: InputConfigInterface): TextInput {
     return input as TextInput;
+  }
+
+  public asTimeInput(input?: InputConfigInterface): TimeInput {
+    return input as TimeInput;
   }
 }

@@ -1,8 +1,11 @@
 import { InjectionToken } from '@angular/core';
-import { FormsClient, SelectOptionsClient } from '../../core';
-import { AngularReactiveFormBuilderBridge } from '.';
 import { RequestClient } from '../../http';
 import { Observable } from 'rxjs';
+import { InputOptionsClient } from './options';
+import { FormsClient } from './form';
+import { HTTPRequest, HTTPResponse } from '@azlabsjs/requests';
+import { AngularReactiveFormBuilderBridge } from './bridge';
+import { UploadOptionsType } from './upload';
 
 export type ValidationMessagesType = Observable<
   { [index: string]: any } | Record<string, any>
@@ -25,10 +28,8 @@ export const API_HOST = new InjectionToken<string>(
   'API HOST FOR FORM MANAGEMENT'
 );
 
-export const OPTIONS_INPUT_ITEMS_CLIENT =
-  new InjectionToken<SelectOptionsClient>(
-    'CLIENT PROVIDER FOR OPTIONS INPUT'
-  );
+export const INPUT_OPTIONS_CLIENT =
+  new InjectionToken<InputOptionsClient>('CLIENT PROVIDER FOR OPTIONS INPUT');
 
 export const HTTP_REQUEST_CLIENT = new InjectionToken<RequestClient>(
   'CLIENT INSTANCE FOR HANDLING FORM SUBMISSION'
@@ -37,3 +38,7 @@ export const HTTP_REQUEST_CLIENT = new InjectionToken<RequestClient>(
 export const TEMPLATE_DICTIONARY = new InjectionToken<ValidationMessagesType>(
   'TEMPLATE DICTIONARY PROVIDER'
 );
+
+export const UPLOADER_OPTIONS = new InjectionToken<UploadOptionsType<HTTPRequest, HTTPResponse>>(
+  'OPTIONS TO PASS TO THE UPLOADER BY DEFAULT'
+)

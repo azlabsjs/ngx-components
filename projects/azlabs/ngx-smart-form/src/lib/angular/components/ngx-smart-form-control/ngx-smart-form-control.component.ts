@@ -1,8 +1,8 @@
 import {
   InputConfigInterface,
   InputTypes,
-  OptionsInputItemsInterface,
-} from '../../../core';
+  InputOptionsInterface,
+} from '@azlabsjs/smart-form-core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import {
   Component,
@@ -22,21 +22,23 @@ import { InputTypeHelper } from '../../services';
   templateUrl: './ngx-smart-form-control.component.html',
   styles: [
     `
-      :host ::ng-deep span.input__subtext, :host ::ng-deep .input__subtext {
+      :host ::ng-deep span.input__subtext,
+      :host ::ng-deep .input__subtext {
         display: block;
         margin-top: 0.3rem;
         font-size: 0.55rem;
         line-height: 0.6rem;
       }
 
-      :host ::ng-deep span.input__error_text, :host ::ng-deep .input__error_text {
-        line-height: .6rem;
+      :host ::ng-deep span.input__error_text,
+      :host ::ng-deep .input__error_text {
+        line-height: 0.6rem;
         left: 0;
         /* background: #ff494f; */
         border-radius: 5px;
         color: #ff494f; /** Previous value : #fff */
         /* padding: 2px 10px; */
-        font-size: .55rem;
+        font-size: 0.55rem;
       }
     `,
   ],
@@ -51,7 +53,7 @@ export class NgxSmartFormControlComponent implements OnDestroy, OnInit {
   @Input() inline: boolean = false;
   @Input() describe = true;
   @Input() inputConfig!: InputConfigInterface;
-  @Input() listItems!: OptionsInputItemsInterface;
+  @Input() options!: InputOptionsInterface;
   @Input() control!: AbstractControl & FormControl;
   //#endregion Component inputs
 
@@ -67,6 +69,8 @@ export class NgxSmartFormControlComponent implements OnDestroy, OnInit {
   @Output('blur') blur = new EventEmitter<InputEventArgs>();
   // Value changes emitters
   @Output() valueChange = new EventEmitter<InputEventArgs>();
+  @Input() autoupload: boolean = false;
+  @Input() submitupload: boolean = false;
   //#endregion Component outputs
 
   constructor(public readonly inputType: InputTypeHelper) {}
@@ -77,7 +81,7 @@ export class NgxSmartFormControlComponent implements OnDestroy, OnInit {
         takeUntil(this._destroy$),
         tap((source) =>
           this.valueChange.emit({
-            name: this.inputConfig.formControlName,
+            name: this.inputConfig.name,
             value: source,
           })
         )

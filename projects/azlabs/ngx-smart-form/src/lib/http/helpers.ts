@@ -1,36 +1,31 @@
-import { ObservableInput } from 'rxjs';
-import { fromFetch } from 'rxjs/fetch';
-import { HTTPRequestMethods, HTTPResponseType } from './types';
-
-/**
- * Get the host part of a web url object
- * //@internal
- *
- * @param url
- */
-export function getHost(url: string) {
-  if (url) {
-    const webURL = new URL(url);
-    url = `${webURL.protocol}//${webURL.host}`;
-    return `${`${url.endsWith('/') ? url.slice(0, -1) : url}`}`;
-  }
-  return url ?? '';
-}
+import {
+  useRequestClient,
+  HTTPRequestMethods,
+  HTTPResponseType,
+  Interceptor,
+  HTTPRequest,
+} from '@azlabsjs/requests';
+import { from } from 'rxjs';
 
 /**
  * Makes an http request using rxjs fetch wrapper
  *
+ * **Note**
+ * If no Content-Type header is provided to the request client
+ * a default application/json content type is internally used
+ *
  * @param request
  * @returns
  */
-export function rxRequest<T>(
+export function rxRequest(
   request:
     | {
         url: string;
         method: HTTPRequestMethods;
-        body: any;
+        body?: any;
         headers?: HeadersInit;
-        responseType?: HTTPResponseType; // -> default=json
+        responseType?: HTTPResponseType;
+        interceptors?: Interceptor<HTTPRequest>[];
       }
     | string
 ) {
@@ -38,59 +33,55 @@ export function rxRequest<T>(
     request = {
       url: request,
       method: 'GET',
-      body: undefined,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
       responseType: 'json',
     };
   }
-  let { headers, responseType = 'json', body, method, url } = request;
-  // Returns the expected response type based on the response type
-  // property
-  const selector: (response: Response) => ObservableInput<T> = (response) => {
-    switch (responseType.toLocaleLowerCase()) {
-      case 'json':
-        return response.json();
-      case 'array':
-        return response.arrayBuffer();
-      case 'blob':
-        return response.blob();
-      case 'text':
-        return response.text();
-      default:
-        return new Promise((resolve) => {
-          resolve(response.body as any);
-        });
-    }
-  };
-  let _headers: Headers;
-  if (typeof headers === 'undefined' || headers == null) {
-    _headers = new Headers({
-      'Content-Type': 'application/json;charset=UTF-8',
-    });
-  } else {
-    _headers = new Headers(headers);
-  }
-  if (['GET', 'HEAD', 'OPTION'].includes(method.toUpperCase())) {
-    const _query = body ?? {};
-    if (_query) {
-      url = `${url.includes('?') ? url : `${url}?`}${new URLSearchParams(
-        body as Record<string, string>
-      ).toString()}`;
-    }
-    body = null;
-  }
-  return fromFetch(url, {
+  let {
+    headers,
+    responseType = 'json',
+    body,
     method,
-    body:
-      _headers.get('content-type')?.includes('application/json') &&
-      typeof body === 'object' &&
-      body !== null
-        ? JSON.stringify(body)
-        : body,
-    headers: _headers,
-    credentials: 'include',
-    selector,
-  });
+    url,
+    interceptors,
+  } = request;
+  let _headers: Record<string, any> = {};
+  if (headers instanceof Headers) {
+    headers.forEach((value, name) => {
+      _headers[name] = value;
+    });
+  } else if (Array.isArray(headers)) {
+    for (const [key, value] of headers) {
+      if (Object.prototype.hasOwnProperty.call(headers, key)) {
+        _headers[key] = value;
+      }
+    }
+  } else if (typeof headers === 'object') {
+    for (const key in headers) {
+      if (Object.prototype.hasOwnProperty.call(headers, key)) {
+        _headers[key] = headers[key];
+      }
+    }
+  } else {
+    // By default request are send as JSON request
+    _headers = {
+      'Content-Type': 'application/json;charset=UTF-8',
+    };
+  }
+  const client = useRequestClient();
+  return from(
+    client.request({
+      url,
+      method,
+      body,
+      options: {
+        headers: _headers,
+        // withCredentials: true,
+        responseType,
+        interceptors,
+      },
+    })
+  );
 }

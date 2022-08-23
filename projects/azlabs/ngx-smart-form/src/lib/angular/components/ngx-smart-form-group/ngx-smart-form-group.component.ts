@@ -12,10 +12,10 @@ import {
 import { FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { InputConfigInterface } from '../../../core';
+import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import {
   controlAttributesDataBindings,
-  createHiddenAttributeSetter,
+  useHiddenAttributeSetter,
   setControlsAttributes,
 } from '../../helpers';
 import { BindingInterface } from '../../types';
@@ -32,6 +32,8 @@ export class NgxSmartFormGroupComponent
   @Input() formGroup!: FormGroup;
   @Input() controls!: InputConfigInterface[];
   @Input() template!: TemplateRef<HTMLElement>;
+  @Input() autoupload: boolean = false;
+  @Input() submitupload: boolean = false;
   //#endregion Component inputs definitions
 
   //#region Component internal properties
@@ -90,12 +92,12 @@ export class NgxSmartFormGroupComponent
     bindings: Map<string, BindingInterface>
   ) {
     for (const current of bindings.values()) {
-      if (current.binding?.formControlName.toString() === name.toString()) {
+      if (current.binding?.name.toString() === name.toString()) {
         const [control, controls] = setControlsAttributes(
           this.controls,
           current,
           event,
-          createHiddenAttributeSetter
+          useHiddenAttributeSetter
         )(this.formGroup);
         this.formGroup = control as FormGroup;
         this.controls = controls;

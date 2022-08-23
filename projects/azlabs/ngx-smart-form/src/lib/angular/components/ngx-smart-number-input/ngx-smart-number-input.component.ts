@@ -1,7 +1,7 @@
 import { Component, Input, ContentChild, TemplateRef } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { getObjectProperty } from '@azlabsjs/js-object';
-import { NumberInput } from '../../../core';
+import { NumberInput } from '@azlabsjs/smart-form-core';
 
 @Component({
   selector: 'ngx-smart-number-input',

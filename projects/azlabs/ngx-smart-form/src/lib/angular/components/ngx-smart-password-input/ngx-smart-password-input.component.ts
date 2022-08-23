@@ -8,7 +8,7 @@ import {
   TemplateRef,
 } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
-import { TextInput } from '../../../core';
+import { TextInput } from '@azlabsjs/smart-form-core';
 import { map } from 'rxjs/operators';
 import { getObjectProperty } from '@azlabsjs/js-object';
 import { InputEventArgs } from '../../types/input';

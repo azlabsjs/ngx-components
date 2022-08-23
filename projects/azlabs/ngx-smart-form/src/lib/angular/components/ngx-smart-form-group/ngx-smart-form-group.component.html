@@ -19,7 +19,7 @@
                 recursiveTemplate;
                 context: {
                   controls: value!.children || [],
-                  group: group.get(value.formControlName)
+                  group: group.get(value.name)
                 }
               "
             ></ng-container>
@@ -44,7 +44,7 @@
 </ng-template>
 
 <ng-template #formTemplate let-group="group" let-value="value">
-  <ng-container *ngIf="group.get(value.formControlName) as control">
+  <ng-container *ngIf="group.get(value.name) as control">
     <ng-container
       *ngTemplateOutlet="template; context: { control, value }"
     ></ng-container>

@@ -1,4 +1,5 @@
 import {
+  AfterContentInit,
   AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -14,13 +15,13 @@ import {
   TemplateRef,
 } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
-import { EMPTY, from, Observable, Subject } from 'rxjs';
+import { EMPTY, from, lastValueFrom, Observable, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import {
   FormConfigInterface,
   InputGroup,
   InputConfigInterface,
-} from '../../../core';
+} from '@azlabsjs/smart-form-core';
 import {
   AngularReactiveFormBuilderBridge,
   HTTP_REQUEST_CLIENT,
@@ -29,7 +30,7 @@ import {
   cloneAbstractControl,
   ComponentReactiveFormHelpers,
   controlAttributesDataBindings,
-  createHiddenAttributeSetter,
+  useHiddenAttributeSetter,
   setControlsAttributes,
 } from '../../helpers';
 import {
@@ -59,7 +60,6 @@ import { RequestClient } from '../../../http';
         margin-top: 1.2rem;
         margin-bottom: 0;
         font-weight: var(--clr-h3-font-weight, 200);
-        color: var(--clr-h3-color, black);
       }
       :host ::ng-deep .required-text,
       :host ::ng-deep .field-has-error {
@@ -78,6 +78,10 @@ import { RequestClient } from '../../../http';
       .ngx-smart-form-control,
       :host ::ng-deep .ngx-smart-form-control {
         padding: 0.3rem;
+      }
+
+      :host ::ng-deep .clr-form-control {
+        margin-top: 0rem !important;
       }
     `,
   ],
@@ -100,6 +104,8 @@ export class NgxSmartFormComponent
   @Input() autoSubmit: boolean = false;
   @Input() path!: string;
   @Input() state!: { [index: string]: any };
+  @Input() autoupload: boolean = false;
+  @Input() submitupload: boolean = false;
   //#endregion Component inputs
 
   //#region Component outputs
@@ -107,6 +113,7 @@ export class NgxSmartFormComponent
   @Output() readyState = new EventEmitter();
   @Output() formGroupChange = new EventEmitter<FormGroup>();
   @Output() complete = new EventEmitter<unknown>();
+  @Output() performingRequest = new EventEmitter<boolean>();
   //#endregion Component outputs
 
   // @internal
@@ -176,7 +183,7 @@ export class NgxSmartFormComponent
   }
 
   //
-  onSubmit(event: Event): void | Observable<unknown> {
+  async onSubmit(event: Event) {
     // Validate the formgroup object to ensure it passes
     // validation before submitting
     this.validateForm();
@@ -187,26 +194,25 @@ export class NgxSmartFormComponent
       return;
     }
     const path = this.path || this.form.endpointURL;
-    if (
-      this.autoSubmit &&
-      typeof this.client !== 'undefined' &&
-      this.client !== null &&
-      path !== null &&
-      path !== 'undefined'
-    ) {
-      from(
-        this.client.request(
-          path || 'http://127.0.0.1', // The path will never be equal to 'http://127.0.0.1' because of the if branch on this.form.endpointURL
-          'POST',
-          this.formGroup.getRawValue()
+    const clientIsDefined =
+      typeof this.client !== 'undefined' && this.client !== null;
+    const pathIsDefined = path !== null && path !== 'undefined';
+    if (this.autoSubmit && clientIsDefined && pathIsDefined) {
+      this.performingRequest.emit(true);
+      const response = await lastValueFrom(
+        from(
+          (this.client as RequestClient).request(
+            path || 'http://localhost',
+            'POST',
+            this.formGroup.getRawValue()
+          )
         )
-      )
-        // Here we notify parent component of completed state
-        .subscribe((response) => this.complete.emit(response));
+      );
+      this.performingRequest.emit(false);
+      this.complete.emit(response);
     } else if (
-      (this.autoSubmit &&
-        (typeof this.client === 'undefined' || this.client === null)) ||
-      (this.autoSubmit && (path !== null || path !== 'undefined'))
+      (this.autoSubmit && !clientIsDefined) ||
+      (this.autoSubmit && !pathIsDefined)
     ) {
       // We throw an error if developper misconfigured the smart form component
       throw new Error(
@@ -240,7 +246,7 @@ export class NgxSmartFormComponent
       // Set input bindings
       this.setBindings();
       // Subscribe to formgroup changes
-      this.formGroup.valueChanges
+      this.formGroup?.valueChanges
         .pipe(
           tap((state) => this.formGroupChange.emit(state)),
           takeUntil(this._destroy$)
@@ -272,18 +278,16 @@ export class NgxSmartFormComponent
   reset(): void {
     this.formGroup.reset();
     for (const control of this.form.controlConfigs ?? []) {
-      this.formGroup.get(control.formControlName)?.setValue(control.value);
+      this.formGroup.get(control.name)?.setValue(control.value);
     }
   }
   //#endregion FormComponent interface Methods definitions
 
   setControlConfig(config?: InputConfigInterface, name?: string) {
     if (config) {
-      name = name ?? config.formControlName;
+      name = name ?? config.name;
       const controls = [...(this.form.controlConfigs ?? [])];
-      const index = controls.findIndex(
-        (current) => current.formControlName === name
-      );
+      const index = controls.findIndex((current) => current.name === name);
       controls.splice(index, 1, config);
       this.form = { ...this.form, controlConfigs: controls };
       // We trigger the change detector to detect changes after updating
@@ -302,11 +306,8 @@ export class NgxSmartFormComponent
         controlConfigs: controls as InputConfigInterface[],
       };
       this.formGroup = formgroup as FormGroup;
-      // Get control entries from the formgroup
-      const entries = Object.entries(this.formGroup.controls);
-      // Handle form control value changes
-      for (const [name, abstractControl] of entries) {
-        abstractControl.valueChanges
+      for (const name in this.formGroup.controls) {
+        this.formGroup.get(name)?.valueChanges
           .pipe(
             tap((state) =>
               this.handleControlChanges(
@@ -329,12 +330,12 @@ export class NgxSmartFormComponent
     bindings: Map<string, BindingInterface>
   ) {
     for (const current of bindings.values()) {
-      if (current.binding?.formControlName.toString() === name.toString()) {
+      if (current.binding?.name.toString() === name.toString()) {
         const [control, controls] = setControlsAttributes(
           this.form.controlConfigs ?? [],
           current,
           event,
-          createHiddenAttributeSetter
+          useHiddenAttributeSetter
         )(this.formGroup);
         this.formGroup = control as FormGroup;
         this.form = { ...this.form, controlConfigs: controls };
@@ -350,7 +351,7 @@ export class NgxSmartFormComponent
   ) {
     for (const [key, value] of Object.entries(values)) {
       const config_ = Array.isArray(configs)
-        ? configs?.find((config) => config.formControlName === key)
+        ? configs?.find((config) => config.name === key)
         : configs;
       if (formgroup.controls[key] && value) {
         if (formgroup.controls[key] instanceof FormGroup) {
@@ -372,7 +373,7 @@ export class NgxSmartFormComponent
           // TODO : Create formgroup
           const group = this.builder.group(children) as FormGroup;
           const values_ = Array.isArray(value) ? value : [];
-          const array_ = new FormArray<AbstractControl>([]);
+          const array_ = new FormArray([]);
           for (const current of values_) {
             const tmp = cloneAbstractControl(group);
             this.setFormGroupValue(tmp, current);
@@ -401,7 +402,9 @@ export class NgxSmartFormComponent
     }
   }
 
-  private createFormGroupOnFly() {}
+  getTypeof(value: any) {
+    return typeof value;
+  }
 
   ngOnDestroy(): void {
     this._destroy$.next();

@@ -53,7 +53,7 @@ export class DropdownToggleDirective implements OnDestroy {
             overlayX: 'start',
             overlayY: 'top',
             offsetY: 2,
-            offsetX: 0
+            offsetX: 0,
           },
         ]),
     });
@@ -77,7 +77,6 @@ export class DropdownToggleDirective implements OnDestroy {
   }
 
   private destroyDropdown(): void {
-    console.log('Destroying...');
     if (!this.overlayRef || !this.isDropdownOpen) {
       return;
     }
@@ -87,7 +86,6 @@ export class DropdownToggleDirective implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    console.log('Destroying overlay...');
     if (this.overlayRef) {
       this.overlayRef.dispose();
     }

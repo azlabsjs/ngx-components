@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { JSDate } from '@azlabsjs/js-datetime';
-import { DateInput } from '../../../core';
+import { DateInput } from '@azlabsjs/smart-form-core';
 
 @Component({
   selector: 'ngx-smart-date-input',
@@ -17,6 +17,16 @@ import { DateInput } from '../../../core';
     `
       :host ::ng-deep .clr-validate-icon.ng-star-inserted {
         display: none;
+      }
+      :host ::ng-deep .clr-date-container .clr-input-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      :host ::ng-deep .clr-input-group {
+        width: 100% !important;
+        max-width: 100% !important;
+
       }
     `,
   ],
