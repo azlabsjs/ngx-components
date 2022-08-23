@@ -7,8 +7,6 @@ import {
   ElementRef,
   ContentChild,
   TemplateRef,
-  Output,
-  EventEmitter,
 } from '@angular/core';
 import { Country } from './core/model';
 import { IntlTelInput } from './core/intl-tel-input';

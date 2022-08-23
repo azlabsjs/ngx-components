@@ -1,21 +1,17 @@
 import { Inject, Injectable } from '@angular/core';
 import { Country } from './model';
-import {
-  PhoneNumberUtil,
-  PhoneNumberFormat,
-  PhoneNumber,
-} from 'google-libphonenumber';
 import { COUNTRIES } from './types';
 import {
   getPhoneNumberPlaceholder,
   phoneNumberAsString,
   safeValidatePhoneNumber,
 } from './internal';
+import {parsePhoneNumber, PhoneNumber, PhoneNumberFormat} from 'awesome-phonenumber';
 
 @Injectable()
 export class IntlTelInput {
   //
-  private instance: PhoneNumberUtil;
+  // private instance: PhoneNumberUtil;
 
   /**
    * Create and instance of Intel Input Service
@@ -23,7 +19,7 @@ export class IntlTelInput {
    * @param countries
    */
   constructor(@Inject(COUNTRIES) private countries: Country[]) {
-    this.instance = PhoneNumberUtil.getInstance();
+    // this.instance = PhoneNumberUtil.getInstance();
   }
 
   /**
@@ -56,11 +52,15 @@ export class IntlTelInput {
       return undefined;
     }
     try {
-      return this.instance.parseAndKeepRawInput(
+      // return this.instance.parseAndKeepRawInput(
+      //   input.toString().startsWith('+') || input.toString().startsWith('00')
+      //     ? input
+      //     : `+${input}`
+      // );
+      return parsePhoneNumber(
         input.toString().startsWith('+') || input.toString().startsWith('00')
           ? input
-          : `+${input}`
-      );
+          : `+${input}`);
     } catch (e) {
       return undefined;
     }
@@ -73,7 +73,8 @@ export class IntlTelInput {
    * @param n Phone number to ve validated
    */
   public isValidPhoneNumber(n: PhoneNumber): boolean {
-    return this.instance.isValidNumber(n);
+    return n.isValid();
+    // return this.instance.isValidNumber(n);
   }
 
   /**
@@ -83,7 +84,7 @@ export class IntlTelInput {
    * @param format
    */
   public format(phoneNumber: PhoneNumber, format: PhoneNumberFormat) {
-    return phoneNumberAsString(this.instance, phoneNumber, format);
+    return phoneNumberAsString(phoneNumber, format);
   }
 
   /**
@@ -92,7 +93,7 @@ export class IntlTelInput {
    * @param phoneNumber
    */
   public isSafeValidPhoneNumber(phoneNumber: string) {
-    return safeValidatePhoneNumber(this.instance, phoneNumber);
+    return safeValidatePhoneNumber(phoneNumber);
   }
 
   /**
@@ -102,6 +103,6 @@ export class IntlTelInput {
    * @param countryCode
    */
   protected getPhoneNumberPlaceHolder(countryCode: string) {
-    return getPhoneNumberPlaceholder(countryCode, PhoneNumberFormat.NATIONAL);
+    return getPhoneNumberPlaceholder(countryCode, 'national');
   }
 }
