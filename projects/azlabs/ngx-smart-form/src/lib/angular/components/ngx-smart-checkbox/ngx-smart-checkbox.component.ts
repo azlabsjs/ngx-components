@@ -17,7 +17,6 @@ import {
 import {
   InputOptionsInterface,
   InputTypes,
-  mapIntoInputOptions,
   OptionsInputConfigInterface,
 } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
