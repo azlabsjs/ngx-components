@@ -64,14 +64,15 @@ import {
   NgxSmartFormControlArrayComponent,
 } from './components';
 import { FetchOptionsDirective, HTMLFileInputDirective } from './directives';
-import { createSelectOptionsQuery, createSubmitHttpHandler } from '../http';
+import {
+  createSelectOptionsQuery,
+  createSubmitHttpHandler,
+  OptionsQueryConfigType,
+} from '../http';
 import { from, lastValueFrom, ObservableInput, of } from 'rxjs';
 import { useDefaultTemplateText } from './helpers';
 import { CacheProvider } from '@azlabsjs/smart-form-core';
-import {
-  HTTPRequest,
-  HTTPResponse,
-} from '@azlabsjs/requests';
+import { HTTPRequest, HTTPResponse } from '@azlabsjs/requests';
 import { NgxUploadsSubjectService } from './components/ngx-smart-file-input/ngx-uploads-subject.service';
 
 type FormApiServerConfigs = {
@@ -82,16 +83,14 @@ type FormApiServerConfigs = {
   };
 };
 
-export type ModuleConfigs = {
+type ConfigType = {
   dropzoneConfigs?: DropzoneConfig;
   serverConfigs: FormApiServerConfigs;
   formsAssets?: string;
   clientFactory?: Function;
   templateTextProvider?: Provider;
   uploadOptions?: UploadOptionsType<HTTPRequest, HTTPResponse>;
-  optionsRequest?: {
-    interceptorFactory?: InterceptorFactory<HTTPRequest>;
-  };
+  optionsRequest?: OptionsQueryConfigType;
   submitRequest?: {
     interceptorFactory?: InterceptorFactory<HTTPRequest>;
   };
@@ -171,9 +170,7 @@ export function createDictionary(dzConfig: { [index: string]: any }) {
   providers: [],
 })
 export class NgxSmartFormModule {
-  static forRoot(
-    configs: ModuleConfigs
-  ): ModuleWithProviders<NgxSmartFormModule> {
+  static forRoot(configs: ConfigType): ModuleWithProviders<NgxSmartFormModule> {
     const providers: Provider[] = [
       FormHttpLoader,
       FormsCacheProvider,
@@ -221,7 +218,7 @@ export class NgxSmartFormModule {
             injector,
             configs!.serverConfigs!.api.host,
             configs!.serverConfigs!.api.bindings,
-            configs.optionsRequest?.interceptorFactory
+            configs.optionsRequest
           );
         },
         deps: [Injector],

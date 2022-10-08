@@ -21,6 +21,7 @@ import { createIntersectionObserver } from '../helpers';
 import { INPUT_OPTIONS_CLIENT } from '../types';
 import { InputOptionsClient } from '../types/options';
 import { lastValueFrom } from 'rxjs';
+import { DOCUMENT } from '@angular/common';
 
 @Directive({
   selector: '[prefetchOptions]',
@@ -33,7 +34,6 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   //#endregion Directive inputs
 
   //#region Directive outputs
-  @Output() loadedChange = new EventEmitter<boolean>();
   @Output() optionsChange = new EventEmitter<InputOptionsInterface>();
   @Output() loadingChange = new EventEmitter<boolean>();
   //#endregion Directive outputs
@@ -44,36 +44,24 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   // Directive constructor
   constructor(
     private elemRef: ElementRef,
-    @Inject(INPUT_OPTIONS_CLIENT) private client: InputOptionsClient
+    @Inject(INPUT_OPTIONS_CLIENT) private client: InputOptionsClient,
+    @Inject(DOCUMENT) private document: Document
   ) {}
 
   ngAfterViewInit() {
-    if (
-      !('IntersectionObserver' in window) &&
-      !('IntersectionObserverEntry' in window) &&
-      !('intersectionRatio' in window.IntersectionObserverEntry.prototype)
-    ) {
-      // If The intersection API is missing we execute the load query
-      // When the view initialize
-      this.executeQuery();
-    } else {
-      if (this.observer) {
-        this.observer.disconnect();
-      }
-      // We create an intersection observer that execute load query
-      // when the HTML element is intersecting
-      this.observer = createIntersectionObserver((entries, _) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            this.executeQuery();
-          }
-        });
-      });
-      this.observer.observe(this.elemRef.nativeElement);
-    }
+    const { defaultView } = this.document ?? ({} as Document);
+    const view = defaultView as any;
+    // If The intersection API is missing we execute the load query
+    // When the view initialize
+    view &&
+    !('IntersectionObserver' in view) &&
+    !('IntersectionObserverEntry' in view) &&
+    !('intersectionRatio' in view.IntersectionObserverEntry.prototype)
+      ? this.query()
+      : this.observeView();
   }
 
-  async executeQuery() {
+  async query() {
     if (
       this.loaded ||
       typeof this.optionsConfig === 'undefined' ||
@@ -93,6 +81,22 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     return this.syncFetch(this.optionsConfig);
   }
 
+  private observeView() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+    // We create an intersection observer that execute load query
+    // when the HTML element is intersecting
+    this.observer = createIntersectionObserver((entries, _) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          this.query();
+        }
+      });
+    });
+    this.observer.observe(this.elemRef.nativeElement);
+  }
+
   private syncFetch(optionsConfig: OptionsConfig) {
     const options = mapStringListToInputOptions(optionsConfig.source.raw);
     this.loadingChange.emit(false);
@@ -101,7 +105,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
 
   private async asyncFetch(optionsConfig: OptionsConfig) {
     await lastValueFrom(
-      this.client.request(optionsConfig).pipe(
+      this.client.request({ ...optionsConfig, name: this.name }).pipe(
         first(),
         tap((state) => {
           this.loadingChange.emit(false);

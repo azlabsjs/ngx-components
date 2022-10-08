@@ -77,8 +77,8 @@ export class NgxSmartSelectInputComponent implements AfterViewInit {
 
   private _handleFetchOnFocus: boolean = false;
 
-  @ViewChild('prefetchOptionsDirective', { static: false })
-  prefetchOptionsDirective!: FetchOptionsDirective;
+  @ViewChild('optionsRef', { static: false })
+  options!: FetchOptionsDirective;
 
   constructor(@Inject(DOCUMENT) private document: Document) {
     const { defaultView } = this.document;
@@ -101,8 +101,8 @@ export class NgxSmartSelectInputComponent implements AfterViewInit {
   }
 
   onFocus(): void {
-    if (this.prefetchOptionsDirective && this._handleFetchOnFocus) {
-      this.prefetchOptionsDirective.executeQuery();
+    if (this.options && this._handleFetchOnFocus) {
+      this.options.query();
     }
   }
 

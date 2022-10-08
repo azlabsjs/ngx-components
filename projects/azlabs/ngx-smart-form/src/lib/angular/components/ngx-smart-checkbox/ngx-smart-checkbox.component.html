@@ -3,6 +3,7 @@
   (optionsChange)="onOptionsChange($event)"
   [loaded]="loaded"
   [optionsConfig]="inputConfig.optionsConfig"
+  [name]="inputConfig.name"
 >
   <ng-container *ngIf="inputConfig.options!.length > 0">
     <ng-container

@@ -89,6 +89,13 @@ ClarityIcons.addIcons(uploadCloudIcon);
             });
           };
         },
+        queries: {
+          // category_id : 'https://coopecclients.lik.tg/',
+          zone_id: () => 'https://coopecclients.liksoft.tg/', // TODO: In future release pass the form id to the function
+          category_id: {
+            host: 'https://coopecclients.azlabs.xyz/'
+          }
+        }
       },
       // Path to the form assets
       // This path will be used the http handler to load the forms in cache

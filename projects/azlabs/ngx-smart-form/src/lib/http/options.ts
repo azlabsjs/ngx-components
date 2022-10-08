@@ -9,7 +9,7 @@ import {
 import { map, ObservableInput } from 'rxjs';
 import { InputOptionsClient } from '../angular/types/options';
 import { rxRequest } from './helpers';
-import { InterceptorFactory } from './types';
+import { InterceptorFactory, OptionsQueryConfigType } from './types';
 
 type _OptionsRequestFunction = <T>(
   param: string,
@@ -54,39 +54,86 @@ function createRequestURL(value: OptionsConfig, host: string, path?: string) {
 }
 
 // @internal
+function resolveURLHost(
+  params: OptionsQueryConfigType,
+  name: string,
+  _default: string
+) {
+  if (params.queries) {
+    const value = params.queries[name];
+    if (value && typeof value === 'string') {
+      return getHttpHost(value);
+    }
+    if (value && typeof value === 'function') {
+      return value();
+    }
+    if (value && typeof value === 'object') {
+      return typeof value.host === 'string'
+        ? getHttpHost(value.host)
+        : typeof value.host === 'function'
+        ? value.host()
+        : _default;
+    }
+    return _default;
+  }
+  return _default;
+}
+
+// @internal
+function resolveRequestInterceptorFactory(
+  params: OptionsQueryConfigType,
+  name: string
+) {
+  if (params.queries) {
+    const value = params.queries[name];
+    return typeof value === 'object'
+      ? value.interceptor ?? params.interceptorFactory
+      : params.interceptorFactory;
+  }
+  return params.interceptorFactory;
+}
+
+// @internal
 export function createSelectOptionsQuery(
   injector: Injector,
-  endpoint?: string,
+  host?: string,
   path?: string,
-  interceptorFactory?: InterceptorFactory<HTTPRequest>
+  queriesConfig?: OptionsQueryConfigType
 ) {
-  let _endpoint!: string | undefined;
-  let _path!: string;
-  if (endpoint === null || typeof endpoint === 'undefined') {
-    _endpoint =
-      typeof path !== 'undefined' && path !== null && isValidHttpUrl(path)
-        ? path
-        : undefined;
-    _path = '';
-  } else {
-    _path = path ?? '';
-    _endpoint = endpoint;
-  }
-  _endpoint =
-    _path && _endpoint
-      ? `${getHttpHost(_endpoint)}/${
-          _path.startsWith('/') ? _path.slice(0, _path.length - 1) : _path
-        }`
-      : _endpoint;
   const _requestClient = queryOptions;
   Object.defineProperty(_requestClient, 'request', {
-    value: (optionsConfig: OptionsConfig) => {
+    value: (optionsConfig: OptionsConfig & { name?: string }) => {
+      let _endpoint!: string | undefined;
+      let _path!: string;
+      if (host === null || typeof host === 'undefined') {
+        _endpoint =
+          typeof path !== 'undefined' && path !== null && isValidHttpUrl(path)
+            ? path
+            : undefined;
+        _path = '';
+      } else {
+        _path = path ?? '';
+        _endpoint = host;
+      }
+      _endpoint =
+        _path && _endpoint
+          ? `${getHttpHost(_endpoint)}/${
+              _path.startsWith('/') ? _path.slice(0, _path.length - 1) : _path
+            }`
+          : _endpoint;
       // We build the request query
       //#region For custom URL configurations, we attempt to build the final URL and update the
       // the resource entry if source property of the option configurations
       let url = optionsConfig.source.resource;
       if (isCustomURL(url ?? '')) {
-        url = customToResourceURL(url, _endpoint ?? '');
+        const hostConfig =
+          typeof queriesConfig?.queries !== 'undefined' &&
+          queriesConfig?.queries !== null &&
+          typeof optionsConfig.name !== 'undefined' &&
+          optionsConfig.name !== null
+            ? resolveURLHost(queriesConfig, optionsConfig.name, _endpoint ?? '')
+            : _endpoint ?? '';
+        url = customToResourceURL(url, hostConfig);
         url = url[0] === '/' ? url.substring(1) : url;
         optionsConfig = {
           ...optionsConfig,
@@ -102,7 +149,13 @@ export function createSelectOptionsQuery(
           _path[0] === '/' ? _path?.substring(1) : _path
         ),
       };
-      return _requestClient(request, injector, interceptorFactory);
+      return _requestClient(
+        request,
+        injector,
+        queriesConfig?.queries && optionsConfig.name
+          ? resolveRequestInterceptorFactory(queriesConfig, optionsConfig.name)
+          : queriesConfig?.interceptorFactory
+      );
     },
   });
   return _requestClient as any as _OptionsRequestFunction & InputOptionsClient;
