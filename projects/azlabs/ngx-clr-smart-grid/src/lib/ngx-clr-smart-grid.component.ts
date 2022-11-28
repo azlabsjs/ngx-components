@@ -4,9 +4,9 @@ import {
   EventEmitter,
   Input,
   Output,
-  TemplateRef,
+  TemplateRef
 } from '@angular/core';
-import { ClrDatagridSortOrder } from '@clr/angular';
+import { ClrDatagridSortOrder, ClrDatagridStateInterface } from '@clr/angular';
 import { GridColumnType, GridConfigType } from './core/types';
 
 @Component({
@@ -102,7 +102,7 @@ export class NgxClrSmartGridComponent {
 
   // Output definitions
   @Output() selectedChange = new EventEmitter<unknown[] | unknown>();
-  @Output() dgRefresh = new EventEmitter<unknown>();
+  @Output() dgRefresh = new EventEmitter<ClrDatagridStateInterface<unknown>>();
   @Output() detailChange = new EventEmitter<unknown>();
 
   // Listen to internal grid component select changes and notify parent component

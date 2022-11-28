@@ -7,7 +7,7 @@ export type Comparator<T> =
   | ClrDatagridComparatorInterface<unknown>;
 
 /**
- * @descritpion Type definition of a smart grid column
+ * Type definition of a smart grid column.
  * It represents each column of the smart grid
  */
 export type GridColumnType = {
@@ -24,8 +24,7 @@ export type GridColumnType = {
 };
 
 /**
- * @description Type definition of Smart datagrid configuration
- * value
+ * Type definition of Smart datagrid configuration value.
  */
 export type GridConfigType = {
   selectable: boolean;

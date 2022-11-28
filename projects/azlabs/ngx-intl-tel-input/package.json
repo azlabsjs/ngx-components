@@ -1,6 +1,6 @@
 {
   "name": "@azlabsjs/ngx-intl-tel-input",
-  "version": "0.13.22",
+  "version": "0.13.24",
   "peerDependencies": {
     "@angular/common": "^13.0.0",
     "@angular/core": "^13.0.0",
@@ -15,9 +15,10 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/azlabsjs/ngx-components.git",
-    "directory": "projects/azlabs/ngx-intl-tel-input"
+    "directory": "/projects/azlabs/ngx-intl-tel-input"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/@azlabsjs"
-  }
+  },
+  "homepage": "https://github.com/azlabsjs/ngx-components/blob/ng-v13/projects/azlabs/ngx-intl-tel-input/README.md"
 }

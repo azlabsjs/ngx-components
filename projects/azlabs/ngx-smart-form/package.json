@@ -1,6 +1,6 @@
 {
   "name": "@azlabsjs/ngx-smart-form",
-  "version": "0.13.22",
+  "version": "0.13.24",
   "peerDependencies": {
     "@angular/common": "^13.0.0",
     "@angular/core": "^13.0.0",
@@ -16,7 +16,7 @@
   "dependencies": {
     "tslib": "^2.3.0",
     "@azlabsjs/built-value": "^0.1.10",
-    "@azlabsjs/collections": "^0.1.10",
+    "@azlabsjs/collections": "^0.1.12",
     "@azlabsjs/utilities": "^0.1.10",
     "@azlabsjs/functional": "^0.1.10",
     "@azlabsjs/smart-form-core": "^0.1.21",
@@ -26,9 +26,10 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/azlabsjs/ngx-components.git",
-    "directory": "projects/azlabs/ngx-smart-form"
+    "directory": "/projects/azlabs/ngx-smart-form"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/@azlabsjs"
-  }
+  },
+  "homepage": "https://github.com/azlabsjs/ngx-components/blob/ng-v13/projects/azlabs/ngx-smart-form/README.md"
 }

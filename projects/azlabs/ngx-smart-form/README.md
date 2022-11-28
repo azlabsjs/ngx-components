@@ -5,12 +5,12 @@ The module also makes use of angular services injector to provide mechanism for 
 
 ## Dependencies
 
-| @azlabsjs/ngx-smart-form | @azlabsjs/ngx-dropzone   | @azlabsjs/ngx-intl-tel-input | Angular |
-|--------------------------|--------------------------|------------------------------|---------|
-| ^0.13.x                  | ^0.13.x                  | ^0.13.x                      | ^13.0   |
-| ^0.14.x                  | ^0.14.x                  | ^0.14.x                      | ^14.0   |
+| @azlabsjs/ngx-smart-form | @azlabsjs/ngx-dropzone | @azlabsjs/ngx-intl-tel-input | Angular |
+| ------------------------ | ---------------------- | ---------------------------- | ------- |
+| ^0.13.x                  | ^0.13.x                | ^0.13.x                      | ^13.0   |
+| ^0.14.x                  | ^0.14.x                | ^0.14.x                      | ^14.0   |
 
-* Basic usage
+- Basic usage
 
 To include the API in your angular project, you must import it module into the root of your application.
 
@@ -47,8 +47,7 @@ To use the smart form component in your component, simply include it requirement
 
 ```html
 <!-- ... -->
-<ngx-smart-form [form]="form">
-</ngx-smart-form>
+<ngx-smart-form [form]="form"> </ngx-smart-form>
 ```
 
 Note: By default the smart component will use default configuration to create controls and default button for adding new control or group of controls if the control is repeatable.
@@ -58,24 +57,27 @@ Also you should note that the form is not submittable by default. To make the fo
 ```html
 <!-- ... -->
 <!-- This add a submit button to the form component -->
-<ngx-smart-form [form]="form" [submitable]="true">
-</ngx-smart-form>
+<ngx-smart-form [form]="form" [submitable]="true"> </ngx-smart-form>
 ```
 
-* Customization
+- Customization
 
 Smart form component tries it best to be flexible enough for cutomization, using angular template directive to pass configurations to the smart form element.
 
 -- Injecting a submit button:
 
 ```html
-<ngx-smart-form [form]="form" [submitable]="true" (submit)="onFormSubmit($event)">
-    <ng-template #submitButton let-handler>
-        <button class="btn btn-primary" (click)="handler($event)">
-            <clr-icon shape="circle-arrow" dir="up"></clr-icon>
-            SOUMETTRE
-        </button>
-    </ng-template>
+<ngx-smart-form
+  [form]="form"
+  [submitable]="true"
+  (submit)="onFormSubmit($event)"
+>
+  <ng-template #submitButton let-handler>
+    <button class="btn btn-primary" (click)="handler($event)">
+      <clr-icon shape="circle-arrow" dir="up"></clr-icon>
+      SOUMETTRE
+    </button>
+  </ng-template>
 </ngx-smart-form>
 ```
 
@@ -88,27 +90,25 @@ As developper we are tend to provide our own custom implementation of HTML eleme
 
 ```ts
 // Custom smart input implementation
-import { InputInterface } from '@azlabsjs/ngx-smart-form';
+import { InputInterface } from "@azlabsjs/ngx-smart-form";
 
 @Component({
-  selector: 'app-custom-smart-input'
+  selector: "app-custom-smart-input",
 })
 export class MyCustomSmartInput {
-
   @Input() input!: InputInterface;
   @Input() control!: AbstractControl;
 
   // ...
-
 }
 ```
 
 ```html
 <ngx-smart-form [form]="form" [submitable]="true" [template]="template">
-    <ng-template #template let-input="value" let-control="control">
-        <app-custom-smart-input [input]="input" [control]="control">
-        </app-custom-smart-input>
-    </ng-template>
+  <ng-template #template let-input="value" let-control="control">
+    <app-custom-smart-input [input]="input" [control]="control">
+    </app-custom-smart-input>
+  </ng-template>
 </ngx-smart-form>
 ```
 
@@ -118,34 +118,36 @@ By default the smart form component comes with a default floating action button 
 
 ```html
 <ngx-smart-form [form]="form" [submitable]="true" [template]="template">
-    <ng-template #addTemplate let-handler>
-        <div class="button" (click)="handler($event)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="8px" height="8px" viewBox="0 0 24 24">
-                <path d="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z" />
-            </svg>
-        </div>
-    </ng-template>
+  <ng-template #addTemplate let-handler>
+    <div class="button" (click)="handler($event)">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="8px"
+        height="8px"
+        viewBox="0 0 24 24"
+      >
+        <path d="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z" />
+      </svg>
+    </div>
+  </ng-template>
 </ngx-smart-form>
 ```
 
-* Services
+- Services
 
 As mentionned above, the smart form component comes with services for loading form from the cache if the exists.
 
 ```ts
-
 // ...
 import { FORM_CLIENT, FormsClient } from "@azlabsjs/ngx-smart-form";
 
 export class MyFormComponent {
-    // Get the form with the id 65 from the cache object
-    // This returns an observable of the form object that can be passed
-    // to the smart form
-    form$ = this.formsClient.get(65);
+  // Get the form with the id 65 from the cache object
+  // This returns an observable of the form object that can be passed
+  // to the smart form
+  form$ = this.formsClient.get(65);
 
-    constructor(
-      @Inject(FORM_CLIENT) private formsClient: FormsClient
-    ) {}
+  constructor(@Inject(FORM_CLIENT) private formsClient: FormsClient) {}
 }
 ```
 
@@ -154,12 +156,11 @@ The html template will be as follow:
 ```html
 <!-- ... -->
 <ng-container *ngIf="form$ | async as vm">
-    <ngx-smart-form [form]="vm">
-    </ngx-smart-form>
+  <ngx-smart-form [form]="vm"> </ngx-smart-form>
 </ng-container>
 ```
 
-* File upload handler
+- File upload handler
 
 The package provides services & component for uploading files to a remote files server automatically.
 
@@ -171,8 +172,7 @@ In order to enable the auto uploading on the smart form component:
 ```html
 <!-- At the template level -->
 <ng-container *ngIf="form$ | async as vm">
-    <ngx-smart-form [form]="vm" [autoupload]="true">
-    </ngx-smart-form>
+  <ngx-smart-form [form]="vm" [autoupload]="true"> </ngx-smart-form>
 </ng-container>
 ```
 
@@ -200,7 +200,7 @@ import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
 })
 ```
 
-* Form auto submission
+- Form auto submission
 
 Sometimes based systems requirements, developpers might not need to handle form submission manually. Therefore the smart form package implementation offers the ability to automatically submit form without the needs of a dedicated http service implementation.
 
@@ -246,9 +246,10 @@ import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
 
 From version `0.13.21` the package add support for custom URL when querying for options using HTTP (TCP) interface. Now option configurations can define URL that are compile at runtime to generate HTTP url based on the configured `serverConfigs.api.host` entry in the root module.
 
-* Requirements
+- Requirements
 
 -- Define a custom URI scheme in place of table or url in your `forms.json` file
+
 **Note**
 Custom URI scheme looks like `uri:/<PATH>` or `url:/<PATH>`. The `/` before the path is required, else the compilation phase of the custom url will fail. Hence form with an option input looking like:
 
@@ -259,7 +260,7 @@ Custom URI scheme looks like `uri:/<PATH>` or `url:/<PATH>`. The `/` before the 
     //...
     {
       //...
-      "selectableModel": "table:https://<HOST>/path|model:https://<HOST>/path",
+      "selectableModel": "table:https://<HOST>/path|model:https://<HOST>/path"
       // Note: For newer form generated by the backend, this is similar to
       // "optionsConfig": "table:https://<HOST>/path|model:https://<HOST>/path",
     }
@@ -300,8 +301,8 @@ in order for the option input configuration to be candidate custom url compiler.
         },
       },
       // ...
-    })
-  ]
+    }),
+  ],
 })
 export class AppModule {}
 ```
@@ -311,3 +312,31 @@ Without the `host` configuration uri will not compile properly, therefore a de-f
 
 **Warning**
 The package is still under development therefore the API is subject to change. Any update to the package api will be mentionned in the current documentation if required.
+
+## Inserting custom HTML template before and after form controls
+
+From version `0.13.24`, `ngx-smart-form` component add support for projected html templates that can be placed before and after the main form component. This allows developper to project custom templates or other forms into the component.
+
+To project a template before controls simply add `before` attribute to the template container as follow:
+
+```html
+<ng-container *ngIf="form$ | async as form">
+  <ngx-smart-form [form]="form" [autoSubmit]="true" [path]="'customers'">
+    <div before>
+      <p>Hello I am before form controls</p>
+    </div>
+  </ngx-smart-form>
+</ng-container>
+```
+
+Intuitively, to project content after controls, simply add `after` to the container of the template to project:
+
+```html
+<ng-container *ngIf="form$ | async as form">
+  <ngx-smart-form [form]="form" [autoSubmit]="true" [path]="'customers'">
+    <div after>
+      <p>Hello I am after form controls</p>
+    </div>
+  </ngx-smart-form>
+</ng-container>
+```
