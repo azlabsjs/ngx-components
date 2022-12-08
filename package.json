@@ -25,7 +25,7 @@
     "@azlabsjs/built-value": "^0.1.10",
     "@azlabsjs/collections": "^0.1.10",
     "@azlabsjs/functional": "^0.1.10",
-    "@azlabsjs/js-datetime": "^0.1.10",
+    "@azlabsjs/js-datetime": "^0.1.11",
     "@azlabsjs/js-object": "^0.1.10",
     "@azlabsjs/requests": "^0.2.0",
     "@azlabsjs/smart-form-core": "^0.1.25",
