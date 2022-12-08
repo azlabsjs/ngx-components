@@ -6,7 +6,7 @@
   },
   "allowedNonPeerDependencies": [
     "@azlabsjs/built-value",
-    "@azlabsjs/collections",
+    "@azlabsjs/js-datetime",
     "@azlabsjs/utilities",
     "@azlabsjs/functional",
     "@azlabsjs/smart-form-core",

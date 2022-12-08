@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import {
   AfterViewInit,
   Directive,
@@ -6,22 +7,21 @@ import {
   Inject,
   Input,
   OnDestroy,
-  Output,
+  Output
 } from '@angular/core';
-import { first, tap } from 'rxjs/operators';
 import {
   InputOptionsInterface,
   isCustomURL,
   isValidHttpUrl,
   mapIntoInputOptions,
   mapStringListToInputOptions,
-  OptionsConfig,
+  OptionsConfig
 } from '@azlabsjs/smart-form-core';
+import { lastValueFrom } from 'rxjs';
+import { first, tap } from 'rxjs/operators';
 import { createIntersectionObserver } from '../helpers';
 import { INPUT_OPTIONS_CLIENT } from '../types';
 import { InputOptionsClient } from '../types/options';
-import { lastValueFrom } from 'rxjs';
-import { DOCUMENT } from '@angular/common';
 
 @Directive({
   selector: '[prefetchOptions]',
@@ -104,6 +104,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   }
 
   private async asyncFetch(optionsConfig: OptionsConfig) {
+    console.log(optionsConfig);
     await lastValueFrom(
       this.client.request({ ...optionsConfig, name: this.name }).pipe(
         first(),

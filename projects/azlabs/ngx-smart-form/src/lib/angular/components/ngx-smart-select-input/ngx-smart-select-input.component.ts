@@ -1,21 +1,16 @@
+import { DOCUMENT } from '@angular/common';
 import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  Inject,
-  ViewChild,
-  AfterViewInit,
+  AfterViewInit, Component, EventEmitter,
+  Inject, Input,
+  Output, ViewChild
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { InputEventArgs } from '../../types/input';
 import {
-  OptionsInputConfigInterface,
-  InputOptionsInterface,
+  InputOptionsInterface, OptionsInputConfigInterface
 } from '@azlabsjs/smart-form-core';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { DOCUMENT } from '@angular/common';
 import { FetchOptionsDirective } from '../../directives';
+import { InputEventArgs } from '../../types/input';
 
 @Component({
   selector: 'ngx-smart-select-input',
@@ -112,13 +107,14 @@ export class NgxSmartSelectInputComponent implements AfterViewInit {
   }
 
   onOptionsChange(options: InputOptionsInterface) {
+    console.log(options);
     this._inputConfig = {
       ...this._inputConfig,
       options: options.map((state) => ({
         ...state,
         // We convert the select values to uppercase
         // for UI consistency
-        name: state?.name.toUpperCase(),
+        name: state?.name?.toUpperCase(),
         description: state.description?.toUpperCase(),
       })),
     };
