@@ -107,7 +107,6 @@ export class NgxSmartSelectInputComponent implements AfterViewInit {
   }
 
   onOptionsChange(options: InputOptionsInterface) {
-    console.log(options);
     this._inputConfig = {
       ...this._inputConfig,
       options: options.map((state) => ({

@@ -104,7 +104,6 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   }
 
   private async asyncFetch(optionsConfig: OptionsConfig) {
-    console.log(optionsConfig);
     await lastValueFrom(
       this.client.request({ ...optionsConfig, name: this.name }).pipe(
         first(),
