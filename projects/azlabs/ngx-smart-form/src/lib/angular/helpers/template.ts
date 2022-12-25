@@ -9,6 +9,7 @@ export function useDefaultTemplateText() {
     clickUploadButtonLabel: 'Click',
     fileUploadError: 'Error while uploading file to server',
     fileSizeError: 'File size must be less than or equal to {{maxFilesize}}Mo.',
+    addButtonText: 'Click on the the button to add a new input element',
     validation: {
       maxValue: 'The maximum number of characters for this field is {{value}}',
       minValue: 'This field must contain at least {{value}} characters',
