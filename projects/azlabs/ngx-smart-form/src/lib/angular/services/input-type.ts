@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AbstractControl, FormArray } from '@angular/forms';
+import { AbstractControl, UntypedFormArray } from '@angular/forms';
 import {
   OptionsInputConfigInterface,
   DateInput,
@@ -19,8 +19,8 @@ export class InputTypeHelper {
    * @description Return an abstract control as angular {@see FormArray}
    * @param control
    */
-  public asFormArray(control?: AbstractControl): FormArray {
-    return control as FormArray;
+  public asFormArray(control?: AbstractControl): UntypedFormArray {
+    return control as UntypedFormArray;
   }
 
   /**

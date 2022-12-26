@@ -13,7 +13,7 @@ import {
   Output,
   TemplateRef,
 } from '@angular/core';
-import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
+import { AbstractControl, UntypedFormArray, UntypedFormGroup } from '@angular/forms';
 import { HTTPRequestMethods } from '@azlabsjs/requests';
 import {
   FormConfigInterface,
@@ -89,7 +89,7 @@ export class NgxSmartFormComponent
   implements FormComponentInterface, AfterViewInit, OnDestroy
 {
   //#region Local properties
-  formGroup!: FormGroup;
+  formGroup!: UntypedFormGroup;
   //#endregion Local properties
 
   //#region Component inputs
@@ -110,7 +110,7 @@ export class NgxSmartFormComponent
   //#region Component outputs
   @Output() submit = new EventEmitter<{ [index: string]: any }>();
   @Output() readyState = new EventEmitter();
-  @Output() formGroupChange = new EventEmitter<FormGroup>();
+  @Output() formGroupChange = new EventEmitter<UntypedFormGroup>();
   @Output() complete = new EventEmitter<unknown>();
   @Output() performingRequest = new EventEmitter<boolean>();
   //#endregion Component outputs
@@ -241,7 +241,7 @@ export class NgxSmartFormComponent
       this._destroy$.next();
       // We create an instance of angular Reactive Formgroup instance
       // from input configurations
-      this.formGroup = this.builder.group(value) as FormGroup;
+      this.formGroup = this.builder.group(value) as UntypedFormGroup;
       // Set input bindings
       this.setBindings();
       // Subscribe to formgroup changes
@@ -304,7 +304,7 @@ export class NgxSmartFormComponent
         ...this.form,
         controlConfigs: controls as InputConfigInterface[],
       };
-      this.formGroup = formgroup as FormGroup;
+      this.formGroup = formgroup as UntypedFormGroup;
       for (const name in this.formGroup.controls) {
         this.formGroup
           .get(name)
@@ -337,7 +337,7 @@ export class NgxSmartFormComponent
           event,
           useHiddenAttributeSetter
         )(this.formGroup);
-        this.formGroup = control as FormGroup;
+        this.formGroup = control as UntypedFormGroup;
         this.form = { ...this.form, controlConfigs: controls };
       }
     }
@@ -345,7 +345,7 @@ export class NgxSmartFormComponent
   //#endregion Ported wrapper methods
 
   private setFormValue(
-    formgroup: FormGroup,
+    formgroup: UntypedFormGroup,
     values: { [index: string]: any },
     configs?: InputConfigInterface[] | InputConfigInterface
   ) {
@@ -354,14 +354,14 @@ export class NgxSmartFormComponent
         ? configs?.find((config) => config.name === key)
         : configs;
       if (formgroup.controls[key] && value) {
-        if (formgroup.controls[key] instanceof FormGroup) {
+        if (formgroup.controls[key] instanceof UntypedFormGroup) {
           this.setFormValue(
-            formgroup.controls[key] as FormGroup,
+            formgroup.controls[key] as UntypedFormGroup,
             value,
             config_
           );
         } else if (
-          formgroup.controls[key] instanceof FormArray &&
+          formgroup.controls[key] instanceof UntypedFormArray &&
           Boolean(config_?.isRepeatable) === true
         ) {
           const controls = (config_ as InputGroup)?.children;
@@ -371,9 +371,9 @@ export class NgxSmartFormComponent
                 (current) => typeof current !== 'undefined' && current !== null
               );
           // TODO : Create formgroup
-          const group = this.builder.group(children) as FormGroup;
+          const group = this.builder.group(children) as UntypedFormGroup;
           const values_ = Array.isArray(value) ? value : [];
-          const array_ = new FormArray([]);
+          const array_ = new UntypedFormArray([]);
           for (const current of values_) {
             const tmp = cloneAbstractControl(group);
             this.setFormGroupValue(tmp, current);
@@ -390,7 +390,7 @@ export class NgxSmartFormComponent
   }
 
   private setFormGroupValue(
-    formgroup: FormGroup,
+    formgroup: UntypedFormGroup,
     values: { [index: string]: any }
   ) {
     for (const [key, value] of Object.entries(values)) {

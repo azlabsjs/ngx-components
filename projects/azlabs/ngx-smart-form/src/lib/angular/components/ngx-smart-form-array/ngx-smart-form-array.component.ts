@@ -12,7 +12,7 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { FormArray, FormGroup } from '@angular/forms';
+import { UntypedFormArray, UntypedFormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
@@ -72,7 +72,7 @@ import { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array-child.co
 })
 export class NgxSmartFormArrayComponent implements OnInit, OnDestroy {
   //#region Component inputs definitions
-  @Input() formArray!: FormArray;
+  @Input() formArray!: UntypedFormArray;
   private _controls!: InputConfigInterface[];
   @Input() set controls(value: InputConfigInterface | InputConfigInterface[]) {
     this._controls = Array.isArray(value)
@@ -111,7 +111,7 @@ export class NgxSmartFormArrayComponent implements OnInit, OnDestroy {
   //#endregion Component inputs definitions
 
   //@internal
-  private formGroup!: FormGroup;
+  private formGroup!: UntypedFormGroup;
   @ViewChild('container', { read: ViewContainerRef, static: true })
   viewContainerRef!: ViewContainerRef;
 
@@ -130,12 +130,12 @@ export class NgxSmartFormArrayComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.formGroup = this.builder.group(this._controls) as FormGroup;
+    this.formGroup = this.builder.group(this._controls) as UntypedFormGroup;
     if (this.formArray.getRawValue().length !== 0) {
       // Add elements
       let index = 0;
       for (const control of this.formArray.controls) {
-        this.addComponent(control as FormGroup, index);
+        this.addComponent(control as UntypedFormGroup, index);
         index++;
       }
     }
@@ -155,12 +155,12 @@ export class NgxSmartFormArrayComponent implements OnInit, OnDestroy {
 
   // tslint:disable-next-line: typedef
   addNewComponent(index: number) {
-    const formGroup = cloneAbstractControl(this.formGroup) as FormGroup;
+    const formGroup = cloneAbstractControl(this.formGroup) as UntypedFormGroup;
     this.addComponent(formGroup, index);
     this.formArray.push(formGroup);
   }
 
-  addComponent(formGroup: FormGroup, index: number) {
+  addComponent(formGroup: UntypedFormGroup, index: number) {
     const componentRef = this.viewContainerRef.createComponent(
       NgxSmartFormArrayChildComponent
     );

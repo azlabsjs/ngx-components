@@ -8,7 +8,7 @@ import {
   OnDestroy,
   Injector,
 } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { DropzoneConfig } from '@azlabsjs/ngx-dropzone';
 import { FileInput, isValidHttpUrl } from '@azlabsjs/smart-form-core';
@@ -71,7 +71,7 @@ function uuidv4() {
 })
 export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
   //#region Component inputs
-  @Input() control!: FormControl;
+  @Input() control!: UntypedFormControl;
   @Input() describe = true;
   @Input() inputConfig!: FileInput;
   @Input() uploadAs!: string;

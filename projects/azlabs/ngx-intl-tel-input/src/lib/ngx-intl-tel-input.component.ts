@@ -1,27 +1,25 @@
 import {
   Component,
-  Input,
-  OnInit,
-  OnDestroy,
-  ViewChild,
-  ElementRef,
   ContentChild,
+  ElementRef,
+  Input,
+  OnDestroy,
+  OnInit,
   TemplateRef,
-  Output,
-  EventEmitter,
+  ViewChild
 } from '@angular/core';
-import { Country } from './core/model';
-import { IntlTelInput } from './core/intl-tel-input';
-import { FormControl, Validators, ValidatorFn } from '@angular/forms';
+import { UntypedFormControl, ValidatorFn, Validators } from '@angular/forms';
+import { JSObject } from '@azlabsjs/js-object';
+import { BehaviorSubject, Subject, merge } from 'rxjs';
 import {
-  takeUntil,
-  tap,
   distinctUntilChanged,
   startWith,
+  takeUntil,
+  tap,
 } from 'rxjs/operators';
-import { BehaviorSubject, merge, Subject } from 'rxjs';
+import { IntlTelInput } from './core/intl-tel-input';
+import { Country } from './core/model';
 import { PhoneNumberValidator } from './core/validators';
-import { JSObject } from '@azlabsjs/js-object';
 
 @Component({
   selector: 'ngx-intl-tel-input',
@@ -109,8 +107,8 @@ import { JSObject } from '@azlabsjs/js-object';
 })
 export class NgxIntlTelInputComponent implements OnInit, OnDestroy {
   //
-  public phoneControl!: FormControl;
-  @Input() control!: FormControl;
+  public phoneControl!: UntypedFormControl;
+  @Input() control!: UntypedFormControl;
   @Input() required = false;
   @Input() allowDropdown = true;
   @Input() country!: string;
@@ -162,7 +160,7 @@ export class NgxIntlTelInputComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     if (typeof this.control === 'undefined' || this.control === null) {
-      this.control = new FormControl();
+      this.control = new UntypedFormControl();
     }
     for (const iso2 of this.preferredCountries) {
       const prefered = this.allCountries.find((c) => c.iso2 === iso2);
@@ -236,7 +234,7 @@ export class NgxIntlTelInputComponent implements OnInit, OnDestroy {
 
   //
   private _initializePhoneNumberControl(disabled = false): void {
-    this.phoneControl = new FormControl({ value: null, disabled });
+    this.phoneControl = new UntypedFormControl({ value: null, disabled });
     // Set the initial country to show
     if (
       typeof this.control!.value !== 'undefined' &&

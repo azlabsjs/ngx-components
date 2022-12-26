@@ -4,7 +4,7 @@ import {
   Inject, Input,
   Output, ViewChild
 } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import {
   InputOptionsInterface, OptionsInputConfigInterface
 } from '@azlabsjs/smart-form-core';
@@ -41,7 +41,7 @@ import { InputEventArgs } from '../../types/input';
 })
 export class NgxSmartSelectInputComponent implements AfterViewInit {
   //
-  @Input() control!: FormControl;
+  @Input() control!: UntypedFormControl;
   @Input() describe = true;
   // tslint:disable-next-line: variable-name
   _state$ = new BehaviorSubject<{

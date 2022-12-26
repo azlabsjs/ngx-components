@@ -11,7 +11,7 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import { FormArray, FormControl } from '@angular/forms';
+import { UntypedFormArray, UntypedFormControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { tap, takeUntil } from 'rxjs/operators';
@@ -42,7 +42,7 @@ import { NgxSmartFormControlArrayChildComponent } from './ngx-smart-form-control
 })
 export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
   //#region Component inputs definitions
-  @Input() formArray!: FormArray;
+  @Input() formArray!: UntypedFormArray;
   @Input() inputConfig!: InputConfigInterface;
   @Input() template!: TemplateRef<any>;
   @Input() addButtonRef!: TemplateRef<Node>;
@@ -67,7 +67,7 @@ export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
   //#endregion Component inputs definitions
 
   //@internal
-  private abstractControl!: FormControl;
+  private abstractControl!: UntypedFormControl;
   @ViewChild('container', { read: ViewContainerRef, static: true })
   viewContainerRef!: ViewContainerRef;
 
@@ -90,14 +90,14 @@ export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.abstractControl = this.builder.control(
       this.inputConfig
-    ) as FormControl;
+    ) as UntypedFormControl;
     if (this.formArray.getRawValue().length === 0) {
       this.addNewComponent(this.componentRefCount);
     } else {
       // Add elements
       let index = 0;
       for (const control of this.formArray.controls) {
-        this.addComponent(control as FormControl, index);
+        this.addComponent(control as UntypedFormControl, index);
         index++;
       }
     }
@@ -117,12 +117,12 @@ export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
 
   // tslint:disable-next-line: typedef
   addNewComponent(index: number) {
-    const control = cloneAbstractControl(this.abstractControl) as FormControl;
+    const control = cloneAbstractControl(this.abstractControl) as UntypedFormControl;
     this.addComponent(control, index);
     this.formArray.push(control);
   }
 
-  addComponent(control: FormControl, index: number) {
+  addComponent(control: UntypedFormControl, index: number) {
     const componentRef = this.viewContainerRef.createComponent(
       NgxSmartFormControlArrayChildComponent
     );

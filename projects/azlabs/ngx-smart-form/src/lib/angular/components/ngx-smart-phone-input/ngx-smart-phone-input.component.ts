@@ -1,5 +1,5 @@
 import { Component, ContentChild, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
-import { AbstractControl, FormControl } from '@angular/forms';
+import { AbstractControl, UntypedFormControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 
 @Component({
@@ -15,7 +15,7 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 })
 export class PhoneInputComponent {
   //#region Component inputs
-  @Input() control!: AbstractControl & FormControl;
+  @Input() control!: AbstractControl & UntypedFormControl;
   @Input() describe = true;
   @Input('inputConfig') config!: InputConfigInterface;
   @ContentChild('input') inputRef!: TemplateRef<any>;

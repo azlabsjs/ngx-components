@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import {
   FormConfigInterface,
   InputConfigInterface,
@@ -14,7 +14,7 @@ import { ComponentReactiveFormHelpers } from '../helpers';
 })
 export class DynamicFormBuilder {
   // Creates an instance of the class
-  public constructor(private builder: FormBuilder) {}
+  public constructor(private builder: UntypedFormBuilder) {}
 
   public readonly formBuilder = this.builder;
 
@@ -41,6 +41,6 @@ export class DynamicFormBuilder {
       return undefined;
     }
     const configs = [...(form.controlConfigs as InputConfigInterface[])];
-    return this.buildFormGroupFromInputConfig(configs) as FormGroup;
+    return this.buildFormGroupFromInputConfig(configs) as UntypedFormGroup;
   }
 }

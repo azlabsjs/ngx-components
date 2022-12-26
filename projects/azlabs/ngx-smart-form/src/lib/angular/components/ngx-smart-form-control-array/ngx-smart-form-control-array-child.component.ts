@@ -6,7 +6,7 @@ import {
   Output,
   TemplateRef,
 } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 
 @Component({
@@ -55,7 +55,7 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 })
 export class NgxSmartFormControlArrayChildComponent {
   //#region Component inputs
-  @Input() control!: FormControl;
+  @Input() control!: UntypedFormControl;
   @Input() inputConfig!: InputConfigInterface;
   @Input() template!: TemplateRef<HTMLElement>;
   @Input() autoupload: boolean = false;

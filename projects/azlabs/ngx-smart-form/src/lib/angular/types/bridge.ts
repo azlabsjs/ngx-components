@@ -1,7 +1,7 @@
-import { AbstractControl, FormBuilder } from "@angular/forms";
+import { AbstractControl, UntypedFormBuilder } from "@angular/forms";
 import { FormConfigInterface, InputConfigInterface } from "@azlabsjs/smart-form-core";
 
-export type Builder = FormBuilder;
+export type Builder = UntypedFormBuilder;
 
 export interface AngularReactiveFormBuilderBridge {
   /**

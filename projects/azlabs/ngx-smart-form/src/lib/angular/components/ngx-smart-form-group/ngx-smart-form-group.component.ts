@@ -9,7 +9,7 @@ import {
   Output,
   TemplateRef,
 } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
@@ -29,7 +29,7 @@ export class NgxSmartFormGroupComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
   //#region Component inputs definitions
-  @Input() formGroup!: FormGroup;
+  @Input() formGroup!: UntypedFormGroup;
   @Input() controls!: InputConfigInterface[];
   @Input() template!: TemplateRef<HTMLElement>;
   @Input() autoupload: boolean = false;
@@ -43,7 +43,7 @@ export class NgxSmartFormGroupComponent
   //#endregion Component internal properties
 
   //#region Component output
-  @Output() formGroupChange = new EventEmitter<FormGroup>();
+  @Output() formGroupChange = new EventEmitter<UntypedFormGroup>();
   //#endregion Component outputs
 
   //
@@ -64,7 +64,7 @@ export class NgxSmartFormGroupComponent
         this.controls
       )(this.formGroup);
       this.controls = controls as InputConfigInterface[];
-      this.formGroup = formgroup as FormGroup;
+      this.formGroup = formgroup as UntypedFormGroup;
       // Get control entries from the formgroup
       const entries = Object.entries(this.formGroup.controls);
       // Handle form control value changes
@@ -99,7 +99,7 @@ export class NgxSmartFormGroupComponent
           event,
           useHiddenAttributeSetter
         )(this.formGroup);
-        this.formGroup = control as FormGroup;
+        this.formGroup = control as UntypedFormGroup;
         this.controls = controls;
       }
     }

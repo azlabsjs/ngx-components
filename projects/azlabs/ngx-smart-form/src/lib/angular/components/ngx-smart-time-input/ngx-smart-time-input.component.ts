@@ -1,5 +1,5 @@
 import { Component, ContentChild, Input, TemplateRef } from "@angular/core";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import { TimeInput } from "@azlabsjs/smart-form-core";
 
 @Component({
@@ -9,7 +9,7 @@ import { TimeInput } from "@azlabsjs/smart-form-core";
 export class NgxSmartTimeInputComponent {
 
   //#region Component inputs
-  @Input() control!: FormControl;
+  @Input() control!: UntypedFormControl;
   @Input() describe = true;
   @Input() inputConfig!: TimeInput;
   @ContentChild('input') inputRef!: TemplateRef<any>;

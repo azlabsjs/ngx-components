@@ -8,10 +8,10 @@ import {
   TemplateRef,
 } from '@angular/core';
 import {
-  FormGroup,
-  FormBuilder,
-  FormControl,
-  FormArray,
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormArray,
   AbstractControl,
 } from '@angular/forms';
 import {
@@ -36,12 +36,12 @@ export class NgxSmartCheckBoxComponent implements OnInit, OnDestroy {
   //#endregion Component inputs
 
   public inputTypes = InputTypes;
-  public formGroup!: FormGroup;
+  public formGroup!: UntypedFormGroup;
   public loaded: boolean = false;
 
   private _destroy$ = new Subject<void>();
 
-  constructor(private builder: FormBuilder, private cdRef: ChangeDetectorRef) {}
+  constructor(private builder: UntypedFormBuilder, private cdRef: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.formGroup = this.builder.group({});
@@ -65,7 +65,7 @@ export class NgxSmartCheckBoxComponent implements OnInit, OnDestroy {
   }
 
   private initializeFormArray() {
-    const control = new FormArray([]);
+    const control = new UntypedFormArray([]);
     // We get the value of the injected control
     // if the value is not an array we wrap it as array
     const value = (
@@ -76,11 +76,11 @@ export class NgxSmartCheckBoxComponent implements OnInit, OnDestroy {
 
     // We add controls to the form array element
     if ((this.inputConfig!.options ?? []).length === 1) {
-      control.push(new FormControl(value.length === 0 ? false : true));
+      control.push(new UntypedFormControl(value.length === 0 ? false : true));
     } else if ((this.inputConfig!.options ?? []).length !== 0) {
       for (const option of this.inputConfig.options) {
         const index = value.find((current) => current == option.value);
-        control.push(new FormControl(index ? true : false));
+        control.push(new UntypedFormControl(index ? true : false));
       }
     }
     this.formGroup.addControl('options', control);
@@ -119,6 +119,6 @@ export class NgxSmartCheckBoxComponent implements OnInit, OnDestroy {
   }
 
   asFormControl(control: AbstractControl) {
-    return control as FormControl;
+    return control as UntypedFormControl;
   }
 }

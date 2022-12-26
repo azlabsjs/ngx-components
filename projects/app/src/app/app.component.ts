@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { GridColumnType } from '@azlabsjs/ngx-clr-smart-grid';
 import {
   FormsClient,
@@ -17,7 +17,7 @@ export class AppComponent {
   form$ = this.client.get(220);
 
   //
-  control = new FormControl();
+  control = new UntypedFormControl();
 
   // Columns configuration
   public columns: GridColumnType[] = [

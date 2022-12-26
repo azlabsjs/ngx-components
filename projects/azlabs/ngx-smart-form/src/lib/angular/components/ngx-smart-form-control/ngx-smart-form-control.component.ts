@@ -3,7 +3,7 @@ import {
   InputTypes,
   InputOptionsInterface,
 } from '@azlabsjs/smart-form-core';
-import { AbstractControl, FormControl } from '@angular/forms';
+import { AbstractControl, UntypedFormControl } from '@angular/forms';
 import {
   Component,
   Input,
@@ -54,7 +54,7 @@ export class NgxSmartFormControlComponent implements OnDestroy, OnInit {
   @Input() describe = true;
   @Input() inputConfig!: InputConfigInterface;
   @Input() options!: InputOptionsInterface;
-  @Input() control!: AbstractControl & FormControl;
+  @Input() control!: AbstractControl & UntypedFormControl;
   //#endregion Component inputs
 
   //#region Component outputs

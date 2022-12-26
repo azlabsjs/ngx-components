@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AbstractControl, FormBuilder } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder } from '@angular/forms';
 import {
   FormConfigInterface,
   InputConfigInterface,
@@ -12,7 +12,7 @@ export class ReactiveFormBuilderBrige
   implements AngularReactiveFormBuilderBridge
 {
   // Creates and instance of the Angular reactive form bridge
-  constructor(public readonly builder: FormBuilder) {}
+  constructor(public readonly builder: UntypedFormBuilder) {}
 
   group(state: FormConfigInterface | InputConfigInterface[]): AbstractControl {
     if (state) {

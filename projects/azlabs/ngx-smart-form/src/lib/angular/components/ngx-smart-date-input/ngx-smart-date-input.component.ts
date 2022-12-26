@@ -6,7 +6,7 @@ import {
   LOCALE_ID,
   TemplateRef,
 } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { JSDate } from '@azlabsjs/js-datetime';
 import { DateInput } from '@azlabsjs/smart-form-core';
 
@@ -32,7 +32,7 @@ import { DateInput } from '@azlabsjs/smart-form-core';
   ],
 })
 export class NgxSmartDateInputComponent {
-  @Input() control!: FormControl;
+  @Input() control!: UntypedFormControl;
   @Input() describe = true;
   @Input() inputConfig!: DateInput;
   today = JSDate.format();

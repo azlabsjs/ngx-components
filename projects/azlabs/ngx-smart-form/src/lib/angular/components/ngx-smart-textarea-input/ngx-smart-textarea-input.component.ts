@@ -1,5 +1,5 @@
 import { Component, Input, ContentChild, TemplateRef } from '@angular/core';
-import { AbstractControl, FormControl } from '@angular/forms';
+import { AbstractControl, UntypedFormControl } from '@angular/forms';
 import { TextAreaInput } from '@azlabsjs/smart-form-core';
 
 @Component({
@@ -15,7 +15,7 @@ import { TextAreaInput } from '@azlabsjs/smart-form-core';
 })
 export class DynamicTextAreaInputComponent {
   //#region Component inputs
-  @Input() control!: AbstractControl & FormControl;
+  @Input() control!: AbstractControl & UntypedFormControl;
   @Input() describe = true;
   @Input() inputConfig!: TextAreaInput;
   @ContentChild('input') inputRef!: TemplateRef<any>;
