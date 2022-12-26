@@ -2,13 +2,13 @@
   "name": "@azlabsjs/ngx-smart-form",
   "version": "0.13.29",
   "peerDependencies": {
-    "@angular/common": "^13.0.0",
-    "@angular/core": "^13.0.0",
-    "@angular/forms": "^13.0.0",
+    "@angular/common": "^14.0",
+    "@angular/core": "^14.0",
+    "@angular/forms": "^14.0",
     "@ng-select/ng-select": "^8.0",
     "@clr/angular": "^13.0",
-    "@azlabsjs/ngx-intl-tel-input": "^0.13.11",
-    "@azlabsjs/ngx-dropzone": "^0.13.11",
+    "@azlabsjs/ngx-intl-tel-input": "^0.14",
+    "@azlabsjs/ngx-dropzone": "^0.14",
     "@azlabsjs/smart-form-core": "^0.1.25",
     "@azlabsjs/requests": "^0.2.0",
     "@azlabsjs/uploader": "^0.2.1"
@@ -30,5 +30,5 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/@azlabsjs"
   },
-  "homepage": "https://github.com/azlabsjs/ngx-components/blob/ng-v13/projects/azlabs/ngx-smart-form/README.md"
+  "homepage": "https://github.com/azlabsjs/ngx-components/blob/ng-v14/projects/azlabs/ngx-smart-form/README.md"
 }
