@@ -1,5 +1,4 @@
 import {
-  AfterContentInit,
   AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -15,31 +14,30 @@ import {
   TemplateRef,
 } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
-import { EMPTY, from, lastValueFrom, Observable, Subject } from 'rxjs';
-import { takeUntil, tap } from 'rxjs/operators';
+import { HTTPRequestMethods } from '@azlabsjs/requests';
 import {
   FormConfigInterface,
-  InputGroup,
   InputConfigInterface,
+  InputGroup,
 } from '@azlabsjs/smart-form-core';
+import { EMPTY, Observable, Subject, from, lastValueFrom } from 'rxjs';
+import { takeUntil, tap } from 'rxjs/operators';
+import { RequestClient } from '../../../http';
 import {
-  AngularReactiveFormBuilderBridge,
-  HTTP_REQUEST_CLIENT,
-} from '../../types';
-import {
-  cloneAbstractControl,
   ComponentReactiveFormHelpers,
+  cloneAbstractControl,
   controlAttributesDataBindings,
-  useHiddenAttributeSetter,
   setControlsAttributes,
+  useHiddenAttributeSetter,
 } from '../../helpers';
 import {
   ANGULAR_REACTIVE_FORM_BRIDGE,
+  AngularReactiveFormBuilderBridge,
   BindingInterface,
   ControlsStateMap,
   FormComponentInterface,
+  HTTP_REQUEST_CLIENT,
 } from '../../types';
-import { RequestClient } from '../../../http';
 
 @Component({
   selector: 'ngx-smart-form',
@@ -106,6 +104,7 @@ export class NgxSmartFormComponent
   @Input() state!: { [index: string]: any };
   @Input() autoupload: boolean = false;
   @Input() submitupload: boolean = false;
+  @Input() action: HTTPRequestMethods = 'POST';
   //#endregion Component inputs
 
   //#region Component outputs
@@ -203,7 +202,7 @@ export class NgxSmartFormComponent
         from(
           (this.client as RequestClient).request(
             path || 'http://localhost',
-            'POST',
+            this.action ?? 'POST',
             this.formGroup.getRawValue()
           )
         )
@@ -307,8 +306,9 @@ export class NgxSmartFormComponent
       };
       this.formGroup = formgroup as FormGroup;
       for (const name in this.formGroup.controls) {
-        this.formGroup.get(name)?.valueChanges
-          .pipe(
+        this.formGroup
+          .get(name)
+          ?.valueChanges.pipe(
             tap((state) =>
               this.handleControlChanges(
                 state,

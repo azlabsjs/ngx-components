@@ -1,52 +1,44 @@
-import {
-  NgModule,
-  APP_INITIALIZER,
-  ModuleWithProviders,
-  Provider,
-  Injector,
-} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgSelectModule } from '@ng-select/ng-select';
-import { ClarityModule } from '@clr/angular';
 import {
-  DropzoneConfig,
-  DropzoneDict,
+  APP_INITIALIZER,
+  Injector,
+  ModuleWithProviders,
+  NgModule,
+  Provider,
+} from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
   DROPZONE_CONFIG,
   DROPZONE_DICT,
+  DropzoneConfig,
+  DropzoneDict,
   NgxDropzoneModule,
   useDefaultDictionary,
 } from '@azlabsjs/ngx-dropzone';
 import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
+import { HTTPRequest, HTTPResponse } from '@azlabsjs/requests';
+import { CacheProvider } from '@azlabsjs/smart-form-core';
+import { ClarityModule } from '@clr/angular';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { ObservableInput, from, lastValueFrom, of } from 'rxjs';
 import {
-  CACHE_PROVIDER,
-  DYNAMIC_FORM_LOADER,
-  FormHttpLoader,
-  FormsCacheProvider,
-  ReactiveFormBuilderBrige,
-} from './services';
-import { SafeHTMLPipe, TemplateMessagesPipe } from './pipes';
-import {
-  FORM_CLIENT,
-  ANGULAR_REACTIVE_FORM_BRIDGE,
-  INPUT_OPTIONS_CLIENT,
-  HTTP_REQUEST_CLIENT,
-  TEMPLATE_DICTIONARY,
-  UPLOADER_OPTIONS,
-  API_BINDINGS_ENDPOINT,
-  API_HOST,
-  InterceptorFactory,
-  UploadOptionsType,
-} from './types';
-import { JSONFormsClient } from './services/client';
+  OptionsQueryConfigType,
+  createSelectOptionsQuery,
+  createSubmitHttpHandler,
+} from '../http';
 import {
   DynamicTextAreaInputComponent,
+  NgxSmartArrayAddButtonComponent,
+  NgxSmartArrayCloseButtonComponent,
   NgxSmartCheckBoxComponent,
   NgxSmartDateInputComponent,
+  NgxSmartDzComponent,
   NgxSmartFileInputComponent,
   NgxSmartFormArrayChildComponent,
   NgxSmartFormArrayComponent,
   NgxSmartFormComponent,
+  NgxSmartFormControlArrayChildComponent,
+  NgxSmartFormControlArrayComponent,
   NgxSmartFormControlComponent,
   NgxSmartFormGroupComponent,
   NgxSmartFormGroupHeaderPipe,
@@ -54,26 +46,34 @@ import {
   NgxSmartPasswordInputComponent,
   NgxSmartRadioInputComponent,
   NgxSmartSelectInputComponent,
+  NgxSmartTimeInputComponent,
   PhoneInputComponent,
   TextInputComponent,
-  NgxSmartTimeInputComponent,
-  NgxSmartDzComponent,
-  NgxSmartArrayCloseButtonComponent,
-  NgxSmartArrayAddButtonComponent,
-  NgxSmartFormControlArrayChildComponent,
-  NgxSmartFormControlArrayComponent,
 } from './components';
-import { FetchOptionsDirective, HTMLFileInputDirective } from './directives';
-import {
-  createSelectOptionsQuery,
-  createSubmitHttpHandler,
-  OptionsQueryConfigType,
-} from '../http';
-import { from, lastValueFrom, ObservableInput, of } from 'rxjs';
-import { useDefaultTemplateText } from './helpers';
-import { CacheProvider } from '@azlabsjs/smart-form-core';
-import { HTTPRequest, HTTPResponse } from '@azlabsjs/requests';
 import { NgxUploadsSubjectService } from './components/ngx-smart-file-input/ngx-uploads-subject.service';
+import { FetchOptionsDirective, HTMLFileInputDirective } from './directives';
+import { useDefaultTemplateText } from './helpers';
+import { SafeHTMLPipe, TemplateMessagesPipe } from './pipes';
+import {
+  CACHE_PROVIDER,
+  DYNAMIC_FORM_LOADER,
+  FormHttpLoader,
+  FormsCacheProvider,
+  ReactiveFormBuilderBrige,
+} from './services';
+import { JSONFormsClient } from './services/client';
+import {
+  ANGULAR_REACTIVE_FORM_BRIDGE,
+  API_BINDINGS_ENDPOINT,
+  API_HOST,
+  FORM_CLIENT,
+  HTTP_REQUEST_CLIENT,
+  INPUT_OPTIONS_CLIENT,
+  InterceptorFactory,
+  TEMPLATE_DICTIONARY,
+  UPLOADER_OPTIONS,
+  UploadOptionsType,
+} from './types';
 
 type FormApiServerConfigs = {
   api: {
@@ -225,13 +225,12 @@ export class NgxSmartFormModule {
       },
       {
         provide: HTTP_REQUEST_CLIENT,
-        useFactory: (injector: Injector) => {
-          return createSubmitHttpHandler(
+        useFactory: (injector: Injector) =>
+          createSubmitHttpHandler(
             injector,
             configs!.serverConfigs!.api.host,
             configs.submitRequest?.interceptorFactory
-          );
-        },
+          ),
         deps: [Injector],
       },
       {

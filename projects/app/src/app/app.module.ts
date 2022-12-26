@@ -1,17 +1,17 @@
 import { Injector, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { AppComponent } from './app.component';
-import { CdsModule } from '@cds/angular';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ClarityIcons, uploadCloudIcon } from '@cds/core/icon';
-import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
-import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
 import { HttpClientModule } from '@angular/common/http';
-import { NgxClrSmartGridModule } from '@azlabsjs/ngx-clr-smart-grid';
-import { NgxSlidesModule } from '@azlabsjs/ngx-slides';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgxClrSmartGridModule } from '@azlabsjs/ngx-clr-smart-grid';
+import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
+import { NgxSlidesModule } from '@azlabsjs/ngx-slides';
+import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
 import { HTTPResponse } from '@azlabsjs/requests';
+import { CdsModule } from '@cds/angular';
+import { ClarityIcons, uploadCloudIcon } from '@cds/core/icon';
+import { AppComponent } from './app.component';
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
@@ -31,7 +31,7 @@ ClarityIcons.addIcons(uploadCloudIcon);
       // Select, Checkbox and Radio button from server
       serverConfigs: {
         api: {
-          host: 'http://localhost:3000',
+          host: 'http://localhost:4000',
           // Custom path on the server else the default is used
           bindings: 'api/v2/bindings',
           // Files upload url
