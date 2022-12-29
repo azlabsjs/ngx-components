@@ -1,9 +1,9 @@
-import { AbstractControl } from '@angular/forms';
-import { Observable, ObservableInput } from 'rxjs';
+import { AbstractControl, FormGroup } from '@angular/forms';
 import {
   FormConfigInterface,
   InputConfigInterface,
 } from '@azlabsjs/smart-form-core';
+import { Observable, ObservableInput } from 'rxjs';
 
 export type ControlsStateMap = {
   [index: string]: { onlySelf: boolean; emitEvent: boolean } | undefined;
@@ -113,4 +113,15 @@ export interface FormComponentInterface {
    * removing any validation failure, and modifications
    */
   reset(): void;
+}
+
+/**
+ * Provides extended interface of the base {@see FormComponentInterface} type for
+ * angular reactive form based components
+ */
+export interface ReactiveFormComponentInterface extends FormComponentInterface {
+  /**
+   * Internal reactive form component interface
+   */
+  formGroup: FormGroup;
 }
