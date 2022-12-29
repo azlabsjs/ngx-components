@@ -35,8 +35,8 @@ import {
   AngularReactiveFormBuilderBridge,
   BindingInterface,
   ControlsStateMap,
-  FormComponentInterface,
   HTTP_REQUEST_CLIENT,
+  ReactiveFormComponentInterface,
 } from '../../types';
 
 @Component({
@@ -86,10 +86,15 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFormComponent
-  implements FormComponentInterface, AfterViewInit, OnDestroy
+  implements ReactiveFormComponentInterface, AfterViewInit, OnDestroy
 {
   //#region Local properties
-  formGroup!: UntypedFormGroup;
+  /** @internal */
+  _formGroup!: UntypedFormGroup;
+
+  get formGroup() {
+    return this._formGroup;
+  }
   //#endregion Local properties
 
   //#region Component inputs
@@ -143,7 +148,7 @@ export class NgxSmartFormComponent
 
   //#region FormComponent interface Methods definitions
   controlValueChanges(control: string): Observable<unknown> {
-    const control_ = this.formGroup?.get(control);
+    const control_ = this._formGroup?.get(control);
     if (control_) {
       return control_.valueChanges;
     }
@@ -151,34 +156,34 @@ export class NgxSmartFormComponent
   }
 
   getControlValue(control: string, _default?: any): unknown {
-    const value = this.formGroup.get(control)?.value;
+    const value = this._formGroup.get(control)?.value;
     return value || _default || undefined;
   }
   setControlValue(control: string, value: any): void {
-    this.formGroup.get(control)?.setValue(value);
+    this._formGroup.get(control)?.setValue(value);
   }
   disableControls(controls: ControlsStateMap): void {
     for (const [key, entry] of Object.entries(controls)) {
-      this.formGroup.get(key)?.disable(entry);
+      this._formGroup.get(key)?.disable(entry);
     }
   }
   enableControls(controls: ControlsStateMap): void {
     for (const [key, entry] of Object.entries(controls)) {
-      this.formGroup.get(key)?.enable(entry);
+      this._formGroup.get(key)?.enable(entry);
     }
   }
 
   //
   addControl(name: string, control: AbstractControl): void {
-    if (this.formGroup.get(name)) {
-      return this.formGroup.get(name)?.setValue(control.value);
+    if (this._formGroup.get(name)) {
+      return this._formGroup.get(name)?.setValue(control.value);
     }
-    this.formGroup.addControl(name, control);
+    this._formGroup.addControl(name, control);
   }
 
   //
   getControl(name: string): AbstractControl | undefined {
-    return this.formGroup.get(name) ?? undefined;
+    return this._formGroup.get(name) ?? undefined;
   }
 
   //
@@ -189,7 +194,7 @@ export class NgxSmartFormComponent
     this.cdRef.detectChanges();
     // We simply return without performing any further action
     // if the validation fails
-    if (!this.formGroup.valid) {
+    if (!this._formGroup.valid) {
       return;
     }
     const path = this.path || this.form.endpointURL;
@@ -203,7 +208,7 @@ export class NgxSmartFormComponent
           (this.client as RequestClient).request(
             path || 'http://localhost',
             this.action ?? 'POST',
-            this.formGroup.getRawValue()
+            this._formGroup.getRawValue()
           )
         )
       );
@@ -218,7 +223,7 @@ export class NgxSmartFormComponent
         'autoSubmit input property must only be true if the form endpointURL is configured or an Http Client has been registered!'
       );
     } else {
-      this.submit.emit(this.formGroup.getRawValue());
+      this.submit.emit(this._formGroup.getRawValue());
     }
     event.preventDefault();
   }
@@ -241,11 +246,11 @@ export class NgxSmartFormComponent
       this._destroy$.next();
       // We create an instance of angular Reactive Formgroup instance
       // from input configurations
-      this.formGroup = this.builder.group(value) as UntypedFormGroup;
+      this._formGroup = this.builder.group(value) as UntypedFormGroup;
       // Set input bindings
       this.setBindings();
       // Subscribe to formgroup changes
-      this.formGroup?.valueChanges
+      this._formGroup?.valueChanges
         .pipe(
           tap((state) => this.formGroupChange.emit(state)),
           takeUntil(this._destroy$)
@@ -254,7 +259,7 @@ export class NgxSmartFormComponent
       // Set the form value if it's defined
       if (this.state) {
         this.setFormValue(
-          this.formGroup,
+          this._formGroup,
           this.state,
           this.form.controlConfigs ?? []
         );
@@ -270,14 +275,14 @@ export class NgxSmartFormComponent
 
   //
   validateForm(): void {
-    ComponentReactiveFormHelpers.validateFormGroupFields(this.formGroup);
+    ComponentReactiveFormHelpers.validateFormGroupFields(this._formGroup);
   }
 
   //
   reset(): void {
-    this.formGroup.reset();
+    this._formGroup.reset();
     for (const control of this.form.controlConfigs ?? []) {
-      this.formGroup.get(control.name)?.setValue(control.value);
+      this._formGroup.get(control.name)?.setValue(control.value);
     }
   }
   //#endregion FormComponent interface Methods definitions
@@ -296,17 +301,17 @@ export class NgxSmartFormComponent
   }
 
   setBindings() {
-    if (this.form && this.formGroup) {
+    if (this.form && this._formGroup) {
       const [bindings, formgroup, controls] = controlAttributesDataBindings(
         this.form.controlConfigs ?? []
-      )(this.formGroup);
+      )(this._formGroup);
       this.form = {
         ...this.form,
         controlConfigs: controls as InputConfigInterface[],
       };
-      this.formGroup = formgroup as UntypedFormGroup;
-      for (const name in this.formGroup.controls) {
-        this.formGroup
+      this._formGroup = formgroup as UntypedFormGroup;
+      for (const name in this._formGroup.controls) {
+        this._formGroup
           .get(name)
           ?.valueChanges.pipe(
             tap((state) =>
@@ -336,8 +341,8 @@ export class NgxSmartFormComponent
           current,
           event,
           useHiddenAttributeSetter
-        )(this.formGroup);
-        this.formGroup = control as UntypedFormGroup;
+        )(this._formGroup);
+        this._formGroup = control as UntypedFormGroup;
         this.form = { ...this.form, controlConfigs: controls };
       }
     }
