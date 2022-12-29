@@ -2,6 +2,15 @@
 
 Smart grid component is an angular component, using clarity datagrid component under the hood, that is highly configurable using angular `ng-template` directive for content projection and Javascript object for columns, datagrid and data configurations.
 
+## Dependencies
+
+| @azlabsjs/ngx-clr-smart-grid | @azlabsjs/js-object    | @azlabsjs/js-datetime      | @azlabsjs/js-datetime      | Angular |
+| ---------------------------- | ---------------------- | ---------------------------| ---------------------------| ------- |
+| ^0.13.x                      | ^0.1.x                 | ^0.1.x                     | ^0.1.x                     | ^13.0   |
+| ^0.14.x                      | ^0.1.x                 | ^0.1.x                     | ^0.1.x                     | ^14.0   |
+
+## Usage
+
 Basically the implementation comes with a module that wrap required component and directives for the module to work. In your root application module, or any child module add this to your imports:
 
 ```ts
@@ -143,6 +152,72 @@ export class AppComponent {
 Note: For `transform` property as string, basic angular pipes are supported as well as some custom pipes:
 
 > 'date', 'datetime', 'timeago', 'month', 'masked', 'safecontent', 'saferesource', 'uppercase', 'lowercase', 'currency', 'decimal', 'json', 'percent', 'slice', 'async'.
+
+* Nested properties
+
+In some scenarios, business requirements might require printing nested properties. To do so simply separated the top level from nested properties using `.` (dot) character. An example of such scenario can be found below:
+
+```ts
+export class Test Component {
+
+  // ...
+
+  // Columns configuration
+  public columns: GridColumnType[] = [
+    {
+      title: 'Nom',
+      label: 'lastname',
+    },
+    {
+      title: 'Prénoms',
+      label: 'firstname',
+    },
+    {
+      title: 'Type',
+      label: 'type',
+    },
+    {
+      title: 'Téléphone',
+      label: 'address.phone',
+    },
+    {
+      title: 'Genre',
+      label: 'sex',
+    },
+    {
+      title: 'Nationalité',
+      label: 'address.nationality',
+    },
+  ];
+  // Test data
+  public data = [
+    {
+      id: 1,
+      firstname: 'RODRIGUE',
+      lastname: 'KOLANI',
+      type: 'INDIVIDUEL',
+      sex: 'M',
+      address: {
+        phone: '+22892146591',
+        nationality: 'TG',
+      },
+    },
+    {
+      id: 3,
+      firstname: 'ANIKA',
+      lastname: 'AGBAGBE',
+      sex: 'F',
+      type: 'INDIVIDUEL',
+      address: {
+        phone: '+22898757475',
+        nationality: 'TG',
+      },
+    },
+  ];
+
+  //...
+}
+```
 
 * Data grid customization
 
