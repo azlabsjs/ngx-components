@@ -1,10 +1,6 @@
 <div class="container">
-  <!-- <ngx-clr-smart-grid
-    [columns]="columns"
-    [data]="data"
-    (dgRefresh)="onDgRefresh($event)"
-    (selectedChange)="onSelectedChanges($event)"
-  ></ngx-clr-smart-grid> -->
+  <ngx-clr-smart-grid [columns]="columns" [data]="data" (dgRefresh)="onDgRefresh($event)"
+    (selectedChange)="onSelectedChanges($event)"></ngx-clr-smart-grid>
   <ng-container *ngIf="form$ | async as form">
     <ngx-smart-form [submitable]="true" [autoupload]="true" (submit)="ngxFormSubmit($event)" [form]="form"
       [autoSubmit]="true" [path]="'http://localhost:3000/customers'">

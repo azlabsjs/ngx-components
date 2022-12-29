@@ -1,11 +1,8 @@
 import { Component, Inject } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { GridColumnType } from '@azlabsjs/ngx-clr-smart-grid';
-import {
-  FormsClient,
-  FORM_CLIENT,
-} from '@azlabsjs/ngx-smart-form';
 import { createSlide } from '@azlabsjs/ngx-slides';
+import { FORM_CLIENT, FormsClient } from '@azlabsjs/ngx-smart-form';
 
 @Component({
   selector: 'app-root',
@@ -35,7 +32,7 @@ export class AppComponent {
     },
     {
       title: 'Téléphone',
-      label: 'phone',
+      label: 'address.phone',
     },
     {
       title: 'Genre',
@@ -43,7 +40,7 @@ export class AppComponent {
     },
     {
       title: 'Nationalité',
-      label: 'nationality',
+      label: 'address.nationality',
     },
   ];
   // Test data
@@ -53,27 +50,33 @@ export class AppComponent {
       firstname: 'RODRIGUE',
       lastname: 'KOLANI',
       type: 'INDIVIDUEL',
-      phone: '+22892146591',
       sex: 'M',
-      nationality: 'TG',
+      address: {
+        phone: '+22892146591',
+        nationality: 'TG',
+      },
     },
     {
       id: 2,
       firstname: 'SONATA',
       lastname: 'PAKIONA',
       type: 'INDIVIDUEL',
-      phone: '+22890250454',
+      address: {
+        phone: '+22890250454',
+        nationality: 'TG'
+      },
       sex: 'M',
-      nationality: 'TG',
     },
     {
       id: 3,
       firstname: 'ANIKA',
       lastname: 'AGBAGBE',
-      phone: '+22898757475',
-      type: 'INDIVIDUEL',
       sex: 'F',
-      nationality: 'TG',
+      type: 'INDIVIDUEL',
+      address: {
+        phone: '+22898757475',
+        nationality: 'TG',
+      },
     },
   ];
 

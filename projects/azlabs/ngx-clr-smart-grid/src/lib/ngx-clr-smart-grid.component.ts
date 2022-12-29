@@ -6,6 +6,7 @@ import {
   Output,
   TemplateRef
 } from '@angular/core';
+import { JSObject } from '@azlabsjs/js-object';
 import { ClrDatagridSortOrder, ClrDatagridStateInterface } from '@clr/angular';
 import { GridColumnType, GridConfigType } from './core/types';
 
@@ -33,6 +34,8 @@ export class NgxClrSmartGridComponent {
   dgDetailBodyRef!: TemplateRef<any>;
   @ContentChild('dgActionBar', { static: false })
   dgActionBarRef!: TemplateRef<any>;
+  @ContentChild('dgRow', {static: false})
+  dgRowRef!: TemplateRef<any>;
   //! Projected Templates
 
   // Datagrid configuration Input
@@ -108,5 +111,9 @@ export class NgxClrSmartGridComponent {
   // Listen to internal grid component select changes and notify parent component
   onSelectedStateChanges(state: unknown[] | unknown) {
     this.selectedChange.emit(state);
+  }
+
+  geetCellValue(element: Record<string, any>, key: string) {
+    return JSObject.getProperty(element, key) ?? '';
   }
 }

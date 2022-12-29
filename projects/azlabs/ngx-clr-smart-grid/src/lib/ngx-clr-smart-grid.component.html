@@ -36,7 +36,7 @@
   <ng-container *ngIf="config.useServerPagination; else smart">
     <ng-container *ngFor="let item of data || []">
       <ng-container
-        *ngTemplateOutlet="rowTemplate; context: { $implicit: item }"
+        *ngTemplateOutlet="dgRowRef ?? rowTemplate; context: { $implicit: item }"
         ngProjectAs="clr-dg-row"
       ></ng-container>
     </ng-container>
@@ -45,7 +45,7 @@
   <ng-template #smart>
     <ng-container *clrDgItems="let item of data || []">
       <ng-container
-        *ngTemplateOutlet="rowTemplate; context: { $implicit: item }"
+        *ngTemplateOutlet="dgRowRef ?? rowTemplate; context: { $implicit: item }"
         ngProjectAs="clr-dg-row"
       ></ng-container>
     </ng-container>
@@ -67,7 +67,7 @@
       </clr-dg-action-overflow>
       <ng-container *ngFor="let column of columns">
         <clr-dg-cell [class]="column.style.class" [style]="column.style.styles">
-          {{ current[column.label] | data: column.transform }}
+          {{ geetCellValue(current, column.label) | data: column.transform }}
         </clr-dg-cell>
       </ng-container>
       <!-- USING ngProjectAs as recommended by the documentation -->
