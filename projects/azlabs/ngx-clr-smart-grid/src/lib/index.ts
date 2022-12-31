@@ -1,8 +1,7 @@
 // Export paginator types
 export {
   createDateQueryParamPipe,
-  PaginateItem,
-  projectPaginateQuery,
+  PaginateItem, PaginateResult, projectPaginateQuery,
   ProjectPaginateQueryOutputType,
   ProjectPaginateQueryParamType,
   QueryFiltersType
