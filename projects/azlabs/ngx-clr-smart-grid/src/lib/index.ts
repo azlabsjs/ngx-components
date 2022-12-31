@@ -1,9 +1,20 @@
-export { NgxClrGridSelectDirective } from './directives';
-export { NgxGridDataPipe } from './pipes';
-export { NgxClrSmartGridComponent } from './ngx-clr-smart-grid.component';
-export { NgxClrSmartGridModule } from './ngx-clr-smart-grid.module';
+// Export paginator types
 export {
-  GriSelectDirectiveInputType,
+  createDateQueryParamPipe,
+  PaginateItem,
+  projectPaginateQuery,
+  ProjectPaginateQueryOutputType,
+  ProjectPaginateQueryParamType,
+  QueryFiltersType
+} from './core/paginate';
+// Export datagrid types
+export {
   GridColumnType,
   GridConfigType,
+  GriSelectDirectiveInputType
 } from './core/types';
+export { NgxClrGridSelectDirective } from './directives';
+export { NgxClrSmartGridComponent } from './ngx-clr-smart-grid.component';
+export { NgxClrSmartGridModule } from './ngx-clr-smart-grid.module';
+export { NgxGridDataPipe } from './pipes';
+
