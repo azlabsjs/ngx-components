@@ -9,16 +9,16 @@ import {
   Output,
   TemplateRef,
   ViewChild,
-  ViewContainerRef,
+  ViewContainerRef
 } from '@angular/core';
 import { UntypedFormArray, UntypedFormControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
-import { tap, takeUntil } from 'rxjs/operators';
+import { takeUntil, tap } from 'rxjs/operators';
 import { cloneAbstractControl } from '../../helpers';
 import {
   AngularReactiveFormBuilderBridge,
-  ANGULAR_REACTIVE_FORM_BRIDGE,
+  ANGULAR_REACTIVE_FORM_BRIDGE
 } from '../../types';
 import { NgxSmartFormControlArrayChildComponent } from './ngx-smart-form-control-array-child.component';
 

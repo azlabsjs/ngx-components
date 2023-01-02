@@ -1,8 +1,6 @@
 export { createDateQueryParamPipe, projectPaginateQuery } from './helpers';
 export {
-    PaginateItem,
-    PaginateResult,
-    ProjectPaginateQueryOutputType,
+    PaginateItem, PaginateResult, ProjectPaginateQueryOutputType,
     ProjectPaginateQueryParamType,
     QueryFiltersType
 } from './types';

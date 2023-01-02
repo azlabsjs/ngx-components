@@ -1,8 +1,11 @@
+import { LowerCasePipe } from '@angular/common';
 import { Component, Inject } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
-import { GridColumnType } from '@azlabsjs/ngx-clr-smart-grid';
+import { createPipeTransform, GridColumnType } from '@azlabsjs/ngx-clr-smart-grid';
 import { createSlide } from '@azlabsjs/ngx-slides';
-import { FORM_CLIENT, FormsClient } from '@azlabsjs/ngx-smart-form';
+import {
+  FormsClient, FORM_CLIENT
+} from '@azlabsjs/ngx-smart-form';
 
 @Component({
   selector: 'app-root',
@@ -41,6 +44,7 @@ export class AppComponent {
     {
       title: 'Nationalité',
       label: 'address.nationality',
+      transform: createPipeTransform(this.lowercasePipe)
     },
   ];
   // Test data
@@ -87,7 +91,7 @@ export class AppComponent {
     createSlide(4, 'https://picsum.photos/id/1002/200/300'),
   ];
 
-  public constructor(@Inject(FORM_CLIENT) private client: FormsClient) {}
+  public constructor(@Inject(FORM_CLIENT) private client: FormsClient, private lowercasePipe: LowerCasePipe) {}
 
   // Listen to datagrid refresh events
   onDgRefresh(event: unknown) {

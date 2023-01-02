@@ -21,7 +21,6 @@ export type PaginateItem = { id: string | number } & Record<string, unknown>;
  */
 export type QueryFiltersType = { [index: string]: any }[];
 
-
 /**
  * Parameter type for projectPaginateQuery() query function
  */
