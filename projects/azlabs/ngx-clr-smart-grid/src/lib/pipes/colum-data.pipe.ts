@@ -1,16 +1,21 @@
-import { Pipe, PipeTransform } from '@angular/core';
 import {
-  UpperCasePipe,
-  LowerCasePipe,
-  CurrencyPipe,
+  AsyncPipe, CurrencyPipe,
   DecimalPipe,
-  JsonPipe,
-  PercentPipe,
-  SlicePipe,
-  AsyncPipe,
+  JsonPipe, LowerCasePipe, PercentPipe,
+  SlicePipe, UpperCasePipe
 } from '@angular/common';
-import { after, before } from '@azlabsjs/str';
+import { Pipe, PipeTransform } from '@angular/core';
 import { GetTimeAgo, JSDate, ParseMonth } from '@azlabsjs/js-datetime';
+import { after, before } from '@azlabsjs/str';
+
+/**
+ * Supported pipe transform type
+ */
+type PipeTransformType =
+  | string
+  | ((value: unknown) => unknown)
+  | undefined
+  | PipeTransform;
 
 function substr(value: string, start: number, length?: number) {
   if (typeof value !== 'string') {
@@ -48,22 +53,30 @@ export class NgxGridDataPipe implements PipeTransform {
    * @param transform
    * @returns
    */
-  transform(
-    value: any,
-    transform: string | ((value: unknown) => unknown) | undefined
-  ) {
+  transform(value: any, transform: PipeTransformType) {
     if (typeof transform === 'function') {
       return transform(value);
     }
     if (typeof transform === 'undefined' || transform === null) {
-      return value;
+      return value ?? '';
     }
-    const hasParams = transform.includes(':');
-    const pipe = hasParams ? before(':', transform) : transform;
+    // Return an empty string if the value is not defined
+    if (typeof value === 'undefined' || value === null) {
+      return '';
+    }
+    if (
+      typeof transform === 'object' &&
+      typeof transform.transform === 'function'
+    ) {
+      return transform.transform(value);
+    }
+    const _transform = transform as string;
+    const hasParams = _transform.includes(':');
+    const pipe = hasParams ? before(':', _transform) : transform;
     const params = hasParams
-      ? after(':', transform)
-          ?.split(',')
-          ?.map((x) => x.trim()) ?? []
+      ? after(':', _transform)
+          .split(',')
+          .map((x) => x.trim()) ?? []
       : [];
     switch (pipe) {
       case 'date':
@@ -101,12 +114,6 @@ export class NgxGridDataPipe implements PipeTransform {
     }
   }
 
-  /**
-   * Returns the masked content
-   *
-   * @param value
-   * @param length
-   */
   mask(value?: string, length: number = 5): string {
     return value ? `*******${substr(value, -length)}` : '*******';
   }

@@ -1,7 +1,9 @@
 // Export paginator types
 export {
   createDateQueryParamPipe,
-  PaginateItem, PaginateResult, projectPaginateQuery,
+  PaginateItem,
+  PaginateResult,
+  projectPaginateQuery,
   ProjectPaginateQueryOutputType,
   ProjectPaginateQueryParamType,
   QueryFiltersType
@@ -15,5 +17,5 @@ export {
 export { NgxClrGridSelectDirective } from './directives';
 export { NgxClrSmartGridComponent } from './ngx-clr-smart-grid.component';
 export { NgxClrSmartGridModule } from './ngx-clr-smart-grid.module';
-export { NgxGridDataPipe } from './pipes';
+export { createPipeFunction, NgxGridDataPipe } from './pipes';
 
