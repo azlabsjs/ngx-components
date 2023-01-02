@@ -7,7 +7,8 @@ import {
   TemplateRef
 } from '@angular/core';
 import { JSObject } from '@azlabsjs/js-object';
-import { ClrDatagridSortOrder, ClrDatagridStateInterface } from '@clr/angular';
+import { ClrDatagridSortOrder } from '@clr/angular';
+import { PaginateResult, ProjectPaginateQueryParamType } from './core/paginate';
 import { GridColumnType, GridConfigType } from './core/types';
 
 @Component({
@@ -16,12 +17,20 @@ import { GridColumnType, GridConfigType } from './core/types';
   styles: [],
 })
 export class NgxClrSmartGridComponent {
-  // Input properties
+  // #region Input properties
+  @Input() set pageResult(result: PaginateResult<any>) {
+    if (result) {
+      this.data = result.data ?? [];
+      this.total = result.total;
+    }
+  }
   @Input() selected!: unknown[] | any;
   @Input() data: { [index: string]: any }[] = [];
   @Input() loading: boolean = false;
   @Input() currentDetail!: unknown;
   @Input() total!: number;
+  @Input() placeholder!: string;
+  // #endregion Input properties
 
   // Projected Templates
   @ContentChild('dgActionOverflow', { static: false })
@@ -34,7 +43,7 @@ export class NgxClrSmartGridComponent {
   dgDetailBodyRef!: TemplateRef<any>;
   @ContentChild('dgActionBar', { static: false })
   dgActionBarRef!: TemplateRef<any>;
-  @ContentChild('dgRow', {static: false})
+  @ContentChild('dgRow', { static: false })
   dgRowRef!: TemplateRef<any>;
   //! Projected Templates
 
@@ -43,7 +52,7 @@ export class NgxClrSmartGridComponent {
     selectable: false,
     class: '',
     sizeOptions: [20, 50, 100, 150],
-    pageSize: 50,
+    pageSize: 20,
     selectableProp: '',
     preserveSelection: false,
     singleSelection: false,
@@ -105,7 +114,7 @@ export class NgxClrSmartGridComponent {
 
   // Output definitions
   @Output() selectedChange = new EventEmitter<unknown[] | unknown>();
-  @Output() dgRefresh = new EventEmitter<ClrDatagridStateInterface<unknown>>();
+  @Output() dgRefresh = new EventEmitter<ProjectPaginateQueryParamType<unknown>>();
   @Output() detailChange = new EventEmitter<unknown>();
 
   // Listen to internal grid component select changes and notify parent component
@@ -115,5 +124,9 @@ export class NgxClrSmartGridComponent {
 
   geetCellValue(element: Record<string, any>, key: string) {
     return JSObject.getProperty(element, key) ?? '';
+  }
+
+  onClrDgRefresh(event: ProjectPaginateQueryParamType) {
+    this.dgRefresh.emit(event);
   }
 }

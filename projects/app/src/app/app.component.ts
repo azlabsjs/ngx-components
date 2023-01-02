@@ -84,6 +84,11 @@ export class AppComponent {
     },
   ];
 
+  pageResult = {
+    data: this.data.slice(1),
+    total: this.data.length
+  };
+
   slides = [
     createSlide(1, 'https://picsum.photos/id/1/200/300'),
     createSlide(2, 'https://picsum.photos/id/1000/200/300'),
