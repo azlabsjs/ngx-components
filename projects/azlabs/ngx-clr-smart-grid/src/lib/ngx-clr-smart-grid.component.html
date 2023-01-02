@@ -6,7 +6,7 @@
   }"
   [(selectState)]="selected"
   [class]="config.class || ''"
-  (clrDgRefresh)="dgRefresh.emit($event)"
+  (clrDgRefresh)="onClrDgRefresh($event)"
   [clrDgPreserveSelection]="config.preserveSelection || false"
   [clrDgLoading]="loading"
   (selectStateChange)="onSelectedStateChanges($event)"
@@ -89,7 +89,7 @@
   <!-- DATAGRID PLACEHOLDER WHEN data IS EMPTY -->
   <!-- DEFAULT -->
   <ng-template #defaultPlaceHolder>
-    <clr-dg-placeholder>We couldn't find any data!</clr-dg-placeholder>
+    <clr-dg-placeholder>{{ placeholder || 'We couldn\'t find any data!'}}</clr-dg-placeholder>
   </ng-template>
   <!-- DEFAULT -->
   <ng-container
