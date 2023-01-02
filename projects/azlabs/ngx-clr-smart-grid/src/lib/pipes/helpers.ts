@@ -11,7 +11,7 @@ type ExceptFirst<T extends unknown[]> = T extends [any, ...infer U] ? U : never;
  * @example
  * ```ts
  * export class MyComponent {
- *     private readonly pipe = createDBSyncPipe(this.pipe, 'users');
+ *     private readonly pipe = createPipeTransform(this.pipe, 'users');
  *
  *     constructor(private pipe: DBSyncPipe) { }
  * }
