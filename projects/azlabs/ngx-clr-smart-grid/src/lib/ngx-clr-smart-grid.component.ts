@@ -18,7 +18,7 @@ import { GridColumnType, GridConfigType } from './core/types';
 })
 export class NgxClrSmartGridComponent {
   // #region Input properties
-  @Input() set pageResult(result: PaginateResult<any>) {
+  @Input() set pageResult(result: PaginateResult<any> | undefined | null) {
     if (result) {
       this.data = result.data ?? [];
       this.total = result.total;
@@ -114,7 +114,9 @@ export class NgxClrSmartGridComponent {
 
   // Output definitions
   @Output() selectedChange = new EventEmitter<unknown[] | unknown>();
-  @Output() dgRefresh = new EventEmitter<ProjectPaginateQueryParamType<unknown>>();
+  @Output() dgRefresh = new EventEmitter<
+    ProjectPaginateQueryParamType<unknown>
+  >();
   @Output() detailChange = new EventEmitter<unknown>();
 
   // Listen to internal grid component select changes and notify parent component

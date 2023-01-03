@@ -7,9 +7,10 @@ import {
   LowerCasePipe,
   PercentPipe,
   SlicePipe,
-  UpperCasePipe,
+  UpperCasePipe
 } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { AzlCachePipe } from '@azlabsjs/ngx-azl-cache';
 import { ClarityModule } from '@clr/angular';
 import { NgxClrGridSelectDirective } from './directives';
 import { NgxClrSmartGridComponent } from './ngx-clr-smart-grid.component';
@@ -36,6 +37,7 @@ import { NgxGridDataPipe } from './pipes';
     PercentPipe,
     SlicePipe,
     AsyncPipe,
+    AzlCachePipe,
   ],
 })
 export class NgxClrSmartGridModule {}

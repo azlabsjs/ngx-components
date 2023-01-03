@@ -27,6 +27,7 @@
     "@azlabsjs/functional": "^0.1.10",
     "@azlabsjs/js-datetime": "^0.1.11",
     "@azlabsjs/js-object": "^0.1.10",
+    "@azlabsjs/ngx-azl-cache": "^0.13.1",
     "@azlabsjs/requests": "^0.2.1",
     "@azlabsjs/smart-form-core": "^0.1.25",
     "@azlabsjs/str": "^0.1.10",
@@ -40,25 +41,25 @@
     "@ng-select/ng-select": "^8.0.0",
     "dropzone": "^6.0.0-beta.2",
     "google-libphonenumber": "^3.2.28",
-    "rxjs": "~7.5.0",
+    "rxjs": "^7.5.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.11.4"
+    "zone.js": "^0.11.4"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^13.0.0",
-    "@angular/cli": "~13.0.0",
+    "@angular/cli": "^13.0.0",
     "@angular/compiler-cli": "^13.0.0",
     "@types/dropzone": "^5.7.4",
     "@types/google-libphonenumber": "^7.4.23",
-    "@types/jasmine": "~4.0.0",
-    "jasmine-core": "~4.1.0",
+    "@types/jasmine": "^4.0.0",
+    "jasmine-core": "^4.1.0",
     "json-server": "^0.17.0",
-    "karma": "~6.3.0",
-    "karma-chrome-launcher": "~3.1.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.0.0",
-    "karma-jasmine-html-reporter": "~1.7.0",
+    "karma": "^6.3.0",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-coverage": "^2.2.0",
+    "karma-jasmine": "^5.0.0",
+    "karma-jasmine-html-reporter": "^1.7.0",
     "ng-packagr": "^13.0.0",
-    "typescript": "~4.5.2"
+    "typescript": "^4.5.2"
   }
 }

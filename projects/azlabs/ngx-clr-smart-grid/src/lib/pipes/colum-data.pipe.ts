@@ -1,11 +1,16 @@
 import {
-  AsyncPipe, CurrencyPipe,
+  AsyncPipe,
+  CurrencyPipe,
   DecimalPipe,
-  JsonPipe, LowerCasePipe, PercentPipe,
-  SlicePipe, UpperCasePipe
+  JsonPipe,
+  LowerCasePipe,
+  PercentPipe,
+  SlicePipe,
+  UpperCasePipe
 } from '@angular/common';
 import { Pipe, PipeTransform } from '@angular/core';
 import { GetTimeAgo, JSDate, ParseMonth } from '@azlabsjs/js-datetime';
+import { AzlCachePipe } from '@azlabsjs/ngx-azl-cache';
 import { after, before } from '@azlabsjs/str';
 
 /**
@@ -35,6 +40,9 @@ function substr(value: string, start: number, length?: number) {
   name: 'data',
 })
 export class NgxGridDataPipe implements PipeTransform {
+  /**
+   * Creates an instance {@see NgxGridDataPipe} pipe
+   */
   constructor(
     private uppercasePipe: UpperCasePipe,
     private lowerCasePipe: LowerCasePipe,
@@ -43,7 +51,8 @@ export class NgxGridDataPipe implements PipeTransform {
     private jsonPipe: JsonPipe,
     private percentPipe: PercentPipe,
     private slicePipe: SlicePipe,
-    private asyncPipe: AsyncPipe
+    private asyncPipe: AsyncPipe,
+    private azlcachePipe: AzlCachePipe
   ) {}
 
   /**
@@ -106,6 +115,13 @@ export class NgxGridDataPipe implements PipeTransform {
           value,
           +params[0],
           +params[1] ?? undefined
+        );
+      case 'azlcache':
+        return this.azlcachePipe.transform(
+          value,
+          params[0],
+          params[1] ?? 'id',
+          params[2] ?? 'label'
         );
       case 'async':
         return this.asyncPipe.transform(value);
