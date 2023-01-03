@@ -98,7 +98,7 @@ export class NgxClrSmartGridComponent {
                 : column.style.class || '',
               styles: Array.isArray(column.style.styles)
                 ? column.style.styles.join(' ')
-                : column.style.class || '',
+                : column.style.styles || '',
             }
           : {},
         type: column.type || 'string',
