@@ -27,7 +27,7 @@
     "@azlabsjs/functional": "^0.1.10",
     "@azlabsjs/js-datetime": "^0.1.11",
     "@azlabsjs/js-object": "^0.1.10",
-    "@azlabsjs/ngx-azl-cache": "^0.13.1",
+    "@azlabsjs/ngx-azl-cache": "^0.13.2",
     "@azlabsjs/requests": "^0.2.1",
     "@azlabsjs/smart-form-core": "^0.1.25",
     "@azlabsjs/str": "^0.1.10",
