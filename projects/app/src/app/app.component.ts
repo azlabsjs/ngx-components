@@ -46,6 +46,14 @@ export class AppComponent {
       label: 'address.nationality',
       transform: createPipeTransform(this.lowercasePipe)
     },
+    {
+      title: 'Test',
+      label: 'test',
+      transform: 'testPipe',
+      style: {
+        class: 'label label-success p-top-bottom-12'
+      }
+    }
   ];
   // Test data
   public data = [
@@ -59,17 +67,19 @@ export class AppComponent {
         phone: '+22892146591',
         nationality: 'TG',
       },
+      test: 'Test value 1'
     },
     {
       id: 2,
       firstname: 'SONATA',
       lastname: 'PAKIONA',
       type: 'INDIVIDUEL',
+      sex: 'M',
       address: {
         phone: '+22890250454',
         nationality: 'TG'
       },
-      sex: 'M',
+      test: 'Test value 2'
     },
     {
       id: 3,
@@ -81,6 +91,7 @@ export class AppComponent {
         phone: '+22898757475',
         nationality: 'TG',
       },
+      test: 'Test value 3'
     },
   ];
 

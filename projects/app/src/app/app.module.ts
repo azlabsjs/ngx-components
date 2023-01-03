@@ -12,6 +12,7 @@ import { HTTPResponse } from '@azlabsjs/requests';
 import { CdsModule } from '@cds/angular';
 import { ClarityIcons, uploadCloudIcon } from '@cds/core/icon';
 import { AppComponent } from './app.component';
+import { TestPipe } from './test.pipe';
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
@@ -101,7 +102,11 @@ ClarityIcons.addIcons(uploadCloudIcon);
       // This path will be used the http handler to load the forms in cache
       formsAssets: '/assets/forms.json',
     }),
-    NgxClrSmartGridModule,
+    NgxClrSmartGridModule.forRoot({
+      pipeTransformMap: {
+        'testPipe': TestPipe
+      }
+    }),
     NgxSlidesModule.forRoot(),
     // NgxAzlCacheModule.forRoot({
     //   debug: true,

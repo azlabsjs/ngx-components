@@ -14,7 +14,13 @@ import { GridColumnType, GridConfigType } from './core/types';
 @Component({
   selector: 'ngx-clr-smart-grid',
   templateUrl: './ngx-clr-smart-grid.component.html',
-  styles: [],
+  styles: [
+    `
+      .cell-value {
+        display: inline-block;
+      }
+    `
+  ],
 })
 export class NgxClrSmartGridComponent {
   // #region Input properties
@@ -101,7 +107,7 @@ export class NgxClrSmartGridComponent {
           compare: (a: unknown, b: unknown) => {
             return Number(ClrDatagridSortOrder.DESC);
           },
-        },
+        }
       }));
     }
   }
@@ -124,7 +130,7 @@ export class NgxClrSmartGridComponent {
     this.selectedChange.emit(state);
   }
 
-  geetCellValue(element: Record<string, any>, key: string) {
+  getCellValue(element: Record<string, any>, key: string) {
     return JSObject.getProperty(element, key) ?? '';
   }
 
