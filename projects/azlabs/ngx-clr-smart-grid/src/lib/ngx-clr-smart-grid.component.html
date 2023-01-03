@@ -44,8 +44,9 @@
           "></ng-container>
       </clr-dg-action-overflow>
       <ng-container *ngFor="let column of columns">
-        <clr-dg-cell [class]="column.style.class" [style]="column.style.styles">
-          {{ geetCellValue(current, column.label) | data: column.transform }}
+        <clr-dg-cell>
+          <span class="cell-value" [ngClass]="column.style.class ?? ''" [style]="column.style.styles">{{
+            getCellValue(current, column.label) | data: column.transform }}</span>
         </clr-dg-cell>
       </ng-container>
       <!-- USING ngProjectAs as recommended by the documentation -->

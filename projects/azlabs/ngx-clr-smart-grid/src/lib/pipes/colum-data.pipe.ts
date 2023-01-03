@@ -8,10 +8,11 @@ import {
   SlicePipe,
   UpperCasePipe
 } from '@angular/common';
-import { Pipe, PipeTransform } from '@angular/core';
+import { Inject, Injector, Pipe, PipeTransform } from '@angular/core';
 import { GetTimeAgo, JSDate, ParseMonth } from '@azlabsjs/js-datetime';
-import { AzlCachePipe } from '@azlabsjs/ngx-azl-cache';
 import { after, before } from '@azlabsjs/str';
+import { PIPE_TRANSFORMS } from '../tokens';
+import { PipeTransformTokenMapType } from '../types';
 
 /**
  * Supported pipe transform type
@@ -52,7 +53,8 @@ export class NgxGridDataPipe implements PipeTransform {
     private percentPipe: PercentPipe,
     private slicePipe: SlicePipe,
     private asyncPipe: AsyncPipe,
-    private azlcachePipe: AzlCachePipe
+    private injector: Injector,
+    @Inject(PIPE_TRANSFORMS) private pipeTransform?: PipeTransformTokenMapType
   ) {}
 
   /**
@@ -81,7 +83,7 @@ export class NgxGridDataPipe implements PipeTransform {
     }
     const _transform = transform as string;
     const hasParams = _transform.includes(':');
-    const pipe = hasParams ? before(':', _transform) : transform;
+    const pipe = hasParams ? before(':', _transform) : (transform as string);
     const params = hasParams
       ? after(':', _transform)
           .split(',')
@@ -116,25 +118,18 @@ export class NgxGridDataPipe implements PipeTransform {
           +params[0],
           +params[1] ?? undefined
         );
-      case 'azlcache':
-        return this.azlcachePipe.transform(
-          value,
-          params[0],
-          params[1] ?? 'id',
-          params[2] ?? 'label'
-        );
       case 'async':
         return this.asyncPipe.transform(value);
       default:
-        return value;
+        return this.getDefault(pipe, value, ...params);
     }
   }
 
-  mask(value?: string, length: number = 5): string {
+  private mask(value?: string, length: number = 5): string {
     return value ? `*******${substr(value, -length)}` : '*******';
   }
 
-  timeAgo(value: any, locale: string = 'fr-FR'): string {
+  private timeAgo(value: any, locale: string = 'fr-FR'): string {
     return typeof value === 'undefined' || value === null
       ? ''
       : JSDate.isValid(value)
@@ -142,7 +137,7 @@ export class NgxGridDataPipe implements PipeTransform {
       : value;
   }
 
-  dateTime(value: any, args?: any): any {
+  private dateTime(value: any, args?: any): any {
     return typeof value === 'undefined' || value === null
       ? ''
       : JSDate.isValid(value)
@@ -150,7 +145,7 @@ export class NgxGridDataPipe implements PipeTransform {
       : value;
   }
 
-  formatDate(value: any, args?: any): any {
+  private formatDate(value: any, args?: any): any {
     return typeof value === 'undefined' || value === null
       ? ''
       : JSDate.isValid(value)
@@ -158,9 +153,27 @@ export class NgxGridDataPipe implements PipeTransform {
       : value;
   }
 
-  getMonth(value: any): any {
+  private getMonth(value: any): any {
     return typeof value === 'undefined' || value === null
       ? ''
       : ParseMonth(value);
+  }
+
+  private getDefault(pipename: string, value: unknown, ...params: any[]) {
+    if (
+      typeof this.pipeTransform === 'undefined' ||
+      this.pipeTransform === null
+    ) {
+      return value;
+    }
+    const pipeToken = this.pipeTransform[pipename];
+    if (typeof pipeToken === 'undefined' || pipeToken === null) {
+      return value;
+    }
+    const pipe = this.injector.get(pipeToken);
+    if (pipe) {
+      return pipe.transform(value, ...params);
+    }
+    return value;
   }
 }

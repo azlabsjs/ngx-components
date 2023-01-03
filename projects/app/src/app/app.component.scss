@@ -1,3 +1,7 @@
 .container {
   padding: 2rem;
 }
+
+:host ::ng-deep .p-top-bottom-12 {
+  padding: 8px;
+}

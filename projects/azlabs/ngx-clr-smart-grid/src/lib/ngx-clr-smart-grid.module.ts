@@ -9,12 +9,13 @@ import {
   SlicePipe,
   UpperCasePipe
 } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { AzlCachePipe, NgxAzlCacheModule } from '@azlabsjs/ngx-azl-cache';
+import { ModuleWithProviders, NgModule } from '@angular/core';
 import { ClarityModule } from '@clr/angular';
 import { NgxClrGridSelectDirective } from './directives';
 import { NgxClrSmartGridComponent } from './ngx-clr-smart-grid.component';
 import { NgxGridDataPipe } from './pipes';
+import { PIPE_TRANSFORMS } from './tokens';
+import { PipeTransformTokenMapType } from './types';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,7 @@ import { NgxGridDataPipe } from './pipes';
     NgxGridDataPipe,
     NgxClrGridSelectDirective,
   ],
-  imports: [CommonModule, ClarityModule, NgxAzlCacheModule],
+  imports: [CommonModule, ClarityModule],
   exports: [
     NgxClrSmartGridComponent,
     NgxGridDataPipe,
@@ -37,7 +38,23 @@ import { NgxGridDataPipe } from './pipes';
     PercentPipe,
     SlicePipe,
     AsyncPipe,
-    AzlCachePipe,
   ],
 })
-export class NgxClrSmartGridModule {}
+export class NgxClrSmartGridModule {
+  static forRoot(config: {
+    pipeTransformMap: PipeTransformTokenMapType;
+  }): ModuleWithProviders<NgxClrSmartGridModule> {
+    return {
+      ngModule: NgxClrSmartGridModule,
+      providers: [
+        {
+          provide: PIPE_TRANSFORMS,
+          useFactory: () => {
+            return config?.pipeTransformMap ?? {};
+          },
+          deps: [],
+        },
+      ],
+    };
+  }
+}
