@@ -18,7 +18,7 @@ import { GridColumnType, GridConfigType } from './core/types';
 })
 export class NgxClrSmartGridComponent {
   // #region Input properties
-  @Input() set pageResult(result: PaginateResult<any>) {
+  @Input() set pageResult(result: PaginateResult<any> | undefined | null) {
     if (result) {
       this.data = result.data ?? [];
       this.total = result.total;
