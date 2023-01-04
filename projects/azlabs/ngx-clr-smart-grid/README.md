@@ -51,7 +51,10 @@ export class AppModule {}
 ```
 
 **Note**
-The example above register a pipe named `testpipe` with the transformation class `TestPipe`.
+The example above register a pipe named `testpipe` with the transformation class `TestPipe`. 
+
+**Note**
+The `TestPipe` is automatically registered as provider to the `NgxClrSmartGridModule`.
 
 **Warning**
 The only issue with using customized pipe, is that the pipe might be injectable. Therefore any custom pipe to be registered must be mark using `@Injectable()` as providing non injectable classes is subject to fail in future angular releases.
@@ -189,7 +192,6 @@ The syntax for pipe transform is as follow: `pipename:param1;param2`. Note that 
 
 **Warning**
 For parameters that as not primitive type, the library internally uses `JSON.parse()` call when the parameter is prefixed with `js:` or `json:` string. For example in order to pass `js` object to a pipe transform method that support object as parameter: `pipename:json:{"key1": "value1", "key2": "value2", ...}`
-
 
 ```ts
 // app.component.ts
