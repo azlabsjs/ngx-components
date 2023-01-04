@@ -6,7 +6,6 @@
     "@angular/core": "^13.0.0",
     "@clr/angular": "^13.0",
     "@azlabsjs/js-object": "^0.1.11",
-    "@azlabsjs/str": "^0.1.10",
     "@azlabsjs/js-datetime": "^0.1.10"
   },
   "dependencies": {
