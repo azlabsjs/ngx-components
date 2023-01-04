@@ -10,18 +10,66 @@ import {
 } from '@angular/common';
 import { Inject, Injector, Pipe, PipeTransform } from '@angular/core';
 import { GetTimeAgo, JSDate, ParseMonth } from '@azlabsjs/js-datetime';
-import { after, before } from '@azlabsjs/str';
 import { PIPE_TRANSFORMS } from '../tokens';
 import { PipeTransformTokenMapType } from '../types';
 
 /**
+ * Returns the strings after the first occurence the specified character
+ *
+ * @example
+ * const substr = after('o', 'Hello World!'); // output " World!"
+ *
+ * @param char
+ * @param haystack
+ * @returns
+ */
+export function after(char: string, haystack: string) {
+  const index = haystack.indexOf(char);
+  return haystack.slice(index + char.length);
+}
+
+/**
+ * Returns the strings before the first occurence the specified character
+ *
+ * @example
+ * const substr = before('W', 'Hello World!'); // outputs -> "Hello "
+ *
+ * @param char
+ * @param haystack
+ * @returns
+ */
+export function before(char: string, haystack: string) {
+  return haystack.slice(0, haystack.indexOf(char));
+}
+
+/**
+ * Creates pipe transform parameter from provided transform definition rules
+ */
+export function createParams(transform: string) {
+  const hasParams = transform.indexOf(':') !== -1;
+  const pipe = hasParams ? before(':', transform) : transform;
+  let params = hasParams
+    ? after(':', transform)
+        .split(';')
+        .map((x) => x.trim()) ?? []
+    : [];
+  params = params.map((item) => {
+    if (item.indexOf('json:') !== -1) {
+      return JSON.parse(after('json:', item));
+    }
+    if (item.indexOf('js:') !== -1) {
+      return JSON.parse(after('js:', item));
+    }
+    return item;
+  });
+
+  return [pipe, ...params];
+}
+
+/**
  * Supported pipe transform type
  */
-type PipeTransformType =
-  | string
-  | ((value: unknown) => unknown)
-  | undefined
-  | PipeTransform;
+type PipeTransformType = string | ((value: unknown) => unknown) | undefined;
 
 function substr(value: string, start: number, length?: number) {
   if (typeof value !== 'string') {
@@ -75,20 +123,11 @@ export class NgxGridDataPipe implements PipeTransform {
     if (typeof value === 'undefined' || value === null) {
       return '';
     }
-    if (
-      typeof transform === 'object' &&
-      typeof transform.transform === 'function'
-    ) {
-      return transform.transform(value);
-    }
-    const _transform = transform as string;
-    const hasParams = _transform.includes(':');
-    const pipe = hasParams ? before(':', _transform) : (transform as string);
-    const params = hasParams
-      ? after(':', _transform)
-          .split(',')
-          .map((x) => x.trim()) ?? []
-      : [];
+    // Create pipe transform name and parameter
+    const [pipe, ...params] = createParams(transform as string);
+
+    // Switch branch on pipe name and call the matching transformation function
+    // TODO: In  future release replace the swith statement with a call to pipe transform
     switch (pipe) {
       case 'date':
         return this.formatDate(value, ...params);

@@ -108,12 +108,6 @@ ClarityIcons.addIcons(uploadCloudIcon);
       }
     }),
     NgxSlidesModule.forRoot(),
-    // NgxAzlCacheModule.forRoot({
-    //   debug: true,
-    //   pagination: {
-    //     perPage: 500,
-    //   },
-    // }),
   ],
   bootstrap: [AppComponent],
 })

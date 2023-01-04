@@ -3,7 +3,7 @@ import { Injectable, Pipe, PipeTransform } from '@angular/core';
 @Pipe({
   name: 'testPipe',
 })
-@Injectable({providedIn: 'root'})
+@Injectable()
 export class TestPipe implements PipeTransform {
   transform(value: any) {
     return `******${value}******`;
