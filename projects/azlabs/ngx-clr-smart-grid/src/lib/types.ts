@@ -1,8 +1,8 @@
-import { PipeTransform, ProviderToken } from '@angular/core';
+import { PipeTransform, Type } from '@angular/core';
 
 /**
  * @internal
  */
 export type PipeTransformTokenMapType = {
-  [k: string]: ProviderToken<PipeTransform>;
+  [k: string]: Type<PipeTransform>;
 };
