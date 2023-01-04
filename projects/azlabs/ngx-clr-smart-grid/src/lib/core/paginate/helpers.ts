@@ -20,6 +20,9 @@ function prepareComposedQueryKey(key: string): [string, string | undefined] {
   let prefix!: string | undefined;
   // First we remove any formatter from the query parameter name
   // before proceeding to trimming operators from the parameter name
+  if (typeof key === 'undefined' || key === null) {
+    return [key, prefix];
+  }
   if (key.startsWith('date:')) {
     key = key.substring('date:'.length);
   }
@@ -109,11 +112,27 @@ export function projectPaginateQuery<T>(
   return (state: Partial<ProjectPaginateQueryParamType<T>>) => {
     let query: { [prop: string]: any } = {};
     if (state.filters) {
-      for (const filter of state.filters) {
+      for (let filter of state.filters) {
+        if (
+          typeof filter === 'object' &&
+          !(filter as Object).hasOwnProperty('property')
+        ) {
+          const keys = Object.keys(filter);
+          if (keys.length > 1) {
+            continue;
+          }
+          filter = { property: keys[0], value: filter[keys[0]] };
+        }
         let { property, value } = filter;
-        let [key, result] = filtersPipe
-          ? filtersPipe(property, value)
-          : [property, value];
+        if (typeof property === 'undefined' || property === null) {
+          continue;
+        }
+        const _filtersPipe =
+          filtersPipe ??
+          ((__key: string, __value?: unknown) => {
+            return [__key, __value];
+          });
+        let [key, result] = _filtersPipe(property, value);
         const [_key, prefix] = prepareComposedQueryKey(key);
         query[_key] = [prefix ? `${prefix}${result}` : result];
       }
