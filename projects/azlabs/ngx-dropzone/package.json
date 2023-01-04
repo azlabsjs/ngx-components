@@ -1,6 +1,6 @@
 {
   "name": "@azlabsjs/ngx-dropzone",
-  "version": "0.14.30",
+  "version": "0.14.31",
   "peerDependencies": {
     "@angular/common": "^14.0",
     "@angular/core": "^14.0"
