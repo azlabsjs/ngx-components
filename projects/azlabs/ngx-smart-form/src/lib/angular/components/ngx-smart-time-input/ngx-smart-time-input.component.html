@@ -1,41 +1,26 @@
-<ng-container
-  *ngTemplateOutlet="
+<ng-container *ngTemplateOutlet="
     inputRef;
-    context: { max: inputConfig.max, min: inputConfig.min, config: inputConfig }
-  "
-></ng-container>
-<span
-  [class]="'input__subtext input__error_text'"
-  *ngIf="control.hasError('required') && control.touched"
->
+    context: { max: inputConfig.max, min: inputConfig.min, config: inputConfig, control }
+  "></ng-container>
+<span [class]="'input__subtext input__error_text'" *ngIf="control.hasError('required') && control.touched">
   {{ 'validation.required' | templateDict }}
 </span>
-<span
-  [class]="'input__subtext input__error_text'"
-  *ngIf="control.hasError('min') && control.touched"
->
+<span [class]="'input__subtext input__error_text'" *ngIf="control.hasError('min') && control.touched">
   {{
-    'validation.min'
-      | templateDict
-        : {
-            value: inputConfig.min
-          }
+  'validation.min'
+  | templateDict
+  : {
+  value: inputConfig.min
+  }
   }}
 </span>
-<span
-  [class]="'input__subtext input__error_text'"
-  *ngIf="control.hasError('max') && control.touched"
->
+<span [class]="'input__subtext input__error_text'" *ngIf="control.hasError('max') && control.touched">
   {{
-    'validation.max'
-      | templateDict
-        : {
-            value: inputConfig.max
-          }
+  'validation.max'
+  | templateDict
+  : {
+  value: inputConfig.max
+  }
   }}
 </span>
-<span
-  [class]="'input__subtext'"
-  *ngIf="describe"
-  [innerHTML]="inputConfig.description || '' | safeHtml"
-></span>
+<span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="inputConfig.description || '' | safeHtml"></span>

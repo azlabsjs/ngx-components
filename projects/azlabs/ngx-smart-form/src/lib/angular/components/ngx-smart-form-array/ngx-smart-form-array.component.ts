@@ -10,7 +10,7 @@ import {
   Output,
   TemplateRef,
   ViewChild,
-  ViewContainerRef,
+  ViewContainerRef
 } from '@angular/core';
 import { FormArray, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
@@ -18,8 +18,8 @@ import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { cloneAbstractControl } from '../../helpers';
 import {
-  ANGULAR_REACTIVE_FORM_BRIDGE,
   AngularReactiveFormBuilderBridge,
+  ANGULAR_REACTIVE_FORM_BRIDGE
 } from '../../types';
 import { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array-child.component';
 
@@ -31,7 +31,7 @@ import { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array-child.co
       <ng-container
         *ngTemplateOutlet="
           addGroupRef ? addGroupRef : addTemplate;
-          context: { $implicit: onTemplateButtonClicked.bind(this) }
+          context: { $implicit: onComponentDestroy.bind(this) }
         "
       ></ng-container>
       <span class="no-control-text">{{ 'addButtonText' | templateDict }}</span>
@@ -40,7 +40,7 @@ import { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array-child.co
       <ng-container
         *ngTemplateOutlet="
           addGroupRef ? addGroupRef : addTemplate;
-          context: { $implicit: onTemplateButtonClicked.bind(this) }
+          context: { $implicit: onComponentDestroy.bind(this) }
         "
       ></ng-container>
     </ng-container>
@@ -58,7 +58,7 @@ import { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array-child.co
         align-items: center;
         align-content: center;
         width: 100%;
-        margin: var(--smart-form-array-add-button-margin, .5rem) 0;
+        margin: var(--smart-form-array-add-button-margin, 0.5rem) 0;
       }
       .no-control-text {
         display: block;
@@ -72,7 +72,24 @@ import { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array-child.co
 })
 export class NgxSmartFormArrayComponent implements OnInit, OnDestroy {
   //#region Component inputs definitions
-  @Input() formArray!: FormArray;
+  private _formArray!: FormArray;
+  @Input() set formArray(array: FormArray) {
+    this._formArray = array;
+    if (this.formArray.getRawValue().length !== 0) {
+      // First we cleared the view container reference to remove any existing component
+      this.viewContainerRef.clear();
+      // Then for each element in the form array we add a new component to the view container
+      // reference
+      let index = 0;
+      for (const control of this.formArray.controls) {
+        this.addComponent(control as FormGroup, index);
+        index++;
+      }
+    }
+  }
+  get formArray() {
+    return this._formArray;
+  }
   private _controls!: InputConfigInterface[];
   @Input() set controls(value: InputConfigInterface | InputConfigInterface[]) {
     this._controls = Array.isArray(value)
@@ -90,7 +107,6 @@ export class NgxSmartFormArrayComponent implements OnInit, OnDestroy {
   private _autoupload: boolean = false;
   @Input() set autoupload(value: boolean) {
     this._autoupload = !!value;
-
     // update child component instance autoupload values
     this.componentRefs.forEach(
       (ref) => (ref.instance.autoupload = this._autoupload)
@@ -110,18 +126,21 @@ export class NgxSmartFormArrayComponent implements OnInit, OnDestroy {
   }
   //#endregion Component inputs definitions
 
-  //@internal
-  private formGroup!: FormGroup;
-  @ViewChild('container', { read: ViewContainerRef, static: true })
-  viewContainerRef!: ViewContainerRef;
-
-  private _destroy$ = new Subject<void>();
-  private componentRefs: ComponentRef<NgxSmartFormArrayChildComponent>[] = [];
-
   //#region Component outputs
   @Output() listChange = new EventEmitter<number>();
   @Output() formArrayChange = new EventEmitter<any[]>();
   //#endregion Component outputs
+
+  // #region View children
+  @ViewChild('container', { read: ViewContainerRef, static: true })
+  viewContainerRef!: ViewContainerRef;
+  // #endregion View children
+
+  // #region Internal properties
+  private _destroy$ = new Subject<void>();
+  private formGroup = this.builder.group(this._controls) as FormGroup;
+  private componentRefs: ComponentRef<NgxSmartFormArrayChildComponent>[] = [];
+  // #endregion Internal properties
 
   // Component instance initializer
   constructor(
@@ -130,31 +149,21 @@ export class NgxSmartFormArrayComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.formGroup = this.builder.group(this._controls) as FormGroup;
-    if (this.formArray.getRawValue().length !== 0) {
-      // Add elements
-      let index = 0;
-      for (const control of this.formArray.controls) {
-        this.addComponent(control as FormGroup, index);
-        index++;
-      }
-    }
-
     // Simulate form array
     this.formArray.valueChanges
       .pipe(tap((state) => this.formArrayChange.emit(state)))
       .subscribe();
   }
 
-  onTemplateButtonClicked(event: Event) {
+  onComponentDestroy(event: Event) {
     this._refCount++;
-    this.addNewComponent(this._refCount);
+    this._addComponent(this._refCount);
     event.preventDefault();
     event.stopPropagation();
   }
 
   // tslint:disable-next-line: typedef
-  addNewComponent(index: number) {
+  private _addComponent(index: number) {
     const formGroup = cloneAbstractControl(this.formGroup) as FormGroup;
     this.addComponent(formGroup, index);
     this.formArray.push(formGroup);

@@ -1,18 +1,11 @@
 import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  ChangeDetectionStrategy,
-  ContentChild,
-  TemplateRef,
+  ChangeDetectionStrategy, Component, ContentChild, Input, TemplateRef
 } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
-import { TextInput } from '@azlabsjs/smart-form-core';
-import { map } from 'rxjs/operators';
 import { getObjectProperty } from '@azlabsjs/js-object';
-import { InputEventArgs } from '../../types/input';
+import { TextInput } from '@azlabsjs/smart-form-core';
 import { BehaviorSubject } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'ngx-smart-password-input',
@@ -41,11 +34,6 @@ export class NgxSmartPasswordInputComponent {
   // Configuration parameters of the input
   @Input() inputConfig!: TextInput;
   @ContentChild('input') inputRef!: TemplateRef<any>;
-
-  @Output() keyup = new EventEmitter<InputEventArgs>();
-  @Output() keydown = new EventEmitter<InputEventArgs>();
-  @Output() keypress = new EventEmitter<InputEventArgs>();
-  @Output() blur = new EventEmitter<InputEventArgs>();
 
   // tslint:disable-next-line: variable-name
   private _showPassword = new BehaviorSubject(false);

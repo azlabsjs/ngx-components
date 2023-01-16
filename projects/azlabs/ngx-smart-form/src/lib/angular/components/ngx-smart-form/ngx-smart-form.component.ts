@@ -11,32 +11,32 @@ import {
   OnDestroy,
   Optional,
   Output,
-  TemplateRef,
+  TemplateRef
 } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { HTTPRequestMethods } from '@azlabsjs/requests';
 import {
   FormConfigInterface,
   InputConfigInterface,
-  InputGroup,
+  InputGroup
 } from '@azlabsjs/smart-form-core';
-import { EMPTY, Observable, Subject, from, lastValueFrom } from 'rxjs';
+import { EMPTY, from, lastValueFrom, Observable, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { RequestClient } from '../../../http';
 import {
-  ComponentReactiveFormHelpers,
   cloneAbstractControl,
+  ComponentReactiveFormHelpers,
   controlAttributesDataBindings,
   setControlsAttributes,
-  useHiddenAttributeSetter,
+  useHiddenAttributeSetter
 } from '../../helpers';
 import {
-  ANGULAR_REACTIVE_FORM_BRIDGE,
   AngularReactiveFormBuilderBridge,
+  ANGULAR_REACTIVE_FORM_BRIDGE,
   BindingInterface,
   ControlsStateMap,
   HTTP_REQUEST_CLIENT,
-  ReactiveFormComponentInterface,
+  ReactiveFormComponentInterface
 } from '../../types';
 
 @Component({
@@ -117,6 +117,7 @@ export class NgxSmartFormComponent
   @Output() readyState = new EventEmitter();
   @Output() formGroupChange = new EventEmitter<FormGroup>();
   @Output() complete = new EventEmitter<unknown>();
+  @Output() error = new EventEmitter<unknown>();
   @Output() performingRequest = new EventEmitter<boolean>();
   //#endregion Component outputs
 
@@ -137,13 +138,18 @@ export class NgxSmartFormComponent
   public constructor(
     @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
     private builder: AngularReactiveFormBuilderBridge,
-    private cdRef: ChangeDetectorRef,
+    private changes: ChangeDetectorRef,
     @Inject(HTTP_REQUEST_CLIENT) @Optional() private client?: RequestClient
   ) {}
 
+  setValue(state: { [k: string]: unknown }): void {
+    // Set or update the form state of the current component
+    this.setFormValue(this._formGroup, state, this.form.controlConfigs ?? []);
+  }
+
   ngAfterViewInit(): void {
     this.setComponentForm(this.form);
-    this.cdRef.detectChanges();
+    this.changes.detectChanges();
   }
 
   //#region FormComponent interface Methods definitions
@@ -191,7 +197,7 @@ export class NgxSmartFormComponent
     // Validate the formgroup object to ensure it passes
     // validation before submitting
     this.validateForm();
-    this.cdRef.detectChanges();
+    this.changes.detectChanges();
     // We simply return without performing any further action
     // if the validation fails
     if (!this._formGroup.valid) {
@@ -202,18 +208,7 @@ export class NgxSmartFormComponent
       typeof this.client !== 'undefined' && this.client !== null;
     const pathIsDefined = path !== null && path !== 'undefined';
     if (this.autoSubmit && clientIsDefined && pathIsDefined) {
-      this.performingRequest.emit(true);
-      const response = await lastValueFrom(
-        from(
-          (this.client as RequestClient).request(
-            path || 'http://localhost',
-            this.action ?? 'POST',
-            this._formGroup.getRawValue()
-          )
-        )
-      );
-      this.performingRequest.emit(false);
-      this.complete.emit(response);
+      await this.sendRequest(path || 'http://localhost');
     } else if (
       (this.autoSubmit && !clientIsDefined) ||
       (this.autoSubmit && !pathIsDefined)
@@ -296,7 +291,7 @@ export class NgxSmartFormComponent
       this.form = { ...this.form, controlConfigs: controls };
       // We trigger the change detector to detect changes after updating
       // the form controlConfigs
-      this.cdRef.detectChanges();
+      this.changes.detectChanges();
     }
   }
 
@@ -386,9 +381,7 @@ export class NgxSmartFormComponent
           }
           formgroup.controls[key] = array_;
         } else {
-          try {
-            formgroup.controls[key].setValue(value);
-          } catch (error) {}
+          formgroup.controls[key]?.setValue(value);
         }
       }
     }
@@ -404,6 +397,25 @@ export class NgxSmartFormComponent
       } catch (error) {
         //
       }
+    }
+  }
+
+  private async sendRequest(path: string) {
+    try {
+      this.performingRequest.emit(true);
+      const response = await lastValueFrom(
+        from(
+          (this.client as RequestClient).request(
+            path || 'http://localhost',
+            this.action ?? 'POST',
+            this._formGroup.getRawValue()
+          )
+        )
+      );
+      this.performingRequest.emit(false);
+      this.complete.emit(response);
+    } catch (error) {
+      this.error.emit(error);
     }
   }
 

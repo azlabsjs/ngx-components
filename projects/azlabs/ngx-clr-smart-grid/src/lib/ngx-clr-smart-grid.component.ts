@@ -19,7 +19,7 @@ import { GridColumnType, GridConfigType } from './core/types';
       .cell-value {
         display: inline-block;
       }
-    `
+    `,
   ],
 })
 export class NgxClrSmartGridComponent {
@@ -68,6 +68,7 @@ export class NgxClrSmartGridComponent {
     useServerPagination: false,
     useCustomFilters: false,
     totalItemLabel: 'Total',
+    projectRowClass: '',
   };
   @Input() set config(value: Partial<GridConfigType>) {
     if (value) {
@@ -107,7 +108,7 @@ export class NgxClrSmartGridComponent {
           compare: (a: unknown, b: unknown) => {
             return Number(ClrDatagridSortOrder.DESC);
           },
-        }
+        },
       }));
     }
   }
@@ -132,6 +133,14 @@ export class NgxClrSmartGridComponent {
 
   getCellValue(element: Record<string, any>, key: string) {
     return JSObject.getProperty(element, key) ?? '';
+  }
+
+  getrowclass(config: GridConfigType, current: { [index: string]: any }) {
+    return config && config.projectRowClass
+      ? typeof config.projectRowClass === 'function'
+        ? config.projectRowClass(current)
+        : config.projectRowClass
+      : '';
   }
 
   onClrDgRefresh(event: ProjectPaginateQueryParamType) {
