@@ -1,45 +1,61 @@
 import {
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ContentChild,
   Input,
+  OnDestroy,
   OnInit,
-  TemplateRef,
+  TemplateRef
 } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import {
-  OptionsInputConfigInterface,
-  InputTypes,
   InputOptionsInterface,
+  OptionsInputConfigInterface
 } from '@azlabsjs/smart-form-core';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'ngx-smart-radio-input',
   templateUrl: './ngx-smart-radio-input.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxSmartRadioInputComponent implements OnInit {
+export class NgxSmartRadioInputComponent implements OnInit, OnDestroy {
+  // #region Component input properties
   // tslint:disable-next-line: variable-name
   @Input() control!: AbstractControl;
   // tslint:disable-next-line: variable-name
   @Input() inputConfig!: OptionsInputConfigInterface;
   @Input() describe = true;
+  // #endregion Component input properties
   @ContentChild('input') inputRef!: TemplateRef<any>;
 
-  public inputTypes = InputTypes;
-  public loaded: boolean = false;
+  // #region Component states
+  loaded: boolean = false;
+  private _destroy$ = new Subject<void>();
+  // #endregion Component states
 
-  constructor(private cdRef: ChangeDetectorRef) {}
+  /**
+   * Creates Smart Radio input
+   * 
+   * @param changes
+   */
+  constructor(private changes: ChangeDetectorRef) {}
 
   //
   ngOnInit(): void {
-    if (this.inputConfig) {
-      this.loaded = this.inputConfig.options!.length !== 0;
+    if (this.inputConfig && this.inputConfig.options) {
+      this.loaded = this.inputConfig.options.length !== 0;
     }
   }
 
   onOptionsChange(state: InputOptionsInterface) {
-    this.loaded = true;
     this.inputConfig = { ...this.inputConfig, options: state };
-    this.cdRef.detectChanges();
+    this.loaded = true;
+    this.changes.detectChanges();
+  }
+
+  ngOnDestroy(): void {
+    this._destroy$.next();
   }
 }

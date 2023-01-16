@@ -40,6 +40,7 @@ export type GridConfigType = {
   useServerPagination: boolean;
   useCustomFilters: boolean;
   totalItemLabel?: string;
+  projectRowClass?: string | ((element: any) => string);
 };
 
 export type GriSelectDirectiveInputType = {

@@ -1,21 +1,23 @@
 import {
-  InputConfigInterface,
-  InputTypes,
-  InputOptionsInterface,
-} from '@azlabsjs/smart-form-core';
-import { AbstractControl, UntypedFormControl } from '@angular/forms';
-import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
-  Input,
-  Output,
   EventEmitter,
+  Input,
   OnDestroy,
   OnInit,
+  Output
 } from '@angular/core';
-import { InputEventArgs } from '../../types';
-import { takeUntil, tap } from 'rxjs/operators';
+import { AbstractControl, UntypedFormControl } from '@angular/forms';
+import {
+  InputConfigInterface,
+  InputOptionsInterface,
+  InputTypes
+} from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
+import { takeUntil, tap } from 'rxjs/operators';
 import { InputTypeHelper } from '../../services';
+import { InputEventArgs } from '../../types';
 
 @Component({
   selector: 'ngx-smart-form-control',
@@ -42,10 +44,11 @@ import { InputTypeHelper } from '../../services';
       }
     `,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFormControlComponent implements OnDestroy, OnInit {
   // Component properties
-  public inputTypes = InputTypes;
+  inputTypes = InputTypes;
   private _destroy$ = new Subject<void>();
 
   //#region Component inputs
@@ -54,14 +57,14 @@ export class NgxSmartFormControlComponent implements OnDestroy, OnInit {
   @Input() describe = true;
   @Input() inputConfig!: InputConfigInterface;
   @Input() options!: InputOptionsInterface;
-  @Input() control!: AbstractControl & UntypedFormControl;
+  @Input('control') formcontrol!: AbstractControl & UntypedFormControl;
   //#endregion Component inputs
 
   //#region Component outputs
-  @Output() remove = new EventEmitter<any>();
-  @Output() selected = new EventEmitter<InputEventArgs>();
-  @Output() fileAdded = new EventEmitter<any>();
-  @Output() fileRemoved = new EventEmitter<any>();
+  @Output('item-removed') remove = new EventEmitter<any>();
+  @Output('item-selected') selected = new EventEmitter<InputEventArgs>();
+  @Output('file-added') fileAdded = new EventEmitter<any>();
+  @Output('file-removed') fileRemoved = new EventEmitter<any>();
   @Output('focus') focus = new EventEmitter<InputEventArgs>();
   @Output('keydown') keydown = new EventEmitter<InputEventArgs>();
   @Output('keyup') keyup = new EventEmitter<InputEventArgs>();
@@ -73,32 +76,43 @@ export class NgxSmartFormControlComponent implements OnDestroy, OnInit {
   @Input() submitupload: boolean = false;
   //#endregion Component outputs
 
-  constructor(public readonly inputType: InputTypeHelper) {}
+  /**
+   * Creates an instance of the Smart Form Control Component
+   *
+   * @param inputType
+   * @param changes
+   */
+  constructor(
+    public readonly inputType: InputTypeHelper,
+    private changes: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    this.control.valueChanges
+    this.formcontrol.valueChanges
       .pipe(
-        takeUntil(this._destroy$),
-        tap((source) =>
+        tap((source) => {
           this.valueChange.emit({
             name: this.inputConfig.name,
             value: source,
-          })
-        )
+          });
+          // Trigger a change detection to insure update tge UI component
+          this.changes.markForCheck();
+        }),
+        takeUntil(this._destroy$)
       )
       .subscribe();
   }
 
-  getInlineTextAreaInput(input: InputConfigInterface) {
+  updateinlineclass(inputConfig: InputConfigInterface) {
     return {
-      ...input,
-      classes: input.classes?.includes('clr-textarea')
-        ? input.classes?.replace('textarea', 'input')
-        : `${input?.classes} clr-input`,
+      ...inputConfig,
+      classes: inputConfig.classes?.includes('clr-textarea')
+        ? inputConfig.classes?.replace('textarea', 'input')
+        : `${inputConfig?.classes} clr-input`,
     };
   }
 
-  radioBoxLabel(name: string, value: string) {
+  radiovalue(name: string, value: string) {
     return `${name}_${value}`;
   }
 

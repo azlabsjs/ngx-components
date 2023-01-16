@@ -4,10 +4,9 @@ import {
   Inject,
   Input,
   LOCALE_ID,
-  TemplateRef,
+  TemplateRef
 } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
-import { JSDate } from '@azlabsjs/js-datetime';
 import { DateInput } from '@azlabsjs/smart-form-core';
 
 @Component({
@@ -26,23 +25,28 @@ import { DateInput } from '@azlabsjs/smart-form-core';
       :host ::ng-deep .clr-input-group {
         width: 100% !important;
         max-width: 100% !important;
-
       }
     `,
   ],
 })
 export class NgxSmartDateInputComponent {
+  // #region Component inputs
   @Input() control!: UntypedFormControl;
   @Input() describe = true;
   @Input() inputConfig!: DateInput;
-  today = JSDate.format();
+  // #endregion Component inputs
   @ContentChild('input') inputRef!: TemplateRef<any>;
 
-  constructor(@Inject(LOCALE_ID) private appLocalID: string) {}
+  /**
+   * Creates an instance of Date Input Component
+   * 
+   * @param locale 
+   */
+  constructor(@Inject(LOCALE_ID) private locale: string) {}
 
   // tslint:disable-next-line: typedef
   onBlur() {
-    const locale = this.appLocalID;
+    const locale = this.locale;
     if (this.control.value) {
       const value: string = this.control.value as string;
       if (value === '' || value.length === 0) {
@@ -57,17 +61,16 @@ export class NgxSmartDateInputComponent {
       if (match) {
         return;
       }
-      // tslint:disable-next-line: max-line-length
       const output: { days: string; month: string; year: string } = {
         days: value.substr(0, 2),
         month: value.substr(2, 2),
         year: value.substr(4),
       };
-      if (locale.match(/fr/)) {
-        this.control.setValue(`${output.days}/${output.month}/${output.year}`);
-      } else {
-        this.control.setValue(`${output.month}/${output.days}/${output.year}`);
-      }
+      this.control.setValue(
+        locale.match(/fr/)
+          ? `${output.days}/${output.month}/${output.year}`
+          : `${output.month}/${output.days}/${output.year}`
+      );
     }
   }
 }

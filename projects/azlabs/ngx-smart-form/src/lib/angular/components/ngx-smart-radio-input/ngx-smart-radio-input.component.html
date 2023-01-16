@@ -1,29 +1,15 @@
-<div
-  prefetchOptions
-  (optionsChange)="onOptionsChange($event)"
-  [loaded]="loaded"
-  [optionsConfig]="inputConfig.optionsConfig"
-  [name]="inputConfig.name"
->
+<div prefetchOptions (optionsChange)="onOptionsChange($event)" [loaded]="loaded"
+  [optionsConfig]="inputConfig.optionsConfig" [name]="inputConfig.name">
   <ng-container *ngIf="inputConfig.options as options">
     <ng-container *ngIf="options!.length > 0">
-      <ng-container
-        *ngTemplateOutlet="
+      <ng-container *ngTemplateOutlet="
           inputRef;
-          context: { options: options, config: inputConfig }
-        "
-      ></ng-container>
-      <span
-        [class]="'input__subtext input__error_text'"
-        *ngIf="control.hasError('required') && control.touched"
-      >
+          context: { options: options, config: inputConfig, control }
+        "></ng-container>
+      <span [class]="'input__subtext input__error_text'" *ngIf="control.hasError('required') && control.touched">
         {{ 'validation.required' | templateDict }}
       </span>
-      <span
-        [class]="'input__subtext'"
-        *ngIf="describe"
-        [innerHTML]="inputConfig.description || '' | safeHtml"
-      ></span>
+      <span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="inputConfig.description || '' | safeHtml"></span>
     </ng-container>
   </ng-container>
 </div>

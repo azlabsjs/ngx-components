@@ -1,25 +1,23 @@
 import {
   Component,
-  OnInit,
-  Input,
-  Inject,
-  Output,
   EventEmitter,
-  OnDestroy,
+  Inject,
   Injector,
+  Input,
+  OnDestroy, Output
 } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
-import { BehaviorSubject, Subject } from 'rxjs';
 import { DropzoneConfig } from '@azlabsjs/ngx-dropzone';
-import { FileInput, isValidHttpUrl } from '@azlabsjs/smart-form-core';
-import { UPLOADER_OPTIONS, UploadOptionsType } from '../../types';
-import { Uploader, UploadOptions } from '@azlabsjs/uploader';
 import {
   HTTPRequest,
   HTTPResponse,
   Interceptor,
-  RequestClient,
+  RequestClient
 } from '@azlabsjs/requests';
+import { FileInput, isValidHttpUrl } from '@azlabsjs/smart-form-core';
+import { Uploader, UploadOptions } from '@azlabsjs/uploader';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { UPLOADER_OPTIONS, UploadOptionsType } from '../../types';
 import { NgxUploadsSubjectService } from './ngx-uploads-subject.service';
 
 function uuidv4() {
@@ -69,11 +67,30 @@ function uuidv4() {
     `,
   ],
 })
-export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
+export class NgxSmartFileInputComponent implements OnDestroy {
   //#region Component inputs
   @Input() control!: UntypedFormControl;
   @Input() describe = true;
-  @Input() inputConfig!: FileInput;
+  private _inputConfig!: FileInput;
+  @Input() set inputConfig(config: FileInput) {
+    this._inputConfig = config;
+    //#region Set the dropzone configurations
+    this.dropzoneConfigs = {
+      maxFiles: config.multiple ? 50 : 1,
+      maxFilesize: config.maxFileSize ? config.maxFileSize : 10,
+      url:
+        typeof config.uploadUrl !== 'undefined' &&
+        config !== null &&
+        config.uploadUrl !== ''
+          ? config.uploadUrl
+          : this.uploadOptions.path ?? 'http://localhost',
+      uploadMultiple: config.multiple ? config.multiple : false,
+      acceptedFiles: config.pattern,
+    } as DropzoneConfig;
+  }
+  get inputConfig() {
+    return this._inputConfig;
+  }
   @Input() uploadAs!: string;
 
   /**
@@ -101,44 +118,34 @@ export class NgxSmartFileInputComponent implements OnInit, OnDestroy {
   @Output() removedEvent = new EventEmitter<any>();
   //#endregion Component outputs
 
+  // #region Component properties
   private _destroy$ = new Subject<void>();
   // Property for handling File Input types
-  public dropzoneConfigs!: DropzoneConfig;
-
+  dropzoneConfigs!: DropzoneConfig;
   // Control HTML uploading indicator
-  public uploading: boolean = false;
-  public hasUploadError: boolean = false;
-
+  uploading: boolean = false;
+  hasUploadError: boolean = false;
   _inputState$ = new BehaviorSubject({
     uploading: false,
     hasError: false,
     tooLargeFiles: [] as File[],
   });
   inputState$ = this._inputState$.asObservable();
+  // #endregion Component properties
 
+  /**
+   * Creates a File Input component
+   *
+   * @param uploadOptions
+   * @param uploadEvents
+   * @param injector
+   */
   constructor(
     @Inject(UPLOADER_OPTIONS)
     private uploadOptions: UploadOptionsType<HTTPRequest, HTTPResponse>,
     private uploadEvents: NgxUploadsSubjectService,
     private injector: Injector
   ) {}
-
-  ngOnInit(): void {
-    const config = this.inputConfig;
-    //#region Set the dropzone configurations
-    this.dropzoneConfigs = {
-      maxFiles: config.multiple ? 50 : 1,
-      maxFilesize: config.maxFileSize ? config.maxFileSize : 10,
-      url:
-        typeof config.uploadUrl !== 'undefined' &&
-        config !== null &&
-        config.uploadUrl !== ''
-          ? config.uploadUrl
-          : this.uploadOptions.path ?? 'http://localhost',
-      uploadMultiple: config.multiple ? config.multiple : false,
-      acceptedFiles: config.pattern,
-    } as DropzoneConfig;
-  }
 
   dzOnAdd(event?: any) {
     // Handle the add event on the dz component

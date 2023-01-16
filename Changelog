@@ -1,0 +1,8 @@
+# Changelogs
+
+## [v0.13.44]
+
+- Added support for error event on smart form
+- Fixed bugs related to radio and checkbox input types
+- Add support for smart grid row class projection
+- Review change detection implementation for smart form control, smart form array, etc...

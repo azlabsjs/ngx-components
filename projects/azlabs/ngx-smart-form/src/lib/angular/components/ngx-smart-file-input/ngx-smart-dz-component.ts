@@ -3,11 +3,11 @@ import {
   EventEmitter,
   Input,
   Output,
-  ViewChild,
+  ViewChild
 } from '@angular/core';
 import {
   DropzoneComponentInterface,
-  DropzoneConfig,
+  DropzoneConfig
 } from '@azlabsjs/ngx-dropzone';
 
 @Component({
@@ -29,7 +29,6 @@ import {
       </ng-template>
     </ngx-dropzone>
   `,
-  styles: [``],
 })
 export class NgxSmartDzComponent {
   //#region Component inputs

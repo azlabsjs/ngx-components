@@ -42,16 +42,16 @@ import { NgxClrSmartGridModule } from "@azlabsjs/ngx-clr-smart-grid";
     // ...
     NgxClrSmartGridModule.forRoot({
       pipeTransformMap: {
-        'testPipe': TestPipe
-      }
+        testPipe: TestPipe,
+      },
     }),
-  ]
+  ],
 })
 export class AppModule {}
 ```
 
 **Note**
-The example above register a pipe named `testpipe` with the transformation class `TestPipe`. 
+The example above register a pipe named `testpipe` with the transformation class `TestPipe`.
 
 **Note**
 The `TestPipe` is automatically registered as provider to the `NgxClrSmartGridModule`.
@@ -545,4 +545,34 @@ The datagrid support a class property that can be set during configuration of th
   (selectedChange)="onSelectedChanges($event)"
 >
 </ngx-clr-smart-grid>
+```
+
+- Projecting row class
+
+Projecting row class allow developpers to set or apply a `css class` to a datagrid row element, using a simple javascript function or string value.
+
+```ts
+@Component({
+  // ...
+  template: `
+    <ngx-clr-smart-grid
+      [config]="gridConfig"
+      (dgRefresh)="onDgRefresh($event)"
+      (selectedChange)="onSelectedChanges($event)"
+    >
+    </ngx-clr-smart-grid>
+  `,
+})
+export class MyComponent {
+  gridConfig: Partial<GridConfigType> = {
+    class: "clr-dg-compact custom-style-1 custom-style-2",
+    // Below we use a Javascript function to apply a class to the datagrid row based on the row value
+    projectRowClass: (current: any) => {
+      return current.id === 3 ? "my-row" : "";
+    },
+
+    // or using a simple javascript string
+    // projectRowClass: 'my-row sticky'
+  };
+}
 ```

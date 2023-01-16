@@ -4,7 +4,6 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration production",
     "build:all": "ng build --configuration production @azlabsjs/ngx-dropzone && ng build --configuration production @azlabsjs/ngx-intl-tel-input && ng build --configuration production @azlabsjs/ngx-smart-form && ng build --configuration production @azlabsjs/ngx-clr-smart-grid && ng build --configuration production @azlabsjs/ngx-slides",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
