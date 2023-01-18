@@ -35,7 +35,7 @@ export class NgxClrSmartGridComponent {
   @Input() loading: boolean = false;
   @Input() currentDetail!: unknown;
   @Input() total!: number;
-  @Input() placeholder!: string;
+  @Input() placeholder!: string | undefined | null;
   // #endregion Input properties
 
   // Projected Templates
@@ -121,7 +121,9 @@ export class NgxClrSmartGridComponent {
 
   // Output definitions
   @Output() selectedChange = new EventEmitter<unknown[] | unknown>();
-  @Output() dgRefresh = new EventEmitter<ProjectPaginateQueryParamType<unknown>>();
+  @Output() dgRefresh = new EventEmitter<
+    ProjectPaginateQueryParamType<unknown>
+  >();
   @Output() detailChange = new EventEmitter<unknown>();
 
   // Listen to internal grid component select changes and notify parent component
