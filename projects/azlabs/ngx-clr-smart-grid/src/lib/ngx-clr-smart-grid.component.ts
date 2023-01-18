@@ -35,7 +35,7 @@ export class NgxClrSmartGridComponent {
   @Input() loading: boolean = false;
   @Input() currentDetail!: unknown;
   @Input() total!: number;
-  @Input() placeholder!: string;
+  @Input() placeholder!: string|undefined|null;
   // #endregion Input properties
 
   // Projected Templates
