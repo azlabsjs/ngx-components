@@ -1,6 +1,6 @@
 {
   "name": "@azlabsjs/ngx-clr-smart-grid",
-  "version": "0.14.34",
+  "version": "0.14.35",
   "peerDependencies": {
     "@angular/common": "^14.0",
     "@angular/core": "^14.0",
