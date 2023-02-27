@@ -11,6 +11,8 @@ import {
   FORM_CLIENT,
   ReactiveFormComponentInterface
 } from '@azlabsjs/ngx-smart-form';
+import { FormConfigInterface, InputGroup } from '@azlabsjs/smart-form-core';
+import { BehaviorSubject, filter, Subject, takeUntil, tap } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -19,7 +21,10 @@ import {
 })
 export class AppComponent {
   //
-  form$ = this.client.get(220);
+  _state$ = new BehaviorSubject<FormConfigInterface | undefined>(undefined);
+  state$ = this._state$.asObservable();
+
+  private _destroy$ = new Subject<void>();
   @ViewChild('smartform', { static: false })
   smartForm!: ReactiveFormComponentInterface;
 
@@ -100,7 +105,7 @@ export class AppComponent {
   ];
 
   gridConfig: Partial<GridConfigType> = {
-    projectRowClass: (current: {id: number}) => {
+    projectRowClass: (current: { id: number }) => {
       return current.id === 3 ? 'my-row' : '';
     },
   };
@@ -130,7 +135,16 @@ export class AppComponent {
   public constructor(
     @Inject(FORM_CLIENT) private client: FormsClient,
     private lowercasePipe: LowerCasePipe
-  ) {}
+  ) {
+    this.client
+      .get(220)
+      .pipe(
+        filter((state) => typeof state !== 'undefined' && state !== null),
+        tap((state) => this._state$.next(state)),
+        takeUntil(this._destroy$)
+      )
+      .subscribe();
+  }
 
   // Listen to datagrid refresh events
   onDgRefresh(event: unknown) {
@@ -142,12 +156,32 @@ export class AppComponent {
     console.log(event);
   }
 
-  onFormReadyState(state: unknown) {
-    console.log(state);
+  onFormReadyState(event: FormConfigInterface) {
     setTimeout(() => {
-      console.log('Setting control value...');
-      this.smartForm.setControlValue('category_id', 1);
-      this.smartForm.setControlValue('fruits', [2, 4]);
+      // this.smartForm.setControlValue('category_id', 1);
+      // this.smartForm.setControlValue('fruits', [2, 4]);
+      this.client
+        .get(234)
+        .pipe(
+          filter((state) => typeof state !== 'undefined' && state !== null),
+          tap((state) => {
+            const { controlConfigs } = event;
+            let values = [...controlConfigs];
+            const index = values.findIndex(
+              (current) => current.name === 'stakeholders'
+            );
+            if (index !== -1) {
+              const stakeHolders = {
+                ...(values[index] as InputGroup),
+                children: state.controlConfigs,
+              } as InputGroup;
+              values.splice(index, 1, stakeHolders);
+            }
+            this._state$.next({ ...event, controlConfigs: values });
+          }),
+          takeUntil(this._destroy$)
+        )
+        .subscribe();
     }, 3000);
 
     setTimeout(() => {
@@ -157,6 +191,10 @@ export class AppComponent {
 
   onError(error: unknown) {
     console.log('Submit error: ', error);
+  }
+
+  ngOnDestroy() {
+    this._destroy$.next();
   }
 
   ngxFormSubmit(event: Record<string, any>) {

@@ -103,7 +103,7 @@
 
 <!-- DEFAULT FORM CONTROL COMPONENT -->
 <ng-template #defaultFormControl let-config="value" let-control="control">
-  <ngx-smart-form-control *ngIf="control" [class]="'ngx-smart-form-control ' + config.containerClass"
+  <ngx-smart-form-control *ngIf="isFormControl(control)" [class]="'ngx-smart-form-control ' + config.containerClass"
     [hidden]="config.hidden" [control]="control" [inputConfig]="config" [options]="config.options"
     [autoupload]="autoupload" [submitupload]="submitupload"></ngx-smart-form-control>
 </ng-template>

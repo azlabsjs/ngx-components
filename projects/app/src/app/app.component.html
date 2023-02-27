@@ -1,16 +1,16 @@
 <div class="container">
-  <ngx-clr-smart-grid [config]="gridConfig" [columns]="columns" [data]="data" (dgRefresh)="onDgRefresh($event)"
-    (selectedChange)="onSelectedChanges($event)"></ngx-clr-smart-grid>
-  <ng-container *ngIf="form$ | async as form">
-    <ngx-smart-form #smartform (readyState)="onFormReadyState($event)" (error)="onError($event)" [submitable]="true"
+  <!-- <ngx-clr-smart-grid [config]="gridConfig" [columns]="columns" [data]="data" (dgRefresh)="onDgRefresh($event)"
+    (selectedChange)="onSelectedChanges($event)"></ngx-clr-smart-grid> -->
+  <ng-container *ngIf="state$ | async as form">
+    <ngx-smart-form #smartform (readyState)="onFormReadyState(form)" (error)="onError($event)" [submitable]="true"
       [autoupload]="true" (submit)="ngxFormSubmit($event)" [form]="form" [autoSubmit]="true"
       [path]="'http://localhost:3000/customers'">
-      <div before>
+      <!-- <div before>
         <p>Hello I am before form controls</p>
       </div>
       <div after>
         <p>Hello I am after form controls</p>
-      </div>
+      </div> -->
     </ngx-smart-form>
   </ng-container>
 </div>
