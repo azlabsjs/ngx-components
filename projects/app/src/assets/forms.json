@@ -120,6 +120,7 @@
         "id": 1277,
         "label": "BÉNÉFICIAIRES DÉCLARÉ(S)",
         "placeholder": "...",
+        "requiredIf": "category_id:1",
         "type": "control_group",
         "classes": "controls-header",
         "multiple": 0,
