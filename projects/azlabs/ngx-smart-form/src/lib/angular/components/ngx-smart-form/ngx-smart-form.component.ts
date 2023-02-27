@@ -8,12 +8,19 @@ import {
   HostListener,
   Inject,
   Input,
+  OnChanges,
   OnDestroy,
   Optional,
   Output,
+  SimpleChanges,
   TemplateRef
 } from '@angular/core';
-import { AbstractControl, UntypedFormArray, UntypedFormGroup } from '@angular/forms';
+import {
+  AbstractControl,
+  UntypedFormArray,
+  UntypedFormControl,
+  UntypedFormGroup
+} from '@angular/forms';
 import { HTTPRequestMethods } from '@azlabsjs/requests';
 import {
   FormConfigInterface,
@@ -49,7 +56,6 @@ import {
       :host ::ng-deep .clr-input-wrapper {
         width: 100%;
       }
-
       div.control__group__header,
       :host ::ng-deep div.control__group__header {
         font-size: 1rem;
@@ -72,12 +78,10 @@ import {
         padding: 0;
         margin-top: 1rem;
       }
-
       .ngx-smart-form-control,
       :host ::ng-deep .ngx-smart-form-control {
         padding: 0.3rem;
       }
-
       :host ::ng-deep .clr-form-control {
         margin-top: 0rem !important;
       }
@@ -86,7 +90,11 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFormComponent
-  implements ReactiveFormComponentInterface, AfterViewInit, OnDestroy
+  implements
+    ReactiveFormComponentInterface,
+    AfterViewInit,
+    OnDestroy,
+    OnChanges
 {
   //#region Local properties
   /** @internal */
@@ -114,7 +122,12 @@ export class NgxSmartFormComponent
 
   //#region Component outputs
   @Output() submit = new EventEmitter<{ [index: string]: any }>();
+  /**
+   * @deprecated In future release, `readyState` event will be remove
+   * Use `ready` listener instead
+   */
   @Output() readyState = new EventEmitter();
+  @Output() changes = new EventEmitter();
   @Output() formGroupChange = new EventEmitter<UntypedFormGroup>();
   @Output() complete = new EventEmitter<unknown>();
   @Output() error = new EventEmitter<unknown>();
@@ -138,9 +151,15 @@ export class NgxSmartFormComponent
   public constructor(
     @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
     private builder: AngularReactiveFormBuilderBridge,
-    private changes: ChangeDetectorRef,
+    private changesRef: ChangeDetectorRef,
     @Inject(HTTP_REQUEST_CLIENT) @Optional() private client?: RequestClient
   ) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('form' in changes) {
+      this.onFormConfigChanges();
+    }
+  }
 
   setValue(state: { [k: string]: unknown }): void {
     // Set or update the form state of the current component
@@ -149,30 +168,36 @@ export class NgxSmartFormComponent
 
   ngAfterViewInit(): void {
     this.setComponentForm(this.form);
-    this.changes.detectChanges();
+    // Timeout and notify parent component of ready state
+    this.readyState.emit();
   }
 
   //#region FormComponent interface Methods definitions
-  controlValueChanges(control: string): Observable<unknown> {
-    const control_ = this._formGroup?.get(control);
-    if (control_) {
-      return control_.valueChanges;
-    }
-    return EMPTY;
+  controlValueChanges(name: string): Observable<unknown> {
+    const control_ = this._formGroup?.get(name);
+    return control_
+      ? control_.valueChanges.pipe(takeUntil(this._destroy$))
+      : EMPTY;
   }
 
   getControlValue(control: string, _default?: any): unknown {
     const value = this._formGroup.get(control)?.value;
     return value || _default || undefined;
   }
+
+  //
   setControlValue(control: string, value: any): void {
     this._formGroup.get(control)?.setValue(value);
   }
+
+  //
   disableControls(controls: ControlsStateMap): void {
     for (const [key, entry] of Object.entries(controls)) {
       this._formGroup.get(key)?.disable(entry);
     }
   }
+
+  //
   enableControls(controls: ControlsStateMap): void {
     for (const [key, entry] of Object.entries(controls)) {
       this._formGroup.get(key)?.enable(entry);
@@ -182,7 +207,7 @@ export class NgxSmartFormComponent
   //
   addControl(name: string, control: AbstractControl): void {
     if (this._formGroup.get(name)) {
-      return this._formGroup.get(name)?.setValue(control.value);
+      this._formGroup.get(name)?.setValue(control.value);
     }
     this._formGroup.addControl(name, control);
   }
@@ -197,7 +222,7 @@ export class NgxSmartFormComponent
     // Validate the formgroup object to ensure it passes
     // validation before submitting
     this.validateForm();
-    this.changes.detectChanges();
+    this.changesRef.detectChanges();
     // We simply return without performing any further action
     // if the validation fails
     if (!this._formGroup.valid) {
@@ -223,48 +248,17 @@ export class NgxSmartFormComponent
     event.preventDefault();
   }
 
-  //
   setComponentForm(value: FormConfigInterface): void {
     if (value) {
       // We set the controls container class
       const controls = (value.controlConfigs ?? []).map((current) => ({
         ...current,
-        containerClass: false
-          ? 'clr-col-md-12'
-          : current.containerClass ?? 'clr-col-md-12',
+        containerClass: current.containerClass ?? 'clr-col-md-12',
         isRepeatable: current.isRepeatable ?? false,
       }));
       //
       this.form = { ...value, controlConfigs: controls };
-      // We unregister from previous event each time we set the
-      // form value
-      this._destroy$.next();
-      // We create an instance of angular Reactive Formgroup instance
-      // from input configurations
-      this._formGroup = this.builder.group(value) as UntypedFormGroup;
-      // Set input bindings
-      this.setBindings();
-      // Subscribe to formgroup changes
-      this._formGroup?.valueChanges
-        .pipe(
-          tap((state) => this.formGroupChange.emit(state)),
-          takeUntil(this._destroy$)
-        )
-        .subscribe();
-      // Set the form value if it's defined
-      if (this.state) {
-        this.setFormValue(
-          this._formGroup,
-          this.state,
-          this.form.controlConfigs ?? []
-        );
-      }
-      // Timeout and notify parent component
-      // of ready state
-      const timeout = setTimeout(() => {
-        this.readyState.emit();
-        clearTimeout(timeout);
-      }, 20);
+      this.onFormConfigChanges();
     }
   }
 
@@ -291,7 +285,7 @@ export class NgxSmartFormComponent
       this.form = { ...this.form, controlConfigs: controls };
       // We trigger the change detector to detect changes after updating
       // the form controlConfigs
-      this.changes.detectChanges();
+      this.changesRef.detectChanges();
     }
   }
 
@@ -419,8 +413,40 @@ export class NgxSmartFormComponent
     }
   }
 
-  getTypeof(value: any) {
-    return typeof value;
+  private onFormConfigChanges() {
+    // We unregister from previous event each time we set the
+    // form value
+    this._destroy$.next();
+    // We create an instance of angular Reactive Formgroup instance
+    // from input configurations
+    this._formGroup = this.builder.group(this.form) as UntypedFormGroup;
+    // Set input bindings
+    this.setBindings();
+    // Subscribe to formgroup changes
+    this._formGroup?.valueChanges
+      .pipe(
+        tap((state) => this.formGroupChange.emit(state)),
+        takeUntil(this._destroy$)
+      )
+      .subscribe();
+    // Set the form value if it's defined
+    if (this.state) {
+      this.setFormValue(
+        this._formGroup,
+        this.state,
+        this.form.controlConfigs ?? []
+      );
+    }
+    this.changes.emit();
+  }
+
+  isFormControl(value: unknown) {
+    return (
+      typeof value !== 'undefined' &&
+      value !== null &&
+      value instanceof AbstractControl &&
+      typeof (value as UntypedFormControl).registerOnChange === 'function'
+    );
   }
 
   ngOnDestroy(): void {

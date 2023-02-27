@@ -33,7 +33,7 @@
           <div [innerHTML]="value.label | ngxGroupHeader | safeHtml"></div>
           <!-- REPEATABLE INPUTS GROUP -->
           <ng-container *ngIf="value!.isRepeatable === true">
-            <ngx-smart-form-array *ngIf="group.get(value.name)" [formArray]="group.get(value.name)"
+            <ngx-smart-form-array *ngIf="group?.get(value.name)" [formArray]="group?.get(value.name)"
               [controls]="value.children || []" [template]="template ? template : defaultFormControl"
               [addGroupRef]="addTemplate" [name]="value.name" [autoupload]="autoupload" [submitupload]="submitupload">
             </ngx-smart-form-array>
@@ -45,7 +45,7 @@
                 recursiveTemplate;
                 context: {
                   controls: value!.children || [],
-                  group: group.get(value.name),
+                  group: group?.get(value.name),
                   submitupload, autoupload
                 }
               "></ng-container>
@@ -75,7 +75,7 @@
 <ng-template #formTemplate let-group="group" let-value="value">
   <!-- REPEATABLE INPUTS -->
   <ng-container *ngIf="value!.isRepeatable === true">
-    <ngx-smart-form-control-array *ngIf="group.get(value.name)" [formArray]="group.get(value.name)"
+    <ngx-smart-form-control-array *ngIf="group?.get(value.name)" [formArray]="group?.get(value.name)"
       [inputConfig]="value" [template]="template ? template : defaultFormControl" [addButtonRef]="addTemplate"
       [name]="value.name" [autoupload]="autoupload" [submitupload]="submitupload"></ngx-smart-form-control-array>
     <!-- </ng-container> -->
@@ -84,7 +84,7 @@
 
   <!-- NON REPEATABLE INPUTS -->
   <ng-container *ngIf="value!.isRepeatable === false">
-    <ng-container *ngIf="group.get(value.name) as control">
+    <ng-container *ngIf="group?.get(value.name) as control">
       <ng-container *ngTemplateOutlet="template ? template : defaultFormControl; context: { control, value }">
       </ng-container>
     </ng-container>
@@ -103,7 +103,7 @@
 
 <!-- DEFAULT FORM CONTROL COMPONENT -->
 <ng-template #defaultFormControl let-config="value" let-control="control">
-  <ngx-smart-form-control *ngIf="control" [class]="'ngx-smart-form-control ' + config.containerClass"
+  <ngx-smart-form-control *ngIf="isFormControl(control)" [class]="'ngx-smart-form-control ' + config.containerClass"
     [hidden]="config.hidden" [control]="control" [inputConfig]="config" [options]="config.options"
     [autoupload]="autoupload" [submitupload]="submitupload"></ngx-smart-form-control>
 </ng-template>
