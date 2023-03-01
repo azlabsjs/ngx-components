@@ -9,3 +9,4 @@
 - Replace the swith statement with a call to pipe transform []
 - Remove dependency to clr-icon []
 - Move HTTP loaders and Submit handlers to dedicated packages []
+- Remove reactive forms depedency from intl-tel-input []

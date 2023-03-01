@@ -1,5 +1,6 @@
 import { LowerCasePipe } from '@angular/common';
 import { Component, Inject, ViewChild } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import {
   createPipeTransform,
   GridColumnType,
@@ -23,9 +24,7 @@ export class AppComponent {
   //
   _state$ = new BehaviorSubject<FormConfigInterface | undefined>(undefined);
   state$ = this._state$.asObservable();
-
   private _destroy$ = new Subject<void>();
-
   @ViewChild('smartform', { static: false })
   smartForm!: ReactiveFormComponentInterface;
 
@@ -137,6 +136,10 @@ export class AppComponent {
     ],
   };
 
+  required = false;
+  control = new FormControl<string | undefined>(undefined);
+  haserror = false;
+
   public constructor(
     @Inject(FORM_CLIENT) private client: FormsClient,
     private lowercasePipe: LowerCasePipe
@@ -201,6 +204,14 @@ export class AppComponent {
         .pipe(tap((state) => console.log('State changes:', state)))
         .subscribe();
     }, 300);
+  }
+
+  onBlur(event: FocusEvent) {
+    console.log(event);
+  }
+
+  onFocus(event: FocusEvent) {
+    console.log(event);
   }
 
   onError(error: unknown) {

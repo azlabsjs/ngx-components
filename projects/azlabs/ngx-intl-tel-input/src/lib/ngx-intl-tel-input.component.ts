@@ -1,25 +1,19 @@
 import {
+  ChangeDetectorRef,
   Component,
   ContentChild,
-  ElementRef,
+  EventEmitter,
   Input,
-  OnDestroy,
-  OnInit,
-  TemplateRef,
-  ViewChild
+  OnChanges,
+  Output,
+  SimpleChanges,
+  TemplateRef
 } from '@angular/core';
-import { UntypedFormControl, ValidatorFn, Validators } from '@angular/forms';
-import { JSObject } from '@azlabsjs/js-object';
-import { BehaviorSubject, Subject, merge } from 'rxjs';
-import {
-  distinctUntilChanged,
-  startWith,
-  takeUntil,
-  tap,
-} from 'rxjs/operators';
+import '@azlabs-wc/dropdown/azl-dropdown.js';
 import { IntlTelInput } from './core/intl-tel-input';
 import { Country } from './core/model';
-import { PhoneNumberValidator } from './core/validators';
+
+type SetStateParam<T> = Partial<T> | ((state: T) => T);
 
 @Component({
   selector: 'ngx-intl-tel-input',
@@ -46,13 +40,13 @@ import { PhoneNumberValidator } from './core/validators';
         width: 100%;
       }
 
-      .intl-tel-input button.btn {
-        background: var(--light-clouds);
-        border: none;
-      }
-
       span.dial-code {
         color: #bfbfbf;
+      }
+
+      .select-countries-view-port {
+        width: auto;
+        overflow-x: hidden;
       }
 
       .countries-viewport {
@@ -64,9 +58,9 @@ import { PhoneNumberValidator } from './core/validators';
       :focus {
         outline: none;
       }
-      .ngx-dropdown-item {
+      .dropdown-item {
         font-family: var(
-          --clr-font,
+          --intl-tel-input-font,
           Metropolis,
           'Avenir Next',
           'Helvetica Neue',
@@ -74,7 +68,7 @@ import { PhoneNumberValidator } from './core/validators';
           sans-serif
         );
         font-size: 0.8rem;
-        padding: 0.3rem 0;
+        padding: 0.3rem;
         letter-spacing: normal;
         background: #0000;
         border: 0;
@@ -87,140 +81,124 @@ import { PhoneNumberValidator } from './core/validators';
         text-transform: none;
       }
 
-      .ngx-dropdown-item:hover {
+      .dropdown-item:hover {
         border-bottom: none;
+        background-color: var(
+          --intl-tel-input-item-bg-color,
+          rgba(40, 39, 39, 0.1)
+        );
       }
 
       .dropdown-divider {
         font-size: 0.6rem;
-        border-bottom: 0.05rem solid #e8e8e8;
-        border-bottom-color: var(--clr-dropdown-divider-color, #e8e8e8);
-        border-bottom-width: var(--clr-dropdown-divider-border-width, 0.05rem);
+        border-bottom: 0.05rem solid;
+        border-bottom-color: var(--dropdown-border-color, #e8e8e8);
+        border-bottom-width: var(--dropdown-border-width, 0.05rem);
         margin: 0.3rem 0;
       }
 
       .dropdown-toggle {
         display: inline;
       }
+
+      .intl-tel-input__layout {
+        display: flex;
+      }
+
+      .intl-tel-input__text-input {
+        flex: 100px 1;
+      }
     `,
   ],
 })
-export class NgxIntlTelInputComponent implements OnInit, OnDestroy {
-  //
-  public phoneControl!: UntypedFormControl;
-  @Input() control!: UntypedFormControl;
+export class NgxIntlTelInputComponent implements OnChanges {
+  // #region Component Inputs
   @Input() required = false;
-  @Input() allowDropdown = true;
   @Input() country!: string;
   @Input() class!: string;
-  @Input() preferredCountries: string[] = ['tg', 'bj', 'gh'];
-  @ViewChild('phoneControlElement', { static: false })
-  phoneControlElement!: ElementRef;
-  @ContentChild('input') inputTemplateRef!: TemplateRef<any>;
+  @Input() preferredCountries: string[] = [];
   @Input() index!: number;
-  @Input() label!: string;
+  @Input() value!: string;
+  @Input() disabled: boolean = false;
+  // #endregion Component Inputs
 
-  //
-  allCountries: Country[] = [];
-  preferredCountriesInDropDown: Country[] = [];
-  selected: Country = {} as Country;
+  // #region Child content selectors
+  @ContentChild('input') inputTemplateRef!: TemplateRef<any>;
+  // #endregion Child content selectors
 
-  //
-  private _destroy$ = new Subject<void>();
+  // #region Component outputs
+  @Output() valueChange = new EventEmitter<string>();
+  @Output() error = new EventEmitter<boolean>();
+  @Output() focus = new EventEmitter<FocusEvent>();
+  @Output() blur = new EventEmitter<FocusEvent>();
+  // #endregion Component outputs
 
-  @Input() set disabled(value: boolean) {
-    this._disableState$.next({ disabled: value || false });
-  }
-  private _disableState$ = new BehaviorSubject({ disabled: false });
-  disableState$ = this._disableState$.pipe(
-    startWith({ disabled: false }),
-    tap((state) => {
-      if (
-        state.disabled &&
-        this.phoneControl.status.toLowerCase() !== 'disabled'
-      ) {
-        this.phoneControl.disable({ onlySelf: true });
-      }
-      if (
-        !state.disabled &&
-        this.phoneControl.status.toLowerCase() === 'disabled'
-      ) {
-        this.phoneControl.enable({ onlySelf: true });
-      }
-    })
-  );
-
-  //
-  public wrapperClass = 'intl-tel-input allow-dropdown input-effect';
-  @ContentChild('toggleButton') toggleButtonRef!: TemplateRef<any>;
-
-  constructor(private service: IntlTelInput) {
-    this.allCountries = this.service.fetchCountries() ?? [];
+  private _countries = this.service.fetchCountries() ?? [];
+  private _state = {
+    disabled: false,
+    required: false,
+    value: undefined as string | undefined,
+    countries: [...this._countries],
+    preferredCountries: ['tg', 'bj', 'gh']
+      .map((iso2) => this._countries.find((c) => c.iso2 === iso2))
+      .filter(
+        (current) => typeof current !== 'undefined' && current !== null
+      ) as Country[],
+    selected: undefined as Country | undefined,
+  };
+  get state() {
+    return this._state;
   }
 
-  ngOnInit() {
-    if (typeof this.control === 'undefined' || this.control === null) {
-      this.control = new UntypedFormControl();
+  constructor(
+    private service: IntlTelInput,
+    private changeRef: ChangeDetectorRef
+  ) {}
+
+  ngOnChanges(changes: SimpleChanges) {
+    let stateChanges = false;
+    let preferredCountries = this._state.preferredCountries;
+    if ('preferredCountries' in changes) {
+      stateChanges = true;
+      preferredCountries = this.preferredCountries
+        .map((iso2) => this._state.countries.find((c) => c.iso2 === iso2))
+        .filter(
+          (current) => typeof current !== 'undefined' && current !== null
+        ) as Country[];
     }
-    for (const iso2 of this.preferredCountries) {
-      const prefered = this.allCountries.find((c) => c.iso2 === iso2);
-      if (prefered) {
-        this.preferredCountriesInDropDown.push(prefered);
-      }
+    if ('country' in changes) {
+      stateChanges = true;
     }
-    const disabled = this.control!.status.toLowerCase() === 'disabled';
-    this._initializePhoneNumberControl(disabled);
-    if (this.control!.status.toLowerCase() === 'disabled') {
-      this._disableState$.next({ disabled: true });
+    if ('value' in changes) {
+      stateChanges = true;
     }
-    // Set the preferred countries
-    merge(
-      this.subscribeToControlChanges(),
-      this.subscribeToPhoneControlChanges()
-    ).subscribe();
-  }
 
-  private subscribeToPhoneControlChanges() {
-    return this.phoneControl.valueChanges.pipe(
-      distinctUntilChanged(),
-      takeUntil(this._destroy$),
-      tap((state) => {
-        if (JSObject.isEmpty(state)) {
-          this.control!.setErrors({ invalidPhoneNumber: null });
-          this.control!.setValue(null);
-        }
-        if (state) {
-          this.setControlValue(this.selected.dialCode, state);
-        }
-      })
-    );
-  }
-
-  private subscribeToControlChanges() {
-    return this.control!.valueChanges.pipe(
-      distinctUntilChanged(),
-      takeUntil(this._destroy$),
-      tap((state) => {
-        if (this.control!.status.toLowerCase() === 'disabled') {
-          this._disableState$.next({ disabled: true });
-        } else {
-          this._disableState$.next({ disabled: false });
-        }
-        if (typeof state !== 'undefined' && state !== null) {
-          this.setPhoneControlValue(state);
-        } else {
-          this.phoneControl.setValue(null);
-        }
-      })
-    );
+    if ('disabled' in changes) {
+      stateChanges = true;
+    }
+    if (stateChanges) {
+      const selected =
+        this._state.selected ??
+        this.getSelectedCountry(this.value, preferredCountries, this.country);
+      const countryCode = this.getCountryCode(this.value ?? '');
+      this.setState((state) => ({
+        ...state,
+        value:
+          typeof countryCode !== 'undefined' && countryCode !== null
+            ? this.value.substring(countryCode.toString().length)
+            : this._state.value,
+        disabled: this.disabled,
+        required: this.required,
+        selected,
+      }));
+    }
   }
 
   //
   public onCountrySelect(country: Country): void {
-    this.selected = country;
-    const value = this.phoneControl.value ? this.phoneControl.value : '';
-    this.setControlValue(country.dialCode, value);
-    this.phoneControlElement.nativeElement.focus();
+    this.setState((state) => ({ ...state, selected: country }));
+    this.dispatchValueChange();
+    // Dispatch a selectionChange event
   }
 
   //
@@ -232,87 +210,86 @@ export class NgxIntlTelInputComponent implements OnInit, OnDestroy {
     }
   }
 
-  //
-  private _initializePhoneNumberControl(disabled = false): void {
-    this.phoneControl = new UntypedFormControl({ value: null, disabled });
-    // Set the initial country to show
+  onBlur(event: FocusEvent) {
+    this.blur.emit(event);
+  }
+
+  onFocus(event: FocusEvent) {
+    this.focus.emit(event);
+  }
+
+  onInputChange(event?: Event) {
+    this.setState((state) => ({
+      ...state,
+      value: (event?.target as HTMLInputElement).value.trim(),
+    }));
+    this.dispatchValueChange();
+    event?.stopPropagation();
+  }
+
+  setState(state: SetStateParam<typeof this._state>) {
+    if (typeof state === 'function') {
+      this._state = state(this._state);
+    }
+    this._state = { ...this._state, ...state };
+    this.error.emit(
+      this._state.value &&
+        this._state.selected &&
+        !this.service.isSafeValidPhoneNumber(this.getPhonenumber())
+        ? true
+        : false
+    );
+    this.changeRef.markForCheck();
+  }
+
+  private dispatchValueChange() {
+    const value = this.getPhonenumber();
     if (
-      typeof this.control!.value !== 'undefined' &&
-      this.control!.value !== null
+      typeof this.value === 'undefined' ||
+      this.value === null ||
+      this.value !== value
     ) {
-      this.setPhoneControlValue(this.control!.value.toString());
-    } else if (this.country) {
-      const selected = this.allCountries.find((c: Country) => {
+      this.valueChange.emit(value);
+    }
+  }
+
+  private getSelectedCountry(
+    value: string | undefined,
+    preferredCountries: Country[],
+    country: string
+  ) {
+    let selected!: Country | undefined;
+    if (value && value !== '') {
+      const tmpCode = this.getCountryCode(value);
+      selected = tmpCode
+        ? this._state.countries.find(
+            (c: Country) => c.dialCode === tmpCode.toString()
+          )
+        : undefined;
+    }
+    if (selected) {
+      return selected;
+    }
+    if (country) {
+      selected = this._state.countries.find((c: Country) => {
         return c.iso2 === this.country;
       });
-      if (selected) {
-        this.selected = selected;
-      }
-    } else {
-      if (this.preferredCountriesInDropDown.length > 0) {
-        this.selected = this.preferredCountriesInDropDown[0];
-      } else {
-        this.selected = this.allCountries[0];
-      }
     }
-    // Setting validators on a control
-    const validators: ValidatorFn[] = [
-      PhoneNumberValidator.ValidatePhoneNumber,
-    ];
-    if (this.required) {
-      validators.push(Validators.required);
+    if (selected) {
+      return selected;
     }
-    this.control!.setValidators(validators);
-    this.control!.updateValueAndValidity({ onlySelf: true });
+    return preferredCountries.length > 0
+      ? preferredCountries[0]
+      : this._state.countries[0];
   }
 
-  //
-  private setControlValue(code: string, phoneNumber: string): void {
-    this.control!.markAsTouched();
-    this.control!.markAsDirty();
-    this.control.updateValueAndValidity();
-    if (this.control!.value === `${code}${phoneNumber}`) {
-      return;
-    }
-    this.control!.setValue(
-      `${code}${phoneNumber?.replace(/[\s\t\/\+\-]/g, '')}`
-    );
+  private getPhonenumber() {
+    return `${this._state.selected?.dialCode ?? ''}${
+      this._state.value?.replace(/[\s\t\/\+\-]/g, '') ?? ''
+    }`;
   }
 
-  //
-  setPhoneControlValue(value: string): void {
-    const tmpCode = this.service.getCountryCode(value);
-    if (tmpCode) {
-      const selected = this.allCountries.find((c: Country) => {
-        return c.dialCode === tmpCode.toString();
-      });
-      if (selected && value) {
-        this.selected = selected;
-        const shortPhoneNumber = value.substring(this.selected.dialCode.length);
-        const phoneControlValue = this.phoneControl.value?.replace(
-          /[\s\t\/\+\-]/g,
-          ''
-        );
-        if (shortPhoneNumber !== phoneControlValue) {
-          this.phoneControl.setValue(shortPhoneNumber);
-        }
-      }
-    }
-  }
-
-  //
-  isDefined(value: any) {
-    return typeof value !== 'undefined' && value !== null;
-  }
-
-  //
-  ngOnDestroy() {
-    this._destroy$.next();
-    this.allCountries = [];
-  }
-
-  //
-  onInputFocus() {
-    this.control!.markAsTouched();
+  private getCountryCode(value: string) {
+    return this.service.getCountryCode(value);
   }
 }

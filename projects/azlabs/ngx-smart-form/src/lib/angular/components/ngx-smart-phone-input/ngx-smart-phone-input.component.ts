@@ -1,19 +1,25 @@
-import { Component, ContentChild, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ContentChild,
+  EventEmitter,
+  Input,
+  Output,
+  TemplateRef
+} from '@angular/core';
 import { AbstractControl, UntypedFormControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
+import { distinctUntilChanged, filter, Subject, takeUntil, tap } from 'rxjs';
+
+type SetStateParam<T> = Partial<T> | ((state: T) => T);
 
 @Component({
   selector: 'ngx-smart-phone-input',
   templateUrl: './ngx-smart-phone-input.component.html',
-  styles: [
-    `
-      :host ::ng-deep .btn {
-        margin-top: .05rem !important;
-      }
-    `
-  ],
+  styles: [],
 })
-export class PhoneInputComponent {
+export class PhoneInputComponent implements AfterViewInit {
   //#region Component inputs
   @Input() control!: AbstractControl & UntypedFormControl;
   @Input() describe = true;
@@ -26,6 +32,20 @@ export class PhoneInputComponent {
   @Output() blur = new EventEmitter<FocusEvent>();
   //#endregion Component event emitter
 
+  // #region Component state
+  private _state = {
+    disabled: false,
+    value: undefined as string | undefined,
+  };
+  private _destroy$ = new Subject<void>();
+  // #endregion Component state
+
+  /**
+   * Creates component instance
+   *
+   */
+  constructor(private changeRef: ChangeDetectorRef) {}
+
   onBlur(event: FocusEvent) {
     this.control?.markAsTouched();
     this.blur.emit(event);
@@ -34,5 +54,41 @@ export class PhoneInputComponent {
   onFocus(event: FocusEvent) {
     this.control?.markAsTouched();
     this.focus.emit(event);
+  }
+
+  ngAfterViewInit(): void {
+    this.control.valueChanges
+      .pipe(
+        distinctUntilChanged(),
+        filter((state) => typeof state !== 'undefined' && state !== null),
+        tap((value: string) => this.setState((state) => ({ ...state, value }))),
+        takeUntil(this._destroy$)
+      )
+      .subscribe();
+    this.control.statusChanges
+      .pipe(
+        tap((status) => {
+          this.setState((state) => ({
+            ...state,
+            disabled:
+              status.toLowerCase() === 'disabled' ||
+              status.toLocaleLowerCase() === 'invalid',
+          }));
+        }),
+        takeUntil(this._destroy$)
+      )
+      .subscribe();
+  }
+
+  onError(value: boolean) {
+    this.control.setErrors({ invalidPhoneNumber: value });
+  }
+
+  setState(state: SetStateParam<typeof this._state>) {
+    if (typeof state === 'function') {
+      this._state = state(this._state);
+    }
+    this._state = { ...this._state, ...state };
+    this.changeRef.markForCheck();
   }
 }

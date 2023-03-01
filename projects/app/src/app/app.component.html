@@ -1,14 +1,20 @@
 <div class="container">
-  <ngx-clr-smart-grid [config]="gridConfig" [columns]="columns" [data]="data" (dgRefresh)="onDgRefresh($event)"
+  <!-- <ngx-clr-smart-grid [config]="gridConfig" [columns]="columns" [data]="data" (dgRefresh)="onDgRefresh($event)"
     (selectedChange)="onSelectedChanges($event)"></ngx-clr-smart-grid>
   <ngx-clr-smart-grid [columns]="columns" [pageResult]="pageResult" (dgRefresh)="onDgRefresh($event)"
     (selectedChange)="onSelectedChanges($event)" [config]="{useServerPagination: true}"></ngx-clr-smart-grid>
   <ng-container *ngIf="state$ | async as form">
-    <ngx-smart-form #smartform (readyState)="onFormReadyState(form)" (changes)="afterChanges()" (error)="onError($event)" [submitable]="true"
-      [autoupload]="true" (submit)="ngxFormSubmit($event)" [form]="form" [autoSubmit]="true"
-      [path]="'http://localhost:3000/customers'">
+    <ngx-smart-form #smartform (readyState)="onFormReadyState(form)" (changes)="afterChanges()"
+      (error)="onError($event)" [submitable]="true" [autoupload]="true" (submit)="ngxFormSubmit($event)" [form]="form"
+      [autoSubmit]="true" [path]="'http://localhost:3000/customers'">
     </ngx-smart-form>
-  </ng-container>
+  </ng-container> -->
+  <pre>Control value: {{ control.value }}</pre>
+  <pre>Has Error: {{ haserror| json }}</pre>
+  <ngx-intl-tel-input [disabled]="true" (error)="haserror = $event" (valueChange)="control.setValue($event)" [value]="control.value ?? ''"
+    (blur)="onBlur($event)" (focus)="onFocus($event)" [class]="'clr-input'" [required]="required"
+    [preferredCountries]="['tg', 'bj', 'gh']" [country]="'tg'">
+  </ngx-intl-tel-input>
 </div>
 
 <!-- <ngx-slides [slides]="slides" [autostart]="true" [timer]="2000">

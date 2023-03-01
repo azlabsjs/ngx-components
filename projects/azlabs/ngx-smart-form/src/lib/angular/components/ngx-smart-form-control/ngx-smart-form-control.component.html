@@ -16,10 +16,10 @@
     <ng-container *ngSwitchCase="inputTypes.PHONE_INPUT">
       <ngx-smart-phone-input [control]="formcontrol" [inputConfig]="inputConfig" [describe]="describe">
         <ng-template #input let-config="config" let-onBlur="onBlur" let-onFocus="onFocus" let-keypress="keypress"
-          let-phoneControl="phoneControl" let-selected="selected">
+          let-selected="selected">
           <input #focusable [tabIndex]="config!.index" [required]="config!.rules!.isRequired || false"
             [class]="'effect-24 ' + config!.classes" (blur)="onBlur($event)" (focus)="onFocus($event)"
-            (keypress)="keypress($event)" [formControl]="phoneControl" placeholder="{{ selected!.placeHolder }}"
+            (keypress)="keypress($event)" [formControl]="formcontrol" placeholder="{{ selected!.placeHolder }}"
             autocomplete="off" type="tel" />
         </ng-template>
       </ngx-smart-phone-input>
