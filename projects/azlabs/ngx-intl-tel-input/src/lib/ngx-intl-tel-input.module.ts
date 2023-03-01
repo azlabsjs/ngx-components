@@ -10,11 +10,18 @@ import { PhoneNumberFormat } from 'google-libphonenumber';
 import { Country, IntlTelInput, ISO3166 } from './core';
 import { getPhoneNumberPlaceholder } from './core/internal';
 import { COUNTRIES } from './core/types';
+import { DropdownModule } from './dropdown';
 import { NgxIntlTelInputComponent } from './ngx-intl-tel-input.component';
 
 @NgModule({
   declarations: [NgxIntlTelInputComponent],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, ScrollingModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    ScrollingModule,
+    DropdownModule,
+  ],
   exports: [NgxIntlTelInputComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

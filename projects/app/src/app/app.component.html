@@ -11,7 +11,7 @@
   </ng-container> -->
   <pre>Control value: {{ control.value }}</pre>
   <pre>Has Error: {{ haserror| json }}</pre>
-  <ngx-intl-tel-input [disabled]="true" (error)="haserror = $event" (valueChange)="control.setValue($event)" [value]="control.value ?? ''"
+  <ngx-intl-tel-input [disabled]="control.status.toLocaleLowerCase() === 'disabled'" (error)="haserror = $event" (valueChange)="control.setValue($event)" [value]="control.value ?? ''"
     (blur)="onBlur($event)" (focus)="onFocus($event)" [class]="'clr-input'" [required]="required"
     [preferredCountries]="['tg', 'bj', 'gh']" [country]="'tg'">
   </ngx-intl-tel-input>

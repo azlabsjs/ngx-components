@@ -58,7 +58,7 @@ type SetStateParam<T> = Partial<T> | ((state: T) => T);
       :focus {
         outline: none;
       }
-      .dropdown-item {
+      .ngx-azl-dropdown-item {
         font-family: var(
           --intl-tel-input-font,
           Metropolis,
@@ -68,9 +68,8 @@ type SetStateParam<T> = Partial<T> | ((state: T) => T);
           sans-serif
         );
         font-size: 0.8rem;
-        padding: 0.3rem;
+        padding: .1rem 0.3rem;
         letter-spacing: normal;
-        background: #0000;
         border: 0;
         cursor: pointer;
         display: block;
@@ -81,7 +80,7 @@ type SetStateParam<T> = Partial<T> | ((state: T) => T);
         text-transform: none;
       }
 
-      .dropdown-item:hover {
+      .ngx-azl-dropdown-item:hover {
         border-bottom: none;
         background-color: var(
           --intl-tel-input-item-bg-color,
@@ -107,6 +106,13 @@ type SetStateParam<T> = Partial<T> | ((state: T) => T);
 
       .intl-tel-input__text-input {
         flex: 100px 1;
+      }
+
+      .intl-tel-search-container {
+        overflow-x: hidden;
+      }
+      .dropdown-divider.no-margin {
+        margin: 0;
       }
     `,
   ],
@@ -240,6 +246,32 @@ export class NgxIntlTelInputComponent implements OnChanges {
         : false
     );
     this.changeRef.markForCheck();
+  }
+
+  onSearchChange(event: string) {
+    const preferredCountries = [] as Country[];
+    if (event.trim() === '') {
+      return this.setState((state) => ({
+        ...state,
+        countries: this._countries,
+        preferredCountries: this.preferredCountries
+          .map((iso2) => this._countries.find((c) => c.iso2 === iso2))
+          .filter(
+            (current) => typeof current !== 'undefined' && current !== null
+          ) as Country[],
+      }));
+    }
+    const countries = this._countries.filter((state) => {
+      return (
+        true ===
+        new RegExp(`${event}`, 'g').test(`${state.dialCode} ${state.name}`)
+      );
+    });
+    return this.setState((state) => ({
+      ...state,
+      countries,
+      preferredCountries,
+    }));
   }
 
   private dispatchValueChange() {
