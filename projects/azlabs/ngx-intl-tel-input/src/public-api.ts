@@ -2,12 +2,10 @@
  * Public API Surface of ngx-intl-tel-input
  */
 
-export { NgxIntlTelInputComponent } from './lib/ngx-intl-tel-input.component';
-export { NgxIntlTelInputModule } from './lib/ngx-intl-tel-input.module';
 export { COUNTRIES, PhoneNumberValidator } from './lib/core';
 export {
-  DropdownModule,
-  DropdownComponent,
-  DropdownToggleDirective,
-  DropdownMenuComponent,
+  DropdownComponent, DropdownModule, DropdownSearchComponent
 } from './lib/dropdown';
+export { NgxIntlTelInputComponent } from './lib/ngx-intl-tel-input.component';
+export { NgxIntlTelInputModule } from './lib/ngx-intl-tel-input.module';
+

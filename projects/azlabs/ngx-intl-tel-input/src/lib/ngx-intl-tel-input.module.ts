@@ -5,7 +5,6 @@ import {
   ModuleWithProviders,
   NgModule
 } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PhoneNumberFormat } from 'google-libphonenumber';
 import { Country, IntlTelInput, ISO3166 } from './core';
 import { getPhoneNumberPlaceholder } from './core/internal';
@@ -17,12 +16,10 @@ import { NgxIntlTelInputComponent } from './ngx-intl-tel-input.component';
   declarations: [NgxIntlTelInputComponent],
   imports: [
     CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
     ScrollingModule,
     DropdownModule,
   ],
-  exports: [NgxIntlTelInputComponent],
+  exports: [NgxIntlTelInputComponent, DropdownModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class NgxIntlTelInputModule {
