@@ -1,49 +1,34 @@
-<div [class]="wrapperClass" *ngIf="disableState$ | async as state">
-  <ngx-dropdown>
-    <div
-      [dropdownTriggerFor]="dropdownMenu"
-      dropdownToggle
-      class="dropdown-toggle"
-    >
-      <ng-container
-        *ngTemplateOutlet="toggleButtonRef; context: { $implicit: selected }"
-      ></ng-container>
-    </div>
-    <ngx-dropdown-menu #dropdownMenu>
-      <div
-        class="ngx-dropdown-item"
-        *ngFor="let country of preferredCountriesInDropDown"
-        (click)="onCountrySelect(country)"
-      >
-        <span class="country-name">{{ country.name }}</span>
-        <span class="dial-code">+{{ country?.dialCode }}</span>
+<div [class]="'intl-tel-input allow-dropdown input-effect'">
+  <div class="intl-tel-input__layout">
+    <ngx-azl-dropdown [disabled]="state.disabled || false" class="intl-tel-input__dropdown" orientation="left"
+      [text]="'+' + state.selected?.dialCode + '  '" [no-hover]="true" [animation]="'scaleY'">
+      <div class="select-countries-view-port">
+        <div class="intl-tel-search-container"><intl-tel-search
+            (valueChange)="onSearchChange($event)"></intl-tel-search></div>
+        <div class="dropdown-divider no-margin"></div>
+        <ng-container *ngIf="(state.preferredCountries ?? []).length > 0">
+          <div class="ngx-azl-dropdown-item" *ngFor="let country of state.preferredCountries"
+            (click)="onCountrySelect(country)">
+            <span class="country-name">{{ country.name }}</span>
+            <span class="dial-code">+{{ country?.dialCode }}</span>
+          </div>
+          <div class="dropdown-divider"></div>
+        </ng-container>
       </div>
-      <div class="dropdown-divider"></div>
       <cdk-virtual-scroll-viewport class="countries-viewport" itemSize="20">
-        <div
-          class="ngx-dropdown-item"
-          *cdkVirtualFor="let country of allCountries"
-          (click)="onCountrySelect(country)"
-        >
+        <div class="ngx-azl-dropdown-item" *cdkVirtualFor="let country of state.countries"
+          (click)="onCountrySelect(country)">
           <span class="country-name">{{ country?.name }}</span>
           <span class="dial-code">+{{ country?.dialCode }}</span>
         </div>
       </cdk-virtual-scroll-viewport>
-    </ngx-dropdown-menu>
-  </ngx-dropdown>
-  <ng-container
-    *ngTemplateOutlet="inputTemplateRef ?? defaultInputElement; context: { phoneControl: phoneControl, keypress: onKeyPress.bind(this), selected: selected }"
-  ></ng-container>
-  <ng-template #defaultInputElement>
-    <input
-      [tabIndex]="index"
-      autocomplete="off"
-      type="tel"
-      [class]="'effect-24 ' + class"
-      (keypress)="onKeyPress($event)"
-      [formControl]="phoneControl"
-      placeholder="{{ selected!.placeHolder }}"
-      #focusable
-    />
-  </ng-template>
+    </ngx-azl-dropdown>
+    <ng-container
+      *ngTemplateOutlet="inputTemplateRef ?? defaultInputElement; context: { keypress: onKeyPress.bind(this), selected: state.selected, required: state.required, disabled: state.disabled, change: onInputChange.bind(this)}"></ng-container>
+    <ng-template #defaultInputElement let-change="change">
+      <input [disabled]="state.disabled" [required]="state.required" [tabIndex]="index" autocomplete="off" type="tel"
+        [class]="'effect-24 ' + class" (keypress)="onKeyPress($event)" (blur)="onBlur($event)" (focus)="onFocus($event)"
+        (change)="change($event)" (input)="change($event)" placeholder="{{ state.selected?.placeHolder }}" #focusable />
+    </ng-template>
+  </div>
 </div>
