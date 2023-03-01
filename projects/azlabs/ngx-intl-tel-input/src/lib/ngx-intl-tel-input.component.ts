@@ -9,7 +9,6 @@ import {
   SimpleChanges,
   TemplateRef
 } from '@angular/core';
-import '@azlabs-wc/dropdown/azl-dropdown.js';
 import { IntlTelInput } from './core/intl-tel-input';
 import { Country } from './core/model';
 
