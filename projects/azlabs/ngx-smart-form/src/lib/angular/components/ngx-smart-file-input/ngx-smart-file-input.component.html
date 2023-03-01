@@ -5,30 +5,10 @@
       (*)
     </small>
   </label>
-  <!-- <ng-container *ngIf="inputConfig.multiple && dropzoneConfigs">
-    <ngx-smart-dz
-      [config]="dropzoneConfigs"
-      (removed)="dzOnRemove($event, inputConfig.multiple)"
-      (added)="dzOnAdd()"
-      [disabled]="control.status.toLowerCase() === 'disabled'"
-      [multiple]="inputConfig.multiple"
-      (acceptedFiles)="
-        onAcceptedFiles(
-          $event,
-          inputConfig.multiple,
-          inputConfig.autoupload,
-          inputConfig.uploadAs
-        )
-      "
-      (reset)="onReset()"
-    ></ngx-smart-dz>
-  </ng-container> -->
-  <ng-container *ngIf="inputState$ | async as state">
-    <!-- TODO: Add the line to div tag if the dropzone input code is uncommented -->
-    <!-- *ngIf="!inputConfig.multiple" -->
+  <ng-container *ngIf="state">
     <div [class]="state.hasError ? 'clr-error' : ''" class="flex-files-input">
       <input type="file" placeholder="{{ inputConfig.placeholder }}" fileInput [class]="inputConfig.classes"
-        [maxFileSize]="dropzoneConfigs.maxFilesize || 10" [maxFiles]="dropzoneConfigs.maxFiles ?? 10"
+        [maxFileSize]="constraints.maxFilesize || 10" [maxFiles]="constraints.maxFiles ?? 10"
         [multiple]="inputConfig.multiple" (sizeError)="onTooLargeFilesEvent($event)" (acceptedFiles)="
           onAcceptedFiles(
             $event,
@@ -50,7 +30,7 @@
     <span [class]="'input__subtext input__error_text'" *ngIf="state.tooLargeFiles.length > 0">
       {{
       'fileSizeError'
-      | templateDict: { maxFilesize: dropzoneConfigs.maxFilesize }
+      | templateDict: { maxFilesize: constraints.maxFilesize }
       }}
     </span>
     <!--\ Large files errors -->
