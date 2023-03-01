@@ -8,7 +8,7 @@ import {
   Output,
   TemplateRef
 } from '@angular/core';
-import { AbstractControl, UntypedFormControl } from '@angular/forms';
+import { AbstractControl, FormControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { distinctUntilChanged, filter, Subject, takeUntil, tap } from 'rxjs';
 
@@ -21,7 +21,7 @@ type SetStateParam<T> = Partial<T> | ((state: T) => T);
 })
 export class PhoneInputComponent implements AfterViewInit {
   //#region Component inputs
-  @Input() control!: AbstractControl & UntypedFormControl;
+  @Input() control!: AbstractControl & FormControl;
   @Input() describe = true;
   @Input('inputConfig') config!: InputConfigInterface;
   @ContentChild('input') inputRef!: TemplateRef<any>;
