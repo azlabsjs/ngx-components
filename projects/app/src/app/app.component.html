@@ -1,5 +1,5 @@
 <div class="container">
-  <!-- <ngx-clr-smart-grid [config]="gridConfig" [columns]="columns" [data]="data" (dgRefresh)="onDgRefresh($event)"
+  <ngx-clr-smart-grid [config]="gridConfig" [columns]="columns" [data]="data" (dgRefresh)="onDgRefresh($event)"
     (selectedChange)="onSelectedChanges($event)"></ngx-clr-smart-grid>
   <ngx-clr-smart-grid [columns]="columns" [pageResult]="pageResult" (dgRefresh)="onDgRefresh($event)"
     (selectedChange)="onSelectedChanges($event)" [config]="{useServerPagination: true}"></ngx-clr-smart-grid>
@@ -8,13 +8,7 @@
       (error)="onError($event)" [submitable]="true" [autoupload]="true" (submit)="ngxFormSubmit($event)" [form]="form"
       [autoSubmit]="true" [path]="'http://localhost:3000/customers'">
     </ngx-smart-form>
-  </ng-container> -->
-  <pre>Control value: {{ control.value }}</pre>
-  <pre>Has Error: {{ haserror| json }}</pre>
-  <ngx-intl-tel-input [disabled]="control.status.toLocaleLowerCase() === 'disabled'" (error)="haserror = $event" (valueChange)="control.setValue($event)" [value]="control.value ?? ''"
-    (blur)="onBlur($event)" (focus)="onFocus($event)" [class]="'clr-input'" [required]="required"
-    [preferredCountries]="['tg', 'bj', 'gh']" [country]="'tg'">
-  </ngx-intl-tel-input>
+  </ng-container>
 </div>
 
 <!-- <ngx-slides [slides]="slides" [autostart]="true" [timer]="2000">

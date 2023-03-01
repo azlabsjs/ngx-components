@@ -6,17 +6,21 @@
         (*)
       </span>
     </label>
-    <ngx-intl-tel-input *ngIf="control" [disabled]="true" (error)="onError($event)"
-      (valueChange)="control.setValue($event)" [value]="control.value ?? ''" (blur)="onBlur($event)"
+    <ngx-intl-tel-input *ngIf="control" [disabled]="state.disabled" (error)="onError($event)"
+      (valueChange)="control.setValue($event)" [value]="state.value ?? ''" (blur)="onBlur($event)"
       (focus)="onFocus($event)" [class]="'clr-input'" [required]="config!.rules?.isRequired || false"
       [preferredCountries]="['tg', 'bj', 'gh']" [country]="'tg'">
-      <ng-template #input let-keypress="keypress" let-selected="selected">
+      <ng-template #input let-keypress="keypress" let-selected="selected" let-change="change" let-required="required"
+        let-disabled="disabled">
         <ng-container *ngTemplateOutlet="
             inputRef;
             context: {
               keypress,
               selected,
+              required,
+              disabled,
               config,
+              change:change,
               onBlur: onBlur.bind(this),
               onFocus: onFocus.bind(this)
             }

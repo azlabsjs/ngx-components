@@ -37,6 +37,9 @@ export class PhoneInputComponent implements AfterViewInit {
     disabled: false,
     value: undefined as string | undefined,
   };
+  get state() {
+    return this._state;
+  }
   private _destroy$ = new Subject<void>();
   // #endregion Component state
 
@@ -70,9 +73,7 @@ export class PhoneInputComponent implements AfterViewInit {
         tap((status) => {
           this.setState((state) => ({
             ...state,
-            disabled:
-              status.toLowerCase() === 'disabled' ||
-              status.toLocaleLowerCase() === 'invalid',
+            disabled: status.toLowerCase() === 'disabled',
           }));
         }),
         takeUntil(this._destroy$)

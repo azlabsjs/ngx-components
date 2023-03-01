@@ -16,11 +16,11 @@
     <ng-container *ngSwitchCase="inputTypes.PHONE_INPUT">
       <ngx-smart-phone-input [control]="formcontrol" [inputConfig]="inputConfig" [describe]="describe">
         <ng-template #input let-config="config" let-onBlur="onBlur" let-onFocus="onFocus" let-keypress="keypress"
-          let-selected="selected">
-          <input #focusable [tabIndex]="config!.index" [required]="config!.rules!.isRequired || false"
-            [class]="'effect-24 ' + config!.classes" (blur)="onBlur($event)" (focus)="onFocus($event)"
-            (keypress)="keypress($event)" [formControl]="formcontrol" placeholder="{{ selected!.placeHolder }}"
-            autocomplete="off" type="tel" />
+          let-selected="selected" let-change="change" let-required="required" let-disabled="disabled">
+          <input #focusable [tabIndex]="config!.index" [required]="required" [class]="'effect-24 ' + config!.classes"
+            (blur)="onBlur($event)" (focus)="onFocus($event)" (keypress)="keypress($event)" (change)="change($event)"
+            (input)="change($event)" [disabled]="disabled" placeholder="{{ selected!.placeHolder }}" autocomplete="off"
+            type="tel" />
         </ng-template>
       </ngx-smart-phone-input>
     </ng-container>
