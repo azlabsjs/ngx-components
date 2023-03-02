@@ -138,7 +138,6 @@ export class NgxSmartFormArrayComponent implements OnInit, OnDestroy {
 
   // #region Internal properties
   private _destroy$ = new Subject<void>();
-  private formGroup = this.builder.group(this._controls) as UntypedFormGroup;
   private componentRefs: ComponentRef<NgxSmartFormArrayChildComponent>[] = [];
   // #endregion Internal properties
 
@@ -164,46 +163,50 @@ export class NgxSmartFormArrayComponent implements OnInit, OnDestroy {
 
   // tslint:disable-next-line: typedef
   private _addComponent(index: number) {
-    const formGroup = cloneAbstractControl(this.formGroup) as UntypedFormGroup;
+    const formGroup = cloneAbstractControl(
+      this.builder.group(this._controls)
+    ) as UntypedFormGroup;
     this.addComponent(formGroup, index);
     this.formArray.push(formGroup);
   }
 
   addComponent(formGroup: UntypedFormGroup, index: number) {
-    const componentRef = this.viewContainerRef.createComponent(
-      NgxSmartFormArrayChildComponent
-    );
-    // Initialize child component input properties
-    componentRef.instance.controls = [...this._controls];
-    componentRef.instance.formGroup = formGroup;
-    componentRef.instance.template = this.template;
-    componentRef.instance.autoupload = this._autoupload;
-    componentRef.instance.submitupload = this._submitupload;
-    componentRef.instance.index = index;
-    // Ends child component properties initialization
+    if (this._controls) {
+      const componentRef = this.viewContainerRef.createComponent(
+        NgxSmartFormArrayChildComponent
+      );
+      // Initialize child component input properties
+      componentRef.instance.controls = [...this._controls];
+      componentRef.instance.formGroup = formGroup;
+      componentRef.instance.template = this.template;
+      componentRef.instance.autoupload = this._autoupload;
+      componentRef.instance.submitupload = this._submitupload;
+      componentRef.instance.index = index;
+      // Ends child component properties initialization
 
-    componentRef.instance.componentDestroyer
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(() => {
-        if (this._refCount > 0) {
-          componentRef.destroy();
-          this._refCount -= 1;
-          // Remove the elment from the list of reference components
-          this.componentRefs = this.componentRefs.filter(
-            (component: ComponentRef<NgxSmartFormArrayChildComponent>) => {
-              return component.instance === componentRef.instance
-                ? false
-                : true;
-            }
-          );
-          this.formArray.removeAt(componentRef.instance.index);
-          this.listChange.emit(this._refCount);
-        } else {
-          componentRef.instance.formGroup.reset();
-          this.formArray.updateValueAndValidity();
-        }
-      });
-    this.componentRefs.push(componentRef);
+      componentRef.instance.componentDestroyer
+        .pipe(takeUntil(this._destroy$))
+        .subscribe(() => {
+          if (this._refCount > 0) {
+            componentRef.destroy();
+            this._refCount -= 1;
+            // Remove the elment from the list of reference components
+            this.componentRefs = this.componentRefs.filter(
+              (component: ComponentRef<NgxSmartFormArrayChildComponent>) => {
+                return component.instance === componentRef.instance
+                  ? false
+                  : true;
+              }
+            );
+            this.formArray.removeAt(componentRef.instance.index);
+            this.listChange.emit(this._refCount);
+          } else {
+            componentRef.instance.formGroup.reset();
+            this.formArray.updateValueAndValidity();
+          }
+        });
+      this.componentRefs.push(componentRef);
+    }
   }
 
   ngOnDestroy(): void {

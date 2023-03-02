@@ -84,7 +84,7 @@ export class NgxClrSmartGridComponent {
   //! Datagrid configuration Input
 
   // Datagrid columns configuraiton inputs
-  private _columns: Required<GridColumnType>[] = [];
+  private _columns: Omit<Required<GridColumnType>, 'sortPropertyName'>[] = [];
   @Input() set columns(values: GridColumnType[]) {
     if (values) {
       // Map input value to typeof Required<GridColumn>
@@ -109,10 +109,11 @@ export class NgxClrSmartGridComponent {
             return Number(ClrDatagridSortOrder.DESC);
           },
         },
+        sortable: column.sortable ?? true,
       }));
     }
   }
-  get columns(): Required<GridColumnType>[] {
+  get columns(): Omit<Required<GridColumnType>, 'sortPropertyName'>[] {
     return this._columns;
   }
   //! Datagrid columns configuraiton inputs

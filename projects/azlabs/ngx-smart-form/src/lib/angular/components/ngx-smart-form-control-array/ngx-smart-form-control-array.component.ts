@@ -66,8 +66,6 @@ export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
   }
   //#endregion Component inputs definitions
 
-  //@internal
-  private abstractControl!: UntypedFormControl;
   @ViewChild('container', { read: ViewContainerRef, static: true })
   viewContainerRef!: ViewContainerRef;
 
@@ -88,9 +86,6 @@ export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.abstractControl = this.builder.control(
-      this.inputConfig
-    ) as UntypedFormControl;
     if (this.formArray.getRawValue().length === 0) {
       this.addNewComponent(this.componentRefCount);
     } else {
@@ -117,7 +112,9 @@ export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
 
   // tslint:disable-next-line: typedef
   addNewComponent(index: number) {
-    const control = cloneAbstractControl(this.abstractControl) as UntypedFormControl;
+    const control = cloneAbstractControl(
+      this.builder.control(this.inputConfig)
+    ) as UntypedFormControl;
     this.addComponent(control, index);
     this.formArray.push(control);
   }
