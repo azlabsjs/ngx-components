@@ -77,6 +77,7 @@ span.dial-code {
 
 .intl-tel-input__layout {
   display: flex;
+  width: 100%;
 }
 
 .intl-tel-input__text-input {
