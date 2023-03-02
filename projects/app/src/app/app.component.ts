@@ -1,17 +1,23 @@
 import { LowerCasePipe } from '@angular/common';
 import { Component, Inject, ViewChild } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import {
   createPipeTransform,
   GridColumnType,
-  GridConfigType,
+  GridConfigType
 } from '@azlabsjs/ngx-clr-smart-grid';
 import { createSlide } from '@azlabsjs/ngx-slides';
 import {
   FormsClient,
   FORM_CLIENT,
-  ReactiveFormComponentInterface,
+  ReactiveFormComponentInterface
 } from '@azlabsjs/ngx-smart-form';
-import { FormConfigInterface, InputGroup } from '@azlabsjs/smart-form-core';
+import {
+  FileInput,
+  FormConfigInterface,
+  InputGroup,
+  InputTypes
+} from '@azlabsjs/smart-form-core';
 import { BehaviorSubject, filter, Subject, takeUntil, tap } from 'rxjs';
 
 @Component({
@@ -20,6 +26,21 @@ import { BehaviorSubject, filter, Subject, takeUntil, tap } from 'rxjs';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
+  formControl = new FormControl();
+  input: FileInput = {
+    uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
+    pattern: 'image/*',
+    multiple: false,
+    maxFileSize: 40,
+    autoupload: true,
+    uploadAs: 'content',
+    label: 'My File',
+    type: InputTypes.FILE_INPUT,
+    name: 'content',
+    classes: 'clr-input',
+    isRepeatable: false,
+    containerClass: 'clr-col-sm-12',
+  };
   //
   _state$ = new BehaviorSubject<FormConfigInterface | undefined>(undefined);
   state$ = this._state$.asObservable();
@@ -143,6 +164,10 @@ export class AppComponent {
         tap((state) => this._state$.next(state)),
         takeUntil(this._destroy$)
       )
+      .subscribe();
+
+    this.formControl.valueChanges
+      .pipe(tap(console.log), takeUntil(this._destroy$))
       .subscribe();
   }
 

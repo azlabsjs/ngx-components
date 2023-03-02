@@ -5,14 +5,15 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxClrSmartGridModule } from '@azlabsjs/ngx-clr-smart-grid';
+import { NgxDropzoneModule } from '@azlabsjs/ngx-dropzone';
 import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
 import { NgxSlidesModule } from '@azlabsjs/ngx-slides';
 import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
+import { HTTPResponse } from '@azlabsjs/requests';
 import { CdsModule } from '@cds/angular';
 import { ClarityIcons, uploadCloudIcon } from '@cds/core/icon';
 import { AppComponent } from './app.component';
 import { TestPipe } from './test.pipe';
-import { HTTPResponse } from '@azlabsjs/requests';
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
@@ -48,9 +49,9 @@ ClarityIcons.addIcons(uploadCloudIcon);
                 ...request.options,
                 headers: {
                   ...request.options.headers,
-                  'x-client-id': '96a6bba2-73e4-404c-9bb3-0d61c31bba44',
+                  'x-client-id': '98954592-d85b-43c4-a77f-e7bb4501f655',
                   'x-client-secret':
-                    '9NYHbYhzNXX2AbrxHs4H0cTmM7udeKEdqfwyTCXGLjnaU2IhmVldNwAknIpysbx5QZ8KBytvw1hW7qQE6iA',
+                    'HeP44SYK11FXhIEzFB8efeyo63nZQ12mZrbBA8KcWqwD91tT9K4EfhngL5Vw7hNu9YUglzdJOdp8zigRQ',
                 },
               },
             });
@@ -108,6 +109,8 @@ ClarityIcons.addIcons(uploadCloudIcon);
       }
     }),
     NgxSlidesModule.forRoot(),
+
+    NgxDropzoneModule.forRoot()
   ],
   bootstrap: [AppComponent],
 })
