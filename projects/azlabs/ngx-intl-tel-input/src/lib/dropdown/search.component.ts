@@ -8,58 +8,53 @@ import {
 import { SetStateParam } from './types';
 
 @Component({
-  selector: 'intl-tel-search',
+  selector: 'ngx-dropdown-search',
   template: `
     <input
       (change)="onInputChange($event)"
       (input)="onInputChange($event)"
       (click)="onSearchClick($event)"
       [placeholder]="placeholder"
-      class="intl-tel-search"
+      class="ngx-dropdown-search"
     />
   `,
   styles: [
     `
-      input.intl-tel-search {
-        padding: var(--intl-tel-search-padding, .7rem .3rem);
+      input.ngx-dropdown-search {
+        padding: var(--ngx-dropdown-search-padding, 0.7rem 0.3rem);
         position: relative;
-        width: var(--intl-tel-search-width, 100%);
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        -ms-appearance: none;
-        -o-appearance: none;
+        width: var(--ngx-dropdown-search-width, 100%);
         margin: 0;
-        border-radius: var(--intl-tel-search-border-radius, 0);
-        border-top: var(--intl-tel-search-border-top-width, 0) solid
-          var(--intl-tel-search-border-top-color, transparent);
-        border-left: var(--intl-tel-search-border-left-width, 0) solid
-          var(--intl-tel-search-border-top-color, transparent);
-        border-right: var(--intl-tel-search-border-right-width, 0) solid
-          var(--intl-tel-search-border-top-color, transparent);
-        border-bottom: var(--intl-tel-search-border-bottom-width, 0.05rem) solid
-          var(--intl-tel-search-border-color, hsl(198deg, 10%, 46%));
-        height: var(--intl-tel-search-height, 1rem);
-        color: var(--intl-tel-search-color, hsl(198deg, 0%, 0%));
+        border-radius: var(--ngx-dropdown-search-border-radius, 0);
+        border-top: var(--ngx-dropdown-search-border-top-width, 0) solid
+          var(--ngx-dropdown-search-border-top-color, transparent);
+        border-left: var(--ngx-dropdown-search-border-left-width, 0) solid
+          var(--ngx-dropdown-search-border-top-color, transparent);
+        border-right: var(--ngx-dropdown-search-border-right-width, 0) solid
+          var(--ngx-dropdown-search-border-top-color, transparent);
+        border-bottom: var(--ngx-dropdown-search-border-bottom-width, 0.05rem)
+          solid var(--ngx-dropdown-search-border-color, hsl(198deg, 10%, 46%));
+        height: var(--ngx-dropdown-search-height, 1rem);
+        color: var(--ngx-dropdown-search-color, hsl(198deg, 0%, 0%));
         box-shadow: none;
         display: inline-block;
-        max-height: var(--intl-tel-search-max-height, 1.2rem);
-        font-size: var(--intl-tel-search-max-height, 0.8rem);
+        max-height: var(--ngx-dropdown-search-max-height, 1.2rem);
+        font-size: var(--ngx-dropdown-search-max-height, 0.8rem);
         background: transparent;
         transition: border-color 200ms ease-in-out;
         outline: 0;
       }
-      input.intl-tel-search:focus {
-        /* padding-bottom: var(--intl-tel-search-padding-bottom, 6px); */
-        border-bottom-width: var(--intl-tel-search-bottom-width, 2.5px);
+      input.ngx-dropdown-search:focus {
+        border-bottom-width: var(--ngx-dropdown-search-bottom-width, 2.5px);
         border-image: linear-gradient(
           to right,
-          var(--intl-tel-search-color, hsl(198deg, 100%, 32%)) 95%,
-          var(--intl-tel-search-color, hsl(198deg, 100%, 32%)) 95%
+          var(--ngx-dropdown-search-color, hsl(198deg, 100%, 32%)) 95%,
+          var(--ngx-dropdown-search-color, hsl(198deg, 100%, 32%)) 95%
         );
         border-image-slice: 1;
       }
 
-      input.intl-tel-search:not([readonly]) {
+      input.ngx-dropdown-search:not([readonly]) {
         background: linear-gradient(
             to bottom,
             var(--text-input-color, hsl(198deg, 100%, 32%)) 95%,

@@ -4,27 +4,18 @@ import {
   Injector,
   ModuleWithProviders,
   NgModule,
-  Provider,
+  Provider
 } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import {
-  DROPZONE_CONFIG,
-  DROPZONE_DICT,
-  DropzoneConfig,
-  DropzoneDict,
-  NgxDropzoneModule,
-  useDefaultDictionary,
-} from '@azlabsjs/ngx-dropzone';
 import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
 import { HTTPRequest, HTTPResponse } from '@azlabsjs/requests';
 import { CacheProvider } from '@azlabsjs/smart-form-core';
 import { ClarityModule } from '@clr/angular';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { ObservableInput, from, lastValueFrom, of } from 'rxjs';
+import { from, lastValueFrom, ObservableInput, of } from 'rxjs';
 import {
-  OptionsQueryConfigType,
   createSelectOptionsQuery,
-  createSubmitHttpHandler,
+  createSubmitHttpHandler, OptionsQueryConfigType
 } from '../http';
 import {
   DynamicTextAreaInputComponent,
@@ -32,7 +23,6 @@ import {
   NgxSmartArrayCloseButtonComponent,
   NgxSmartCheckBoxComponent,
   NgxSmartDateInputComponent,
-  NgxSmartDzComponent,
   NgxSmartFileInputComponent,
   NgxSmartFormArrayChildComponent,
   NgxSmartFormArrayComponent,
@@ -48,7 +38,7 @@ import {
   NgxSmartSelectInputComponent,
   NgxSmartTimeInputComponent,
   PhoneInputComponent,
-  TextInputComponent,
+  TextInputComponent
 } from './components';
 import { NgxUploadsSubjectService } from './components/ngx-smart-file-input/ngx-uploads-subject.service';
 import { FetchOptionsDirective, HTMLFileInputDirective } from './directives';
@@ -59,7 +49,7 @@ import {
   DYNAMIC_FORM_LOADER,
   FormHttpLoader,
   FormsCacheProvider,
-  ReactiveFormBuilderBrige,
+  ReactiveFormBuilderBrige
 } from './services';
 import { JSONFormsClient } from './services/client';
 import {
@@ -72,7 +62,7 @@ import {
   InterceptorFactory,
   TEMPLATE_DICTIONARY,
   UPLOADER_OPTIONS,
-  UploadOptionsType,
+  UploadOptionsType
 } from './types';
 
 type FormApiServerConfigs = {
@@ -84,7 +74,10 @@ type FormApiServerConfigs = {
 };
 
 type ConfigType = {
-  dropzoneConfigs?: DropzoneConfig;
+  /**
+   * @deprecated There is no need for the configuration anymore
+   */
+  dropzoneConfigs?: Record<string, unknown>;
   serverConfigs: FormApiServerConfigs;
   formsAssets?: string;
   clientFactory?: Function;
@@ -108,6 +101,9 @@ export function preloadAppForms(service: CacheProvider, assetsURL: string) {
   };
 }
 
+/**
+ * @deprecated v0.13.40
+ */
 export function createDictionary(dzConfig: { [index: string]: any }) {
   const iterable = [];
   for (const [key, value] of Object.entries(dzConfig)) {
@@ -126,7 +122,6 @@ export function createDictionary(dzConfig: { [index: string]: any }) {
     ReactiveFormsModule,
     NgxIntlTelInputModule,
     ClarityModule,
-    NgxDropzoneModule,
   ],
   declarations: [
     NgxSmartFileInputComponent,
@@ -150,7 +145,6 @@ export function createDictionary(dzConfig: { [index: string]: any }) {
     TemplateMessagesPipe,
     FetchOptionsDirective,
     HTMLFileInputDirective,
-    NgxSmartDzComponent,
     NgxSmartArrayCloseButtonComponent,
     NgxSmartArrayAddButtonComponent,
     NgxSmartFormControlArrayChildComponent,
@@ -232,40 +226,6 @@ export class NgxSmartFormModule {
             configs.submitRequest?.interceptorFactory
           ),
         deps: [Injector],
-      },
-      {
-        provide: DROPZONE_DICT,
-        useValue:
-          typeof configs?.dropzoneConfigs === 'undefined' ||
-          configs?.dropzoneConfigs === null ||
-          Object.keys(configs?.dropzoneConfigs ?? {}).length === 0
-            ? useDefaultDictionary()
-            : createDictionary(configs?.dropzoneConfigs),
-      },
-      {
-        provide: DROPZONE_CONFIG,
-        useFactory: (dictionary: Partial<DropzoneDict>) => {
-          const dzConfig = (configs?.dropzoneConfigs || {
-            url: configs!.serverConfigs!.api.host ?? 'http://localhost',
-            maxFilesize: 10,
-            acceptedFiles: '*/*',
-            autoProcessQueue: false,
-            uploadMultiple: false,
-            maxFiles: 1,
-            addRemoveLinks: true,
-          }) as any;
-          for (const [prop, value] of Object.entries(dictionary)) {
-            if (
-              !(prop in dzConfig) ||
-              dzConfig[prop] === 'undefined' ||
-              dzConfig[prop] === null
-            ) {
-              dzConfig[prop] = value;
-            }
-          }
-          return dzConfig as DropzoneConfig;
-        },
-        deps: [DROPZONE_DICT],
       },
       {
         provide: UPLOADER_OPTIONS,

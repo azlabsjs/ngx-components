@@ -107,7 +107,7 @@ type SetStateParam<T> = Partial<T> | ((state: T) => T);
         flex: 100px 1;
       }
 
-      .intl-tel-search-container {
+      .ngx-dropdown-search-container {
         overflow-x: hidden;
       }
       .dropdown-divider.no-margin {

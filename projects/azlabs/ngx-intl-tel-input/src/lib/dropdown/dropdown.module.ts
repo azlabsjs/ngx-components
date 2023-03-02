@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DropdownSearchComponent } from './dropdown-search.component';
 import { DropdownComponent } from './dropdown.component';
+import { DropdownSearchComponent } from './search.component';
 
 @NgModule({
   declarations: [DropdownSearchComponent, DropdownComponent],

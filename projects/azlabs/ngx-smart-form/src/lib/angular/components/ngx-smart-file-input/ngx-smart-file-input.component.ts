@@ -1,13 +1,10 @@
 import {
-  Component,
-  EventEmitter,
-  Inject,
+  ChangeDetectorRef,
+  Component, Inject,
   Injector,
-  Input,
-  OnDestroy, Output
+  Input
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { DropzoneConfig } from '@azlabsjs/ngx-dropzone';
 import {
   HTTPRequest,
   HTTPResponse,
@@ -16,30 +13,10 @@ import {
 } from '@azlabsjs/requests';
 import { FileInput, isValidHttpUrl } from '@azlabsjs/smart-form-core';
 import { Uploader, UploadOptions } from '@azlabsjs/uploader';
-import { BehaviorSubject, Subject } from 'rxjs';
 import { UPLOADER_OPTIONS, UploadOptionsType } from '../../types';
+import { uuidv4 } from './helpers';
 import { NgxUploadsSubjectService } from './ngx-uploads-subject.service';
-
-function uuidv4() {
-  const rand = Math.random;
-  function substr(str: string, offset: number, length: number) {
-    return str.substring(offset, Math.min(str.length, offset + length));
-  }
-  let nbr: number;
-  let randStr = '';
-  do {
-    randStr += substr((nbr = rand()).toString(16), 3, 6);
-  } while (randStr.length < 30);
-  return `${substr(randStr, 0, 8)}-${substr(randStr, 8, 4)}-${substr(
-    randStr,
-    12,
-    3
-  )}-${(((nbr * 4) | 0) + 8).toString(16) + substr(randStr, 15, 3)}-${substr(
-    randStr,
-    18,
-    12
-  )}`;
-}
+import { InputConstraints, SetStateParam } from './types';
 
 @Component({
   selector: 'ngx-smart-file-input',
@@ -67,7 +44,7 @@ function uuidv4() {
     `,
   ],
 })
-export class NgxSmartFileInputComponent implements OnDestroy {
+export class NgxSmartFileInputComponent {
   //#region Component inputs
   @Input() control!: FormControl;
   @Input() describe = true;
@@ -75,18 +52,10 @@ export class NgxSmartFileInputComponent implements OnDestroy {
   @Input() set inputConfig(config: FileInput) {
     this._inputConfig = config;
     //#region Set the dropzone configurations
-    this.dropzoneConfigs = {
+    this.constraints = {
       maxFiles: config.multiple ? 50 : 1,
       maxFilesize: config.maxFileSize ? config.maxFileSize : 10,
-      url:
-        typeof config.uploadUrl !== 'undefined' &&
-        config !== null &&
-        config.uploadUrl !== ''
-          ? config.uploadUrl
-          : this.uploadOptions.path ?? 'http://localhost',
-      uploadMultiple: config.multiple ? config.multiple : false,
-      acceptedFiles: config.pattern,
-    } as DropzoneConfig;
+    } as InputConstraints;
   }
   get inputConfig() {
     return this._inputConfig;
@@ -113,24 +82,17 @@ export class NgxSmartFileInputComponent implements OnDestroy {
   @Input() url!: string | undefined;
   //#endregion Component inputs
 
-  //#region Component outputs
-  @Output() addedEvent = new EventEmitter<any>();
-  @Output() removedEvent = new EventEmitter<any>();
-  //#endregion Component outputs
-
   // #region Component properties
-  private _destroy$ = new Subject<void>();
   // Property for handling File Input types
-  dropzoneConfigs!: DropzoneConfig;
-  // Control HTML uploading indicator
-  uploading: boolean = false;
-  hasUploadError: boolean = false;
-  _inputState$ = new BehaviorSubject({
+  constraints!: InputConstraints;
+  private _state = {
     uploading: false,
     hasError: false,
     tooLargeFiles: [] as File[],
-  });
-  inputState$ = this._inputState$.asObservable();
+  };
+  get state() {
+    return this._state;
+  }
   // #endregion Component properties
 
   /**
@@ -144,41 +106,12 @@ export class NgxSmartFileInputComponent implements OnDestroy {
     @Inject(UPLOADER_OPTIONS)
     private uploadOptions: UploadOptionsType<HTTPRequest, HTTPResponse>,
     private uploadEvents: NgxUploadsSubjectService,
-    private injector: Injector
+    private injector: Injector,
+    private changeRef: ChangeDetectorRef
   ) {}
 
-  dzOnAdd(event?: any) {
-    // Handle the add event on the dz component
-  }
-
-  // tslint:disable-next-line: typedef
-  dzOnRemove(event: any, multiple: boolean = false) {
-    if (
-      typeof this.control.value === 'undefined' ||
-      this.control.value === null
-    ) {
-      return;
-    }
-    // Notify the parent component of the remove event
-    this.removedEvent.emit();
-
-    // Then if supporting multiple files upload, remove the deleted file from the list
-    if (multiple) {
-      return this.control.setValue(
-        (this.control.value as File[]).filter((file) => {
-          return file !== event;
-        })
-      );
-    }
-    // Reset the input control
-    this.onReset();
-  }
-
   onTooLargeFilesEvent(event: File[]) {
-    this._inputState$.next({
-      ...this._inputState$.getValue(),
-      tooLargeFiles: event,
-    });
+    this.setState((state) => ({ ...state, tooLargeFiles: event }));
   }
 
   async onAcceptedFiles(
@@ -244,11 +177,11 @@ export class NgxSmartFileInputComponent implements OnDestroy {
         backend,
       } as UploadOptions<HTTPRequest, HTTPResponse>;
       // Set the uploading state of the current component
-      this._inputState$.next({
-        ...this._inputState$.getValue(),
+      this.setState((state) => ({
+        ...state,
         uploading: true,
         hasError: false,
-      });
+      }));
       let results = await Promise.all(
         _files.map(async (file) => {
           this.uploadEvents.startUpload({
@@ -283,11 +216,11 @@ export class NgxSmartFileInputComponent implements OnDestroy {
           typeof result['error'] === 'undefined' || result['error'] === null
       );
       // Set the uploading state of the current component
-      this._inputState$.next({
-        ...this._inputState$.getValue(),
+      this.setState((_state) => ({
+        ..._state,
         uploading: false,
         hasError: false,
-      });
+      }));
       // After all files has been uploaded, we set the form control value to
       // ids returned by the uploader request
       this.control.setValue(
@@ -302,11 +235,11 @@ export class NgxSmartFileInputComponent implements OnDestroy {
           : results[0]['id']
       );
     } catch (error) {
-      this._inputState$.next({
-        ...this._inputState$.getValue(),
+      this.setState((_state) => ({
+        ..._state,
         uploading: false,
         hasError: true,
-      });
+      }));
     }
   }
 
@@ -314,7 +247,15 @@ export class NgxSmartFileInputComponent implements OnDestroy {
     this.control.reset();
   }
 
-  ngOnDestroy() {
-    this._destroy$.next();
+  /**
+   * Local state management API that marks component for update on
+   * each state changes
+   */
+  private setState(state: SetStateParam<typeof this._state>) {
+    if (typeof state === 'function') {
+      this._state = state(this._state);
+    }
+    this._state = { ...this._state, ...state };
+    this.changeRef.markForCheck();
   }
 }

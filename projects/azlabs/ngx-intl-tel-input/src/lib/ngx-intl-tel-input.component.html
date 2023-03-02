@@ -3,8 +3,8 @@
     <ngx-azl-dropdown [disabled]="state.disabled || false" class="intl-tel-input__dropdown" orientation="left"
       [text]="'+' + state.selected?.dialCode + '  '" [no-hover]="true" [animation]="'scaleY'">
       <div class="select-countries-view-port">
-        <div class="intl-tel-search-container"><intl-tel-search
-            (valueChange)="onSearchChange($event)"></intl-tel-search></div>
+        <div class="ngx-dropdown-search-container"><ngx-dropdown-search
+            (valueChange)="onSearchChange($event)"></ngx-dropdown-search></div>
         <div class="dropdown-divider no-margin"></div>
         <ng-container *ngIf="(state.preferredCountries || []).length > 0">
           <div class="ngx-azl-dropdown-item" *ngFor="let country of state.preferredCountries"

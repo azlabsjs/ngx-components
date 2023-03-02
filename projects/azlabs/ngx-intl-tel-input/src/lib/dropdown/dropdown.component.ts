@@ -30,7 +30,7 @@ import { Animation, Orientation, SetStateParam } from './types';
           #dropdownHeader
         >
           <ng-container
-            *ngTemplateOutlet="dropdownToggleRef || defaultDdHeader"
+            *ngTemplateOutlet="dropdownToggleRef ?? defaultDdHeader"
           ></ng-container>
         </a>
         <div class="ngx-azl-dropdown-menu" [ngClass]="state.menuClass">
@@ -185,7 +185,6 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
   }
 
   private onDefaultViewClick(event: MouseEvent) {
-    console.log('Mouse event: ', event);
     if (this.dropdownHeaderRef?.nativeElement) {
       const {
         left: x,
