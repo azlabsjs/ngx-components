@@ -12,54 +12,21 @@ import {
   Optional,
   SimpleChanges,
   TemplateRef,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { computeCssClass, computeMenuClass } from './helpers';
 import { Animation, Orientation, SetStateParam } from './types';
 
+type StateType = {
+  active: boolean;
+  cssClass: Record<string, boolean>;
+  menuClass: Record<string, boolean>;
+};
+
 @Component({
   selector: 'ngx-azl-dropdown',
-  template: `
-    <div class="dropdown-container">
-      <div class="ngx-azl-dropdown" [ngClass]="state.cssClass">
-        <a
-          href="#"
-          id="dropdown-toggle"
-          (click)="onToggleDropdown($event)"
-          class="ngx-azl-dropdown-header"
-          #dropdownHeader
-        >
-          <ng-container
-            *ngTemplateOutlet="dropdownToggleRef ?? defaultDdHeader"
-          ></ng-container>
-        </a>
-        <div class="ngx-azl-dropdown-menu" [ngClass]="state.menuClass">
-          <ng-content></ng-content>
-        </div>
-      </div>
-    </div>
-    <ng-template #defaultDdHeader>
-      <div class="ngx-azl-dropdown-header">
-        <span class="ngx-azl-dropdown-text">
-          {{ text }}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            class="icon chevron-down"
-            viewBox="0 0 16 16"
-          >
-            <path
-              fill-rule="evenodd"
-              class="path"
-              d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"
-            /></svg
-        ></span>
-      </div>
-    </ng-template>
-  `,
-  styleUrls: ['./dropdown.styles.scss'],
+  templateUrl: './dropdown.component.html',
+  styleUrls: ['./dropdown.component.css'],
 })
 export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
   /**
@@ -98,7 +65,7 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
   @ContentChild('dropdownToggle') dropdownToggleRef!: TemplateRef<any>;
   // #endregion component view children
 
-  private _state = {
+  private _state: StateType = {
     active: false,
     cssClass: {} as Record<string, boolean>,
     menuClass: {} as Record<string, boolean>,
@@ -176,7 +143,7 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
     );
   }
 
-  private setState(state: SetStateParam<typeof this._state>) {
+  private setState(state: SetStateParam<StateType>) {
     if (typeof state === 'function') {
       this._state = state(this._state);
     }

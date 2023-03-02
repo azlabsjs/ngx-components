@@ -26,7 +26,7 @@
   border-top: var(--dropdown-button-border-top-width, 0px) solid var(--dropdown-button-border-color, hsl(198deg, 10%, 46%));
   border-left: var(--dropdown-button-border-left-width, 0px) solid var(--dropdown-button-border-color, hsl(198deg, 10%, 46%));
   border-right: var(--dropdown-button-border-right-width, 0px) solid var(--dropdown-button-border-color, hsl(198deg, 10%, 46%));
-  line-height: var(--dropdown-button-line-height, 1.15rem);
+  line-height: var(--dropdown-button-line-height, .9rem);
   border-radius: var(--dropdown-button-border-radius, 0px);
   padding: var(--dropdown-button-padding, 0px);
   background-color: var(--dropdown-button-bg-color, inherit);
@@ -59,11 +59,9 @@
 
 .ngx-azl-dropdown:not(.disabled).hover:hover .ngx-azl-dropdown-menu :host ::ng-deep *,
 .ngx-azl-dropdown:not(.disabled).hover:hover .ngx-azl-dropdown-menu.scaleY :host ::ng-deep *,
-.ngx-azl-dropdown:not(.disabled).hover:hover .ngx-azl-dropdown-menu.scaleReverseY :host ::ng-deep *,
 .ngx-azl-dropdown:not(.disabled).hover:hover .ngx-azl-dropdown-menu.translateX :host ::ng-deep *,
 .ngx-azl-dropdown:not(.disabled).active .ngx-azl-dropdown-menu :host ::ng-deep *,
 .ngx-azl-dropdown:not(.disabled).active .ngx-azl-dropdown-menu.scaleY :host ::ng-deep *,
-.ngx-azl-dropdown:not(.disabled).active .ngx-azl-dropdown-menu.scaleReverseY :host ::ng-deep *,
 .ngx-azl-dropdown:not(.disabled).active .ngx-azl-dropdown-menu.translateX :host ::ng-deep * {
   opacity: 1;
 }
@@ -216,70 +214,6 @@
   }
 }
 
-@-o-keyframes scaleReverseY {
-  0% {
-    opacity: 0;
-    transform: scaleY(0);
-  }
-
-  80% {
-    transform: scaleY(-1.1);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scaleY(-1);
-  }
-}
-
-@keyframes scaleReverseY {
-  0% {
-    opacity: 0;
-    transform: scaleY(0);
-  }
-
-  80% {
-    transform: scaleY(-1.1);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scaleY(-1);
-  }
-}
-
-@-moz-keyframes scaleReverseY {
-  0% {
-    opacity: 0;
-    transform: scaleY(0);
-  }
-
-  80% {
-    transform: scaleY(-1.1);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scaleY(-1);
-  }
-}
-
-@-webkit-keyframes scaleReverseY {
-  0% {
-    opacity: 0;
-    transform: scaleY(0);
-  }
-
-  80% {
-    transform: scaleY(-1.1);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scaleY(-1);
-  }
-}
-
 @-moz-keyframes translateToRight {
   0% {
     opacity: 0;
@@ -341,70 +275,6 @@
   100% {
     opacity: 1;
     transform: translateX(0px);
-  }
-}
-
-@-moz-keyframes translateZ {
-  0% {
-    opacity: 0;
-    transform: translateZ(200px) transLateY(40px);
-  }
-
-  80% {
-    transform: translateZ(-10px) transLateY(0px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateZ(0px) transLateY(0px);
-  }
-}
-
-@-webkit-keyframes translateZ {
-  0% {
-    opacity: 0;
-    transform: translateZ(200px) transLateY(40px);
-  }
-
-  80% {
-    transform: translateZ(-10px) transLateY(0px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateZ(0px) transLateY(0px);
-  }
-}
-
-@-o-keyframes translateZ {
-  0% {
-    opacity: 0;
-    transform: translateZ(200px) transLateY(40px);
-  }
-
-  80% {
-    transform: translateZ(-10px) transLateY(0px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateZ(0px) transLateY(0px);
-  }
-}
-
-@keyframes translateZ {
-  0% {
-    opacity: 0;
-    transform: translateZ(200px) transLateY(40px);
-  }
-
-  80% {
-    transform: translateZ(-10px) transLateY(0px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateZ(0px) transLateY(0px);
   }
 }
 
@@ -471,5 +341,4 @@
     transform: translateX(0px);
   }
 }
-
 /*! Animations */
