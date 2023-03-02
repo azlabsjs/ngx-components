@@ -1,18 +1,18 @@
 import { DOCUMENT } from '@angular/common';
 import {
-    AfterViewInit,
-    ChangeDetectorRef,
-    Component,
-    ContentChild,
-    ElementRef,
-    Inject,
-    Input,
-    OnChanges,
-    OnDestroy,
-    Optional,
-    SimpleChanges,
-    TemplateRef,
-    ViewChild
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ContentChild,
+  ElementRef,
+  Inject,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Optional,
+  SimpleChanges,
+  TemplateRef,
+  ViewChild
 } from '@angular/core';
 import { computeCssClass, computeMenuClass } from './helpers';
 import { Animation, Orientation, SetStateParam } from './types';
@@ -185,7 +185,6 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
   }
 
   private onDefaultViewClick(event: MouseEvent) {
-    console.log('Mouse event: ', event);
     if (this.dropdownHeaderRef?.nativeElement) {
       const {
         left: x,
