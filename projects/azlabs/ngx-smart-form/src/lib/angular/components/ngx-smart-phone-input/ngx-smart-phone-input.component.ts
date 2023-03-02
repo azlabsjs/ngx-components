@@ -82,6 +82,13 @@ export class PhoneInputComponent implements AfterViewInit {
         takeUntil(this._destroy$)
       )
       .subscribe();
+
+      // Set the current state based on the control value
+      this.setState((state) => ({
+        ...state,
+        disabled: this.control.status.toLocaleLowerCase() === 'disabled',
+        value: this.control.value,
+      }));
   }
 
   onError(value: boolean) {
@@ -89,10 +96,7 @@ export class PhoneInputComponent implements AfterViewInit {
   }
 
   setState(state: SetStateParam<StateType>) {
-    if (typeof state === 'function') {
-      this._state = state(this._state);
-    }
-    this._state = { ...this._state, ...state };
+    this._state = typeof state === 'function' ? state(this._state) : { ...this._state, ...state };
     this.changeRef.markForCheck();
   }
 }

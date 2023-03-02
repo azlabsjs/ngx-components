@@ -46,14 +46,15 @@
           selected: state.selected,
           required: state.required,
           disabled: state.disabled,
+          value: state.value ?? '',
           change: onInputChange.bind(this)
         }
       "
     ></ng-container>
-    <ng-template #defaultInputElement let-change="change">
+    <ng-template #defaultInputElement let-change="change" let-selected="selected" let-disabled="disabled" let-required="required">
       <input
-        [disabled]="state.disabled"
-        [required]="state.required"
+        [disabled]="disabled"
+        [required]="required"
         [tabIndex]="index"
         autocomplete="off"
         type="tel"
@@ -63,7 +64,7 @@
         (focus)="onFocus($event)"
         (change)="change($event)"
         (input)="change($event)"
-        placeholder="{{ state.selected?.placeHolder }}"
+        placeholder="{{ selected?.placeHolder }}"
         #focusable
       />
     </ng-template>

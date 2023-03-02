@@ -144,10 +144,7 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
   }
 
   private setState(state: SetStateParam<StateType>) {
-    if (typeof state === 'function') {
-      this._state = state(this._state);
-    }
-    this._state = { ...this._state, ...state };
+    this._state = typeof state === 'function' ? state(this._state) : { ...this._state, ...state };
     this.changeRef.markForCheck();
   }
 

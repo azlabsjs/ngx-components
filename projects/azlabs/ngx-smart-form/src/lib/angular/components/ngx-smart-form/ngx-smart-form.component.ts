@@ -31,7 +31,6 @@ import { EMPTY, from, lastValueFrom, Observable, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { RequestClient } from '../../../http';
 import {
-  cloneAbstractControl,
   ComponentReactiveFormHelpers,
   controlAttributesDataBindings,
   setControlsAttributes,
@@ -56,7 +55,6 @@ import {
       :host ::ng-deep .clr-input-wrapper {
         width: 100%;
       }
-
       div.control__group__header,
       :host ::ng-deep div.control__group__header {
         font-size: 1rem;
@@ -79,12 +77,10 @@ import {
         padding: 0;
         margin-top: 1rem;
       }
-
       .ngx-smart-form-control,
       :host ::ng-deep .ngx-smart-form-control {
         padding: 0.3rem;
       }
-
       :host ::ng-deep .clr-form-control {
         margin-top: 0rem !important;
       }
@@ -125,7 +121,12 @@ export class NgxSmartFormComponent
 
   //#region Component outputs
   @Output() submit = new EventEmitter<{ [index: string]: any }>();
+  /**
+   * @deprecated In future release, `readyState` event will be remove
+   * Use `ready` listener instead
+   */
   @Output() readyState = new EventEmitter();
+  @Output() changes = new EventEmitter();
   @Output() formGroupChange = new EventEmitter<FormGroup>();
   @Output() complete = new EventEmitter<unknown>();
   @Output() error = new EventEmitter<unknown>();
@@ -149,7 +150,7 @@ export class NgxSmartFormComponent
   public constructor(
     @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
     private builder: AngularReactiveFormBuilderBridge,
-    private changes: ChangeDetectorRef,
+    private changesRef: ChangeDetectorRef,
     @Inject(HTTP_REQUEST_CLIENT) @Optional() private client?: RequestClient
   ) {}
 
@@ -162,20 +163,21 @@ export class NgxSmartFormComponent
   setValue(state: { [k: string]: unknown }): void {
     // Set or update the form state of the current component
     this.setFormValue(this._formGroup, state, this.form.controlConfigs ?? []);
+    this.changesRef?.markForCheck();
   }
 
   ngAfterViewInit(): void {
     this.setComponentForm(this.form);
-    // Timeout and notify parent component
-    // of ready state
+    // Timeout and notify parent component of ready state
     this.readyState.emit();
-    // this.changes.detectChanges();
   }
 
   //#region FormComponent interface Methods definitions
-  controlValueChanges(control: string): Observable<unknown> {
-    const control_ = this._formGroup?.get(control);
-    return control_ ? control_.valueChanges : EMPTY;
+  controlValueChanges(name: string): Observable<unknown> {
+    const control_ = this._formGroup?.get(name);
+    return control_
+      ? control_.valueChanges.pipe(takeUntil(this._destroy$))
+      : EMPTY;
   }
 
   getControlValue(control: string, _default?: any): unknown {
@@ -220,7 +222,7 @@ export class NgxSmartFormComponent
     // Validate the formgroup object to ensure it passes
     // validation before submitting
     this.validateForm();
-    this.changes.detectChanges();
+    this.changesRef.detectChanges();
     // We simply return without performing any further action
     // if the validation fails
     if (!this._formGroup.valid) {
@@ -283,7 +285,7 @@ export class NgxSmartFormComponent
       this.form = { ...this.form, controlConfigs: controls };
       // We trigger the change detector to detect changes after updating
       // the form controlConfigs
-      this.changes.detectChanges();
+      this.changesRef.detectChanges();
     }
   }
 
@@ -345,6 +347,9 @@ export class NgxSmartFormComponent
       const config_ = Array.isArray(configs)
         ? configs?.find((config) => config.name === key)
         : configs;
+      if (typeof config_ === 'undefined' || config_ === null) {
+        continue;
+      }
       if (formgroup.controls[key] && value) {
         if (formgroup.controls[key] instanceof FormGroup) {
           this.setFormValue(
@@ -354,7 +359,8 @@ export class NgxSmartFormComponent
           );
         } else if (
           formgroup.controls[key] instanceof FormArray &&
-          Boolean(config_?.isRepeatable) === true
+          Boolean(config_?.isRepeatable) === true &&
+          ((config_ as InputGroup)?.children ?? []).length > 0
         ) {
           const controls = (config_ as InputGroup)?.children;
           const children = Array.isArray(controls)
@@ -362,13 +368,23 @@ export class NgxSmartFormComponent
             : [controls].filter(
                 (current) => typeof current !== 'undefined' && current !== null
               );
-          // TODO : Create formgroup
-          const group = this.builder.group(children) as FormGroup;
           const values_ = Array.isArray(value) ? value : [];
-          const array_ = new FormArray([]);
+          const array_ = new FormArray([] as FormGroup[]);
           for (const current of values_) {
-            const tmp = cloneAbstractControl(group);
+            const tmp = this.builder.group(children) as FormGroup;
             this.setFormGroupValue(tmp, current);
+            array_.push(tmp);
+          }
+          formgroup.controls[key] = array_;
+        } else if (
+          formgroup.controls[key] instanceof FormArray &&
+          Boolean(config_?.isRepeatable)
+        ) {
+          const values_ = Array.isArray(value) ? value : [];
+          const array_ = new FormArray([] as FormControl[]);
+          for (const current of values_) {
+            const tmp = this.builder.control(config_) as FormControl;
+            tmp.setValue(current);
             array_.push(tmp);
           }
           formgroup.controls[key] = array_;
@@ -429,12 +445,9 @@ export class NgxSmartFormComponent
       .subscribe();
     // Set the form value if it's defined
     if (this.state) {
-      this.setFormValue(
-        this._formGroup,
-        this.state,
-        this.form.controlConfigs ?? []
-      );
+      this.setValue(this.state);
     }
+    this.changes.emit();
   }
 
   isFormControl(value: unknown) {
@@ -445,7 +458,6 @@ export class NgxSmartFormComponent
       typeof (value as FormControl).registerOnChange === 'function'
     );
   }
-
   ngOnDestroy(): void {
     this._destroy$.next();
   }
