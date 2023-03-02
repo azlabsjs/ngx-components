@@ -448,7 +448,6 @@ export class NgxSmartFormComponent
       typeof (value as UntypedFormControl).registerOnChange === 'function'
     );
   }
-
   ngOnDestroy(): void {
     this._destroy$.next();
   }
