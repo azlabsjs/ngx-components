@@ -14,7 +14,7 @@ type StateType = {
 
 @Component({
   selector: 'ngx-azl-dropdown-search',
-  template: './search.component.html',
+  templateUrl: './search.component.html',
   styleUrls: ['./search.component.css'],
 })
 export class DropdownSearchComponent {
