@@ -1,12 +1,10 @@
 import {
-  Component,
+  AfterContentInit, ChangeDetectionStrategy, Component,
   ComponentRef,
   EventEmitter,
   Inject,
   Input,
-  OnDestroy,
-  OnInit,
-  Output,
+  OnDestroy, Output,
   TemplateRef,
   ViewChild,
   ViewContainerRef
@@ -39,8 +37,9 @@ import { NgxSmartFormControlArrayChildComponent } from './ngx-smart-form-control
       ></ngx-smart-array-add-button>
     </ng-template>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
+export class NgxSmartFormControlArrayComponent implements AfterContentInit, OnDestroy {
   //#region Component inputs definitions
   @Input() formArray!: UntypedFormArray;
   @Input() inputConfig!: InputConfigInterface;
@@ -85,7 +84,7 @@ export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
     private builder: AngularReactiveFormBuilderBridge
   ) {}
 
-  ngOnInit(): void {
+  ngAfterContentInit(): void {
     if (this.formArray.getRawValue().length === 0) {
       this.addNewComponent(this.componentRefCount);
     } else {
