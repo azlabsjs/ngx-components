@@ -11,10 +11,11 @@
       (focus)="onFocus($event)" [class]="'clr-input'" [required]="config!.rules?.isRequired || false"
       [preferredCountries]="['tg', 'bj', 'gh']" [country]="'tg'">
       <ng-template #input let-keypress="keypress" let-selected="selected" let-change="change" let-required="required"
-        let-disabled="disabled">
+        let-disabled="disabled" let-value="value">
         <ng-container *ngTemplateOutlet="
               inputRef;
               context: {
+                value,
                 keypress,
                 selected,
                 required,

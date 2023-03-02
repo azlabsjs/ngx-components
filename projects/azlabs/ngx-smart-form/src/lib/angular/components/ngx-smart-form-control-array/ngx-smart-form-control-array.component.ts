@@ -1,12 +1,13 @@
 import {
+  AfterContentInit,
   Component,
   ComponentRef,
   EventEmitter,
   Inject,
   Input,
   OnDestroy,
-  OnInit,
   Output,
+  SimpleChanges,
   TemplateRef,
   ViewChild,
   ViewContainerRef
@@ -40,7 +41,9 @@ import { NgxSmartFormControlArrayChildComponent } from './ngx-smart-form-control
     </ng-template>
   `,
 })
-export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
+export class NgxSmartFormControlArrayComponent
+  implements AfterContentInit, OnDestroy
+{
   //#region Component inputs definitions
   @Input() formArray!: UntypedFormArray;
   @Input() inputConfig!: InputConfigInterface;
@@ -85,22 +88,23 @@ export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
     private builder: AngularReactiveFormBuilderBridge
   ) {}
 
-  ngOnInit(): void {
+  ngAfterContentInit(): void {
     if (this.formArray.getRawValue().length === 0) {
-      this.addNewComponent(this.componentRefCount);
-    } else {
-      // Add elements
-      let index = 0;
-      for (const control of this.formArray.controls) {
-        this.addComponent(control as UntypedFormControl, index);
-        index++;
-      }
+      return this.addNewComponent(this.componentRefCount);
     }
+    // Add elements
+    this.addArrayControls();
 
     // Simulate form array
     this.formArray.valueChanges
       .pipe(tap((state) => this.formArrayChange.emit(state)))
       .subscribe();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if ('formArray' in changes) {
+      this.addArrayControls();
+    }
   }
 
   onTemplateButtonClicked(event: Event) {
@@ -160,5 +164,16 @@ export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this._destroy$.next();
+  }
+
+  private addArrayControls() {
+    if (this.formArray.getRawValue().length !== 0) {
+      this.viewContainerRef.clear();
+      let index = 0;
+      for (const control of this.formArray.controls) {
+        this.addComponent(control as UntypedFormControl, index);
+        index++;
+      }
+    }
   }
 }

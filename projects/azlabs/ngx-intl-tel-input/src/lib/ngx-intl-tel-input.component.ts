@@ -7,7 +7,7 @@ import {
   OnChanges,
   Output,
   SimpleChanges,
-  TemplateRef,
+  TemplateRef
 } from '@angular/core';
 import { IntlTelInput } from './core/intl-tel-input';
 import { Country } from './core/model';
@@ -83,20 +83,14 @@ export class NgxIntlTelInputComponent implements OnChanges {
           (current) => typeof current !== 'undefined' && current !== null
         ) as Country[];
     }
-    if ('country' in changes) {
-      stateChanges = true;
-    }
-    if ('value' in changes) {
-      stateChanges = true;
-    }
-
-    if ('disabled' in changes) {
+    if ('country' in changes || 'value' in changes || 'disabled' in changes) {
       stateChanges = true;
     }
     if (stateChanges) {
-      const selected =
-        this._state.selected ??
-        this.getSelectedCountry(this.value, preferredCountries, this.country);
+      const selected = this.value
+        ? this.getSelectedCountry(this.value, preferredCountries, this.country)
+        : this._state.selected ??
+          this.getSelectedCountry(undefined, preferredCountries, this.country);
       const countryCode = this.getCountryCode(this.value ?? '');
       this.setState((state) => ({
         ...state,
@@ -145,10 +139,10 @@ export class NgxIntlTelInputComponent implements OnChanges {
   }
 
   setState(state: SetStateParam<StateType>) {
-    if (typeof state === 'function') {
-      this._state = state(this._state);
-    }
-    this._state = { ...this._state, ...state };
+    this._state =
+      typeof state === 'function'
+        ? state(this._state)
+        : { ...this._state, ...state };
     this.error.emit(
       this._state.value &&
         this._state.selected &&

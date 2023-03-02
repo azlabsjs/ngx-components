@@ -151,6 +151,10 @@ export class AppComponent {
         profession: 'INFORMATIQUE',
       },
     ],
+    phonenumber: [
+      '22891969456',
+      '22892384958'
+    ]
   };
 
   public constructor(

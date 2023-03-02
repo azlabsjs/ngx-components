@@ -3,14 +3,14 @@ import {
   Component,
   Inject,
   Injector,
-  Input,
+  Input
 } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import {
   HTTPRequest,
   HTTPResponse,
   Interceptor,
-  RequestClient,
+  RequestClient
 } from '@azlabsjs/requests';
 import { FileInput, isValidHttpUrl } from '@azlabsjs/smart-form-core';
 import { Uploader, UploadOptions } from '@azlabsjs/uploader';
@@ -258,10 +258,7 @@ export class NgxSmartFileInputComponent {
    * each state changes
    */
   private setState(state: SetStateParam<StateType>) {
-    if (typeof state === 'function') {
-      this._state = state(this._state);
-    }
-    this._state = { ...this._state, ...state };
+    this._state = typeof state === 'function' ? state(this._state) : { ...this._state, ...state };
     this.changeRef.markForCheck();
   }
 }

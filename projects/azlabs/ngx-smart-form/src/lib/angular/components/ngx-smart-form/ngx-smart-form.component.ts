@@ -31,7 +31,6 @@ import { EMPTY, from, lastValueFrom, Observable, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { RequestClient } from '../../../http';
 import {
-  cloneAbstractControl,
   ComponentReactiveFormHelpers,
   controlAttributesDataBindings,
   setControlsAttributes,
@@ -164,6 +163,7 @@ export class NgxSmartFormComponent
   setValue(state: { [k: string]: unknown }): void {
     // Set or update the form state of the current component
     this.setFormValue(this._formGroup, state, this.form.controlConfigs ?? []);
+    this.changesRef?.markForCheck();
   }
 
   ngAfterViewInit(): void {
@@ -347,6 +347,9 @@ export class NgxSmartFormComponent
       const config_ = Array.isArray(configs)
         ? configs?.find((config) => config.name === key)
         : configs;
+      if (typeof config_ === 'undefined' || config_ === null) {
+        continue;
+      }
       if (formgroup.controls[key] && value) {
         if (formgroup.controls[key] instanceof UntypedFormGroup) {
           this.setFormValue(
@@ -356,7 +359,8 @@ export class NgxSmartFormComponent
           );
         } else if (
           formgroup.controls[key] instanceof UntypedFormArray &&
-          Boolean(config_?.isRepeatable) === true
+          Boolean(config_?.isRepeatable) === true &&
+          ((config_ as InputGroup)?.children ?? []).length > 0
         ) {
           const controls = (config_ as InputGroup)?.children;
           const children = Array.isArray(controls)
@@ -364,13 +368,23 @@ export class NgxSmartFormComponent
             : [controls].filter(
                 (current) => typeof current !== 'undefined' && current !== null
               );
-          // TODO : Create formgroup
-          const group = this.builder.group(children) as UntypedFormGroup;
           const values_ = Array.isArray(value) ? value : [];
           const array_ = new UntypedFormArray([]);
           for (const current of values_) {
-            const tmp = cloneAbstractControl(group);
+            const tmp = this.builder.group(children) as UntypedFormGroup;
             this.setFormGroupValue(tmp, current);
+            array_.push(tmp);
+          }
+          formgroup.controls[key] = array_;
+        } else if (
+          formgroup.controls[key] instanceof UntypedFormArray &&
+          Boolean(config_?.isRepeatable)
+        ) {
+          const values_ = Array.isArray(value) ? value : [];
+          const array_ = new UntypedFormArray([]);
+          for (const current of values_) {
+            const tmp = this.builder.control(config_) as UntypedFormControl;
+            tmp.setValue(current);
             array_.push(tmp);
           }
           formgroup.controls[key] = array_;
@@ -431,11 +445,7 @@ export class NgxSmartFormComponent
       .subscribe();
     // Set the form value if it's defined
     if (this.state) {
-      this.setFormValue(
-        this._formGroup,
-        this.state,
-        this.form.controlConfigs ?? []
-      );
+      this.setValue(this.state);
     }
     this.changes.emit();
   }
