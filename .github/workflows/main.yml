@@ -5,8 +5,8 @@ name: Ngx-components packages deployment on github packages
 
 on:
   push:
-    branches:
-      - ng-v14
+    tags:
+      - "v[0-9]+.14.[0-9]+"
 
 jobs:
   publish-gpr:
