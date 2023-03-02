@@ -1,31 +1,14 @@
-import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import {
-  NgZone,
-  Inject,
-  Optional,
-  ElementRef,
-  Renderer2,
-  Directive,
-  OnInit,
-  OnDestroy,
-  DoCheck,
-  OnChanges,
-  Input,
-  Output,
-  EventEmitter,
-  SimpleChanges,
-  KeyValueDiffer,
-  KeyValueDiffers,
+  Directive, DoCheck, ElementRef, EventEmitter, Inject, Input, KeyValueDiffer,
+  KeyValueDiffers, NgZone, OnChanges, OnDestroy, OnInit, Optional, Output, PLATFORM_ID, Renderer2, SimpleChanges
 } from '@angular/core';
 
-import {
-  DROPZONE_CONFIG,
-  DropzoneEvent,
-  DropzoneEvents,
-  DropzoneConfig,
-} from './types';
 import { autoDiscover, createDropzone, createDzConfig } from './helpers';
+import {
+  DropzoneConfig, DropzoneEvent,
+  DropzoneEvents, DROPZONE_CONFIG
+} from './types';
 
 @Directive({
   selector: '[dropzone]',

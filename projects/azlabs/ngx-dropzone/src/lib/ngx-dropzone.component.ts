@@ -1,28 +1,28 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  Output,
-  EventEmitter,
-  ViewChild,
-  AfterViewInit,
-  PLATFORM_ID,
-  Inject,
-  OnDestroy,
-  ContentChild,
-  TemplateRef,
-} from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import {
-  DropzoneEvents,
-  DropzoneEvent,
-  DROPZONE_CONFIG,
-  DropzoneComponentInterface,
-} from './types';
+  AfterViewInit,
+  Component,
+  ContentChild,
+  EventEmitter,
+  Inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  PLATFORM_ID,
+  TemplateRef,
+  ViewChild
+} from '@angular/core';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { createDefaultPreviewTemplate, mergeDzAcceptFiles } from './helpers';
 import { NgxDropzoneDirective } from './ngx-dropzone.directive';
-import { DropzoneConfig } from './types';
-import { BehaviorSubject, Subject, tap } from 'rxjs';
-import { mergeDzAcceptFiles, createDefaultPreviewTemplate } from './helpers';
+import {
+  DropzoneComponentInterface,
+  DropzoneConfig,
+  DropzoneEvent,
+  DropzoneEvents,
+  DROPZONE_CONFIG
+} from './types';
 
 @Component({
   selector: 'ngx-dropzone',
@@ -36,8 +36,6 @@ import { mergeDzAcceptFiles, createDefaultPreviewTemplate } from './helpers';
         [dropzone]="defaults"
         [disabled]="disabled"
         (init)="DZ_INIT.emit($event)"
-        (error)="onUploadError()"
-        (success)="onUploadSuccess()"
       >
         <div
           class="dz-message"
@@ -227,13 +225,7 @@ export class NgxDropzoneComponent
     });
   }
 
-  // tslint:disable-next-line: typedef
-  onUploadError() {}
-
-  // tslint:disable-next-line: typedef
-  onUploadSuccess() {}
-
-  public getPlaceholder(): string {
+  getPlaceholder(): string {
     return 'url(' + encodeURI(this.placeholder) + ')';
   }
 

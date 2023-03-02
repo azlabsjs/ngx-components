@@ -20,7 +20,19 @@ export type GridColumnType = {
   };
   type?: 'string' | 'number';
   field?: string;
-  sort?: Comparator<unknown> | undefined;
+  /**
+   * Sort comparator function
+   */
+  sort?: Comparator<unknown> | undefined
+  /**
+   * The sortable property makes the column available for sorting
+   */;
+  sortable?: boolean;
+  /**
+   * Property name used during sort queries
+   *
+   */
+  sortPropertyName?: string;
 };
 
 /**
