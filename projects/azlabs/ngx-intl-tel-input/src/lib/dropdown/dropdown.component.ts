@@ -12,10 +12,16 @@ import {
   Optional,
   SimpleChanges,
   TemplateRef,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { computeCssClass, computeMenuClass } from './helpers';
 import { Animation, Orientation, SetStateParam } from './types';
+
+type StateType = {
+  active: boolean;
+  cssClass: Record<string, boolean>;
+  menuClass: Record<string, boolean>;
+};
 
 @Component({
   selector: 'ngx-azl-dropdown',
@@ -59,7 +65,7 @@ import { Animation, Orientation, SetStateParam } from './types';
       </div>
     </ng-template>
   `,
-  styleUrls: ['./dropdown.styles.scss'],
+  styleUrls: ['./dropdown.component.scss'],
 })
 export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
   /**
@@ -98,7 +104,7 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
   @ContentChild('dropdownToggle') dropdownToggleRef!: TemplateRef<any>;
   // #endregion component view children
 
-  private _state = {
+  private _state: StateType = {
     active: false,
     cssClass: {} as Record<string, boolean>,
     menuClass: {} as Record<string, boolean>,
@@ -176,7 +182,7 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
     );
   }
 
-  private setState(state: SetStateParam<typeof this._state>) {
+  private setState(state: SetStateParam<StateType>) {
     if (typeof state === 'function') {
       this._state = state(this._state);
     }

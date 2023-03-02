@@ -1,15 +1,16 @@
 import {
   ChangeDetectorRef,
-  Component, Inject,
+  Component,
+  Inject,
   Injector,
-  Input
+  Input,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import {
   HTTPRequest,
   HTTPResponse,
   Interceptor,
-  RequestClient
+  RequestClient,
 } from '@azlabsjs/requests';
 import { FileInput, isValidHttpUrl } from '@azlabsjs/smart-form-core';
 import { Uploader, UploadOptions } from '@azlabsjs/uploader';
@@ -17,6 +18,12 @@ import { UPLOADER_OPTIONS, UploadOptionsType } from '../../types';
 import { uuidv4 } from './helpers';
 import { NgxUploadsSubjectService } from './ngx-uploads-subject.service';
 import { InputConstraints, SetStateParam } from './types';
+
+type StateType = {
+  uploading: boolean;
+  hasError: boolean;
+  tooLargeFiles: File[];
+};
 
 @Component({
   selector: 'ngx-smart-file-input',
@@ -85,7 +92,7 @@ export class NgxSmartFileInputComponent {
   // #region Component properties
   // Property for handling File Input types
   constraints!: InputConstraints;
-  private _state = {
+  private _state: StateType = {
     uploading: false,
     hasError: false,
     tooLargeFiles: [] as File[],
@@ -251,7 +258,7 @@ export class NgxSmartFileInputComponent {
    * Local state management API that marks component for update on
    * each state changes
    */
-  private setState(state: SetStateParam<typeof this._state>) {
+  private setState(state: SetStateParam<StateType>) {
     if (typeof state === 'function') {
       this._state = state(this._state);
     }

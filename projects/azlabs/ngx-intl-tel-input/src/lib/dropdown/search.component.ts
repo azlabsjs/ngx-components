@@ -3,69 +3,19 @@ import {
   Component,
   EventEmitter,
   Input,
-  Output
+  Output,
 } from '@angular/core';
 import { SetStateParam } from './types';
 
-@Component({
-  selector: 'ngx-dropdown-search',
-  template: `
-    <input
-      (change)="onInputChange($event)"
-      (input)="onInputChange($event)"
-      (click)="onSearchClick($event)"
-      [placeholder]="placeholder"
-      class="ngx-dropdown-search"
-    />
-  `,
-  styles: [
-    `
-      input.ngx-dropdown-search {
-        padding: var(--ngx-dropdown-search-padding, 0.7rem 0.3rem);
-        position: relative;
-        width: var(--ngx-dropdown-search-width, 100%);
-        margin: 0;
-        border-radius: var(--ngx-dropdown-search-border-radius, 0);
-        border-top: var(--ngx-dropdown-search-border-top-width, 0) solid
-          var(--ngx-dropdown-search-border-top-color, transparent);
-        border-left: var(--ngx-dropdown-search-border-left-width, 0) solid
-          var(--ngx-dropdown-search-border-top-color, transparent);
-        border-right: var(--ngx-dropdown-search-border-right-width, 0) solid
-          var(--ngx-dropdown-search-border-top-color, transparent);
-        border-bottom: var(--ngx-dropdown-search-border-bottom-width, 0.05rem)
-          solid var(--ngx-dropdown-search-border-color, hsl(198deg, 10%, 46%));
-        height: var(--ngx-dropdown-search-height, 1rem);
-        color: var(--ngx-dropdown-search-color, hsl(198deg, 0%, 0%));
-        box-shadow: none;
-        display: inline-block;
-        max-height: var(--ngx-dropdown-search-max-height, 1.2rem);
-        font-size: var(--ngx-dropdown-search-max-height, 0.8rem);
-        background: transparent;
-        transition: border-color 200ms ease-in-out;
-        outline: 0;
-      }
-      input.ngx-dropdown-search:focus {
-        border-bottom-width: var(--ngx-dropdown-search-bottom-width, 2.5px);
-        border-image: linear-gradient(
-          to right,
-          var(--ngx-dropdown-search-color, hsl(198deg, 100%, 32%)) 95%,
-          var(--ngx-dropdown-search-color, hsl(198deg, 100%, 32%)) 95%
-        );
-        border-image-slice: 1;
-      }
+type StateType = {
+  value: string;
+  disabled: boolean;
+};
 
-      input.ngx-dropdown-search:not([readonly]) {
-        background: linear-gradient(
-            to bottom,
-            var(--text-input-color, hsl(198deg, 100%, 32%)) 95%,
-            var(--text-input-color, hsl(198deg, 100%, 32%)) 95%
-          )
-          no-repeat;
-        background-size: 0% 100%;
-        transition: background-size 200ms ease-in-out;
-      }
-    `,
-  ],
+@Component({
+  selector: 'ngx-azl-dropdown-search',
+  template: './search.component.html',
+  styleUrls: ['./search.component.css'],
 })
 export class DropdownSearchComponent {
   // #region component outputs
@@ -76,7 +26,7 @@ export class DropdownSearchComponent {
   @Input() placeholder: string = 'Search...';
   // #endregion component output
 
-  private _state = {
+  private _state: StateType = {
     value: '',
     disabled: false,
   };
@@ -104,7 +54,7 @@ export class DropdownSearchComponent {
     event?.stopPropagation();
   }
 
-  setState(state: SetStateParam<typeof this._state>) {
+  setState(state: SetStateParam<StateType>) {
     if (typeof state === 'function') {
       this._state = state(this._state);
     }

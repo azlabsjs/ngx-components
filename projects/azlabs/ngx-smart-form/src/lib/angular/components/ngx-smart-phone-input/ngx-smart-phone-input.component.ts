@@ -6,14 +6,17 @@ import {
   EventEmitter,
   Input,
   Output,
-  TemplateRef
+  TemplateRef,
 } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { distinctUntilChanged, filter, Subject, takeUntil, tap } from 'rxjs';
 
 type SetStateParam<T> = Partial<T> | ((state: T) => T);
-
+type StateType = {
+  disabled: boolean;
+  value?: string;
+};
 @Component({
   selector: 'ngx-smart-phone-input',
   templateUrl: './ngx-smart-phone-input.component.html',
@@ -33,7 +36,7 @@ export class PhoneInputComponent implements AfterViewInit {
   //#endregion Component event emitter
 
   // #region Component state
-  private _state = {
+  private _state: StateType = {
     disabled: false,
     value: undefined as string | undefined,
   };
@@ -85,7 +88,7 @@ export class PhoneInputComponent implements AfterViewInit {
     this.control.setErrors({ invalidPhoneNumber: value });
   }
 
-  setState(state: SetStateParam<typeof this._state>) {
+  setState(state: SetStateParam<StateType>) {
     if (typeof state === 'function') {
       this._state = state(this._state);
     }

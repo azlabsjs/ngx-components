@@ -5,8 +5,8 @@ import { DropdownComponent } from './dropdown.component';
 import { DropdownSearchComponent } from './search.component';
 
 @NgModule({
-  declarations: [DropdownSearchComponent, DropdownComponent],
+  declarations: [DropdownComponent, DropdownSearchComponent],
   imports: [CommonModule, FormsModule],
-  exports: [DropdownSearchComponent, DropdownComponent],
+  exports: [DropdownComponent, DropdownSearchComponent],
 })
 export class DropdownModule {}

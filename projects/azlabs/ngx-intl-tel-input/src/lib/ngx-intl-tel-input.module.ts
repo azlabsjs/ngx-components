@@ -11,7 +11,7 @@ import { NgxIntlTelInputComponent } from './ngx-intl-tel-input.component';
 @NgModule({
   declarations: [NgxIntlTelInputComponent],
   imports: [CommonModule, ScrollingModule, DropdownModule],
-  exports: [DropdownModule, NgxIntlTelInputComponent]
+  exports: [DropdownModule, NgxIntlTelInputComponent],
 })
 export class NgxIntlTelInputModule {
   static forRoot(configs?: {

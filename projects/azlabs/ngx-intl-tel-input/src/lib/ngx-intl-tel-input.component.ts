@@ -7,114 +7,26 @@ import {
   OnChanges,
   Output,
   SimpleChanges,
-  TemplateRef
+  TemplateRef,
 } from '@angular/core';
 import { IntlTelInput } from './core/intl-tel-input';
 import { Country } from './core/model';
 
 type SetStateParam<T> = Partial<T> | ((state: T) => T);
 
+type StateType = {
+  disabled: boolean;
+  required: boolean;
+  value?: string;
+  countries: Country[];
+  preferredCountries: Country[];
+  selected?: Country;
+};
+
 @Component({
   selector: 'ngx-intl-tel-input',
   templateUrl: './ngx-intl-tel-input.component.html',
-  styles: [
-    `
-      .required-text,
-      .field-has-error {
-        color: rgb(241, 50, 50);
-        line-height: 1rem;
-      }
-
-      small.field-has-error {
-        display: block;
-      }
-
-      li.country:hover {
-        background-color: rgba(0, 0, 0, 0.05);
-      }
-
-      .intl-tel-input {
-        display: flex;
-        justify-content: flex-start;
-        width: 100%;
-      }
-
-      span.dial-code {
-        color: #bfbfbf;
-      }
-
-      .select-countries-view-port {
-        width: auto;
-        overflow-x: hidden;
-      }
-
-      .countries-viewport {
-        height: 200px;
-        width: auto;
-        overflow-x: hidden;
-      }
-
-      :focus {
-        outline: none;
-      }
-      .ngx-azl-dropdown-item {
-        font-family: var(
-          --intl-tel-input-font,
-          Metropolis,
-          'Avenir Next',
-          'Helvetica Neue',
-          Arial,
-          sans-serif
-        );
-        font-size: 0.8rem;
-        padding: .1rem 0.3rem;
-        letter-spacing: normal;
-        border: 0;
-        cursor: pointer;
-        display: block;
-        height: auto;
-        line-height: inherit;
-        margin: 0;
-        width: 100%;
-        text-transform: none;
-      }
-
-      .ngx-azl-dropdown-item:hover {
-        border-bottom: none;
-        background-color: var(
-          --intl-tel-input-item-bg-color,
-          rgba(40, 39, 39, 0.1)
-        );
-      }
-
-      .dropdown-divider {
-        font-size: 0.6rem;
-        border-bottom: 0.05rem solid;
-        border-bottom-color: var(--dropdown-border-color, #e8e8e8);
-        border-bottom-width: var(--dropdown-border-width, 0.05rem);
-        margin: 0.3rem 0;
-      }
-
-      .dropdown-toggle {
-        display: inline;
-      }
-
-      .intl-tel-input__layout {
-        display: flex;
-      }
-
-      .intl-tel-input__text-input {
-        flex: 100px 1;
-      }
-
-      .ngx-dropdown-search-container {
-        overflow-x: hidden;
-      }
-      .dropdown-divider.no-margin {
-        margin: 0;
-      }
-    `,
-  ],
+  styleUrls: ['./ngx-intl-tel-input.component.css'],
 })
 export class NgxIntlTelInputComponent implements OnChanges {
   // #region Component Inputs
@@ -139,7 +51,7 @@ export class NgxIntlTelInputComponent implements OnChanges {
   // #endregion Component outputs
 
   private _countries = this.service.fetchCountries() ?? [];
-  private _state = {
+  private _state: StateType = {
     disabled: false,
     required: false,
     value: undefined as string | undefined,
@@ -232,7 +144,7 @@ export class NgxIntlTelInputComponent implements OnChanges {
     event?.stopPropagation();
   }
 
-  setState(state: SetStateParam<typeof this._state>) {
+  setState(state: SetStateParam<StateType>) {
     if (typeof state === 'function') {
       this._state = state(this._state);
     }
