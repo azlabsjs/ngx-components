@@ -158,6 +158,30 @@ export class AppComponent {
     phonenumber: '22890072872'
   };
 
+  fromState2 = {
+    fruits: ['2', '3', '4'],
+    category_id: 1,
+    lastname: 'AZOMEDOH',
+    firstname: 'KOMI SIDOINE',
+    profession: 'INFORMATIQUE',
+    stakeholders: [
+      {
+        lastname: 'AYI',
+        firstname: 'EKUE',
+        profession: 'INFORMATIQUE',
+      },
+      {
+        lastname: 'HARRY',
+        firstname: 'KOUEVI',
+        profession: 'SOFTWARE',
+      },
+    ],
+    phonenumbers: [
+      '22891969456'
+    ],
+    phonenumber: '22890072872'
+  };
+
   public constructor(
     @Inject(FORM_CLIENT) private client: FormsClient,
     private lowercasePipe: LowerCasePipe
@@ -217,6 +241,10 @@ export class AppComponent {
     setTimeout(() => {
       this.smartForm.setValue(this.fromState);
     }, 5000);
+
+    setTimeout(() => {
+      this.smartForm.setValue(this.fromState2);
+    }, 7000);
   }
 
   onError(error: unknown) {
