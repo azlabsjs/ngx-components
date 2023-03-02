@@ -4,10 +4,11 @@ Smart grid component is an angular component, using clarity datagrid component u
 
 ## Dependencies
 
-| @azlabsjs/ngx-clr-smart-grid | @azlabsjs/js-object | @azlabsjs/js-datetime | @azlabsjs/js-datetime | Angular |
-| ---------------------------- | ------------------- | --------------------- | --------------------- | ------- |
-| ^0.13.x                      | ^0.1.x              | ^0.1.x                | ^0.1.x                | ^13.0   |
-| ^0.14.x                      | ^0.1.x              | ^0.1.x                | ^0.1.x                | ^14.0   |
+| @azlabsjs/ngx-clr-smart-grid | @azlabsjs/js-object | @azlabsjs/js-datetime | Angular |
+| ---------------------------- | ------------------- | --------------------- | ------- |
+| ^0.13.x                      | ^0.1.x              | ^0.1.x                | ^13.0   |
+| ^0.14.x                      | ^0.1.x              | ^0.1.x                | ^14.0   |
+| ^0.15.x                      | ^0.1.x              | ^0.1.x                | ^15.0   |
 
 ## Usage
 

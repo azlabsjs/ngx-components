@@ -2,14 +2,10 @@
   "name": "@azlabsjs/ngx-smart-form",
   "version": "0.14.36",
   "peerDependencies": {
-    "@angular/common": "^14.0",
-    "@angular/core": "^14.0",
-    "@angular/forms": "^14.0",
-    "@ng-select/ng-select": "^9.0",
-    "@clr/angular": "^13.0",
-    "@azlabsjs/ngx-intl-tel-input": "^0.14",
-    "@azlabsjs/ngx-dropzone": "^0.14",
-    "@azlabsjs/smart-form-core": "^0.1.25",
+    "@angular/common": "^15.0",
+    "@angular/core": "^15.0",
+    "@angular/forms": "^15.0",
+    "@azlabsjs/smart-form-core": "^0.2.0",
     "@azlabsjs/requests": "^0.2.0",
     "@azlabsjs/uploader": "^0.2.1"
   },
@@ -18,7 +14,7 @@
     "@azlabsjs/built-value": "^0.1.10",
     "@azlabsjs/js-datetime": "^0.1.11",
     "@azlabsjs/utilities": "^0.1.10",
-    "@azlabsjs/smart-form-core": "^0.1.25",
+    "@azlabsjs/smart-form-core": "^0.2.0",
     "@azlabsjs/requests": "^0.2.1",
     "@azlabsjs/uploader": "^0.2.1"
   },

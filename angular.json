@@ -258,6 +258,40 @@
           }
         }
       }
+    },
+    "@azlabs/ngx-dropdown": {
+      "projectType": "library",
+      "root": "projects/azlabs/ngx-dropdown",
+      "sourceRoot": "projects/azlabs/ngx-dropdown/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/azlabs/ngx-dropdown/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/azlabs/ngx-dropdown/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/azlabs/ngx-dropdown/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/azlabs/ngx-dropdown/src/test.ts",
+            "tsConfig": "projects/azlabs/ngx-dropdown/tsconfig.spec.json",
+            "karmaConfig": "projects/azlabs/ngx-dropdown/karma.conf.js"
+          }
+        }
+      }
     }
+  },
+  "cli": {
+    "analytics": "35e09b6e-8bf7-4656-be07-5367358a9e3d"
   }
 }

@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build:all": "ng build --configuration production @azlabsjs/ngx-dropzone && ng build --configuration production @azlabsjs/ngx-intl-tel-input && ng build --configuration production @azlabsjs/ngx-smart-form && ng build --configuration production @azlabsjs/ngx-clr-smart-grid && ng build --configuration production @azlabsjs/ngx-slides",
+    "build:all": "ng build --configuration production @azlabsjs/ngx-dropzone && ng build --configuration production @azlabs/ngx-dropdown && ng build --configuration production @azlabsjs/ngx-intl-tel-input && ng build --configuration production @azlabsjs/ngx-smart-form && ng build --configuration production @azlabsjs/ngx-clr-smart-grid && ng build --configuration production @azlabsjs/ngx-slides",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "build:sass": "sass ./projects/azlabs/ngx-intl-tel-input/styles/styles.scss ./projects/azlabs/ngx-intl-tel-input/assets/styles.css",
@@ -21,8 +21,6 @@
     "@angular/platform-browser": "^15.2.0",
     "@angular/platform-browser-dynamic": "^15.2.0",
     "@angular/router": "^15.2.0",
-    "@azlabs-wc/dropdown": "^0.1.12",
-    "@azlabs-wc/layouts": "^0.1.16",
     "@azlabsjs/built-value": "^0.1.10",
     "@azlabsjs/collections": "^0.1.10",
     "@azlabsjs/functional": "^0.1.10",
