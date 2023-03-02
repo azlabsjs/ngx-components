@@ -1,11 +1,6 @@
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
-import {
-  CUSTOM_ELEMENTS_SCHEMA,
-  ModuleWithProviders,
-  NgModule
-} from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ModuleWithProviders, NgModule } from '@angular/core';
 import { PhoneNumberFormat } from 'google-libphonenumber';
 import { Country, IntlTelInput, ISO3166 } from './core';
 import { getPhoneNumberPlaceholder } from './core/internal';
@@ -15,15 +10,8 @@ import { NgxIntlTelInputComponent } from './ngx-intl-tel-input.component';
 
 @NgModule({
   declarations: [NgxIntlTelInputComponent],
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    ScrollingModule,
-    DropdownModule,
-  ],
-  exports: [NgxIntlTelInputComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  imports: [CommonModule, ScrollingModule, DropdownModule],
+  exports: [DropdownModule, NgxIntlTelInputComponent],
 })
 export class NgxIntlTelInputModule {
   static forRoot(configs?: {
