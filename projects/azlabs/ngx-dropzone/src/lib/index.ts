@@ -1,15 +1,12 @@
-export { NgxDropzoneModule } from './ngx-dropzone.module';
+export { useDefaultDictionary } from './helpers';
 export { NgxDropzoneComponent } from './ngx-dropzone.component';
 export { NgxDropzoneDirective } from './ngx-dropzone.directive';
+export { NgxDropzoneModule } from './ngx-dropzone.module';
 export {
-  DROPZONE_CONFIG,
-  DROPZONE_DICT,
-  DropzoneConfig,
-  DropzoneDict,
-  DropzoneEvent,
-  DropzoneEvents,
-  DropzoneComponentInterface,
-  DropzoneDirectiveInterface,
+  DropzoneComponentInterface, DropzoneConfig,
+  DropzoneDict, DropzoneDirectiveInterface, DropzoneEvent,
+  DropzoneEvents, DROPZONE_CONFIG,
+  DROPZONE_DICT
 } from './types';
 
-export { useDefaultDictionary } from './helpers';
+

@@ -5,6 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxClrSmartGridModule } from '@azlabsjs/ngx-clr-smart-grid';
+import { NgxDropzoneModule } from '@azlabsjs/ngx-dropzone';
 import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
 import { NgxSlidesModule } from '@azlabsjs/ngx-slides';
 import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
@@ -108,6 +109,8 @@ ClarityIcons.addIcons(uploadCloudIcon);
       }
     }),
     NgxSlidesModule.forRoot(),
+
+    NgxDropzoneModule.forRoot()
   ],
   bootstrap: [AppComponent],
 })

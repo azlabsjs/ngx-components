@@ -7,16 +7,14 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  TemplateRef,
+  TemplateRef
 } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
+import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import {
-  controlAttributesDataBindings,
-  useHiddenAttributeSetter,
-  setControlsAttributes,
+  controlAttributesDataBindings, setControlsAttributes, useHiddenAttributeSetter
 } from '../../helpers';
 import { BindingInterface } from '../../types';
 
@@ -104,7 +102,6 @@ export class NgxSmartFormGroupComponent
       }
     }
   }
-
   //#region Destructor
   ngOnDestroy(): void {
     this._destroy$.next();

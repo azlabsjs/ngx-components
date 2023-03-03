@@ -4,7 +4,7 @@ import {
   EventEmitter,
   Input,
   Output,
-  TemplateRef,
+  TemplateRef
 } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';

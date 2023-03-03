@@ -11,20 +11,21 @@
       (focus)="onFocus($event)" [class]="'clr-input'" [required]="config!.rules?.isRequired || false"
       [preferredCountries]="['tg', 'bj', 'gh']" [country]="'tg'">
       <ng-template #input let-keypress="keypress" let-selected="selected" let-change="change" let-required="required"
-        let-disabled="disabled">
+        let-disabled="disabled" let-value="value">
         <ng-container *ngTemplateOutlet="
-            inputRef;
-            context: {
-              keypress,
-              selected,
-              required,
-              disabled,
-              config,
-              change:change,
-              onBlur: onBlur.bind(this),
-              onFocus: onFocus.bind(this)
-            }
-          "></ng-container>
+              inputRef;
+              context: {
+                value,
+                keypress,
+                selected,
+                required,
+                disabled,
+                config,
+                change:change,
+                onBlur: onBlur.bind(this),
+                onFocus: onFocus.bind(this)
+              }
+            "></ng-container>
       </ng-template>
     </ngx-intl-tel-input>
   </div>

@@ -1,6 +1,6 @@
 import { LowerCasePipe } from '@angular/common';
 import { Component, Inject, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import {
   createPipeTransform,
   GridColumnType,
@@ -12,7 +12,7 @@ import {
   FORM_CLIENT,
   ReactiveFormComponentInterface
 } from '@azlabsjs/ngx-smart-form';
-import { FormConfigInterface, InputGroup } from '@azlabsjs/smart-form-core';
+import { FileInput, FormConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
 import { BehaviorSubject, filter, Subject, takeUntil, tap } from 'rxjs';
 
 @Component({
@@ -21,6 +21,21 @@ import { BehaviorSubject, filter, Subject, takeUntil, tap } from 'rxjs';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
+  formControl = new UntypedFormControl();
+  input: FileInput = {
+    uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
+    pattern: 'image/*',
+    multiple: false,
+    maxFileSize: 40,
+    autoupload: true,
+    uploadAs: 'content',
+    label: 'My File',
+    type: InputTypes.FILE_INPUT,
+    name: 'content',
+    classes: 'clr-input',
+    isRepeatable: false,
+    containerClass: 'clr-col-sm-12',
+  };
   //
   _state$ = new BehaviorSubject<FormConfigInterface | undefined>(undefined);
   state$ = this._state$.asObservable();
@@ -134,6 +149,10 @@ export class AppComponent {
         profession: 'INFORMATIQUE',
       },
     ],
+    phonenumber: [
+      '22891969456',
+      '22892384958'
+    ]
   };
 
   required = false;
@@ -168,28 +187,28 @@ export class AppComponent {
     setTimeout(() => {
       // this.smartForm.setControlValue('category_id', 1);
       // this.smartForm.setControlValue('fruits', [2, 4]);
-      this.client
-        .get(234)
-        .pipe(
-          filter((state) => typeof state !== 'undefined' && state !== null),
-          tap((state) => {
-            const { controlConfigs } = event;
-            let values = [...controlConfigs];
-            const index = values.findIndex(
-              (current) => current.name === 'stakeholders'
-            );
-            if (index !== -1) {
-              const stakeHolders = {
-                ...(values[index] as InputGroup),
-                children: state.controlConfigs,
-              } as InputGroup;
-              values.splice(index, 1, stakeHolders);
-            }
-            this._state$.next({ ...event, controlConfigs: values });
-          }),
-          takeUntil(this._destroy$)
-        )
-        .subscribe();
+      // this.client
+      //   .get(234)
+      //   .pipe(
+      //     filter((state) => typeof state !== 'undefined' && state !== null),
+      //     tap((state) => {
+      //       const { controlConfigs } = event;
+      //       let values = [...controlConfigs];
+      //       const index = values.findIndex(
+      //         (current) => current.name === 'stakeholders'
+      //       );
+      //       if (index !== -1) {
+      //         const stakeHolders = {
+      //           ...(values[index] as InputGroup),
+      //           children: state.controlConfigs,
+      //         } as InputGroup;
+      //         values.splice(index, 1, stakeHolders);
+      //       }
+      //       this._state$.next({ ...event, controlConfigs: values });
+      //     }),
+      //     takeUntil(this._destroy$)
+      //   )
+      //   .subscribe();
     }, 5000);
 
     setTimeout(() => {

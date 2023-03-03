@@ -75,7 +75,7 @@ type FormApiServerConfigs = {
 
 type ConfigType = {
   /**
-   * @deprecated Will be removed in future release as dropzone component is no more used by this library
+   * @deprecated Will be removed in future release as the dropzone component is not being used anymore
    */
   dropzoneConfigs?: Record<string, unknown>;
   serverConfigs: FormApiServerConfigs;
@@ -89,6 +89,13 @@ type ConfigType = {
   };
 };
 
+
+/**
+ * @internal
+ * 
+ * @param service 
+ * @param assetsURL 
+ */
 export function preloadAppForms(service: CacheProvider, assetsURL: string) {
   return async () => {
     return await lastValueFrom(

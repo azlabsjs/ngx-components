@@ -8,6 +8,7 @@ import {
   Input,
   OnDestroy,
   Output,
+  SimpleChanges,
   TemplateRef,
   ViewChild,
   ViewContainerRef
@@ -72,13 +73,7 @@ import { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array-child.co
 })
 export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
   //#region Component inputs definitions
-  private _formArray!: UntypedFormArray;
-  @Input() set formArray(array: UntypedFormArray) {
-    this._formArray = array;
-  }
-  get formArray() {
-    return this._formArray;
-  }
+  @Input() formArray!: UntypedFormArray;
   private _controls!: InputConfigInterface[];
   @Input() set controls(value: InputConfigInterface | InputConfigInterface[]) {
     this._controls = Array.isArray(value)
@@ -136,18 +131,14 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
     private builder: AngularReactiveFormBuilderBridge
   ) {}
 
-  ngAfterContentInit(): void {
-    if (this.formArray.getRawValue().length !== 0) {
-      // First we cleared the view container reference to remove any existing component
-      this.viewContainerRef.clear();
-      // Then for each element in the form array we add a new component to the view container
-      // reference
-      let index = 0;
-      for (const control of this.formArray.controls) {
-        this.addComponent(control as UntypedFormGroup, index);
-        index++;
-      }
+  ngOnChanges(changes: SimpleChanges) {
+    if ('formArray' in changes) {
+      this.addArrayControls();
     }
+  }
+
+  ngAfterContentInit(): void {
+    this.addArrayControls();
     // Simulate form array
     this.formArray.valueChanges
       .pipe(tap((state) => this.formArrayChange.emit(state)))
@@ -211,5 +202,19 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
 
   ngOnDestroy(): void {
     this._destroy$.next();
+  }
+
+  private addArrayControls() {
+    if (this.formArray.getRawValue().length !== 0) {
+      // First we cleared the view container reference to remove any existing component
+      this.viewContainerRef.clear();
+      // Then for each element in the form array we add a new component to the view container
+      // reference
+      let index = 0;
+      for (const control of this.formArray.controls) {
+        this.addComponent(control as UntypedFormGroup, index);
+        index++;
+      }
+    }
   }
 }

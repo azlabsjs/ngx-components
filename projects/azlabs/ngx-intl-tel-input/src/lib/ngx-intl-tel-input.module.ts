@@ -1,11 +1,11 @@
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
 import { ModuleWithProviders, NgModule } from '@angular/core';
+import { DropdownModule } from '@azlabs/ngx-dropdown';
 import { PhoneNumberFormat } from 'google-libphonenumber';
 import { Country, IntlTelInput, ISO3166 } from './core';
 import { getPhoneNumberPlaceholder } from './core/internal';
 import { COUNTRIES } from './core/types';
-import { DropdownModule } from '@azlabs/ngx-dropdown';
 import { NgxIntlTelInputComponent } from './ngx-intl-tel-input.component';
 
 @NgModule({
