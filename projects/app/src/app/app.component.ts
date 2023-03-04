@@ -1,6 +1,6 @@
 import { LowerCasePipe } from '@angular/common';
 import { Component, Inject, ViewChild } from '@angular/core';
-import { UntypedFormControl } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import {
   createPipeTransform,
   GridColumnType,
@@ -12,7 +12,11 @@ import {
   FORM_CLIENT,
   ReactiveFormComponentInterface
 } from '@azlabsjs/ngx-smart-form';
-import { FileInput, FormConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
+import {
+  FileInput,
+  FormConfigInterface,
+  InputTypes
+} from '@azlabsjs/smart-form-core';
 import { BehaviorSubject, filter, Subject, takeUntil, tap } from 'rxjs';
 
 @Component({
@@ -21,7 +25,7 @@ import { BehaviorSubject, filter, Subject, takeUntil, tap } from 'rxjs';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  formControl = new UntypedFormControl();
+  formControl = new FormControl<string | undefined>(undefined);
   input: FileInput = {
     uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
     pattern: 'image/*',
@@ -149,10 +153,7 @@ export class AppComponent {
         profession: 'INFORMATIQUE',
       },
     ],
-    phonenumber: [
-      '22891969456',
-      '22892384958'
-    ]
+    phonenumber: ['22891969456', '22892384958'],
   };
 
   required = false;
