@@ -5,10 +5,10 @@ The module also makes use of angular services injector to provide mechanism for 
 
 ## Dependencies
 
-| @azlabsjs/ngx-smart-form | @azlabsjs/ngx-dropzone | @azlabsjs/ngx-intl-tel-input | Angular |
-| ------------------------ | ---------------------- | ---------------------------- | ------- |
-| ^0.13.x                  | ^0.13.x                | ^0.13.x                      | ^13.0   |
-| ^0.14.x                  | ^0.14.x                | ^0.14.x                      | ^14.0   |
+| @azlabsjs/ngx-smart-form | @azlabsjs/ngx-intl-tel-input | Angular |
+| ------------------------ | ---------------------------- | ------- |
+| ^0.13.x                  | ^0.13.x                      | ^13.0   |
+| ^0.14.x                  | ^0.14.x                      | ^14.0   |
 
 - Basic usage
 

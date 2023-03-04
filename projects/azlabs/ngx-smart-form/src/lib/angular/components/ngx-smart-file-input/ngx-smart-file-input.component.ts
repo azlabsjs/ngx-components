@@ -3,14 +3,14 @@ import {
   Component,
   Inject,
   Injector,
-  Input,
+  Input
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import {
   HTTPRequest,
   HTTPResponse,
   Interceptor,
-  RequestClient,
+  RequestClient
 } from '@azlabsjs/requests';
 import { FileInput, isValidHttpUrl } from '@azlabsjs/smart-form-core';
 import { Uploader, UploadOptions } from '@azlabsjs/uploader';
@@ -58,7 +58,6 @@ export class NgxSmartFileInputComponent {
   private _inputConfig!: FileInput;
   @Input() set inputConfig(config: FileInput) {
     this._inputConfig = config;
-    //#region Set the dropzone configurations
     this.constraints = {
       maxFiles: config.multiple ? 50 : 1,
       maxFilesize: config.maxFileSize ? config.maxFileSize : 10,
