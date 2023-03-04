@@ -75,7 +75,7 @@ type FormApiServerConfigs = {
 
 type ConfigType = {
   /**
-   * @deprecated Will be removed in future release as the dropzone component is not being used anymore
+   * @deprecated Will be removed in future release as the dz component is not being used anymore
    */
   dropzoneConfigs?: Record<string, unknown>;
   serverConfigs: FormApiServerConfigs;
