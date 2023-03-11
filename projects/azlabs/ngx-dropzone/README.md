@@ -35,14 +35,14 @@ import { NgxDropzoneModule } from '@azlabsjs/ngx-smart-form';
 ### Using dropzone component
 
 ```html
-<ngx-smart-dz
+<ngx-dropzone
   [config]="dropzoneConfigs"
   (removed)="onDropzoneFileRemoved($event)"
   (added)="onDropzoneFileAdd($event)"
   [multiple]="inputConfig.multiple"
   (acceptedFiles)="onAcceptedFiles($event)"
   (reset)="onReset()"
-></ngx-smart-dz>
+></ngx-dropzone>
 ```
 
 Below is your typescript source code:
