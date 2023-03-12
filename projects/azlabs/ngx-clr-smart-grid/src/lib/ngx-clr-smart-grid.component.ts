@@ -27,7 +27,7 @@ export class NgxClrSmartGridComponent {
   @Input() set pageResult(result: PaginateResult<any> | undefined | null) {
     if (result) {
       this.data = result.data ?? [];
-      this.total = result.total;
+      this.total = result.total ?? this.data.length;
     }
   }
   @Input() selected!: unknown[] | any;
