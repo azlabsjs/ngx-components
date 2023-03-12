@@ -18,7 +18,57 @@ import {
   InputGroup,
   InputTypes
 } from '@azlabsjs/smart-form-core';
-import { BehaviorSubject, filter, Subject, takeUntil, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  filter,
+  startWith,
+  Subject,
+  takeUntil,
+  tap
+} from 'rxjs';
+
+const _values = {
+  data: [
+    {
+      id: 1,
+      firstname: 'RODRIGUE',
+      lastname: 'KOLANI',
+      type: 'INDIVIDUEL',
+      sex: 'M',
+      address: {
+        phone: '+22892146591',
+        nationality: 'TG',
+      },
+      test: 'Test value 1',
+    },
+    {
+      id: 2,
+      firstname: 'SONATA',
+      lastname: 'PAKIONA',
+      type: 'INDIVIDUEL',
+      sex: 'M',
+      address: {
+        phone: '+22890250454',
+        nationality: 'TG',
+      },
+      test: 'Test value 2',
+    },
+    {
+      id: 3,
+      firstname: 'ANIKA',
+      lastname: 'AGBAGBE',
+      sex: 'F',
+      type: 'INDIVIDUEL',
+      address: {
+        phone: '+22898757475',
+        nationality: 'TG',
+      },
+      test: 'Test value 3',
+    },
+  ]
+};
+
+type ValuesType = typeof _values;
 
 @Component({
   selector: 'app-root',
@@ -86,44 +136,9 @@ export class AppComponent {
     },
   ];
   // Test data
-  public data = [
-    {
-      id: 1,
-      firstname: 'RODRIGUE',
-      lastname: 'KOLANI',
-      type: 'INDIVIDUEL',
-      sex: 'M',
-      address: {
-        phone: '+22892146591',
-        nationality: 'TG',
-      },
-      test: 'Test value 1',
-    },
-    {
-      id: 2,
-      firstname: 'SONATA',
-      lastname: 'PAKIONA',
-      type: 'INDIVIDUEL',
-      sex: 'M',
-      address: {
-        phone: '+22890250454',
-        nationality: 'TG',
-      },
-      test: 'Test value 2',
-    },
-    {
-      id: 3,
-      firstname: 'ANIKA',
-      lastname: 'AGBAGBE',
-      sex: 'F',
-      type: 'INDIVIDUEL',
-      address: {
-        phone: '+22898757475',
-        nationality: 'TG',
-      },
-      test: 'Test value 3',
-    },
-  ];
+  private _data = new Subject<ValuesType>();
+  public data$ = this._data.asObservable().pipe(startWith(undefined));
+  public placeholder: string|undefined = 'Loading please wait...';
 
   gridConfig: Partial<GridConfigType> = {
     projectRowClass: (current: { id: number }) => {
@@ -151,11 +166,8 @@ export class AppComponent {
         profession: 'INFORMATIQUE',
       },
     ],
-    phonenumbers: [
-      '22891969456',
-      '22892384958'
-    ],
-    phonenumber: '22890072872'
+    phonenumbers: ['22891969456', '22892384958'],
+    phonenumber: '22890072872',
   };
 
   fromState2 = {
@@ -176,10 +188,8 @@ export class AppComponent {
         profession: 'SOFTWARE',
       },
     ],
-    phonenumbers: [
-      '22891969456'
-    ],
-    phonenumber: '22890072872'
+    phonenumbers: ['22891969456'],
+    phonenumber: '22890072872',
   };
 
   public constructor(
@@ -212,6 +222,8 @@ export class AppComponent {
 
   onFormReadyState(event: FormConfigInterface) {
     setTimeout(() => {
+      this._data.next(_values);
+      this.placeholder = undefined;
       // this.smartForm.setControlValue('category_id', 1);
       // this.smartForm.setControlValue('fruits', [2, 4]);
       this.client
