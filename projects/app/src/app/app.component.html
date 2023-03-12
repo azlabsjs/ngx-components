@@ -1,7 +1,5 @@
 <div class="container">
-  <ngx-clr-smart-grid [config]="gridConfig" [columns]="columns" [data]="data" (dgRefresh)="onDgRefresh($event)"
-    (selectedChange)="onSelectedChanges($event)"></ngx-clr-smart-grid>
-  <ngx-clr-smart-grid [columns]="columns" [pageResult]="pageResult" (dgRefresh)="onDgRefresh($event)"
+  <ngx-clr-smart-grid [columns]="columns" [placeholder]="placeholder" [pageResult]="(pageResult$ | async)" (dgRefresh)="onDgRefresh($event)"
     (selectedChange)="onSelectedChanges($event)" [config]="{useServerPagination: true}"></ngx-clr-smart-grid>
   <ng-container *ngIf="state$ | async as form">
     <ngx-smart-form #smartform (readyState)="onFormReadyState(form)" (changes)="afterChanges()"

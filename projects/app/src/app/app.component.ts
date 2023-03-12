@@ -19,6 +19,51 @@ import {
 } from '@azlabsjs/smart-form-core';
 import { BehaviorSubject, filter, Subject, takeUntil, tap } from 'rxjs';
 
+
+
+const _values = {
+  data: [
+    {
+      id: 1,
+      firstname: 'RODRIGUE',
+      lastname: 'KOLANI',
+      type: 'INDIVIDUEL',
+      sex: 'M',
+      address: {
+        phone: '+22892146591',
+        nationality: 'TG',
+      },
+      test: 'Test value 1',
+    },
+    {
+      id: 2,
+      firstname: 'SONATA',
+      lastname: 'PAKIONA',
+      type: 'INDIVIDUEL',
+      sex: 'M',
+      address: {
+        phone: '+22890250454',
+        nationality: 'TG',
+      },
+      test: 'Test value 2',
+    },
+    {
+      id: 3,
+      firstname: 'ANIKA',
+      lastname: 'AGBAGBE',
+      sex: 'F',
+      type: 'INDIVIDUEL',
+      address: {
+        phone: '+22898757475',
+        nationality: 'TG',
+      },
+      test: 'Test value 3',
+    },
+  ]
+};
+
+type ValuesType = typeof _values;
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -83,50 +128,11 @@ export class AppComponent {
       },
     },
   ];
-  // Test data
-  public data = [
-    {
-      id: 1,
-      firstname: 'RODRIGUE',
-      lastname: 'KOLANI',
-      type: 'INDIVIDUEL',
-      sex: 'M',
-      address: {
-        phone: '+22892146591',
-        nationality: 'TG',
-      },
-      test: 'Test value 1',
-    },
-    {
-      id: 2,
-      firstname: 'SONATA',
-      lastname: 'PAKIONA',
-      type: 'INDIVIDUEL',
-      sex: 'M',
-      address: {
-        phone: '+22890250454',
-        nationality: 'TG',
-      },
-      test: 'Test value 2',
-    },
-    {
-      id: 3,
-      firstname: 'ANIKA',
-      lastname: 'AGBAGBE',
-      sex: 'F',
-      type: 'INDIVIDUEL',
-      address: {
-        phone: '+22898757475',
-        nationality: 'TG',
-      },
-      test: 'Test value 3',
-    },
-  ];
 
-  pageResult = {
-    data: this.data.slice(1),
-    total: this.data.length,
-  };
+  pageResult = new Subject<ValuesType|undefined>();
+  pageResult$ = this.pageResult.asObservable();
+  placeholder: string|undefined = 'Loading, Please wait...';
+
   gridConfig: Partial<GridConfigType> = {
     projectRowClass: (current: { id: number }) => {
       return current.id === 3 ? 'my-row' : '';
@@ -186,6 +192,8 @@ export class AppComponent {
 
   onFormReadyState(event: FormConfigInterface) {
     setTimeout(() => {
+      this.pageResult.next(_values);
+      this.placeholder = undefined;
       // this.smartForm.setControlValue('category_id', 1);
       // this.smartForm.setControlValue('fruits', [2, 4]);
       // this.client

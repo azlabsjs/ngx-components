@@ -2,7 +2,7 @@
  * Paginate query result type definition
  */
 export type PaginateResult<T> = {
-  total: number;
+  total?: number;
   data: T[];
   lastPage?: number;
   nextPageURL?: string;
