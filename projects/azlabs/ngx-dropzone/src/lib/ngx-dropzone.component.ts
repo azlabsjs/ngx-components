@@ -1,19 +1,19 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ContentChild,
   EventEmitter,
   Inject,
   Input,
-  OnDestroy,
-  OnInit,
+  OnChanges,
   Output,
   PLATFORM_ID,
+  SimpleChanges,
   TemplateRef,
   ViewChild
 } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
 import { createDefaultPreviewTemplate, mergeDzAcceptFiles } from './helpers';
 import { NgxDropzoneDirective } from './ngx-dropzone.directive';
 import {
@@ -27,15 +27,15 @@ import {
 @Component({
   selector: 'ngx-dropzone',
   template: `
-    <ng-container *ngIf="defaults$ | async as defaults">
+    <ng-container *ngIf="state">
       <div
         class="dropzone-wrapper"
         [class.disabled]="disabled"
         [class]="'dz-wrapper'"
         [class.dropzone]="useDropzoneClass"
+        [dropzone]="state"
         [disabled]="disabled"
         (init)="DZ_INIT.emit($event)"
-        [dropzone]="defaults"
       >
         <div
           class="dz-message"
@@ -45,13 +45,13 @@ import {
           <div class="text-center dz-upload-btn">
             <ng-container *ngTemplateOutlet="dzuploadbuttonRef"></ng-container>
           </div>
-          <span>{{ dragFileText || defaults.dictDrag }}</span>
+          <span>{{ dragFileText || state.dictDrag }}</span>
           <span class="dz-text">
             <a href="javascript:undefined;">{{
-              defaultMessage || defaults?.dictDefaultMessage
+              defaultMessage || state.dictDefaultMessage
             }}</a>
           </span>
-          <span> {{ uploadFileText || defaults.dictDrag2 }}</span>
+          <span> {{ uploadFileText || state.dictDrag2 }}</span>
           <div
             *ngIf="placeholder"
             class="dz-image"
@@ -65,10 +65,10 @@ import {
   styleUrls: ['./ngx-dropzone.component.scss'],
 })
 export class NgxDropzoneComponent
-  implements OnInit, AfterViewInit, OnDestroy, DropzoneComponentInterface
+  implements AfterViewInit, DropzoneComponentInterface, OnChanges
 {
   @ViewChild(NgxDropzoneDirective, { static: false })
-  dropzoneDirective!: NgxDropzoneDirective;
+  directive!: NgxDropzoneDirective;
   @Input() defaultMessage!: string;
   @Input() dragFileText!: string;
   @Input() uploadFileText!: string;
@@ -81,145 +81,100 @@ export class NgxDropzoneComponent
   @Input() accepted!: string;
 
   // #region Output properties
-  // tslint:disable-next-line: no-output-rename
   @Output('init') DZ_INIT = new EventEmitter<any>();
 
-  // tslint:disable-next-line: no-output-rename
-  // tslint:disable-next-line: no-output-native
-  // tslint:disable-next-line: no-output-rename
   @Output('error') DZ_ERROR = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
-  // tslint:disable-next-line: no-output-native
   @Output('success') DZ_SUCCESS = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('sending') DZ_SENDING = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('canceled') DZ_CANCELED = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('complete') DZ_COMPLETE = new EventEmitter<any>();
   @Output('processing') DZ_PROCESSING = new EventEmitter<any>();
 
-  // tslint:disable-next-line: no-output-rename
   @Output('drop') DZ_DROP = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('dragStart') DZ_DRAGSTART = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('dragEnd') DZ_DRAGEND = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('dragEnter') DZ_DRAGENTER = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('dragOver') DZ_DRAGOVER = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('dragLeave') DZ_DRAGLEAVE = new EventEmitter<any>();
 
-  // tslint:disable-next-line: no-output-rename
   @Output('thumbnail') DZ_THUMBNAIL = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('addedFile') DZ_ADDEDFILE = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('addedFiles') DZ_ADDEDFILES = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('removedFile') DZ_REMOVEDFILE = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('uploadProgress') DZ_UPLOADPROGRESS = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('maxFilesReached') DZ_MAXFILESREACHED = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('maxFilesExceeded') DZ_MAXFILESEXCEEDED = new EventEmitter<any>();
 
-  // tslint:disable-next-line: no-output-rename
   @Output('errorMultiple') DZ_ERRORMULTIPLE = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('successMultiple') DZ_SUCCESSMULTIPLE = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('sendingMultiple') DZ_SENDINGMULTIPLE = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('canceledMultiple') DZ_CANCELEDMULTIPLE = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('completeMultiple') DZ_COMPLETEMULTIPLE = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('processingMultiple') DZ_PROCESSINGMULTIPLE = new EventEmitter<any>();
 
-  // tslint:disable-next-line: no-output-rename
-  // tslint:disable-next-line: no-output-native
   @Output('reset') DZ_RESET = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('queueComplete') DZ_QUEUECOMPLETE = new EventEmitter<any>();
-  // tslint:disable-next-line: no-output-rename
   @Output('totalUploadProgress') DZ_TOTALUPLOADPROGRESS =
     new EventEmitter<any>();
-
-  // Added to facilitates interactions with dropzone files
 
   //#region Content
   @ContentChild('dzuploadbutton') dzuploadbuttonRef!: TemplateRef<any>;
   //#endregion Content
 
-  // tslint:disable-next-line: variable-name
-  private config$ = new BehaviorSubject<DropzoneConfig>({} as DropzoneConfig);
-  defaults$ = this.config$.asObservable();
-  // tslint:disable-next-line: variable-name
-  private _destroy$ = new Subject<void>();
+  state: DropzoneConfig = {
+    previewTemplate: createDefaultPreviewTemplate(),
+    ...this.defaultConfig,
+  };
 
   constructor(
     @Inject(PLATFORM_ID) private platform: object,
-    @Inject(DROPZONE_CONFIG) private defaultConfig: DropzoneConfig
+    @Inject(DROPZONE_CONFIG) private defaultConfig: DropzoneConfig,
+    private changesRef: ChangeDetectorRef
   ) {}
 
-  // tslint:disable-next-line: typedef
+  /**
+   * Returns the dropzone element
+   */
   dropzone() {
-    return this.dropzoneDirective?.dropzone();
+    return this.directive.dropzone();
   }
 
-  // tslint:disable-next-line: typedef
-  public reset() {
-    this.dropzoneDirective?.reset();
+  /**
+   * Reset the dropzone element
+   */
+  reset() {
+    this.directive.reset();
   }
 
-  // tslint:disable-next-line: typedef
-  ngOnInit() {
-    this.config = mergeDzAcceptFiles(
-      { ...(this.defaultConfig ?? {}), ...(this.config ?? {}) },
-      this.accepted
-    );
-    this.setDzConfig();
+  /**
+   * Returns the list of dropzone accepted files
+   *
+   * @returns
+   */
+  acceptedFiles() {
+    return this.dropzone()?.getAcceptedFiles() ?? [];
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if ('config' in changes || 'accepted' in changes) {
+      this.state = this.getDropzoneState(
+        mergeDzAcceptFiles(
+          { ...(this.defaultConfig ?? {}), ...(this.config ?? {}) },
+          this.accepted
+        )
+      );
+      this.changesRef!.markForCheck();
+    }
   }
 
   ngAfterViewInit(): void {
     if (!isPlatformBrowser(this.platform)) {
       return;
     }
-    this.subscribeToEvents();
-  }
-
-  private setDzConfig() {
-    if (typeof this.config === 'undefined' || this.config === null) {
-      return this.config$.next({
-        previewTemplate: createDefaultPreviewTemplate(this.filePreview),
-      } as DropzoneConfig);
-    }
-    if (
-      typeof this.config!.previewTemplate === 'undefined' ||
-      this.config!.previewTemplate === null
-    ) {
-      return this.config$.next({
-        ...this.config,
-        previewTemplate: createDefaultPreviewTemplate(
-          this.config.acceptedFiles &&
-            this.config.acceptedFiles.indexOf('image/*') !== -1
-            ? undefined
-            : this.filePreview
-        ),
-      } as DropzoneConfig);
-    }
-    return this.config$.next(this.config);
-  }
-
-  private subscribeToEvents() {
     DropzoneEvents.forEach((event: DropzoneEvent) => {
-      if (this.dropzoneDirective) {
+      if (this.directive) {
         const output = `DZ_${event.toUpperCase()}`;
-        this.dropzoneDirective.setEmitter(
+        this.directive.setEmitter(
           output as keyof NgxDropzoneDirective,
           this[output as keyof NgxDropzoneComponent]
         );
@@ -227,12 +182,29 @@ export class NgxDropzoneComponent
     });
   }
 
-  public getPlaceholder(): string {
-    return 'url(' + encodeURI(this.placeholder) + ')';
+  private getDropzoneState(value: DropzoneConfig) {
+    if (typeof value === 'undefined' || value === null) {
+      return {
+        previewTemplate: createDefaultPreviewTemplate(this.filePreview),
+      } as DropzoneConfig;
+    }
+    if (
+      typeof value!.previewTemplate === 'undefined' ||
+      value!.previewTemplate === null
+    ) {
+      return {
+        ...value,
+        previewTemplate: createDefaultPreviewTemplate(
+          value.acceptedFiles && value.acceptedFiles.indexOf('image/*') !== -1
+            ? undefined
+            : this.filePreview
+        ),
+      } as DropzoneConfig;
+    }
+    return value;
   }
 
-  // tslint:disable-next-line: typedef
-  ngOnDestroy() {
-    this._destroy$.next();
+  getPlaceholder() {
+    return 'url(' + encodeURI(this.placeholder) + ')';
   }
 }

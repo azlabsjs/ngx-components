@@ -15,5 +15,5 @@ export interface DropzoneDict {
   dictAcceptedFiles: string;
   dictDrag?: string;
   dictDrag2?: string;
-  dictUpload: string;
+  dictUpload?: string;
 }
