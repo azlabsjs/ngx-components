@@ -4,8 +4,8 @@ Angular dropzone component build on top of `dropzone.js` [https://docs.dropzone.
 
 ## Dependencies
 
-| @azlabsjs/ngx-dropzone | Angular | dropzone      |
-| ---------------------- | ------- | ------------- |
+| @azlabsjs/ngx-dropzone | Angular |      dropzone |
+|----------------------- |---------|---------------|
 | ^0.13.x                | ^13.0   | ^6.0.0.beta-2 |
 | ^0.14.x                | ^14.0   | ^6.0.0.beta-2 |
 
@@ -34,11 +34,10 @@ import { NgxDropzoneModule } from '@azlabsjs/ngx-smart-form';
 
 ```html
 <ngx-dropzone
+  #dropzone
   [config]="dropzoneConfigs"
-  (removed)="onDropzoneFileRemoved($event)"
-  (added)="onDropzoneFileAdd($event)"
-  [multiple]="inputConfig.multiple"
-  (acceptedFiles)="onAcceptedFiles($event)"
+  (addedFiles)="onAddedFiles($event, dropzone)"
+  (removedFile)="onRemovedFile($event)"
   (reset)="onReset()"
 ></ngx-dropzone>
 ```
@@ -54,16 +53,15 @@ export class MyComponent {
    */
   dropzoneConfigs: DropzoneConfig;
 
-  onDropzoneFileRemoved(event: unkown) {
+  onRemovedFile(event: unkown) {
     // Listen for event that get trigger when a file is removed from the dropzone
   }
 
-  onDropzoneFileAdd(event: unkown) {
-    // Listen for event that get trigger when a file is added to the dropzone
-  }
-
-  onAcceptedFiles(event: File[]) {
-    // Interact with the accpeted files
+  onAddedFiles(event: FileList, instance: any) {
+    // Added files might not be accepted, if you wish to query for the accepted files
+    // inject the the dropzone component to get tge accepted files
+    // Ex:
+    console.log(instance.dropzone()?.getAcceptedFiles() ?? []); // File[]
   }
 
   onDropdownReset() {

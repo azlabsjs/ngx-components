@@ -263,6 +263,15 @@ export class AppComponent {
     console.log('Submit error: ', error);
   }
 
+
+  onAcceptedFiles(event: any) {
+    console.log(event);
+  }
+
+  onRemovedFile(event: any) {
+    console.log('Removed file ...', event);
+  }
+
   ngOnDestroy() {
     this._destroy$.next();
   }
