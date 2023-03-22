@@ -1,13 +1,30 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
-  Directive, DoCheck, ElementRef, EventEmitter, Inject, Input, KeyValueDiffer,
-  KeyValueDiffers, NgZone, OnChanges, OnDestroy, OnInit, Optional, Output, PLATFORM_ID, Renderer2, SimpleChanges
+  Directive,
+  DoCheck,
+  ElementRef,
+  EventEmitter,
+  Inject,
+  Input,
+  KeyValueDiffer,
+  KeyValueDiffers,
+  NgZone,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Optional,
+  Output,
+  PLATFORM_ID,
+  Renderer2,
+  SimpleChanges
 } from '@angular/core';
 
 import { autoDiscover, createDropzone, createDzConfig } from './helpers';
 import {
-  DropzoneConfig, DropzoneEvent,
-  DropzoneEvents, DROPZONE_CONFIG
+  DropzoneConfig,
+  DropzoneEvent,
+  DropzoneEvents,
+  DROPZONE_CONFIG
 } from './types';
 
 @Directive({
@@ -18,7 +35,7 @@ export class NgxDropzoneDirective
   implements OnInit, OnDestroy, DoCheck, OnChanges
 {
   private instance: any;
-  private configDiff: KeyValueDiffer<string, any> | undefined = undefined;
+  private configDiff!: KeyValueDiffer<string, any> | undefined;
   @Input() disabled: boolean = false;
   @Input('dropzone') config?: DropzoneConfig;
 
@@ -69,12 +86,11 @@ export class NgxDropzoneDirective
     autoDiscover(false);
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) {
       return;
     }
-    let params = createDzConfig(this.defaults);
-    params = createDzConfig(this.config, params);
+    const params = createDzConfig(this.config, createDzConfig(this.defaults));
 
     this.renderer.addClass(
       this.elementRef.nativeElement,
@@ -104,8 +120,8 @@ export class NgxDropzoneDirective
     this.instance.on('success', () => {
       if (params.autoReset) {
         const timeout = setTimeout(() => {
-          clearTimeout(timeout);
           this.reset();
+          clearTimeout(timeout);
         }, params.autoReset);
       }
     });
@@ -113,8 +129,8 @@ export class NgxDropzoneDirective
     this.instance.on('error', () => {
       if (params.errorReset) {
         const timeout = setTimeout(() => {
-          clearTimeout(timeout);
           this.reset();
+          clearTimeout(timeout);
         }, params.errorReset);
       }
     });
@@ -135,7 +151,7 @@ export class NgxDropzoneDirective
         const emitter = this[
           `DZ_${eventName.toUpperCase()}` as keyof NgxDropzoneDirective
         ] as EventEmitter<any>;
-        if (emitter.observers.length > 0) {
+        if (emitter.observed) {
           this.zone.run(() => {
             emitter.emit(args);
           });
@@ -154,7 +170,8 @@ export class NgxDropzoneDirective
       this.zone.runOutsideAngular(() => {
         this.instance.destroy();
       });
-      this.instance = undefined;
+      // Destroy the dropzone when the directive get destroyed
+      this.instance?.destroy();
     }
   }
 
@@ -169,20 +186,18 @@ export class NgxDropzoneDirective
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.instance && changes['disabled']) {
-      if (
-        changes['disabled'].currentValue !== changes['disabled'].previousValue
-      ) {
-        if (changes['disabled'].currentValue === false) {
-          this.zone.runOutsideAngular(() => {
-            this.instance.enable();
-          });
-        } else if (changes['disabled'].currentValue === true) {
-          this.zone.runOutsideAngular(() => {
-            this.instance.disable();
-          });
-        }
-      }
+    if (typeof this.instance === 'undefined' || this.instance === null) {
+      return;
+    }
+    const disabledChanges =
+      'disabled' in changes &&
+      changes['disabled'].currentValue !== changes['disabled'].previousValue;
+    if (disabledChanges) {
+      this.zone.runOutsideAngular(() => {
+        changes['disabled'].currentValue === false
+          ? this.instance.enable()
+          : this.instance.disable();
+      });
     }
   }
 

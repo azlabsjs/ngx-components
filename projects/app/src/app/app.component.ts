@@ -216,7 +216,7 @@ export class AppComponent {
     }, 5000);
 
     setTimeout(() => {
-      this.smartForm.setValue(this.fromState);
+      // this.smartForm.setValue(this.fromState);
     }, 5000);
   }
 
@@ -231,6 +231,14 @@ export class AppComponent {
 
   onError(error: unknown) {
     console.log('Submit error: ', error);
+  }
+
+  onAcceptedFiles(event: any) {
+    console.log(event);
+  }
+
+  onRemovedFile(event: any) {
+    console.log('Removed file ...', event);
   }
 
   ngxFormSubmit(event: Record<string, any>) {

@@ -8,7 +8,7 @@
       <ngx-smart-form-control after [control]="formControl" [inputConfig]="input"></ngx-smart-form-control>
     </ngx-smart-form>
   </ng-container>
-  <ngx-dropzone></ngx-dropzone>
+  <ngx-dropzone (addedFiles)="onAcceptedFiles($event)" (removedFile)="onRemovedFile($event)"></ngx-dropzone>
 </div>
 
 <!-- <ngx-slides [slides]="slides" [autostart]="true" [timer]="2000">

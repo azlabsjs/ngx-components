@@ -94,7 +94,7 @@ export interface DZConfigInterface {
   //
   dictDrag?: string;
   dictDrag2?: string;
-  dictUpload: string;
+  dictUpload?: string;
 }
 
 export type DropzoneConfig = DZConfigInterface & Dropzone.DropzoneOptions;
