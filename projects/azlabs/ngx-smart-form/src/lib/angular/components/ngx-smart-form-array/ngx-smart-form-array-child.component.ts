@@ -19,6 +19,7 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
       <div class="ngx__form_array__card__card_block">
         <ng-container *ngIf="formGroup">
           <ngx-smart-form-group
+            [no-grid-layout]="noGridLayout"
             [formGroup]="formGroup"
             [controls]="controls"
             [template]="template"
@@ -66,6 +67,7 @@ export class NgxSmartFormArrayChildComponent {
   @Input() autoupload: boolean = false;
   @Input() submitupload: boolean = false;
   @Input() index!: number;
+  @Input('no-grid-layout') noGridLayout = false;
   //#endregion Component inputs
 
   // #region Component outputs

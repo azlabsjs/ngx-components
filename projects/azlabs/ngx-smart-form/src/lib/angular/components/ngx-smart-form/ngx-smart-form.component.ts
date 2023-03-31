@@ -117,6 +117,7 @@ export class NgxSmartFormComponent
   @Input() autoupload: boolean = false;
   @Input() submitupload: boolean = false;
   @Input() action: HTTPRequestMethods = 'POST';
+  @Input('no-grid-layout') noGridLayout = false;
   //#endregion Component inputs
 
   //#region Component outputs

@@ -32,6 +32,7 @@ export class NgxSmartFormGroupComponent
   @Input() template!: TemplateRef<HTMLElement>;
   @Input() autoupload: boolean = false;
   @Input() submitupload: boolean = false;
+  @Input('no-grid-layout') noGridLayout = false;
   //#endregion Component inputs definitions
 
   //#region Component internal properties
