@@ -7,7 +7,7 @@
     "@angular/forms": "^14.0",
     "@ng-select/ng-select": "^9.0",
     "@clr/angular": "^13.0",
-    "@azlabsjs/ngx-intl-tel-input": "^0.14.52",
+    "@azlabsjs/ngx-intl-tel-input": "^0.14.55",
     "@azlabsjs/smart-form-core": "^0.1.25",
     "@azlabsjs/requests": "^0.2.0",
     "@azlabsjs/uploader": "^0.2.1"
