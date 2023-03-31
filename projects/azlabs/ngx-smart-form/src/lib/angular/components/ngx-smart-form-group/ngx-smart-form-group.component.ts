@@ -7,16 +7,14 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  TemplateRef,
+  TemplateRef
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import {
-  controlAttributesDataBindings,
-  useHiddenAttributeSetter,
-  setControlsAttributes,
+  controlAttributesDataBindings, setControlsAttributes, useHiddenAttributeSetter
 } from '../../helpers';
 import { BindingInterface } from '../../types';
 
@@ -34,6 +32,7 @@ export class NgxSmartFormGroupComponent
   @Input() template!: TemplateRef<HTMLElement>;
   @Input() autoupload: boolean = false;
   @Input() submitupload: boolean = false;
+  @Input('no-grid-layout') noGridLayout = false;
   //#endregion Component inputs definitions
 
   //#region Component internal properties

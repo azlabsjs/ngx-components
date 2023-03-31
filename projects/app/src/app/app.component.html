@@ -2,7 +2,7 @@
   <ngx-clr-smart-grid [config]="gridConfig" [columns]="columns" [placeholder]="placeholder" [pageResult]="data$ | async" (dgRefresh)="onDgRefresh($event)"
     (selectedChange)="onSelectedChanges($event)"></ngx-clr-smart-grid>
   <ng-container *ngIf="state$ | async as form">
-    <ngx-smart-form #smartform (readyState)="onFormReadyState(form)" (error)="onError($event)" [submitable]="true"
+    <ngx-smart-form #smartform [no-grid-layout]="true" (readyState)="onFormReadyState(form)" (error)="onError($event)" [submitable]="true"
       [autoupload]="true" (submit)="ngxFormSubmit($event)" [form]="form" [autoSubmit]="true"
       [path]="'http://localhost:3000/customers'">
       <ngx-smart-form-control after [control]="formControl" [inputConfig]="input"></ngx-smart-form-control>

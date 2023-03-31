@@ -340,3 +340,11 @@ Intuitively, to project content after controls, simply add `after` to the contai
   </ngx-smart-form>
 </ng-container>
 ```
+
+## Single column form [v0.13.57]
+
+From version `0.14.55` the `ngx-smart-form` add a new input variable that forces the input to be laid out in a single colum view like a flexbox instead of gridview layout. To generate a single view layout:
+
+```html
+<ngx-smart-form [form]="form" [no-grid-layout]="true"></ngx-smart-form>
+```
