@@ -60,10 +60,9 @@ import {
   HTTP_REQUEST_CLIENT,
   INPUT_OPTIONS_CLIENT,
   InterceptorFactory,
-  TEMPLATE_DICTIONARY,
-  UPLOADER_OPTIONS,
-  UploadOptionsType
+  TEMPLATE_DICTIONARY
 } from './types';
+import { UploadOptionsType, UPLOADER_OPTIONS } from './components/ngx-smart-file-input';
 
 type FormApiServerConfigs = {
   api: {

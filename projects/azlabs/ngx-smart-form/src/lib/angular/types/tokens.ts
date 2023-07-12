@@ -3,9 +3,7 @@ import { RequestClient } from '../../http';
 import { Observable } from 'rxjs';
 import { InputOptionsClient } from './options';
 import { FormsClient } from './form';
-import { HTTPRequest, HTTPResponse } from '@azlabsjs/requests';
 import { AngularReactiveFormBuilderBridge } from './bridge';
-import { UploadOptionsType } from './upload';
 
 export type ValidationMessagesType = Observable<
   { [index: string]: any } | Record<string, any>
@@ -38,7 +36,3 @@ export const HTTP_REQUEST_CLIENT = new InjectionToken<RequestClient>(
 export const TEMPLATE_DICTIONARY = new InjectionToken<ValidationMessagesType>(
   'TEMPLATE DICTIONARY PROVIDER'
 );
-
-export const UPLOADER_OPTIONS = new InjectionToken<UploadOptionsType<HTTPRequest, HTTPResponse>>(
-  'OPTIONS TO PASS TO THE UPLOADER BY DEFAULT'
-)

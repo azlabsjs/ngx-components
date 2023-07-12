@@ -1,6 +1,6 @@
 export { NgxSmartCheckBoxComponent } from './ngx-smart-checkbox/ngx-smart-checkbox.component';
 export { NgxSmartDateInputComponent } from './ngx-smart-date-input/ngx-smart-date-input.component';
-export { NgxSmartFileInputComponent } from './ngx-smart-file-input/ngx-smart-file-input.component';
+export { NgxSmartFileInputComponent } from './ngx-smart-file-input';
 export { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array/ngx-smart-form-array-child.component';
 export { NgxSmartFormArrayComponent } from './ngx-smart-form-array/ngx-smart-form-array.component';
 export { NgxSmartFormControlArrayChildComponent } from './ngx-smart-form-control-array/ngx-smart-form-control-array-child.component';

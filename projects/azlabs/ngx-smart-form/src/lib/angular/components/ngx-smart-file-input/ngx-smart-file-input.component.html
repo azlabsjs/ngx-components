@@ -1,83 +1,71 @@
-<ng-container *ngIf="inputConfig">
-  <ng-content select="label"></ng-content>
-  <ng-container *ngIf="state">
-    <!-- TODO : Review to identify error class later -->
-    <div [class]="state.hasError ? '' : ''" class="flex-files-input">
-      <input
-        type="file"
-        placeholder="{{ inputConfig.placeholder }}"
-        fileInput
-        [class]="inputConfig.classes"
-        [maxFileSize]="constraints.maxFilesize || 10"
-        [maxFiles]="constraints.maxFiles ?? 10"
-        [multiple]="inputConfig.multiple"
-        (sizeError)="onTooLargeFilesEvent($event)"
-        (acceptedFiles)="
-          onAcceptedFiles(
-            $event,
-            inputConfig.multiple,
-            inputConfig.autoupload,
-            inputConfig.uploadAs
-          )
-        "
-        (reset)="onReset()"
-      />
-      <span *ngIf="state.uploading" class="spinner spinner-inline"></span>
-      <a
-        *ngIf="state.hasError"
-        href="#"
-        role="tooltip"
-        aria-haspopup="true"
-        class="tooltip tooltip-sm input__error_text"
+<ng-content select="label"></ng-content>
+<ng-container *ngIf="state">
+  <!-- TODO : Review to identify error class later -->
+  <div [class]="state.hasError ? '' : ''" class="flex-files-input">
+    <input
+      type="file"
+      [placeholder]="placeholder"
+      fileInput
+      [class]="cssClass || ''"
+      [maxFileSize]="maxFilesize || 10"
+      [maxFiles]="multiple ? maxFiles ?? 50 : 1"
+      [multiple]="multiple"
+      (sizeError)="onTooLargeFilesEvent($event)"
+      (acceptedFiles)="onAcceptedFiles($event, multiple, autoupload, uploadAs)"
+      (reset)="onReset()"
+    />
+    <span *ngIf="state.uploading" class="spinner spinner-inline"></span>
+    <a
+      *ngIf="state.hasError"
+      href="#"
+      role="tooltip"
+      aria-haspopup="true"
+      class="tooltip tooltip-sm input__error_text"
+    >
+      <!-- Error SVG icon -->
+      <svg
+        class="error-icon"
+        version="1.1"
+        width="36"
+        height="36"
+        viewBox="0 0 36 36"
+        preserveAspectRatio="xMidYMid meet"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
       >
-        <!-- Error SVG icon -->
-        <svg
-          class="error-icon"
-          version="1.1"
-          width="36"
-          height="36"
-          viewBox="0 0 36 36"
-          preserveAspectRatio="xMidYMid meet"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-        >
-          <title>error-standard-line</title>
-          <circle cx="18" cy="26.06" r="1.33" />
-          <path
-            d="M18,22.61a1,1,0,0,1-1-1v-12a1,1,0,1,1,2,0v12A1,1,0,0,1,18,22.61Z"
-          />
-          <path
-            d="M18,34A16,16,0,1,1,34,18,16,16,0,0,1,18,34ZM18,4A14,14,0,1,0,32,18,14,14,0,0,0,18,4Z"
-          />
-          <rect x="0" y="0" width="36" height="36" fill-opacity="0" />
-        </svg>
-        <!--\ Error SVG icon -->
-        <span class="tooltip-content error">
-          {{ "fileUploadError" | templateDict }}
-        </span>
-      </a>
-    </div>
-    <!-- Large files errors -->
-    <span
-      [class]="'input__subtext input__error_text'"
-      *ngIf="state.tooLargeFiles.length > 0"
-    >
-      {{
-        "fileSizeError"
-          | templateDict : { maxFilesize: constraints.maxFilesize }
-      }}
-    </span>
-    <!--\ Large files errors -->
-    <span
-      [class]="'input__subtext input__error_text'"
-      *ngIf="control.hasError('required') && control.touched"
-    >
-      {{ "validation.required" | templateDict }}
-    </span>
-    <span
-      [class]="'input__subtext'"
-      *ngIf="describe"
-      [innerHTML]="inputConfig.description || '' | safeHtml"
-    ></span>
-  </ng-container>
+        <title>error-standard-line</title>
+        <circle cx="18" cy="26.06" r="1.33" />
+        <path
+          d="M18,22.61a1,1,0,0,1-1-1v-12a1,1,0,1,1,2,0v12A1,1,0,0,1,18,22.61Z"
+        />
+        <path
+          d="M18,34A16,16,0,1,1,34,18,16,16,0,0,1,18,34ZM18,4A14,14,0,1,0,32,18,14,14,0,0,0,18,4Z"
+        />
+        <rect x="0" y="0" width="36" height="36" fill-opacity="0" />
+      </svg>
+      <!--\ Error SVG icon -->
+      <span class="tooltip-content error">
+        {{ "fileUploadError" | templateDict }}
+      </span>
+    </a>
+  </div>
+  <!-- Large files errors -->
+  <span
+    [class]="'input__subtext input__error_text'"
+    *ngIf="state.tooLargeFiles.length > 0"
+  >
+    {{ "fileSizeError" | templateDict : { maxFilesize: maxFilesize } }}
+  </span>
+  <!--\ Large files errors -->
+  <span
+    [class]="'input__subtext input__error_text'"
+    *ngIf="control.hasError('required') && control.touched"
+  >
+    {{ "validation.required" | templateDict }}
+  </span>
+  <span
+    [class]="'input__subtext'"
+    *ngIf="describe"
+    [innerHTML]="description || '' | safeHtml"
+  ></span>
 </ng-container>

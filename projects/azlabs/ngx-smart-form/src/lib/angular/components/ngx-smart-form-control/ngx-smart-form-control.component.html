@@ -5,10 +5,17 @@
         (addedEvent)="fileAdded.emit($event)"
         (removedEvent)="fileRemoved.emit($event)"
         [control]="formcontrol"
-        [inputConfig]="inputType.asFileInput(inputConfig)"
         [describe]="describe"
         [autoupload]="autoupload"
         [submitupload]="submitupload"
+        [upload-as]="inputType.asFileInput(inputConfig).uploadAs"
+        [placeholder]="inputConfig.placeholder"
+        [class]="inputConfig.classes"
+        [multiple]="inputType.asFileInput(inputConfig).multiple"
+        [description]="inputType.asFileInput(inputConfig).description"
+        [max-file-size]="inputType.asFileInput(inputConfig).maxFileSize"
+        [max-files]="50"
+        [url]="inputType.asFileInput(inputConfig).uploadUrl"
       >
         <label
           class="clr-control-label"

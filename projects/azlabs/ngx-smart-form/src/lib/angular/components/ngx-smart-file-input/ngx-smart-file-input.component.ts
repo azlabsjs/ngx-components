@@ -1,22 +1,23 @@
 import {
   ChangeDetectorRef,
-  Component, Inject,
+  Component,
+  Inject,
   Injector,
-  Input
+  Input,
 } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import {
   HTTPRequest,
   HTTPResponse,
   Interceptor,
-  RequestClient
+  RequestClient,
 } from '@azlabsjs/requests';
-import { FileInput, isValidHttpUrl } from '@azlabsjs/smart-form-core';
+import { isValidHttpUrl } from '@azlabsjs/smart-form-core';
 import { Uploader, UploadOptions } from '@azlabsjs/uploader';
-import { UPLOADER_OPTIONS, UploadOptionsType } from '../../types';
 import { uuidv4 } from './helpers';
 import { NgxUploadsSubjectService } from './ngx-uploads-subject.service';
-import { InputConstraints, SetStateParam } from './types';
+import { SetStateParam, UploadOptionsType } from './types';
+import { UPLOADER_OPTIONS } from './tokens';
 
 type StateType = {
   uploading: boolean;
@@ -58,18 +59,13 @@ export class NgxSmartFileInputComponent {
   //#region Component inputs
   @Input() control!: UntypedFormControl;
   @Input() describe = true;
-  private _inputConfig!: FileInput;
-  @Input() set inputConfig(config: FileInput) {
-    this._inputConfig = config;
-    this.constraints = {
-      maxFiles: config.multiple ? 50 : 1,
-      maxFilesize: config.maxFileSize ? config.maxFileSize : 10,
-    } as InputConstraints;
-  }
-  get inputConfig() {
-    return this._inputConfig;
-  }
-  @Input() uploadAs!: string;
+  @Input('upload-as') uploadAs!: string|undefined;
+  @Input('placeholder') placeholder!: string|undefined;
+  @Input('class') cssClass!: string|undefined;
+  @Input('description') description!: string|undefined;
+  @Input('multiple') multiple: boolean = false;
+  @Input('max-file-size') maxFilesize: number = 10;
+  @Input('max-files') maxFiles: number = 50;
 
   /**
    * Ng Input attribute that defines whether files must
@@ -78,7 +74,7 @@ export class NgxSmartFileInputComponent {
    *
    * @property
    */
-  @Input() autoupload: boolean = false;
+  @Input('autoupload') autoupload: boolean = false;
   /**
    *
    * Ng Input attribute that defines whether files must
@@ -90,7 +86,7 @@ export class NgxSmartFileInputComponent {
 
   /**
    * @attr
-   * 
+   *
    * Uploader submit url
    */
   @Input() url!: string | undefined;
@@ -98,7 +94,6 @@ export class NgxSmartFileInputComponent {
 
   // #region Component properties
   // Property for handling File Input types
-  constraints!: InputConstraints;
   private _state: StateType = {
     uploading: false,
     hasError: false,
@@ -147,8 +142,7 @@ export class NgxSmartFileInputComponent {
     // When the autoupload is set on the current component, we send an upload request
     // to configured url or server url for each accepted files
     try {
-      const path =
-        this.url ?? this.inputConfig.uploadUrl ?? this.uploadOptions.path;
+      const path = this.url ?? this.uploadOptions.path;
 
       if (
         typeof path === 'undefined' ||
@@ -266,7 +260,10 @@ export class NgxSmartFileInputComponent {
    * each state changes
    */
   private setState(state: SetStateParam<StateType>) {
-    this._state = typeof state === 'function' ? state(this._state) : { ...this._state, ...state };
+    this._state =
+      typeof state === 'function'
+        ? state(this._state)
+        : { ...this._state, ...state };
     this.changeRef.markForCheck();
   }
 }
