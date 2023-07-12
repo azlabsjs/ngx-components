@@ -3,6 +3,9 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
+      "@azlabs/ngx-azl-form": [
+        "dist/azlabs/ngx-azl-form"
+      ],
       "@azlabs/ngx-dropdown": [
         "dist/azlabs/ngx-dropdown"
       ],

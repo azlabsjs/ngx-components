@@ -5,13 +5,7 @@ import { TextAreaInput } from '@azlabsjs/smart-form-core';
 @Component({
   selector: 'ngx-smart-textarea-input',
   templateUrl: './ngx-smart-textarea-input.component.html',
-  styles: [
-    `
-      .clr-control-container textarea {
-        min-width: 100% !important;
-      }
-    `,
-  ],
+  styles: [],
 })
 export class DynamicTextAreaInputComponent {
   //#region Component inputs

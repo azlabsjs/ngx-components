@@ -10,22 +10,7 @@ import { map } from 'rxjs/operators';
 @Component({
   selector: 'ngx-smart-password-input',
   templateUrl: './ngx-smart-password-input.component.html',
-  styles: [
-    `
-      :host ::ng-deep .password-clr-input-wrapper,
-      .password-clr-input-wrapper,
-      :host ::ng-deep .password-wrapper,
-      .password-wrapper {
-        position: relative !important;
-      }
-      :host ::ng-deep .password-trigger,
-      .password-trigger {
-        position: absolute !important;
-        right: 10px !important;
-        cursor: pointer !important;
-      }
-    `,
-  ],
+  styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartPasswordInputComponent {

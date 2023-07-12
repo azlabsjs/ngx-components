@@ -29,6 +29,7 @@ export class PhoneInputComponent implements AfterViewInit {
   @Input() control!: AbstractControl & UntypedFormControl;
   @Input() describe = true;
   @Input('inputConfig') config!: InputConfigInterface;
+  @Input('class') cssClass!: string;
   @ContentChild('input') inputRef!: TemplateRef<any>;
   //#endregion Component inputs
 

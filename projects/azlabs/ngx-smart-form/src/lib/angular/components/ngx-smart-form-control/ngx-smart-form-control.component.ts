@@ -6,13 +6,13 @@ import {
   Input,
   OnDestroy,
   OnInit,
-  Output
+  Output,
 } from '@angular/core';
 import { AbstractControl, UntypedFormControl } from '@angular/forms';
 import {
   InputConfigInterface,
   InputOptionsInterface,
-  InputTypes
+  InputTypes,
 } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
@@ -41,6 +41,55 @@ import { InputEventArgs } from '../../types';
         color: #ff494f; /** Previous value : #fff */
         /* padding: 2px 10px; */
         font-size: 0.55rem;
+      }
+      :host ::ng-deep .clr-validate-icon.ng-star-inserted {
+        display: none;
+      }
+      :host ::ng-deep .clr-date-container .clr-input-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      :host ::ng-deep .clr-input-group {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      .clr-input-wrapper .clr-input:disabled,
+      :host ::ng-deep .clr-input-wrapper .clr-input:disabled {
+        background: rgba(244, 244, 244, 0.3);
+      }
+
+      .clr-input,
+      :host ::ng-deep .clr-input,
+      .clr-control-container,
+      :host ::ng-deep .clr-control-container,
+      .clr-input-wrapper,
+      :host ::ng-deep .clr-input-wrapper {
+        width: 100%;
+      }
+
+      .clr-form-control,
+      :host ::ng-deep .clr-form-control {
+        margin-top: 0rem !important;
+      }
+
+      :host ::ng-deep .password-clr-input-wrapper,
+      .password-clr-input-wrapper,
+      :host ::ng-deep .password-wrapper,
+      .password-wrapper {
+        position: relative !important;
+      }
+      :host ::ng-deep .password-trigger,
+      .password-trigger {
+        position: absolute !important;
+        right: 10px !important;
+        cursor: pointer !important;
+      }
+
+      .clr-control-container textarea,
+      :host ::ng-deep .clr-control-container textarea {
+        min-width: 100% !important;
       }
     `,
   ],

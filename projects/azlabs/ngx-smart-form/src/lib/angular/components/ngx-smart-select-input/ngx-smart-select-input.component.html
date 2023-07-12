@@ -1,10 +1,5 @@
 <ng-container *ngIf="state$ | async as vm">
-  <label class="clr-control-label" *ngIf="describe" [for]="inputConfig.name">
-    {{ inputConfig.label }}
-    <small class="required-text" *ngIf="inputConfig.rules?.isRequired">
-      (*)
-    </small>
-  </label>
+  <ng-content select="label"></ng-content>
   <div
     #optionsRef
     prefetchOptions
@@ -55,7 +50,7 @@
   *ngIf="control.hasError('required') && control.touched"
   [class]="'input__subtext input__error_text'"
 >
-  {{ 'validation.required' | templateDict }}
+  {{ "validation.required" | templateDict }}
 </span>
 <span
   *ngIf="describe"

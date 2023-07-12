@@ -8,10 +8,10 @@
 </ng-container>
 
 <ng-template #recursiveTemplate let-controls="controls" let-group="group">
-  <div class="clr-row">
+  <div class="input-row">
     <ng-container *ngFor="let value of controls">
       <ng-container *ngIf="(value!.children || []).length > 0">
-        <div class="clr-row" [hidden]="value.hidden">
+        <div class="input-row" [hidden]="value.hidden">
           <div [class]="value.containerClass">
             <div [innerHTML]="value.label | safeHtml"></div>
             <ng-container

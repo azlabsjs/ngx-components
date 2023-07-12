@@ -12,22 +12,6 @@ import { DateInput } from '@azlabsjs/smart-form-core';
 @Component({
   selector: 'ngx-smart-date-input',
   templateUrl: './ngx-smart-date-input.component.html',
-  styles: [
-    `
-      :host ::ng-deep .clr-validate-icon.ng-star-inserted {
-        display: none;
-      }
-      :host ::ng-deep .clr-date-container .clr-input-wrapper {
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-
-      :host ::ng-deep .clr-input-group {
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-    `,
-  ],
 })
 export class NgxSmartDateInputComponent {
   // #region Component inputs

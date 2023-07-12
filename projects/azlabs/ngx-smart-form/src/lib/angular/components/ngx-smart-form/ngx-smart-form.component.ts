@@ -50,11 +50,6 @@ import {
   templateUrl: './ngx-smart-form.component.html',
   styles: [
     `
-      :host ::ng-deep .clr-input,
-      :host ::ng-deep .clr-control-container,
-      :host ::ng-deep .clr-input-wrapper {
-        width: 100%;
-      }
       div.control__group__header,
       :host ::ng-deep div.control__group__header {
         font-size: 1rem;
@@ -62,14 +57,11 @@ import {
         line-height: 1.2rem;
         margin-top: 1.2rem;
         margin-bottom: 0;
-        font-weight: var(--clr-h3-font-weight, 200);
+        font-weight: var(--input-header-font-weight, 200);
       }
       :host ::ng-deep .required-text,
       :host ::ng-deep .field-has-error {
         color: rgb(241, 50, 50);
-      }
-      :host ::ng-deep .clr-input-wrapper .clr-input:disabled {
-        background: rgba(244, 244, 244, 0.3);
       }
       .ngx-smart-form-control,
       :host ::ng-deep .ngx-smart-form-control {
@@ -81,9 +73,13 @@ import {
       :host ::ng-deep .ngx-smart-form-control {
         padding: 0.3rem;
       }
-      :host ::ng-deep .clr-form-control {
-        margin-top: 0rem !important;
+      .inputs-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-right: -0.6rem;
+        margin-left: -0.6rem;
       }
+
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -253,7 +249,7 @@ export class NgxSmartFormComponent
       // We set the controls container class
       const controls = (value.controlConfigs ?? []).map((current) => ({
         ...current,
-        containerClass: current.containerClass ?? 'clr-col-md-12',
+        containerClass: current.containerClass ?? 'input-col-md-12',
         isRepeatable: current.isRepeatable ?? false,
       }));
       //

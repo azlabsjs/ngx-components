@@ -25,7 +25,7 @@
 
 <ng-template #recursiveTemplate let-controls="controls" let-group="group" let-autoupload="autoupload"
   let-submitupload="submitupload">
-  <div class="clr-row">
+  <div class="inputs-row">
     <ng-container *ngFor="let value of controls">
       <!-- INPUT GROUP CONTAINER PART -->
       <ng-container *ngIf="(value!.children || []).length > 0">

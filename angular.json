@@ -289,6 +289,39 @@
           }
         }
       }
+    },
+    "@azlabs/ngx-azl-form": {
+      "projectType": "library",
+      "root": "projects/azlabs/ngx-azl-form",
+      "sourceRoot": "projects/azlabs/ngx-azl-form/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/azlabs/ngx-azl-form/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/azlabs/ngx-azl-form/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/azlabs/ngx-azl-form/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/azlabs/ngx-azl-form/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
     }
   },
   "cli": {

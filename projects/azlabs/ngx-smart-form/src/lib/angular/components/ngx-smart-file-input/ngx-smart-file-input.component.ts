@@ -47,6 +47,10 @@ type StateType = {
         border-right: 0.3rem solid transparent;
         border-bottom: 0.25rem solid transparent;
       }
+
+      .error-icon {
+        fill: red;
+      }
     `,
   ],
 })
