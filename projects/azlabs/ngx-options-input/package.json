@@ -1,0 +1,14 @@
+{
+  "name": "@azlabsjs/ngx-options-input",
+  "version": "0.15.0",
+  "peerDependencies": {
+    "@angular/common": "^15.2.0",
+    "@angular/core": "^15.2.0",
+    "@azlabsjs/requests": "^0.2.0",
+    "@azlabsjs/smart-form-core": "^0.2.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false
+}

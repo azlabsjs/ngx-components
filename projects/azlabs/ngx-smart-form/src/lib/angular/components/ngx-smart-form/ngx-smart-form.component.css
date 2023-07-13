@@ -1,0 +1,30 @@
+div.control__group__header,
+:host ::ng-deep div.control__group__header {
+  font-size: 1rem;
+  letter-spacing: normal;
+  line-height: 1.2rem;
+  margin-top: 1.2rem;
+  margin-bottom: 0;
+  font-weight: var(--input-header-font-weight, 200);
+}
+:host ::ng-deep .required-text,
+:host ::ng-deep .field-has-error {
+  color: rgb(241, 50, 50);
+}
+.ngx-smart-form-control,
+:host ::ng-deep .ngx-smart-form-control {
+  margin: 0;
+  padding: 0;
+  margin-top: 1rem;
+}
+.ngx-smart-form-control,
+:host ::ng-deep .ngx-smart-form-control {
+  padding: 0.3rem;
+}
+.inputs-row,
+:host ::ng-deep .input-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -0.6rem;
+  margin-left: -0.6rem;
+}

@@ -13,7 +13,3 @@ export {
   setControlsAttributes,
 } from './attributes';
 
-export { createIntersectionObserver } from './native';
-
-// Default template messages
-export {useDefaultTemplateText} from './template';

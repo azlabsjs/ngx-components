@@ -6,10 +6,10 @@ The module also makes use of angular services injector to provide mechanism for 
 ## Dependencies
 
 | @azlabsjs/ngx-smart-form | @azlabsjs/smart-form-core | @azlabsjs/ngx-intl-tel-input | Angular |
-| ------------------------ | --------------------------| ---------------------------- | ------- |
-| ^0.13.x                  |                 ^0.1.20   | ^0.13.x                      | ^13.0   |
-| ^0.14.x                  |                 ^0.1.20   | ^0.14.x                      | ^14.0   |
-| ^0.15.x                  |                 ^0.2.0    | ^0.15.x                      | ^15.0   |
+| ------------------------ | ------------------------- | ---------------------------- | ------- |
+| ^0.13.x                  | ^0.1.20                   | ^0.13.x                      | ^13.0   |
+| ^0.14.x                  | ^0.1.20                   | ^0.14.x                      | ^14.0   |
+| ^0.15.x                  | ^0.2.0                    | ^0.15.x                      | ^15.0   |
 
 ## Usage
 
@@ -48,7 +48,11 @@ To use the smart form component in your component, simply include it requirement
 
 ```html
 <!-- ... -->
-<ngx-smart-form [form]="form"> </ngx-smart-form>
+<ngx-smart-form [form]="form" [template]="inputTemplate">
+  <ng-template #inputTemplate let-config="value" let-control="control">
+    <ngx-clr-form-control [class]="'ngx-smart-form-control ' + config.containerClass" [hidden]="config.hidden" [control]="control" [inputConfig]="config" [options]="config.options" [autoupload]="true" [submitupload]="true"></ngx-clr-form-control>
+  </ng-template>
+</ngx-smart-form>
 ```
 
 Note: By default the smart component will use default configuration to create controls and default button for adding new control or group of controls if the control is repeatable.
@@ -68,11 +72,7 @@ Smart form component tries it best to be flexible enough for cutomization, using
 -- Injecting a submit button:
 
 ```html
-<ngx-smart-form
-  [form]="form"
-  [submitable]="true"
-  (submit)="onFormSubmit($event)"
->
+<ngx-smart-form [form]="form" [submitable]="true" (submit)="onFormSubmit($event)">
   <ng-template #submitButton let-handler>
     <button class="btn btn-primary" (click)="handler($event)">
       <clr-icon shape="circle-arrow" dir="up"></clr-icon>
@@ -107,8 +107,7 @@ export class MyCustomSmartInput {
 ```html
 <ngx-smart-form [form]="form" [submitable]="true" [template]="template">
   <ng-template #template let-input="value" let-control="control">
-    <app-custom-smart-input [input]="input" [control]="control">
-    </app-custom-smart-input>
+    <app-custom-smart-input [input]="input" [control]="control"> </app-custom-smart-input>
   </ng-template>
 </ngx-smart-form>
 ```
@@ -121,12 +120,7 @@ By default the smart form component comes with a default floating action button 
 <ngx-smart-form [form]="form" [submitable]="true" [template]="template">
   <ng-template #addTemplate let-handler>
     <div class="button" (click)="handler($event)">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="8px"
-        height="8px"
-        viewBox="0 0 24 24"
-      >
+      <svg xmlns="http://www.w3.org/2000/svg" width="8px" height="8px" viewBox="0 0 24 24">
         <path d="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z" />
       </svg>
     </div>
@@ -208,13 +202,7 @@ Sometimes based systems requirements, developpers might not need to handle form 
 At the template level, in order to use the auto submit functionnality developpers must configure the `autosubmit` and `path` input properties.
 
 ```html
-<ngx-smart-form
-  [submitable]="true"
-  [autoupload]="true"
-  [form]="form"
-  [autoSubmit]="true"
-  [path]="'api/v1/customers'"
-></ngx-smart-form>
+<ngx-smart-form [submitable]="true" [autoupload]="true" [form]="form" [autoSubmit]="true" [path]="'api/v1/customers'"></ngx-smart-form>
 ```
 
 **Note**

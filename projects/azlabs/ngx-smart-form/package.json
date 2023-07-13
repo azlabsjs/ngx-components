@@ -1,22 +1,16 @@
 {
   "name": "@azlabsjs/ngx-smart-form",
-  "version": "0.14.51",
+  "version": "0.15.0",
   "peerDependencies": {
     "@angular/common": "^15.0",
     "@angular/core": "^15.0",
     "@angular/forms": "^15.0",
     "@azlabsjs/smart-form-core": "^0.2.0",
-    "@azlabsjs/requests": "^0.2.0",
-    "@azlabsjs/uploader": "^0.2.1"
+    "@azlabsjs/requests": "^0.2.0"
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "@azlabsjs/built-value": "^0.1.10",
-    "@azlabsjs/js-datetime": "^0.1.11",
-    "@azlabsjs/utilities": "^0.1.10",
-    "@azlabsjs/smart-form-core": "^0.2.0",
-    "@azlabsjs/requests": "^0.2.1",
-    "@azlabsjs/uploader": "^0.2.1"
+    "@azlabsjs/built-value": "^0.1.10"
   },
   "repository": {
     "type": "git",

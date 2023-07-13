@@ -123,7 +123,7 @@ export interface ReactiveFormComponentInterface extends FormComponentInterface {
   /**
    * Internal reactive form component interface
    */
-  formGroup: FormGroup;
+  readonly formGroup: FormGroup;
 
   /**
    * Set the form group value imperative

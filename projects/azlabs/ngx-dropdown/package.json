@@ -1,6 +1,6 @@
 {
-  "name": "@azlabs/ngx-dropdown",
-  "version": "0.14.0",
+  "name": "@azlabsjs/ngx-dropdown",
+  "version": "0.15.0",
   "peerDependencies": {
     "@angular/common": "^15.0",
     "@angular/core": "^15.0"

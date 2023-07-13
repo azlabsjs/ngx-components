@@ -3,11 +3,17 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
-      "@azlabs/ngx-azl-form": [
-        "dist/azlabs/ngx-azl-form"
+      "@azlabsjs/ngx-clr-form-control": [
+        "dist/azlabs/ngx-clr-form-control"
       ],
-      "@azlabs/ngx-dropdown": [
+      "@azlabsjs/ngx-dropdown": [
         "dist/azlabs/ngx-dropdown"
+      ],
+      "@azlabsjs/ngx-file-input": [
+        "dist/azlabs/ngx-file-input"
+      ],
+      "@azlabsjs/ngx-options-input": [
+        "dist/azlabs/ngx-options-input"
       ],
       "@azlabsjs/ngx-clr-smart-grid": [
         "dist/azlabs/ngx-clr-smart-grid"

@@ -48,40 +48,7 @@ import {
 @Component({
   selector: 'ngx-smart-form',
   templateUrl: './ngx-smart-form.component.html',
-  styles: [
-    `
-      div.control__group__header,
-      :host ::ng-deep div.control__group__header {
-        font-size: 1rem;
-        letter-spacing: normal;
-        line-height: 1.2rem;
-        margin-top: 1.2rem;
-        margin-bottom: 0;
-        font-weight: var(--input-header-font-weight, 200);
-      }
-      :host ::ng-deep .required-text,
-      :host ::ng-deep .field-has-error {
-        color: rgb(241, 50, 50);
-      }
-      .ngx-smart-form-control,
-      :host ::ng-deep .ngx-smart-form-control {
-        margin: 0;
-        padding: 0;
-        margin-top: 1rem;
-      }
-      .ngx-smart-form-control,
-      :host ::ng-deep .ngx-smart-form-control {
-        padding: 0.3rem;
-      }
-      .inputs-row {
-        display: flex;
-        flex-wrap: wrap;
-        margin-right: -0.6rem;
-        margin-left: -0.6rem;
-      }
-
-    `,
-  ],
+  styleUrls: ['./ngx-smart-form.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFormComponent
@@ -117,11 +84,7 @@ export class NgxSmartFormComponent
 
   //#region Component outputs
   @Output() submit = new EventEmitter<{ [index: string]: any }>();
-  /**
-   * @deprecated In future release, `readyState` event will be remove
-   * Use `ready` listener instead
-   */
-  @Output() readyState = new EventEmitter();
+  @Output() ready = new EventEmitter();
   @Output() changes = new EventEmitter();
   @Output() formGroupChange = new EventEmitter<UntypedFormGroup>();
   @Output() complete = new EventEmitter<unknown>();
@@ -165,7 +128,7 @@ export class NgxSmartFormComponent
   ngAfterViewInit(): void {
     this.setComponentForm(this.form);
     // Timeout and notify parent component of ready state
-    this.readyState.emit();
+    this.ready.emit();
   }
 
   //#region FormComponent interface Methods definitions

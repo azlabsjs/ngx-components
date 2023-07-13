@@ -13,7 +13,7 @@ export { InterceptorFactory } from './interceptors';
 export { InputOptionsClient } from './options';
 //
 export {
-  ANGULAR_REACTIVE_FORM_BRIDGE, API_BINDINGS_ENDPOINT, API_HOST, FORM_CLIENT, HTTP_REQUEST_CLIENT, INPUT_OPTIONS_CLIENT, TEMPLATE_DICTIONARY, ValidationMessagesType
+  ANGULAR_REACTIVE_FORM_BRIDGE, API_HOST, FORM_CLIENT, HTTP_REQUEST_CLIENT
 } from './tokens';
 
 

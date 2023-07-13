@@ -20,7 +20,7 @@ To include the API in your angular project, you must import it module into the r
 
 // ...
 
-import { NgxDropzoneModule } from '@azlabsjs/ngx-smart-form';
+import { NgxDropzoneModule } from '@azlabsjs/ngx-dropzone';
 
 @NgModule({
     // ...

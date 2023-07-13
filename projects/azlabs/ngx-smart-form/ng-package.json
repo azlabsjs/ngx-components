@@ -5,13 +5,7 @@
     "entryFile": "src/public-api.ts"
   },
   "allowedNonPeerDependencies": [
-    "@azlabsjs/built-value",
-    "@azlabsjs/js-datetime",
-    "@azlabsjs/utilities",
-    "@azlabsjs/functional",
-    "@azlabsjs/smart-form-core",
-    "@azlabsjs/requests",
-    "@azlabsjs/uploader"
+    "@azlabsjs/built-value"
   ],
   "assets": ["assets/**/*.*"]
 }

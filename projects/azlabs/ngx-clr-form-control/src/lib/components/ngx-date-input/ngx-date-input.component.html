@@ -1,0 +1,18 @@
+<ng-container
+  *ngTemplateOutlet="inputRef; context: {control, onBlur: onBlur.bind(this), config: inputConfig}"></ng-container>
+<span [class]="'input__subtext input__error_text'" *ngIf="control.hasError('required') && control.touched">
+  {{ 'validation.required' | translate }}
+</span>
+<span [class]="'input__subtext input__error_text'" *ngIf="control.hasError('minDate') && control.touched">
+  {{
+  'validation.minDate'
+  | translate: { date: control.errors ? control.errors['minDate'] : '' }
+  }}
+</span>
+<span [class]="'input__subtext input__error_text'" *ngIf="control.hasError('maxDate') && control.touched">
+  {{
+  'validation.maxDate'
+  | translate: { date: control.errors ? control.errors['maxDate'] : '' }
+  }}
+</span>
+<span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="inputConfig.description || '' | trustHtml"></span>

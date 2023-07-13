@@ -35,7 +35,6 @@ import { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array-child.co
           context: { $implicit: onComponentDestroy.bind(this) }
         "
       ></ng-container>
-      <span class="no-control-text">{{ 'addButtonText' | templateDict }}</span>
     </div>
     <ng-container *ngIf="refCount !== 0">
       <ng-container

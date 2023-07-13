@@ -1,0 +1,46 @@
+<ng-container
+  *ngTemplateOutlet="
+    inputRef;
+    context: {
+      max: inputConfig.max,
+      min: inputConfig.min,
+      config: inputConfig,
+      control
+    }
+  "
+></ng-container>
+<span
+  [class]="'input__subtext input__error_text'"
+  *ngIf="control.hasError('required') && control.touched"
+>
+  {{ "validation.required" | translate }}
+</span>
+<span
+  [class]="'input__subtext input__error_text'"
+  *ngIf="control.hasError('min') && control.touched"
+>
+  {{
+    "validation.min"
+      | translate
+        : {
+            value: inputConfig.min
+          }
+  }}
+</span>
+<span
+  [class]="'input__subtext input__error_text'"
+  *ngIf="control.hasError('max') && control.touched"
+>
+  {{
+    "validation.max"
+      | translate
+        : {
+            value: inputConfig.max
+          }
+  }}
+</span>
+<span
+  [class]="'input__subtext'"
+  *ngIf="describe"
+  [innerHTML]="inputConfig.description || '' | trustHtml"
+></span>

@@ -14,6 +14,9 @@ import { CdsModule } from '@cds/angular';
 import { ClarityIcons, uploadCloudIcon } from '@cds/core/icon';
 import { AppComponent } from './app.component';
 import { TestPipe } from './test.pipe';
+import { NgxFileInputModule } from '@azlabsjs/ngx-file-input';
+import { NgxClrFormControlModule } from '@azlabsjs/ngx-clr-form-control';
+import { NgxOptionsInputModule } from '@azlabsjs/ngx-options-input';
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
@@ -36,27 +39,6 @@ ClarityIcons.addIcons(uploadCloudIcon);
           host: 'http://localhost:4000',
           // Custom path on the server else the default is used
           bindings: 'api/v2/bindings',
-          // Files upload url
-          uploadURL: 'https://storage.lik.tg/api/storage/object/upload',
-        },
-      },
-      uploadOptions: {
-        interceptorFactory: (injector: Injector) => {
-          // Replace the interceptor function by using the injector
-          return (request, next) => {
-            request = request.clone({
-              options: {
-                ...request.options,
-                headers: {
-                  ...request.options.headers,
-                  'x-client-id': '96a6bba2-73e4-404c-9bb3-0d61c31bba44',
-                  'x-client-secret':
-                    '9NYHbYhzNXX2AbrxHs4H0cTmM7udeKEdqfwyTCXGLjnaU2IhmVldNwAknIpysbx5QZ8KBytvw1hW7qQE6iA',
-                },
-              },
-            });
-            return next(request);
-          };
         },
       },
       submitRequest: {
@@ -76,6 +58,21 @@ ClarityIcons.addIcons(uploadCloudIcon);
           };
         },
       },
+      // Path to the form assets
+      // This path will be used the http handler to load the forms in cache
+      formsAssets: '/assets/forms.json',
+    }),
+    NgxClrSmartGridModule.forRoot({
+      pipeTransformMap: {
+        testPipe: TestPipe,
+      },
+    }),
+    NgxSlidesModule.forRoot(),
+
+    NgxDropzoneModule.forRoot(),
+
+    // Configure clr control module
+    NgxClrFormControlModule.forRoot({
       optionsRequest: {
         interceptorFactory: (injector: Injector) => {
           // Replace the interceptor function by using the injector
@@ -95,22 +92,35 @@ ClarityIcons.addIcons(uploadCloudIcon);
           // category_id : 'https://coopecclients.lik.tg/',
           zone_id: () => 'https://coopecclients.liksoft.tg/', // TODO: In future release pass the form id to the function
           category_id: {
-            host: 'https://coopecclients.azlabs.xyz/'
-          }
-        }
+            host: 'https://coopecclients.azlabs.xyz/',
+          },
+        },
       },
-      // Path to the form assets
-      // This path will be used the http handler to load the forms in cache
-      formsAssets: '/assets/forms.json',
     }),
-    NgxClrSmartGridModule.forRoot({
-      pipeTransformMap: {
-        'testPipe': TestPipe
-      }
-    }),
-    NgxSlidesModule.forRoot(),
 
-    NgxDropzoneModule.forRoot()
+    NgxFileInputModule.forRoot({
+      uploadOptions: {
+        interceptorFactory: (injector: Injector) => {
+          // Replace the interceptor function by using the injector
+          return (request, next) => {
+            request = request.clone({
+              options: {
+                ...request.options,
+                headers: {
+                  ...request.options.headers,
+                  'x-client-id': '96a6bba2-73e4-404c-9bb3-0d61c31bba44',
+                  'x-client-secret':
+                    '9NYHbYhzNXX2AbrxHs4H0cTmM7udeKEdqfwyTCXGLjnaU2IhmVldNwAknIpysbx5QZ8KBytvw1hW7qQE6iA',
+                },
+              },
+            });
+            return next(request);
+          };
+        },
+      },
+      // Files upload url
+      uploadURL: 'https://storage.lik.tg/api/storage/object/upload',
+    }),
   ],
   bootstrap: [AppComponent],
 })

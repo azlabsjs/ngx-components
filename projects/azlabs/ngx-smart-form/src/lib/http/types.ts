@@ -4,31 +4,9 @@ import {
   Interceptor,
   HTTPRequestMethods,
   HTTPResponseType,
-  HTTPRequest,
 } from '@azlabsjs/requests';
 
 export type InterceptorFactory<T> = (injector: Injector) => Interceptor<T>;
-
-/**
- * @internal
- */
-type QueryConfigType = {
-  [name: string]:
-    | string
-    | (() => string)
-    | {
-        host?: string | (() => string);
-        interceptor?: InterceptorFactory<HTTPRequest>;
-      };
-};
-
-/**
- * @internal
- */
-export type OptionsQueryConfigType = {
-  interceptorFactory?: InterceptorFactory<HTTPRequest>;
-  queries?: QueryConfigType;
-};
 
 export interface RequestClient {
   /**
