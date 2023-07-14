@@ -13,19 +13,19 @@ import {
   Optional,
   Output,
   SimpleChanges,
-  TemplateRef
+  TemplateRef,
 } from '@angular/core';
 import {
   AbstractControl,
   UntypedFormArray,
   UntypedFormControl,
-  UntypedFormGroup
+  UntypedFormGroup,
 } from '@angular/forms';
 import { HTTPRequestMethods } from '@azlabsjs/requests';
 import {
   FormConfigInterface,
   InputConfigInterface,
-  InputGroup
+  InputGroup,
 } from '@azlabsjs/smart-form-core';
 import { EMPTY, from, lastValueFrom, Observable, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
@@ -34,7 +34,7 @@ import {
   ComponentReactiveFormHelpers,
   controlAttributesDataBindings,
   setControlsAttributes,
-  useHiddenAttributeSetter
+  useHiddenAttributeSetter,
 } from '../../helpers';
 import {
   AngularReactiveFormBuilderBridge,
@@ -42,13 +42,13 @@ import {
   BindingInterface,
   ControlsStateMap,
   HTTP_REQUEST_CLIENT,
-  ReactiveFormComponentInterface
+  ReactiveFormComponentInterface,
 } from '../../types';
 
 @Component({
   selector: 'ngx-smart-form',
   templateUrl: './ngx-smart-form.component.html',
-  styleUrls: ['./ngx-smart-form.component.css'],
+  styleUrls: ['./ngx-form-grid.css', './ngx-smart-form.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFormComponent
