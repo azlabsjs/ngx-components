@@ -79,14 +79,6 @@ export class NgxSmartFileInputComponent {
    * @property
    */
   @Input('autoupload') autoupload: boolean = false;
-  /**
-   *
-   * Ng Input attribute that defines whether files must
-   * be uploaded during submit stage
-   *
-   * @property
-   */
-  @Input() submitupload: boolean = false;
 
   /**
    * @attr

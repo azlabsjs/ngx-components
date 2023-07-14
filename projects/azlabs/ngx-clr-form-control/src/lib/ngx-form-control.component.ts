@@ -19,7 +19,7 @@ import { takeUntil, tap } from 'rxjs/operators';
 import { InputEventArgs } from './types';
 
 @Component({
-  selector: 'ngx-form-control',
+  selector: 'ngx-clr-form-control',
   templateUrl: './ngx-form-control.component.html',
   styleUrls: ['./ngx-form-control.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,8 +50,6 @@ export class NgxFormControlComponent implements OnDestroy, OnInit {
   @Output('blur') blur = new EventEmitter<InputEventArgs>();
   // Value changes emitters
   @Output() valueChange = new EventEmitter<InputEventArgs>();
-  @Input() autoupload: boolean = false;
-  @Input() submitupload: boolean = false;
   //#endregion Component outputs
 
   /**
@@ -80,9 +78,9 @@ export class NgxFormControlComponent implements OnDestroy, OnInit {
   updateinlineclass(inputConfig: InputConfigInterface) {
     return {
       ...inputConfig,
-      classes: inputConfig.classes?.includes('clr-textarea')
+      classes: this.inline ? (inputConfig.classes?.includes('clr-textarea')
         ? inputConfig.classes?.replace('textarea', 'input')
-        : `${inputConfig?.classes} clr-input`,
+        : `${inputConfig?.classes}`) : inputConfig?.classes,
     };
   }
 

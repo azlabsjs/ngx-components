@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build:all": "ng build --configuration production @azlabsjs/ngx-dropzone && ng build --configuration production @azlabsjs/ngx-dropdown && ng build --configuration production @azlabsjs/ngx-intl-tel-input && ng build --configuration production @azlabsjs/ngx-file-input && ng build --configuration production @azlabsjs/ngx-options-input && ng build --configuration production @azlabsjs/ngx-clr-form-control && ng build --configuration production @azlabsjs/ngx-smart-form && ng build --configuration production @azlabsjs/ngx-clr-smart-grid && ng build --configuration production @azlabsjs/ngx-slides",
-    "watch": "ng build --watch --configuration development",
+    "watch": "ng build --watch --configuration production @azlabsjs/ngx-dropzone && ng build --watch --configuration production @azlabsjs/ngx-dropdown && ng build --watch --configuration production @azlabsjs/ngx-intl-tel-input && ng build --watch --configuration production @azlabsjs/ngx-file-input && ng build --watch --configuration production @azlabsjs/ngx-options-input && ng build --watch --configuration production @azlabsjs/ngx-clr-form-control && ng build --watch --configuration production @azlabsjs/ngx-smart-form && ng build --watch --configuration production @azlabsjs/ngx-clr-smart-grid && ng build --watch --configuration production @azlabsjs/ngx-slides",
     "test": "ng test",
     "build:sass": "sass ./projects/azlabs/ngx-intl-tel-input/styles/styles.scss ./projects/azlabs/ngx-intl-tel-input/assets/styles.css",
     "start:server": "json-server --watch db.json"

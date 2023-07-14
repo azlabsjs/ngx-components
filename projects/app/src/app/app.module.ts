@@ -16,12 +16,12 @@ import { AppComponent } from './app.component';
 import { TestPipe } from './test.pipe';
 import { NgxFileInputModule } from '@azlabsjs/ngx-file-input';
 import { NgxClrFormControlModule } from '@azlabsjs/ngx-clr-form-control';
-import { NgxOptionsInputModule } from '@azlabsjs/ngx-options-input';
+import { FormControlComponent } from './form-control/form-control.component';
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, FormControlComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -108,9 +108,9 @@ ClarityIcons.addIcons(uploadCloudIcon);
                 ...request.options,
                 headers: {
                   ...request.options.headers,
-                  'x-client-id': '96a6bba2-73e4-404c-9bb3-0d61c31bba44',
+                  'x-client-id': '98954592-d85b-43c4-a77f-e7bb4501f655',
                   'x-client-secret':
-                    '9NYHbYhzNXX2AbrxHs4H0cTmM7udeKEdqfwyTCXGLjnaU2IhmVldNwAknIpysbx5QZ8KBytvw1hW7qQE6iA',
+                    'HeP44SYK11FXhIEzFB8efeyo63nZQ12mZrbBA8KcWqwD91tT9K4EfhngL5Vw7hNu9YUglzdJOdp8zigRQ',
                 },
               },
             });

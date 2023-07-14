@@ -1,17 +1,3 @@
 <div class="container">
-  <ngx-clr-smart-grid [columns]="columns" [placeholder]="placeholder" [pageResult]="(pageResult$ | async)" (dgRefresh)="onDgRefresh($event)"
-    (selectedChange)="onSelectedChanges($event)" [config]="{useServerPagination: true}"></ngx-clr-smart-grid>
-  <ng-container *ngIf="state$ | async as form">
-    <ngx-smart-form #smartform (readyState)="onFormReadyState(form)" (changes)="afterChanges()"
-      (error)="onError($event)" [submitable]="true" [autoupload]="true" (submit)="ngxFormSubmit($event)" [form]="form"
-      [autoSubmit]="true" [path]="'http://localhost:3000/customers'">
-    </ngx-smart-form>
-  </ng-container>
-  <ngx-dropzone></ngx-dropzone>
+  <app-form-control></app-form-control>
 </div>
-
-<!-- <ngx-slides [slides]="slides" [autostart]="true" [timer]="2000">
-  <ng-template #ngxSlide let-slide>
-    <img [src]="slide.src" alt="Slide image">
-  </ng-template>
-</ngx-slides> -->

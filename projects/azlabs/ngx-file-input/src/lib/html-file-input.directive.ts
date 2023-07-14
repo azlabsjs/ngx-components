@@ -19,7 +19,7 @@ type EventType<T = EventTarget> = Omit<Event, 'target'> & {
 };
 
 @Directive({
-  selector: '[fileInput]',
+  selector: '[fileInput]'
 })
 export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
   //#region Directive inputs
