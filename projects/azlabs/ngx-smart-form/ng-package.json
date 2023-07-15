@@ -6,6 +6,5 @@
   },
   "allowedNonPeerDependencies": [
     "@azlabsjs/built-value"
-  ],
-  "assets": ["assets/**/*.*"]
+  ]
 }

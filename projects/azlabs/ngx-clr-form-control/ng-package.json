@@ -3,5 +3,6 @@
   "dest": "../../../dist/azlabs/ngx-clr-form-control",
   "lib": {
     "entryFile": "src/public-api.ts"
-  }
+  },
+  "assets": ["assets/**/*.*"]
 }
