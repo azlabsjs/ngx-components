@@ -7,11 +7,11 @@ The module also makes use of angular services injector to provide mechanism for 
 
 ## Dependencies
 
-| @azlabsjs/ngx-smart-form | @azlabsjs/smart-form-core | @azlabsjs/ngx-intl-tel-input | Angular |
+| @azlabsjs/ngx-smart-form | @azlabsjs/smart-form-core | @azlabsjs/requests           | Angular |
 | ------------------------ | ------------------------- | ---------------------------- | ------- |
-| ^0.13.x                  | ^0.1.20                   | ^0.13.x                      | ^13.0   |
-| ^0.14.x                  | ^0.1.20                   | ^0.14.x                      | ^14.0   |
-| ^0.15.x                  | ^0.2.0                    | ^0.15.x                      | ^15.0   |
+| ^0.13.x                  | ^0.1.x                    | ^0.1.x                       | ^13.0   |
+| ^0.14.x                  | ^0.1.x                    | ^0.2.x                       | ^14.0   |
+| ^0.15.x                  | ^0.2.x                    | ^0.2.x                       | ^15.0   |
 
 ## Usage
 
