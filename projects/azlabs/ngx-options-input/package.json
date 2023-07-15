@@ -10,5 +10,14 @@
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/azlabsjs/ngx-components.git",
+    "directory": "/projects/azlabs/ngx-options-input"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@azlabsjs"
+  },
+  "homepage": "https://github.com/azlabsjs/ngx-components/blob/ng-v15/projects/azlabs/ngx-options-input/README.md"
 }

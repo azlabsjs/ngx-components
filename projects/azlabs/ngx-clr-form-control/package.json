@@ -5,14 +5,23 @@
     "@angular/common": "^15.2.0",
     "@angular/core": "^15.2.0",
     "@angular/forms": "^15.0",
+    "@clr/angular": "^15.0.0",
     "@azlabsjs/ngx-file-input": "^0.15.0",
     "@azlabsjs/ngx-options-input": "^0.15.0",
     "@azlabsjs/ngx-intl-tel-input": "^0.15.0",
-    "@clr/angular": "^15.0.0",
     "@azlabsjs/smart-form-core": "^0.2.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/azlabsjs/ngx-components.git",
+    "directory": "/projects/azlabs/ngx-clr-form-control"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@azlabsjs"
+  },
+  "homepage": "https://github.com/azlabsjs/ngx-components/blob/ng-v15/projects/azlabs/ngx-clr-form-control/README.md"
 }
