@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
-import { distinctUntilChanged, filter, Subject, takeUntil, tap } from 'rxjs';
+import { Subscription, distinctUntilChanged, tap } from 'rxjs';
 
 type SetStateParam<T> = Partial<T> | ((state: T) => T);
 type StateType = {
@@ -27,6 +27,7 @@ export class PhoneInputComponent implements AfterViewInit {
   @Input() control!: AbstractControl & FormControl;
   @Input() describe = true;
   @Input('inputConfig') config!: InputConfigInterface;
+  @Input('class') cssClass!: string;
   @ContentChild('input') inputRef!: TemplateRef<any>;
   //#endregion Component inputs
 
@@ -43,8 +44,11 @@ export class PhoneInputComponent implements AfterViewInit {
   get state() {
     return this._state;
   }
-  private _destroy$ = new Subject<void>();
   // #endregion Component state
+
+  //#region Class properties
+  private subscriptions: Subscription[] = [];
+  //#endregion Class properties
 
   /**
    * Creates component instance
@@ -63,32 +67,33 @@ export class PhoneInputComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.control.valueChanges
-      .pipe(
-        distinctUntilChanged(),
-        filter((state) => typeof state !== 'undefined' && state !== null),
-        tap((value: string) => this.setState((state) => ({ ...state, value }))),
-        takeUntil(this._destroy$)
-      )
-      .subscribe();
-    this.control.statusChanges
-      .pipe(
-        tap((status) => {
-          this.setState((state) => ({
-            ...state,
-            disabled: status.toLowerCase() === 'disabled',
-          }));
-        }),
-        takeUntil(this._destroy$)
-      )
-      .subscribe();
+    this.subscriptions.push(
+      this.control.valueChanges
+        .pipe(
+          distinctUntilChanged(),
+          tap((value: string | undefined) =>
+            this.setState((state) => ({ ...state, value }))
+          )
+        )
+        .subscribe(),
+      this.control.statusChanges
+        .pipe(
+          tap((status) => {
+            this.setState((state) => ({
+              ...state,
+              disabled: status.toLowerCase() === 'disabled',
+            }));
+          })
+        )
+        .subscribe()
+    );
 
-      // Set the current state based on the control value
-      this.setState((state) => ({
-        ...state,
-        disabled: this.control.status.toLocaleLowerCase() === 'disabled',
-        value: this.control.value,
-      }));
+    // Set the current state based on the control value
+    this.setState((state) => ({
+      ...state,
+      disabled: this.control.status.toLocaleLowerCase() === 'disabled',
+      value: this.control.value,
+    }));
   }
 
   onError(value: boolean) {
@@ -96,7 +101,16 @@ export class PhoneInputComponent implements AfterViewInit {
   }
 
   setState(state: SetStateParam<StateType>) {
-    this._state = typeof state === 'function' ? state(this._state) : { ...this._state, ...state };
+    this._state =
+      typeof state === 'function'
+        ? state(this._state)
+        : { ...this._state, ...state };
     this.changeRef.markForCheck();
+  }
+
+  ngOnDestroy(): void {
+    for (const subscription of this.subscriptions) {
+      subscription.unsubscribe();
+    }
   }
 }
