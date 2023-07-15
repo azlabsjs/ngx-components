@@ -1,11 +1,13 @@
 {
-  "name": "@azlabjs/ngx-clr-form-control",
-  "version": "0.15.2",
+  "name": "@azlabsjs/ngx-clr-form-control",
+  "version": "0.15.3",
   "peerDependencies": {
     "@angular/common": "^15.2.0",
     "@angular/core": "^15.2.0",
     "@angular/forms": "^15.0",
     "@clr/angular": "^15.0.0",
+    "@cds/core": "^6.0",
+    "@clr/ui": "^15.0.0",
     "@ng-select/ng-select": "^10.0.3",
     "@azlabsjs/ngx-file-input": "^0.15.0",
     "@azlabsjs/ngx-options-input": "^0.15.0",
