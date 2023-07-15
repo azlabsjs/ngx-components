@@ -42,6 +42,15 @@ jobs:
 
       - name: Publish ngx-intl-tel-input
         run: cd dist/azlabs/ngx-intl-tel-input && npm publish --access public
+      
+      - name: Publish ngx-file-input
+        run: cd dist/azlabs/ngx-file-input && npm publish --access public
+        
+      - name: Publish ngx-options-input
+        run: cd dist/azlabs/ngx-options-input && npm publish --access public
+        
+      - name: Publish ngx-clr-form-control
+        run: cd dist/azlabs/ngx-clr-form-control && npm publish --access public
 
       - name: Publish ngx-smart-form
         run: cd dist/azlabs/ngx-smart-form && npm publish --access public
