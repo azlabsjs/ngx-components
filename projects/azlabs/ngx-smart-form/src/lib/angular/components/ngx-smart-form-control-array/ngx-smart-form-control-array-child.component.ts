@@ -21,8 +21,7 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
               context: {
                 control: this.control,
                 value: inputConfig,
-                autoupload: this.autoupload,
-                submitupload: this.submitupload
+                autoupload: this.autoupload
               }
             "
           ></ng-container>
@@ -46,7 +45,7 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
       }
       :host ::ng-deep .ngx__form_array__card__close_btn {
         position: absolute;
-        top: 44px;
+        top: 32px;
         right: -8px;
       }
     `,
@@ -59,7 +58,6 @@ export class NgxSmartFormControlArrayChildComponent {
   @Input() inputConfig!: InputConfigInterface;
   @Input() template!: TemplateRef<HTMLElement>;
   @Input() autoupload: boolean = false;
-  @Input() submitupload: boolean = false;
   @Input() index!: number;
   //#endregion Component inputs
 

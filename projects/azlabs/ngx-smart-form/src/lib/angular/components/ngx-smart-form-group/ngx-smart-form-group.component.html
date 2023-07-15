@@ -46,7 +46,7 @@
 <ng-template #formTemplate let-group="group" let-value="value">
   <ng-container *ngIf="group.get(value.name) as control">
     <ng-container
-      *ngTemplateOutlet="template; context: { control, value }"
+      *ngTemplateOutlet="template; context: { control, value, autoupload }"
     ></ng-container>
   </ng-container>
 </ng-template>

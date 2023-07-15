@@ -3,6 +3,8 @@
 Smart form component is an angular component that abstract native platform form element configuration and create operations using javascript object.
 The module also makes use of angular services injector to provide mechanism for loading and building javascript form objects.
 
+**Note** The library is still under development, therefore the API is subject to change. Please consult this documentation for each version release to stay up-to-date with latest changes.
+
 ## Dependencies
 
 | @azlabsjs/ngx-smart-form | @azlabsjs/smart-form-core | @azlabsjs/ngx-intl-tel-input | Angular |
@@ -48,11 +50,7 @@ To use the smart form component in your component, simply include it requirement
 
 ```html
 <!-- ... -->
-<ngx-smart-form [form]="form" [template]="inputTemplate">
-  <ng-template #inputTemplate let-config="value" let-control="control">
-    <ngx-clr-form-control [class]="'ngx-smart-form-control ' + config.containerClass" [hidden]="config.hidden" [control]="control" [inputConfig]="config" [options]="config.options" [autoupload]="true" [submitupload]="true"></ngx-clr-form-control>
-  </ng-template>
-</ngx-smart-form>
+<ngx-smart-form [form]="form"></ngx-smart-form>
 ```
 
 Note: By default the smart component will use default configuration to create controls and default button for adding new control or group of controls if the control is repeatable.
@@ -195,6 +193,10 @@ import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
 })
 ```
 
+**Warning** Version `0.15.x` changes
+
+From version `0.15.x`, breaking changes have been introduced, which does not support `uploadOptions` property in the smart form module configuration object. Therefore from version `0.15.x` the configuration above is no more valid.
+
 - Form auto submission
 
 Sometimes based systems requirements, developpers might not need to handle form submission manually. Therefore the smart form package implementation offers the ability to automatically submit form without the needs of a dedicated http service implementation.
@@ -328,4 +330,37 @@ Intuitively, to project content after controls, simply add `after` to the contai
     </div>
   </ngx-smart-form>
 </ng-container>
+```
+
+### Version 0.15.x breaking changes
+
+From version `0.15.x`, smart form component does not provide internal implementation for rendering inputs. 
+The component relies on angular content projection AI that allow developpers to provide their own inputs redering component. For easy transition, developpers can use the `@azlabs/ngx-clr-form-control` library components which provides clarity design input components for redering input elements. Below are configuration required for migration purpose:
+
+```ts
+import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
+import { NgxClrFormControlModule } from '@azlabsjs/ngx-clr-form-control';
+
+// app.module.ts
+@NgModule({
+  // ...
+  imports: [
+    NgxSmartFormModule.forRoot(...),
+    // Configure the clr form control module library
+    NgxClrFormControlModule.forRoot(...)
+  ]
+})
+export class AppModule {
+
+}
+```
+
+```html
+<!-- HTML code below uses the ngx-clr-form-control component for previewing input elements -->
+<ngx-smart-form [template]="controlTemplate">
+  <ng-template #controlTemplate let-config="value" let-control="control">
+    <ngx-clr-form-control [class]="'ngx-smart-form-control ' + config.containerClass"
+      [hidden]="config.hidden" [control]="control" [inputConfig]="config"></ngx-clr-form-control>
+  </ng-template>
+</ngx-smart-form>
 ```

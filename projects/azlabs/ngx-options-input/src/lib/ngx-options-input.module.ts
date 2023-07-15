@@ -5,9 +5,8 @@ import { optionsQueryClient } from './query-factory';
 import { OptionsQueryConfigType } from './types';
 
 type ConfigType = {
-  host?: string,
-  bindingsPath?: string,
-  optionsRequest: OptionsQueryConfigType
+  host?: string;
+  optionsRequest: OptionsQueryConfigType;
 };
 
 @NgModule({
@@ -16,7 +15,9 @@ type ConfigType = {
   exports: [FetchOptionsDirective],
 })
 export class NgxOptionsInputModule {
-  static forRoot(configs: ConfigType): ModuleWithProviders<NgxOptionsInputModule> {
+  static forRoot(
+    configs: ConfigType
+  ): ModuleWithProviders<NgxOptionsInputModule> {
     return {
       ngModule: NgxOptionsInputModule,
       providers: [
@@ -26,7 +27,6 @@ export class NgxOptionsInputModule {
             return optionsQueryClient(
               injector,
               configs.host,
-              configs.bindingsPath,
               configs.optionsRequest
             );
           },

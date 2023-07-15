@@ -61,14 +61,6 @@ export class NgxSmartFormControlArrayComponent
       (ref) => (ref.instance.autoupload = this._autoupload)
     );
   }
-  private _submitupload: boolean = false;
-  @Input() set submitupload(value: boolean) {
-    this._submitupload = !!value;
-    // update child component instance submitupload values
-    this.componentRefs.forEach(
-      (ref) => (ref.instance.submitupload = this._submitupload)
-    );
-  }
   //#endregion Component inputs definitions
 
   @ViewChild('container', { read: ViewContainerRef, static: true })
@@ -134,7 +126,6 @@ export class NgxSmartFormControlArrayComponent
     componentRef.instance.control = control;
     componentRef.instance.template = this.template;
     componentRef.instance.autoupload = this._autoupload;
-    componentRef.instance.submitupload = this._submitupload;
     componentRef.instance.index = index;
     // Ends child component properties initialization
 

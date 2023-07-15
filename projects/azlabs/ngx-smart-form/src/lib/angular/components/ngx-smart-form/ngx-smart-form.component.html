@@ -4,41 +4,30 @@
   <ng-content select="[before]"></ng-content>
   <!--\ before controls-->
   <!-- controls area -->
-  <ng-container
-    *ngTemplateOutlet="
+  <ng-container *ngTemplateOutlet="
       recursiveTemplate;
       context: {
         group: formGroup,
         controls: form.controlConfigs,
-        submitupload,
         autoupload
       }
-    "
-  ></ng-container>
+    "></ng-container>
   <!--\ controls area -->
   <!-- after controls-->
   <ng-content select="[after]"></ng-content>
   <!--\ after controls-->
   <!-- submit area -->
   <ng-container *ngIf="submitable">
-    <ng-container
-      *ngTemplateOutlet="
+    <ng-container *ngTemplateOutlet="
         submitButtonRef ? submitButtonRef : defaultSubmitButtonTemplate;
         context: { $implicit: onSubmit.bind(this) }
-      "
-    ></ng-container>
+      "></ng-container>
   </ng-container>
   <!--\ submit area -->
 </ng-container>
 <!--\ Main Template -->
 
-<ng-template
-  #recursiveTemplate
-  let-controls="controls"
-  let-group="group"
-  let-autoupload="autoupload"
-  let-submitupload="submitupload"
->
+<ng-template #recursiveTemplate let-controls="controls" let-group="group" let-autoupload="autoupload">
   <div class="inputs-row">
     <ng-container *ngFor="let value of controls">
       <!-- INPUT GROUP CONTAINER PART -->
@@ -47,32 +36,22 @@
           <div [innerHTML]="value.label | ngxGroupHeader | safeHtml"></div>
           <!-- REPEATABLE INPUTS GROUP -->
           <ng-container *ngIf="value!.isRepeatable === true">
-            <ngx-smart-form-array
-              *ngIf="group?.get(value.name)"
-              [formArray]="group?.get(value.name)"
-              [controls]="value.children || []"
-              [template]="template"
-              [addGroupRef]="addTemplate"
-              [name]="value.name"
-              [autoupload]="autoupload"
-              [submitupload]="submitupload"
-            >
+            <ngx-smart-form-array *ngIf="group?.get(value.name)" [formArray]="group?.get(value.name)"
+              [controls]="value.children || []" [template]="template" [addGroupRef]="addTemplate" [name]="value.name"
+              [autoupload]="autoupload">
             </ngx-smart-form-array>
           </ng-container>
           <!--\ REPEATABLE INPUTS GROUP -->
           <!-- INPUTS GROUP -->
           <ng-container *ngIf="value!.isRepeatable === false">
-            <ng-container
-              *ngTemplateOutlet="
+            <ng-container *ngTemplateOutlet="
                 recursiveTemplate;
                 context: {
                   controls: value!.children || [],
                   group: group?.get(value.name),
-                  submitupload,
                   autoupload
                 }
-              "
-            ></ng-container>
+              "></ng-container>
           </ng-container>
           <!--\ INPUTS GROUP-->
         </div>
@@ -81,17 +60,14 @@
       <!-- SIMPLE INPUT CONTAINER PART -->
       <ng-container *ngIf="(value!.children || []).length === 0">
         <div [class]="value.containerClass" [hidden]="value.hidden">
-          <ng-container
-            *ngTemplateOutlet="
+          <ng-container *ngTemplateOutlet="
               formTemplate;
               context: {
                 value,
                 group,
-                submitupload,
                 autoupload
               }
-            "
-          ></ng-container>
+            "></ng-container>
         </div>
       </ng-container>
       <!--\ SIMPLE INPUT CONTAINER PART -->
@@ -102,16 +78,9 @@
 <ng-template #formTemplate let-group="group" let-value="value">
   <!-- REPEATABLE INPUTS -->
   <ng-container *ngIf="value!.isRepeatable === true">
-    <ngx-smart-form-control-array
-      *ngIf="group?.get(value.name)"
-      [formArray]="group?.get(value.name)"
-      [inputConfig]="value"
-      [template]="template"
-      [addButtonRef]="addTemplate"
-      [name]="value.name"
-      [autoupload]="autoupload"
-      [submitupload]="submitupload"
-    ></ngx-smart-form-control-array>
+    <ngx-smart-form-control-array *ngIf="group?.get(value.name)" [formArray]="group?.get(value.name)"
+      [inputConfig]="value" [template]="template" [addButtonRef]="addTemplate" [name]="value.name"
+      [autoupload]="autoupload"></ngx-smart-form-control-array>
     <!-- </ng-container> -->
   </ng-container>
   <!--\ REPEATABLE INPUTS -->
@@ -119,7 +88,7 @@
   <!-- NON REPEATABLE INPUTS -->
   <ng-container *ngIf="value!.isRepeatable === false">
     <ng-container *ngIf="group?.get(value.name) as control">
-      <ng-container *ngTemplateOutlet="template; context: { control, value }">
+      <ng-container *ngTemplateOutlet="template; context: { control, value, autoupload }">
       </ng-container>
     </ng-container>
   </ng-container>
@@ -128,12 +97,7 @@
 
 <!-- DEFAULT SUMIT BUTTON -->
 <ng-template #defaultSubmitButtonTemplate let-handler>
-  <button
-    type="button"
-    [disabled]="performingAction || disabled"
-    class="btn btn-primary"
-    (click)="handler($event)"
-  >
+  <button type="button" [disabled]="performingAction || disabled" class="btn btn-primary" (click)="handler($event)">
     SUBMIT
   </button>
 </ng-template>

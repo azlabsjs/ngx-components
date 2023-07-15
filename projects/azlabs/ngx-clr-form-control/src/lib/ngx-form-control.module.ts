@@ -33,7 +33,12 @@ import { TranslatePipe } from './pipes/translate.pipe';
 import { TrustHTMLPipe } from './pipes/safe-html.pipe';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
-import { NgxFileInputModule } from '@azlabsjs/ngx-file-input';
+import {
+  NgxFileInputModule,
+  NgxUploadsEventsService,
+  UPLOADER_OPTIONS,
+  UploadOptionsType,
+} from '@azlabsjs/ngx-file-input';
 import {
   INPUT_OPTIONS_CLIENT,
   NgxOptionsInputModule,
@@ -41,12 +46,18 @@ import {
   OptionsQueryConfigType,
 } from '@azlabsjs/ngx-options-input';
 import { ClarityModule } from '@clr/angular';
+import { HTTPRequest, HTTPResponse } from '@azlabsjs/requests';
 
 type ConfigType = {
   translationsProvider?: Provider;
-  optionsHost?: string;
-  optionsPath?: string;
-  optionsRequest: OptionsQueryConfigType;
+  options?: {
+    url?: string;
+    requests: OptionsQueryConfigType;
+  };
+  uploads?: {
+    options: UploadOptionsType<HTTPRequest, HTTPResponse>;
+    url: string;
+  };
 };
 
 @NgModule({
@@ -88,26 +99,49 @@ export class NgxClrFormControlModule {
   static forRoot(
     config?: ConfigType
   ): ModuleWithProviders<NgxClrFormControlModule> {
+    const providers = [
+      NgxUploadsEventsService,
+      config?.translationsProvider ?? {
+        provide: TRANSLATIONS_DICTIONARY,
+        useValue: of(defaultTranslations()),
+      },
+      {
+        provide: INPUT_OPTIONS_CLIENT,
+        useFactory: (injector: Injector) => {
+          return optionsQueryClient(
+            injector,
+            config?.options?.url,
+            config?.options?.requests
+          );
+        },
+        deps: [Injector],
+      },
+    ];
+
+    if (typeof config?.uploads !== 'undefined' && config?.uploads !== null) {
+      providers.push({
+        provide: UPLOADER_OPTIONS,
+        useFactory: (injector: Injector) => {
+          if (
+            typeof config?.uploads?.options === 'undefined' ||
+            config.uploads.options === null
+          ) {
+            return {
+              path: config?.uploads?.url,
+            };
+          }
+          return {
+            ...config?.uploads.options,
+            injector,
+            path: config?.uploads.options.path || config?.uploads.url,
+          } as UploadOptionsType<HTTPRequest, HTTPResponse>;
+        },
+        deps: [Injector],
+      });
+    }
     return {
       ngModule: NgxClrFormControlModule,
-      providers: [
-        config?.translationsProvider ?? {
-          provide: TRANSLATIONS_DICTIONARY,
-          useValue: of(defaultTranslations()),
-        },
-        {
-          provide: INPUT_OPTIONS_CLIENT,
-          useFactory: (injector: Injector) => {
-            return optionsQueryClient(
-              injector,
-              config?.optionsHost,
-              config?.optionsPath,
-              config?.optionsRequest
-            );
-          },
-          deps: [Injector],
-        },
-      ],
+      providers,
     };
   }
 }

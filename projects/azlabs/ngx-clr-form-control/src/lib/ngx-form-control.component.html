@@ -53,7 +53,7 @@
               <input #focusable [tabIndex]="config!.index" [value]="value" [required]="required"
                 [class]="'effect-24 ' + config!.classes" (blur)="onBlur($event)" (focus)="onFocus($event)"
                 (keypress)="keypress($event)" (change)="change($event)" (input)="change($event)" [disabled]="disabled"
-                placeholder="{{ selected!.placeHolder }}" autocomplete="off" type="tel" />
+                placeholder="{{ selected?.placeHolder }}" autocomplete="off" type="tel" />
             </ng-template>
           </ngx-phone-input>
         </div>
@@ -173,7 +173,6 @@
     <ng-container *ngSwitchCase="inputTypes.RADIO_INPUT">
       <ngx-radio-input [control]="formcontrol" [inputConfig]="inputConfig | selectInput" [describe]="describe">
         <ng-template #input let-options="options" let-config="config" let-control="control">
-          <ng-container *ngFor="let option of options"> </ng-container>
           <clr-radio-container clrInline>
             <label>
               {{ config!.label }}

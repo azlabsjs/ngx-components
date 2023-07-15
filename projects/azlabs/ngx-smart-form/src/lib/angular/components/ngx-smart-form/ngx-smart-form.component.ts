@@ -78,7 +78,6 @@ export class NgxSmartFormComponent
   @Input() path!: string;
   @Input() state!: { [index: string]: any };
   @Input() autoupload: boolean = false;
-  @Input() submitupload: boolean = false;
   @Input() action: HTTPRequestMethods = 'POST';
   //#endregion Component inputs
 

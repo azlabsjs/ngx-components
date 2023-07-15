@@ -127,17 +127,11 @@ function createQueryURL(url: string, optionsConfig: OptionsConfig) {
  * @internal
  *
  * @param value
- * @param host
+ * @param endpoint
  */
-function createRequestURL(value: OptionsConfig, host: string, path?: string) {
+function createRequestURL(value: OptionsConfig, endpoint: string) {
   const url = value.source.resource;
-  return isValidHttpUrl(url)
-    ? createQueryURL(url, value)
-    : url
-    ? url
-    : path
-    ? `${host}/${path}`
-    : `${host}`;
+  return isValidHttpUrl(url) ? createQueryURL(url, value) : `${endpoint}`;
 }
 
 // @internal
@@ -183,31 +177,13 @@ function resolveRequestInterceptorFactory(
 // @internal
 export function optionsQueryClient(
   injector: Injector,
-  host?: string,
-  path?: string,
+  endpoint?: string,
   queriesConfig?: OptionsQueryConfigType
 ) {
   const _requestClient = queryOptions;
   Object.defineProperty(_requestClient, 'request', {
     value: (optionsConfig: OptionsConfig & { name?: string }) => {
-      let _endpoint!: string | undefined;
-      let _path!: string;
-      if (host === null || typeof host === 'undefined') {
-        _endpoint =
-          typeof path !== 'undefined' && path !== null && isValidHttpUrl(path)
-            ? path
-            : undefined;
-        _path = '';
-      } else {
-        _path = path ?? '';
-        _endpoint = host;
-      }
-      _endpoint =
-        _path && _endpoint
-          ? `${getHttpHost(_endpoint)}/${
-              _path.startsWith('/') ? _path.slice(0, _path.length - 1) : _path
-            }`
-          : _endpoint;
+      let _endpoint: string | undefined = endpoint;
       // We build the request query
       //#region For custom URL configurations, we attempt to build the final URL and update the
       // the resource entry if source property of the option configurations
@@ -230,11 +206,7 @@ export function optionsQueryClient(
       //#endregion
       const request = {
         ...optionsConfig,
-        url: createRequestURL(
-          optionsConfig,
-          _endpoint ?? '',
-          _path[0] === '/' ? _path?.substring(1) : _path
-        ),
+        url: createRequestURL(optionsConfig, _endpoint ?? ''),
       };
       return _requestClient(
         request,
@@ -248,6 +220,14 @@ export function optionsQueryClient(
   return _requestClient as any as _OptionsRequestFunction & InputOptionsClient;
 }
 
+/**
+ * function for querying options value from server
+ * 
+ * @param optionsConfig 
+ * @param injector 
+ * @param interceptorFactory 
+ * @returns 
+ */
 export function queryOptions(
   optionsConfig: OptionsQueryParams,
   injector: Injector,

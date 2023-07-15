@@ -9,13 +9,9 @@ import {
   Output,
 } from '@angular/core';
 import { AbstractControl, UntypedFormControl } from '@angular/forms';
-import {
-  InputConfigInterface,
-  InputOptionsInterface,
-  InputTypes,
-} from '@azlabsjs/smart-form-core';
-import { Subject } from 'rxjs';
-import { takeUntil, tap } from 'rxjs/operators';
+import { InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
+import { Subscription } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { InputEventArgs } from './types';
 
 @Component({
@@ -27,14 +23,12 @@ import { InputEventArgs } from './types';
 export class NgxFormControlComponent implements OnDestroy, OnInit {
   // Component properties
   inputTypes = InputTypes;
-  private _destroy$ = new Subject<void>();
 
   //#region Component inputs
   @Input() class: string = 'clr-form-control';
   @Input() inline: boolean = false;
   @Input() describe = true;
   @Input() inputConfig!: InputConfigInterface;
-  @Input() options!: InputOptionsInterface;
   @Input('control') formcontrol!: AbstractControl & UntypedFormControl;
   //#endregion Component inputs
 
@@ -52,6 +46,10 @@ export class NgxFormControlComponent implements OnDestroy, OnInit {
   @Output() valueChange = new EventEmitter<InputEventArgs>();
   //#endregion Component outputs
 
+  //#region Class properties
+  subscriptions: Subscription[] = [];
+  //#endregion Class properties
+
   /**
    * Creates an instance of Form Control Component
    *
@@ -60,27 +58,30 @@ export class NgxFormControlComponent implements OnDestroy, OnInit {
   constructor(private changes: ChangeDetectorRef) {}
 
   ngOnInit() {
-    this.formcontrol.valueChanges
-      .pipe(
-        tap((source) => {
-          this.valueChange.emit({
-            name: this.inputConfig.name,
-            value: source,
-          });
-          // Trigger a change detection to insure update tge UI component
-          this.changes.markForCheck();
-        }),
-        takeUntil(this._destroy$)
-      )
-      .subscribe();
+    this.subscriptions.push(
+      this.formcontrol.valueChanges
+        .pipe(
+          tap((source) => {
+            this.valueChange.emit({
+              name: this.inputConfig.name,
+              value: source,
+            });
+            // Trigger a change detection to insure update tge UI component
+            this.changes.markForCheck();
+          })
+        )
+        .subscribe()
+    );
   }
 
   updateinlineclass(inputConfig: InputConfigInterface) {
     return {
       ...inputConfig,
-      classes: this.inline ? (inputConfig.classes?.includes('clr-textarea')
-        ? inputConfig.classes?.replace('textarea', 'input')
-        : `${inputConfig?.classes}`) : inputConfig?.classes,
+      classes: this.inline
+        ? inputConfig.classes?.includes('clr-textarea')
+          ? inputConfig.classes?.replace('textarea', 'input')
+          : `${inputConfig?.classes}`
+        : inputConfig?.classes,
     };
   }
 
@@ -89,6 +90,8 @@ export class NgxFormControlComponent implements OnDestroy, OnInit {
   }
 
   ngOnDestroy() {
-    this._destroy$.next();
+    for (const subscription of this.subscriptions) {
+      subscription.unsubscribe();
+    }
   }
 }

@@ -14,7 +14,6 @@ import { CdsModule } from '@cds/angular';
 import { ClarityIcons, uploadCloudIcon } from '@cds/core/icon';
 import { AppComponent } from './app.component';
 import { TestPipe } from './test.pipe';
-import { NgxFileInputModule } from '@azlabsjs/ngx-file-input';
 import { NgxClrFormControlModule } from '@azlabsjs/ngx-clr-form-control';
 import { FormControlComponent } from './form-control/form-control.component';
 
@@ -73,53 +72,54 @@ ClarityIcons.addIcons(uploadCloudIcon);
 
     // Configure clr control module
     NgxClrFormControlModule.forRoot({
-      optionsRequest: {
-        interceptorFactory: (injector: Injector) => {
-          // Replace the interceptor function by using the injector
-          return async (request, next) => {
-            const response = await (next(request) as Promise<HTTPResponse>);
-            return response.clone({
-              setBody: (body: Record<string, unknown>) => {
-                return typeof body['data'] !== 'undefined' &&
-                  body['data'] !== null
-                  ? body['data']
-                  : body;
-              },
-            });
-          };
-        },
-        queries: {
-          // category_id : 'https://coopecclients.lik.tg/',
-          zone_id: () => 'https://coopecclients.liksoft.tg/', // TODO: In future release pass the form id to the function
-          category_id: {
-            host: 'https://coopecclients.azlabs.xyz/',
+      options: {
+        requests: {
+          interceptorFactory: (injector: Injector) => {
+            // Replace the interceptor function by using the injector
+            return async (request, next) => {
+              const response = await (next(request) as Promise<HTTPResponse>);
+              return response.clone({
+                setBody: (body: Record<string, unknown>) => {
+                  return typeof body['data'] !== 'undefined' &&
+                    body['data'] !== null
+                    ? body['data']
+                    : body;
+                },
+              });
+            };
+          },
+          queries: {
+            // category_id : 'https://coopecclients.lik.tg/',
+            zone_id: () => 'https://coopecclients.liksoft.tg/', // TODO: In future release pass the form id to the function
+            category_id: {
+              host: 'https://coopecclients.azlabs.xyz/',
+            },
           },
         },
       },
-    }),
-
-    NgxFileInputModule.forRoot({
-      uploadOptions: {
-        interceptorFactory: (injector: Injector) => {
-          // Replace the interceptor function by using the injector
-          return (request, next) => {
-            request = request.clone({
-              options: {
-                ...request.options,
-                headers: {
-                  ...request.options.headers,
-                  'x-client-id': '98954592-d85b-43c4-a77f-e7bb4501f655',
-                  'x-client-secret':
-                    'HeP44SYK11FXhIEzFB8efeyo63nZQ12mZrbBA8KcWqwD91tT9K4EfhngL5Vw7hNu9YUglzdJOdp8zigRQ',
+      uploads: {
+        options: {
+          interceptorFactory: (injector: Injector) => {
+            // Replace the interceptor function by using the injector
+            return (request, next) => {
+              request = request.clone({
+                options: {
+                  ...request.options,
+                  headers: {
+                    ...request.options.headers,
+                    'x-client-id': '98954592-d85b-43c4-a77f-e7bb4501f655',
+                    'x-client-secret':
+                      'HeP44SYK11FXhIEzFB8efeyo63nZQ12mZrbBA8KcWqwD91tT9K4EfhngL5Vw7hNu9YUglzdJOdp8zigRQ',
+                  },
                 },
-              },
-            });
-            return next(request);
-          };
+              });
+              return next(request);
+            };
+          },
         },
+        // Files upload url
+        url: 'https://storage.lik.tg/api/storage/object/upload',
       },
-      // Files upload url
-      uploadURL: 'https://storage.lik.tg/api/storage/object/upload',
     }),
   ],
   bootstrap: [AppComponent],
