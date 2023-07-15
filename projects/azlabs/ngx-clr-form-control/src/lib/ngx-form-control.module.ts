@@ -46,7 +46,6 @@ import {
   OptionsQueryConfigType,
 } from '@azlabsjs/ngx-options-input';
 import { ClarityModule } from '@clr/angular';
-import { HTTPRequest, HTTPResponse } from '@azlabsjs/requests';
 
 type ConfigType = {
   translationsProvider?: Provider;
@@ -55,7 +54,7 @@ type ConfigType = {
     requests: OptionsQueryConfigType;
   };
   uploads?: {
-    options: UploadOptionsType<HTTPRequest, HTTPResponse>;
+    options: UploadOptionsType<any, any>;
     url: string;
   };
 };
@@ -134,7 +133,7 @@ export class NgxClrFormControlModule {
             ...config?.uploads.options,
             injector,
             path: config?.uploads.options.path || config?.uploads.url,
-          } as UploadOptionsType<HTTPRequest, HTTPResponse>;
+          };
         },
         deps: [Injector],
       });

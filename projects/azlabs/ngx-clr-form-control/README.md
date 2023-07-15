@@ -1,24 +1,107 @@
-# NgxClrFormControl
+# Ngx Clarity Form control
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.2.0.
+The `ngx-clr-form-control` library provide angular UI component for rendering input elements from `json` configuration object. It's a UI component extracted from `@azlabs/ngx-smart-form` library that provides bindings for clarity library.
 
-## Code scaffolding
+## Dependencies
 
-Run `ng generate component component-name --project ngx-clr-form-control` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project ngx-clr-form-control`.
-> Note: Don't forget to add `--project ngx-clr-form-control` or else it will be added to the default project in your `angular.json` file. 
+| @azlabsjs/ngx-clr-form-control | @azlabsjs/smart-form-core | @azlabsjs/ngx-intl-tel-input | @azlabsjs/ngx-options-input | @azlabsjs/ngx-file-input | Angular |
+| ------------------------------ | ------------------------- | ---------------------------- | --------------------------- | ------------------------ | ------- |
+| ^0.15.x                        | ^0.2.0                    | ^0.15.x                      | ^0.15.x                     | ^0.15.x                  | ^15.0   |
 
-## Build
+## Usage
 
-Run `ng build ngx-clr-form-control` to build the project. The build artifacts will be stored in the `dist/` directory.
+To use the `ngx-clr-form-control` in angular projects, we must import the library module which export required component, and pipes and directives:
 
-## Publishing
+```ts
+// app.module.ts
+import { NgxClrFormControlModule } from "@azlabsjs/ngx-clr-form-control";
 
-After building your library with `ng build ngx-clr-form-control`, go to the dist folder `cd dist/ngx-clr-form-control` and run `npm publish`.
+@NgModule({
+  imports: [NgxClrFormControlModule],
+})
+export class AppModule {}
+```
 
-## Running unit tests
+Then use the component in your project:
 
-Run `ng test ngx-clr-form-control` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```ts
+import { FormControl } from "@angular/forms";
+import { TextInput } from "@azlabsjs/smart-form-core";
 
-## Further help
+export class MyComponent {
+  textInputControl = new FormControl();
+  textInput: TextInput = {
+    label: "Firstname",
+    type: "text",
+    name: "name",
+    classes: "clr-input",
+    isRepeatable: false,
+    containerClass: "clr-col-6",
+  };
+}
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+```html
+<h3>Text Control</h3>
+<br />
+<ngx-clr-form-control [class]="'ngx-smart-form-control ' + textInput.containerClass" [hidden]="textInput.hidden" [control]="textInputControl" [inputConfig]="textInput"></ngx-clr-form-control>
+<h3>Text Area Control</h3>
+```
+
+- Options providers
+
+Options providers are angular service that are used by `radio`, `checkox` and `select` elements to query options from backend services:
+
+```ts
+// app.module.ts
+import { NgxClrFormControlModule } from "@azlabsjs/ngx-clr-form-control";
+
+@NgModule({
+  imports: [
+    NgxClrFormControlModule.forRoot({
+      options: {
+        requests: {
+          interceptorFactory: (injector: Injector) => {
+            // TODO: Provide request interceptors
+          },
+          queries: {
+            // .. queries configurations per control names
+          },
+        },
+      },
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+- Upload providers
+
+`ngx-clr-form-control` provide integrates `ngx-file-input` library for handling file contents. The library also provides an automatic upload which uses an upload service configurable in the root of your project as follow:
+
+```ts
+// app.module.ts
+import { NgxClrFormControlModule } from "@azlabsjs/ngx-clr-form-control";
+
+@NgModule({
+  imports: [
+    NgxClrFormControlModule.forRoot({
+      uploads: {
+        options: {
+          interceptorFactory: (injector: Injector) => {
+            // Replace the interceptor function by using the injector
+            return (request, next) => {
+            // TODO: Provide request interceptors
+            };
+          },
+        },
+        // Files upload url
+        url: 'https://127.0.0.1/api/storage/object/upload',
+      
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+**Note** Library is still under development and API might change. Please consult the current page for any version update.
