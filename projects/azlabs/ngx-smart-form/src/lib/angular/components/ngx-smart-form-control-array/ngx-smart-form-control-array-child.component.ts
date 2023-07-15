@@ -40,7 +40,7 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
       }
 
       .ngx__form_array__card__card_block {
-        padding: 0.6rem 0.9rem;
+        padding: var(--ngx-form-array-card-padding, 0.6rem 0rem);
         flex-grow: 1;
       }
       :host ::ng-deep .ngx__form_array__card__close_btn {

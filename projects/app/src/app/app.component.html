@@ -4,12 +4,12 @@
 <div class="container">
   <h3>Form Group</h3>
   <ng-container *ngIf="state$ | async as form">
-    <ngx-smart-form #smartform (ready)="onFormReadyState(form)" (changes)="afterChanges()" (error)="onError($event)"
-      [submitable]="true" [autoupload]="true" (submit)="ngxFormSubmit($event)" [form]="form" [autoSubmit]="true"
-      [path]="'http://localhost:3000/customers'" [template]="controlTemplate">
+    <ngx-smart-form #smartform [no-grid-layout]="true" (ready)="onFormReadyState(form)" (changes)="afterChanges()"
+      (error)="onError($event)" [submitable]="true" [autoupload]="true" (submit)="ngxFormSubmit($event)" [form]="form"
+      [autoSubmit]="true" [path]="'http://localhost:3000/customers'" [template]="controlTemplate">
       <ng-template #controlTemplate let-config="value" let-control="control">
-        <ngx-clr-form-control [class]="'ngx-smart-form-control ' + config.containerClass"
-          [hidden]="config.hidden" [control]="control" [inputConfig]="config"></ngx-clr-form-control>
+        <ngx-clr-form-control class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control"
+          [inputConfig]="config"></ngx-clr-form-control>
       </ng-template>
     </ngx-smart-form>
   </ng-container>

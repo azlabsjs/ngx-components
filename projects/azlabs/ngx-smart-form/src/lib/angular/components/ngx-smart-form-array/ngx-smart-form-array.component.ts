@@ -99,6 +99,7 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
   get refCount() {
     return this._refCount;
   }
+  @Input('no-grid-layout') noGridLayout = false;
   //#endregion Component inputs definitions
 
   //#region Component outputs
@@ -163,6 +164,7 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
       componentRef.instance.template = this.template;
       componentRef.instance.autoupload = this._autoupload;
       componentRef.instance.index = index;
+      componentRef.instance.noGridLayout = this.noGridLayout;
       // Ends child component properties initialization
 
       componentRef.instance.componentDestroyer
