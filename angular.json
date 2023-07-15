@@ -28,17 +28,15 @@
               "projects/app/src/assets"
             ],
             "styles": [
-              "node_modules/@clr/icons/clr-icons.min.css",
               "node_modules/@clr/ui/clr-ui.min.css",
               "projects/app/src/styles.scss"
             ],
-            "scripts": [
-              "node_modules/@clr/icons/clr-icons.min.js"
-            ]
+            "scripts": []
           },
           "configurations": {
             "production": {
-              "budgets": [{
+              "budgets": [
+                {
                   "type": "initial",
                   "maximumWarning": "500kb",
                   "maximumError": "1mb"
@@ -49,10 +47,12 @@
                   "maximumError": "4kb"
                 }
               ],
-              "fileReplacements": [{
-                "replace": "projects/app/src/environments/environment.ts",
-                "with": "projects/app/src/environments/environment.prod.ts"
-              }],
+              "fileReplacements": [
+                {
+                  "replace": "projects/app/src/environments/environment.ts",
+                  "with": "projects/app/src/environments/environment.prod.ts"
+                }
+              ],
               "outputHashing": "all"
             },
             "development": {
