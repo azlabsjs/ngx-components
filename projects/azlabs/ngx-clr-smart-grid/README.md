@@ -414,15 +414,15 @@ Action bar provide way to add action buttons on top of the datagrid that allow t
     <ng-template #dgActionBar let-selected>
       <div class="btn-group">
         <button type="button" class="btn btn-sm btn-outline">
-          <clr-icon shape="plus"></clr-icon>
+          <cds-icon shape="plus"></cds-icon>
           Add to group
         </button>
         <button type="button" class="btn btn-sm btn-outline">
-          <clr-icon shape="close"></clr-icon>
+          <cds-icon shape="close"></cds-icon>
           Delete
         </button>
         <button type="button" class="btn btn-sm btn-outline" *ngIf="selected">
-          <clr-icon shape="pencil"></clr-icon>
+          <cds-icon shape="pencil"></cds-icon>
           Edit
         </button>
       </div>

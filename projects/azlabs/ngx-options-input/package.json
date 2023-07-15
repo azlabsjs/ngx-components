@@ -1,6 +1,6 @@
 {
   "name": "@azlabsjs/ngx-options-input",
-  "version": "0.15.2",
+  "version": "0.16.0",
   "peerDependencies": {
     "@angular/common": "^15.2.0",
     "@angular/core": "^15.2.0",
@@ -19,5 +19,5 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/@azlabsjs"
   },
-  "homepage": "https://github.com/azlabsjs/ngx-components/blob/ng-v15/projects/azlabs/ngx-options-input/README.md"
+  "homepage": "https://github.com/azlabsjs/ngx-components/blob/ng-v16/projects/azlabs/ngx-options-input/README.md"
 }

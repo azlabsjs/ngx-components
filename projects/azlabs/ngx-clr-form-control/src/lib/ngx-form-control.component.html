@@ -253,10 +253,10 @@
                 [formControl]="control" placeholder="{{
                   config!.placeholder ? config!.placeholder : ''
                 }}" />
-              <clr-icon shape="eye" (click)="toggle($event)" *ngIf="state.showPassword"
-                class="password-trigger"></clr-icon>
-              <clr-icon shape="eye-hide" (click)="toggle($event)" *ngIf="!state.showPassword"
-                class="password-trigger"></clr-icon>
+              <cds-icon shape="eye" (click)="toggle($event)" *ngIf="state.showPassword"
+                class="password-trigger"></cds-icon>
+              <cds-icon shape="eye-hide" (click)="toggle($event)" *ngIf="!state.showPassword"
+                class="password-trigger"></cds-icon>
             </div>
           </div>
         </ng-template>

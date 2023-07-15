@@ -7,11 +7,11 @@ The module also makes use of angular services injector to provide mechanism for 
 
 ## Dependencies
 
-| @azlabsjs/ngx-smart-form | @azlabsjs/smart-form-core | @azlabsjs/requests           | Angular |
-| ------------------------ | ------------------------- | ---------------------------- | ------- |
-| ^0.13.x                  | ^0.1.x                    | ^0.1.x                       | ^13.0   |
-| ^0.14.x                  | ^0.1.x                    | ^0.2.x                       | ^14.0   |
-| ^0.15.x                  | ^0.2.x                    | ^0.2.x                       | ^15.0   |
+| @azlabsjs/ngx-smart-form | @azlabsjs/smart-form-core | @azlabsjs/requests | Angular |
+| ------------------------ | ------------------------- | ------------------ | ------- |
+| ^0.13.x                  | ^0.1.x                    | ^0.1.x             | ^13.0   |
+| ^0.14.x                  | ^0.1.x                    | ^0.2.x             | ^14.0   |
+| ^0.15.x                  | ^0.2.x                    | ^0.2.x             | ^15.0   |
 
 ## Usage
 
@@ -73,7 +73,7 @@ Smart form component tries it best to be flexible enough for cutomization, using
 <ngx-smart-form [form]="form" [submitable]="true" (submit)="onFormSubmit($event)">
   <ng-template #submitButton let-handler>
     <button class="btn btn-primary" (click)="handler($event)">
-      <clr-icon shape="circle-arrow" dir="up"></clr-icon>
+      <cds-icon shape="circle-arrow" dir="up"></cds-icon>
       SOUMETTRE
     </button>
   </ng-template>
@@ -334,7 +334,7 @@ Intuitively, to project content after controls, simply add `after` to the contai
 
 ### Version 0.15.x breaking changes
 
-From version `0.15.x`, smart form component does not provide internal implementation for rendering inputs. 
+From version `0.15.x`, smart form component does not provide internal implementation for rendering inputs.
 The component relies on angular content projection AI that allow developpers to provide their own inputs redering component. For easy transition, developpers can use the `@azlabs/ngx-clr-form-control` library components which provides clarity design input components for redering input elements. Below are configuration required for migration purpose:
 
 ```ts
@@ -359,8 +359,7 @@ export class AppModule {
 <!-- HTML code below uses the ngx-clr-form-control component for previewing input elements -->
 <ngx-smart-form [template]="controlTemplate">
   <ng-template #controlTemplate let-config="value" let-control="control">
-    <ngx-clr-form-control [class]="'ngx-smart-form-control ' + config.containerClass"
-      [hidden]="config.hidden" [control]="control" [inputConfig]="config"></ngx-clr-form-control>
+    <ngx-clr-form-control [class]="'ngx-smart-form-control ' + config.containerClass" [hidden]="config.hidden" [control]="control" [inputConfig]="config"></ngx-clr-form-control>
   </ng-template>
 </ngx-smart-form>
 ```
