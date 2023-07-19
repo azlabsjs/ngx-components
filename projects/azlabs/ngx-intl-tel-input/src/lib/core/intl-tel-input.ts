@@ -1,11 +1,11 @@
-import { Inject, Injectable } from '@angular/core';
+import { Inject, Injectable, Optional } from '@angular/core';
 import { Country } from './model';
 import {
   PhoneNumberUtil,
   PhoneNumberFormat,
   PhoneNumber,
 } from 'google-libphonenumber';
-import { COUNTRIES } from './types';
+import { COUNTRIES, SUPPORTED_COUNTRIES } from './tokens';
 import {
   getPhoneNumberPlaceholder,
   phoneNumberAsString,
@@ -22,14 +22,23 @@ export class IntlTelInput {
    *
    * @param countries
    */
-  constructor(@Inject(COUNTRIES) private countries: Country[]) {
+  constructor(
+    @Inject(COUNTRIES) private countries: Country[],
+    @Inject(SUPPORTED_COUNTRIES)
+    @Optional()
+    private supportedCountries: Country[] = []
+  ) {
     this.instance = PhoneNumberUtil.getInstance();
   }
 
   /**
    * @description Returns a list of supported countries
    */
-  public fetchCountries(): Array<Country> {
+  public fetchCountries(): Country[] {
+    const supportedCountries = this.supportedCountries ?? [];
+    if (supportedCountries?.length > 0) {
+      return supportedCountries;
+    }
     return this.countries;
   }
 

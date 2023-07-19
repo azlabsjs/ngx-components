@@ -6,8 +6,8 @@ import {
   groupControlsBy,
   setControlChildren,
   sortRawFormControls,
+  FormInterface
 } from '@azlabsjs/smart-form-core';
-import { FormInterface } from '@azlabsjs/smart-form-core';
 import { DYNAMIC_FORM_LOADER } from './loader';
 import { CacheProvider } from '../types';
 

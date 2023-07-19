@@ -2,8 +2,8 @@
   "name": "@azlabsjs/ngx-options-input",
   "version": "0.16.0",
   "peerDependencies": {
-    "@angular/common": "^15.2.0",
-    "@angular/core": "^15.2.0",
+    "@angular/common": "^16.0",
+    "@angular/core": "^16.0",
     "@azlabsjs/requests": "^0.2.0",
     "@azlabsjs/smart-form-core": "^0.2.0"
   },

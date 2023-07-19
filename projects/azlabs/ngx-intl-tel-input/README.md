@@ -1,24 +1,15 @@
 # NgxIntlTelInput
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.0.0.
+The `ngx-intl-tel-input` library provide angular UI component for redenring ISO 3366 compatible phone input element.
 
-## Code scaffolding
+## Dependencies
 
-Run `ng generate component component-name --project ngx-intl-tel-input` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project ngx-intl-tel-input`.
-> Note: Don't forget to add `--project ngx-intl-tel-input` or else it will be added to the default project in your `angular.json` file. 
+| @azlabsjs/ngx-intl-tel-input   | @azlabsjs/@azlabsjs/ngx-dropdown | Angular |
+| ------------------------------ | -------------------------------- | ------- |
+| ^0.15.x                        | ^0.15.0                          | ^15.0   |
+| ^0.16.x                        | ^0.16.0                          | ^15.0   |
 
-## Build
 
-Run `ng build ngx-intl-tel-input` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Usage
 
-## Publishing
-
-After building your library with `ng build ngx-intl-tel-input`, go to the dist folder `cd dist/ngx-intl-tel-input` and run `npm publish`.
-
-## Running unit tests
-
-Run `ng test ngx-intl-tel-input` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+To use the the `ngx-intl-tel-input` component in your application, you must 

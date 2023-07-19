@@ -56,7 +56,7 @@ export class NgxSmartFormControlArrayChildComponent {
   //#region Component inputs
   @Input() control!: UntypedFormControl;
   @Input() inputConfig!: InputConfigInterface;
-  @Input() template!: TemplateRef<HTMLElement>;
+  @Input() template!: TemplateRef<any>;
   @Input() autoupload: boolean = false;
   @Input() index!: number;
   //#endregion Component inputs

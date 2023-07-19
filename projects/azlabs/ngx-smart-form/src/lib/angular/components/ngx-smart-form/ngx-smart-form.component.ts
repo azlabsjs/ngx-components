@@ -68,8 +68,8 @@ export class NgxSmartFormComponent
   //#endregion Local properties
 
   //#region Component inputs
-  @Input() template!: TemplateRef<Node>;
-  @Input() addTemplate!: TemplateRef<Node>;
+  @Input() template!: TemplateRef<any>;
+  @Input() addTemplate!: TemplateRef<any>;
   @Input() performingAction = false;
   @Input() disabled = false;
   @Input() submitable = false;

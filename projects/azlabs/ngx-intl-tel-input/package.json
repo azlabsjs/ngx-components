@@ -2,9 +2,10 @@
   "name": "@azlabsjs/ngx-intl-tel-input",
   "version": "0.16.0",
   "peerDependencies": {
-    "@angular/common": "^15.0",
-    "@angular/core": "^15.0",
-    "@angular/cdk": "^15.0"
+    "@angular/common": "^16.0",
+    "@angular/core": "^16.0",
+    "@angular/cdk": "^16.0",
+    "@azlabsjs/ngx-dropdown": "^0.16.0"
   },
   "dependencies": {
     "tslib": "^2.3.0",
