@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, LocationStrategy, PlatformLocation } from '@angular/common';
 import {
   APP_INITIALIZER,
   Injector,
@@ -124,9 +124,14 @@ export class NgxSmartFormModule {
       ReactiveFormBuilderBrige,
       {
         provide: FORMS_LOADER,
-        useFactory: () => {
-          return new DefaultFormsLoader(_loadFormsHandler);
+        useFactory: (location: LocationStrategy, platformLocation: PlatformLocation) => {
+          return new DefaultFormsLoader(_loadFormsHandler, (path?: string) => {
+            const _base = `${platformLocation.protocol}//${platformLocation.hostname}${platformLocation.port ? `:${platformLocation.port}` : ''}`;
+            const _path = location.prepareExternalUrl(path ?? '/');
+            return `${_base.endsWith('/') ? _base.substring(0, _base.length - 1): _base}/${_path.startsWith('/') ? _path.substring(1) : _path}`;
+          });
         },
+        deps: [LocationStrategy, PlatformLocation],
       },
       {
         provide: CACHE_PROVIDER,

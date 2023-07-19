@@ -86,6 +86,18 @@ export function createFormConfig(value: Record<string, unknown>) {
 }
 
 /**
+ * Basic URL validation logic
+ */
+function isValidURL(url: string) {
+  try {
+    const _url = new URL(url);
+    return typeof _url.protocol !== 'undefined' && _url.protocol !== null;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * @internal
  *
  * Internal implementation of forms loader that relies on a request handler implementation to query for
@@ -93,9 +105,15 @@ export function createFormConfig(value: Record<string, unknown>) {
  */
 export class DefaultFormsLoader implements FormsLoader {
   // @constructor
-  public constructor(private requestHandler: LoadFormsRequestHandler) {}
+  public constructor(
+    private requestHandler: LoadFormsRequestHandler,
+    private endpointFactory: (path: string) => string
+  ) {}
 
-  public load = (endpoint: string, options?: { [index: string]: any }) => {
+  load(endpoint: string, options?: { [index: string]: any }) {
+    // Construct the endpoint url before passing it to the request handler
+    endpoint = isValidURL(endpoint) ? endpoint : this.endpointFactory(endpoint);
+
     return this.requestHandler(endpoint, options).pipe(
       map((state) => {
         if (state && Array.isArray(state)) {
@@ -116,5 +134,5 @@ export class DefaultFormsLoader implements FormsLoader {
         return [];
       })
     );
-  };
+  }
 }
