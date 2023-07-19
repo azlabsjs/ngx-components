@@ -1,4 +1,4 @@
-import { Inject, Injectable, InjectionToken, Optional } from '@angular/core';
+import { Inject, Injectable, Optional } from '@angular/core';
 import { BehaviorSubject, from, Observable, ObservableInput } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import {
@@ -6,17 +6,11 @@ import {
   groupControlsBy,
   setControlChildren,
   sortRawFormControls,
-  FormInterface
+  FormInterface,
+  CacheProvider
 } from '@azlabsjs/smart-form-core';
-import { DYNAMIC_FORM_LOADER } from './loader';
-import { CacheProvider } from '../types';
+import { FORMS_LOADER } from '../types';
 
-/**
- * @description Cache provider injection token
- */
-export const CACHE_PROVIDER = new InjectionToken<CacheProvider>(
-  'PROVIDES AN INSTANCE OF CacheProvider::Interface'
-);
 
 @Injectable()
 export class FormsCacheProvider implements CacheProvider {
@@ -29,7 +23,7 @@ export class FormsCacheProvider implements CacheProvider {
    * @param loader
    */
   constructor(
-    @Inject(DYNAMIC_FORM_LOADER) @Optional() private loader: FormsLoader
+    @Inject(FORMS_LOADER) @Optional() private loader: FormsLoader
   ) {}
 
   /**

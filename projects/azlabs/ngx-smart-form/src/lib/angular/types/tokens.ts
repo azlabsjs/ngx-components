@@ -2,6 +2,18 @@ import { InjectionToken } from '@angular/core';
 import { RequestClient } from '../../http';
 import { FormsClient } from './form';
 import { AngularReactiveFormBuilderBridge } from './bridge';
+import { CacheProvider, FormsLoader } from '@azlabsjs/smart-form-core';
+
+export const FORMS_LOADER = new InjectionToken<FormsLoader>(
+  'PROVIDE DYNAMIC FORM LOADER'
+);
+
+/**
+ * @description Cache provider injection token
+ */
+export const CACHE_PROVIDER = new InjectionToken<CacheProvider>(
+  'PROVIDES AN INSTANCE OF CacheProvider::Interface'
+);
 
 export const FORM_CLIENT = new InjectionToken<FormsClient>(
   'FORM CLIENT FOR LOADING FORM THE DATA SOURCE'

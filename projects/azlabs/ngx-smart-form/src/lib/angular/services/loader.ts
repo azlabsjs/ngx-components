@@ -1,15 +1,10 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable, InjectionToken } from '@angular/core';
 import { map } from 'rxjs/operators';
 import {
   ControlInterface,
   FormInterface,
   FormsLoader,
 } from '@azlabsjs/smart-form-core';
-
-export const DYNAMIC_FORM_LOADER = new InjectionToken<FormsLoader>(
-  'PROVIDE DYNAMIC FORM LOADER'
-);
+import { LoadFormsRequestHandler } from '../types';
 
 // #region Factory functions
 /**
@@ -90,13 +85,36 @@ export function createFormConfig(value: Record<string, unknown>) {
   } as FormInterface;
 }
 
-@Injectable()
-export class FormHttpLoader implements FormsLoader {
-  // @constructor
-  public constructor(private _http: HttpClient) {}
+/**
+ * Basic URL validation logic
+ */
+function isValidURL(url: string) {
+  try {
+    const _url = new URL(url);
+    return typeof _url.protocol !== 'undefined' && _url.protocol !== null;
+  } catch {
+    return false;
+  }
+}
 
-  public load = (endpoint: string, options?: { [index: string]: any }) => {
-    return this._http.get(endpoint, options || {}).pipe(
+/**
+ * @internal
+ *
+ * Internal implementation of forms loader that relies on a request handler implementation to query for
+ * list of form from the resources
+ */
+export class DefaultFormsLoader implements FormsLoader {
+  // @constructor
+  public constructor(
+    private requestHandler: LoadFormsRequestHandler,
+    private endpointFactory: (path: string) => string
+  ) {}
+
+  load(endpoint: string, options?: { [index: string]: any }) {
+    // Construct the endpoint url before passing it to the request handler
+    endpoint = isValidURL(endpoint) ? endpoint : this.endpointFactory(endpoint);
+
+    return this.requestHandler(endpoint, options).pipe(
       map((state) => {
         if (state && Array.isArray(state)) {
           return (state as any[]).map((value: { [index: string]: any }) => {
@@ -116,5 +134,5 @@ export class FormHttpLoader implements FormsLoader {
         return [];
       })
     );
-  };
+  }
 }
