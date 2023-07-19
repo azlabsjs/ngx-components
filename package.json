@@ -1,6 +1,6 @@
 {
   "name": "ngx-components",
-  "version": "0.15.6",
+  "version": "0.15.7",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
