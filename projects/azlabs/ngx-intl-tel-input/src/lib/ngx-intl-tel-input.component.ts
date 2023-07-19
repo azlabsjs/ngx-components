@@ -9,8 +9,7 @@ import {
   SimpleChanges,
   TemplateRef,
 } from '@angular/core';
-import { IntlTelInput } from './core/intl-tel-input';
-import { Country } from './core/model';
+import { IntlTelInput, Country } from './core';
 
 type SetStateParam<T> = Partial<T> | ((state: T) => T);
 
@@ -27,6 +26,7 @@ type StateType = {
   selector: 'ngx-intl-tel-input',
   templateUrl: './ngx-intl-tel-input.component.html',
   styleUrls: ['./ngx-intl-tel-input.component.css'],
+  providers: [IntlTelInput]
 })
 export class NgxIntlTelInputComponent implements OnChanges {
   // #region Component Inputs
@@ -74,14 +74,8 @@ export class NgxIntlTelInputComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     let stateChanges = false;
-    let preferredCountries = this._state.preferredCountries;
     if ('preferredCountries' in changes) {
       stateChanges = true;
-      preferredCountries = this.preferredCountries
-        .map((iso2) => this._state.countries.find((c) => c.iso2 === iso2))
-        .filter(
-          (current) => typeof current !== 'undefined' && current !== null
-        ) as Country[];
     }
     if ('country' in changes || 'value' in changes || 'disabled' in changes) {
       stateChanges = true;
@@ -97,7 +91,10 @@ export class NgxIntlTelInputComponent implements OnChanges {
       }
 
       if (!selected) {
-        selected = this._state.preferredCountries.length !== 0 ? this._state.preferredCountries[0] : this._state.countries[0]; 
+        selected =
+          this._state.preferredCountries.length !== 0
+            ? this._state.preferredCountries[0]
+            : this._state.countries[0];
       }
 
       // get country code from value property

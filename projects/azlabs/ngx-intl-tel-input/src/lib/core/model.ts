@@ -4,6 +4,6 @@ export interface Country {
   dialCode: string;
   priority: number;
   areaCode?: number;
-  flagClass: string;
-  placeHolder: string;
+  flagClass?: string;
+  placeHolder?: string;
 }

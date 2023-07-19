@@ -4,12 +4,12 @@
   "peerDependencies": {
     "@angular/common": "^15.0",
     "@angular/core": "^15.0",
-    "@angular/cdk": "^15.0"
+    "@angular/cdk": "^15.0",
+    "@azlabsjs/ngx-dropdown": "^0.15.0"
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "google-libphonenumber": "^3.2",
-    "@azlabsjs/js-object": "^0.1.10"
+    "google-libphonenumber": "^3.2"
   },
   "repository": {
     "type": "git",
