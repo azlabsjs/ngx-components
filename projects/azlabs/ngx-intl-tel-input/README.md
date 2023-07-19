@@ -1,15 +1,73 @@
 # NgxIntlTelInput
 
-The `ngx-intl-tel-input` library provide angular UI component for redenring ISO 3366 compatible phone input element.
+The `ngx-intl-tel-input` library provide angular UI component for redenring ISO3166 compatible phone input element.
 
 ## Dependencies
 
-| @azlabsjs/ngx-intl-tel-input   | @azlabsjs/@azlabsjs/ngx-dropdown | Angular |
-| ------------------------------ | -------------------------------- | ------- |
-| ^0.15.x                        | ^0.15.0                          | ^15.0   |
-| ^0.16.x                        | ^0.16.0                          | ^15.0   |
-
+| @azlabsjs/ngx-intl-tel-input | @azlabsjs/@azlabsjs/ngx-dropdown | Angular |
+| ---------------------------- | -------------------------------- | ------- |
+| ^0.15.x                      | ^0.15.0                          | ^15.0   |
+| ^0.16.x                      | ^0.16.0                          | ^15.0   |
 
 ## Usage
 
-To use the the `ngx-intl-tel-input` component in your application, you must 
+To use the the `ngx-intl-tel-input` component in your application, you must import the it module in the root of your angular application:
+
+```ts
+import { NgxIntlTelInputModule } from "@azlabsjs/ngx-intl-tel-input";
+
+@NgModule({
+  // ...
+  imports: [NgxIntlTelInputModule],
+})
+export class AppModule {}
+```
+
+By default the library will create load a list of default `ISO3166` countries when using the `intl-input-component`. To override the default countries :
+
+```ts
+import { NgxIntlTelInputModule } from "@azlabsjs/ngx-intl-tel-input";
+
+@NgModule({
+  // ...
+  imports: [
+    NgxIntlTelInputModule.forRoot({
+      countries: [
+        {
+          name: "Togo",
+          iso2: "tg",
+          dialCode: "+228",
+        },
+        {
+          name: "Ghana",
+          iso2: "gh",
+          dialCode: "+233",
+        },
+      ],
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+- Using the component in angular templates
+
+To use the `ngx-intl-tel-input` in your angular template:
+
+```html
+<ngx-intl-tel-input *ngIf="control" (error)="onError($event)" (valueChange)="control.setValue($event)" [value]="state.value ?? ''" (blur)="onBlur($event)" (focus)="onFocus($event)" [class]="cssClass" [required]="true" [preferredCountries]="['tg', 'gh']" [country]="'tg'"> </ngx-intl-tel-input>
+```
+
+**Note** The library comes with a default `html input` element which for user input action. To override the default input, developpers use angular content projection API as follow:
+
+```html
+<ngx-intl-tel-input *ngIf="control" (error)="onError($event)" (valueChange)="onValueChange($event)" [value]="state.value ?? ''" (blur)="onBlur($event)" (focus)="onFocus($event)" [class]="cssClass" [required]="config!.rules?.isRequired || false" [preferredCountries]="['tg', 'gh']" [country]="'tg'">
+  <ng-template #input let-keypress="keypress" let-selected="selected" let-change="change" let-required="required" let-disabled="disabled" let-value="value">
+    <input type="text" (keypress)="keypress" (change)="change" [required]="required" [disabled]="disabled" [value]="value" />
+  </ng-template>
+</ngx-intl-tel-input>
+```
+
+## APIs
+
+API documentation is under development. Please consult the current page for any changes.
