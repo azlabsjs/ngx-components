@@ -50,7 +50,7 @@ export class NgxSmartFormControlArrayComponent
   @Input() formArray!: UntypedFormArray;
   @Input() inputConfig!: InputConfigInterface;
   @Input() template!: TemplateRef<any>;
-  @Input() addButtonRef!: TemplateRef<Node>;
+  @Input() addButtonRef!: TemplateRef<any>;
   @Input() name!: string;
   private _autoupload: boolean = false;
   @Input() set autoupload(value: boolean) {

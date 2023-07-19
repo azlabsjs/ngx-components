@@ -19,12 +19,11 @@ export interface FormsClient {
   getAll(id: string[] | number[]): Observable<FormConfigInterface[]>;
 }
 
-
 /**
  * @description Provide implementation for preloading application form
  * into developper defined cache
  */
- export interface FormsLoader {
+export interface FormsLoader {
   /**
    * @descritpion Provides an abstraction for loading dynamic form definitions
    * from an asset configuration file, a remote server
@@ -66,3 +65,13 @@ export interface CacheProvider {
     options?: { [index: string]: any }
   ): Observable<never> | Observable<FormInterface[]>;
 }
+
+/**
+ * @internal
+ * 
+ * Internal type definition for load form request handler function
+ */
+export type LoadFormsRequestHandler = (
+  path: string,
+  options?: Record<string, unknown>
+) => Observable<Record<string, unknown>[]>;

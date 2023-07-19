@@ -15,9 +15,7 @@ export { NgxSmartFormModule } from './ngx-smart-form.module';
 // Pipes exports
 export { SafeHTMLPipe } from './pipes';
 // Ng Services
-export { DYNAMIC_FORM_LOADER, FormHttpLoader } from './services';
-// Type helper export
-export { InputTypeHelper } from './services/input-type';
+export { DefaultFormsLoader } from './services';
 // Ng forms helpers classes & interfaces
 export {
   ANGULAR_REACTIVE_FORM_BRIDGE,

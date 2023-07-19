@@ -9,7 +9,7 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HTTPRequest } from '@azlabsjs/requests';
 import { CacheProvider } from '@azlabsjs/smart-form-core';
-import { from, lastValueFrom, ObservableInput, of } from 'rxjs';
+import { from, lastValueFrom, map, ObservableInput, of } from 'rxjs';
 import { createSubmitHttpHandler } from '../http';
 import {
   NgxSmartArrayAddButtonComponent,
@@ -24,9 +24,7 @@ import {
 } from './components';
 import { SafeHTMLPipe } from './pipes';
 import {
-  CACHE_PROVIDER,
-  DYNAMIC_FORM_LOADER,
-  FormHttpLoader,
+  DefaultFormsLoader,
   FormsCacheProvider,
   ReactiveFormBuilderBrige,
 } from './services';
@@ -34,11 +32,14 @@ import { JSONFormsClient } from './services/client';
 import {
   ANGULAR_REACTIVE_FORM_BRIDGE,
   API_HOST,
+  CACHE_PROVIDER,
+  FORMS_LOADER,
   FORM_CLIENT,
   HTTP_REQUEST_CLIENT,
   InterceptorFactory,
+  LoadFormsRequestHandler,
 } from './types';
-
+import { rxRequest } from '../http/helpers';
 
 type FormApiServerConfigs = {
   api: {
@@ -56,6 +57,7 @@ type ConfigType = {
   submitRequest?: {
     interceptorFactory?: InterceptorFactory<HTTPRequest>;
   };
+  loadFormsHandler?: LoadFormsRequestHandler;
 };
 
 /**
@@ -67,21 +69,13 @@ type ConfigType = {
 export function preloadAppForms(service: CacheProvider, assetsURL: string) {
   return async () => {
     return await lastValueFrom(
-      from(
-        service.cache(
-          assetsURL || '/assets/resources/forms.json'
-        ) as ObservableInput<unknown>
-      )
+      from(service.cache(assetsURL) as ObservableInput<unknown>)
     );
   };
 }
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-  ],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   declarations: [
     NgxSmartFormComponent,
     NgxSmartFormGroupComponent,
@@ -105,14 +99,34 @@ export function preloadAppForms(service: CacheProvider, assetsURL: string) {
 })
 export class NgxSmartFormModule {
   static forRoot(configs: ConfigType): ModuleWithProviders<NgxSmartFormModule> {
+    let { formsAssets: assets, loadFormsHandler } = configs;
+    const _assets = assets ?? '/assets/resources/app-forms.json';
+    const _loadFormsHandler =
+      loadFormsHandler ??
+      ((url: string) => {
+        return rxRequest({
+          url,
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+          },
+          responseType: 'json',
+        }).pipe(
+          map(
+            (response) => response.body as unknown as Record<string, unknown>[]
+          )
+        );
+      });
+
     const providers: Provider[] = [
-      FormHttpLoader,
       FormsCacheProvider,
       JSONFormsClient,
       ReactiveFormBuilderBrige,
       {
-        provide: DYNAMIC_FORM_LOADER,
-        useClass: FormHttpLoader,
+        provide: FORMS_LOADER,
+        useFactory: () => {
+          return new DefaultFormsLoader(_loadFormsHandler);
+        },
       },
       {
         provide: CACHE_PROVIDER,
@@ -129,10 +143,7 @@ export class NgxSmartFormModule {
       {
         provide: APP_INITIALIZER,
         useFactory: (service: CacheProvider) =>
-          preloadAppForms(
-            service,
-            configs!.formsAssets || '/assets/resources/app-forms.json'
-          ),
+          preloadAppForms(service, _assets),
         multi: true,
         deps: [CACHE_PROVIDER],
       },

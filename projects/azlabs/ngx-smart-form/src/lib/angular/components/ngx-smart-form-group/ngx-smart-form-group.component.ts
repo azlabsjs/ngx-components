@@ -29,7 +29,7 @@ export class NgxSmartFormGroupComponent
   //#region Component inputs definitions
   @Input() formGroup!: UntypedFormGroup;
   @Input() controls!: InputConfigInterface[];
-  @Input() template!: TemplateRef<HTMLElement>;
+  @Input() template!: TemplateRef<any>;
   @Input() autoupload: boolean = false;
   @Input('no-grid-layout') noGridLayout = false;
   //#endregion Component inputs definitions
