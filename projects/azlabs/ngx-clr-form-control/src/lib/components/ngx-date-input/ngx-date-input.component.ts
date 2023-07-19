@@ -6,7 +6,7 @@ import {
   LOCALE_ID,
   TemplateRef
 } from '@angular/core';
-import { UntypedFormControl } from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
 import { DateInput } from '@azlabsjs/smart-form-core';
 
 @Component({
@@ -15,7 +15,7 @@ import { DateInput } from '@azlabsjs/smart-form-core';
 })
 export class NgxDateInputComponent {
   // #region Component inputs
-  @Input() control!: UntypedFormControl;
+  @Input() control!: AbstractControl;
   @Input() describe = true;
   @Input() inputConfig!: DateInput;
   // #endregion Component inputs

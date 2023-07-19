@@ -9,7 +9,7 @@ import {
   Output,
   TemplateRef,
 } from '@angular/core';
-import { AbstractControl, UntypedFormControl } from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { distinctUntilChanged, Subscription, tap } from 'rxjs';
 
@@ -27,7 +27,7 @@ type StateType = {
 })
 export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
   //#region Component inputs
-  @Input() control!: AbstractControl & UntypedFormControl;
+  @Input() control!: AbstractControl;
   @Input() describe = true;
   @Input('inputConfig') config!: InputConfigInterface;
   @Input('class') cssClass!: string;

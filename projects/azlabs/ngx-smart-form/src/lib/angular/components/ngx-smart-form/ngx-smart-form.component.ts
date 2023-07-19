@@ -15,12 +15,7 @@ import {
   SimpleChanges,
   TemplateRef,
 } from '@angular/core';
-import {
-  AbstractControl,
-  UntypedFormArray,
-  UntypedFormControl,
-  UntypedFormGroup,
-} from '@angular/forms';
+import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { HTTPRequestMethods } from '@azlabsjs/requests';
 import {
   FormConfigInterface,
@@ -60,7 +55,7 @@ export class NgxSmartFormComponent
 {
   //#region Local properties
   /** @internal */
-  _formGroup!: UntypedFormGroup;
+  _formGroup!: FormGroup;
 
   get formGroup() {
     return this._formGroup;
@@ -86,7 +81,7 @@ export class NgxSmartFormComponent
   @Output() submit = new EventEmitter<{ [index: string]: any }>();
   @Output() ready = new EventEmitter();
   @Output() changes = new EventEmitter();
-  @Output() formGroupChange = new EventEmitter<UntypedFormGroup>();
+  @Output() formGroupChange = new EventEmitter<FormGroup>();
   @Output() complete = new EventEmitter<unknown>();
   @Output() error = new EventEmitter<unknown>();
   @Output() performingRequest = new EventEmitter<boolean>();
@@ -257,7 +252,7 @@ export class NgxSmartFormComponent
         ...this.form,
         controlConfigs: controls as InputConfigInterface[],
       };
-      this._formGroup = formgroup as UntypedFormGroup;
+      this._formGroup = formgroup as FormGroup;
       for (const name in this._formGroup.controls) {
         this._formGroup
           .get(name)
@@ -290,7 +285,7 @@ export class NgxSmartFormComponent
           event,
           useHiddenAttributeSetter
         )(this._formGroup);
-        this._formGroup = control as UntypedFormGroup;
+        this._formGroup = control as FormGroup;
         this.form = { ...this.form, controlConfigs: controls };
       }
     }
@@ -298,7 +293,7 @@ export class NgxSmartFormComponent
   //#endregion Ported wrapper methods
 
   private setFormValue(
-    formgroup: UntypedFormGroup,
+    formgroup: FormGroup,
     values: { [index: string]: any },
     configs?: InputConfigInterface[] | InputConfigInterface
   ) {
@@ -310,14 +305,14 @@ export class NgxSmartFormComponent
         continue;
       }
       if (formgroup.controls[key] && value) {
-        if (formgroup.controls[key] instanceof UntypedFormGroup) {
+        if (formgroup.controls[key] instanceof FormGroup) {
           this.setFormValue(
-            formgroup.controls[key] as UntypedFormGroup,
+            formgroup.controls[key] as FormGroup,
             value,
             config_
           );
         } else if (
-          formgroup.controls[key] instanceof UntypedFormArray &&
+          formgroup.controls[key] instanceof FormArray &&
           Boolean(config_?.isRepeatable) === true &&
           ((config_ as InputGroup)?.children ?? []).length > 0
         ) {
@@ -328,21 +323,21 @@ export class NgxSmartFormComponent
                 (current) => typeof current !== 'undefined' && current !== null
               );
           const values_ = Array.isArray(value) ? value : [];
-          const array_ = new UntypedFormArray([]);
+          const array_ = new FormArray<AbstractControl<any>>([]);
           for (const current of values_) {
-            const tmp = this.builder.group(children) as UntypedFormGroup;
+            const tmp = this.builder.group(children) as FormGroup;
             this.setFormGroupValue(tmp, current);
             array_.push(tmp);
           }
           formgroup.controls[key] = array_;
         } else if (
-          formgroup.controls[key] instanceof UntypedFormArray &&
+          formgroup.controls[key] instanceof FormArray &&
           Boolean(config_?.isRepeatable)
         ) {
           const values_ = Array.isArray(value) ? value : [];
-          const array_ = new UntypedFormArray([]);
+          const array_ = new FormArray<AbstractControl<any>>([]);
           for (const current of values_) {
-            const tmp = this.builder.control(config_) as UntypedFormControl;
+            const tmp = this.builder.control(config_);
             tmp.setValue(current);
             array_.push(tmp);
           }
@@ -355,7 +350,7 @@ export class NgxSmartFormComponent
   }
 
   private setFormGroupValue(
-    formgroup: UntypedFormGroup,
+    formgroup: FormGroup,
     values: { [index: string]: any }
   ) {
     for (const [key, value] of Object.entries(values)) {
@@ -392,7 +387,7 @@ export class NgxSmartFormComponent
     this._destroy$.next();
     // We create an instance of angular Reactive Formgroup instance
     // from input configurations
-    this._formGroup = this.builder.group(this.form) as UntypedFormGroup;
+    this._formGroup = this.builder.group(this.form) as FormGroup;
     // Set input bindings
     this.setBindings();
     // Subscribe to formgroup changes
@@ -409,14 +404,6 @@ export class NgxSmartFormComponent
     this.changes.emit();
   }
 
-  isFormControl(value: unknown) {
-    return (
-      typeof value !== 'undefined' &&
-      value !== null &&
-      value instanceof AbstractControl &&
-      typeof (value as UntypedFormControl).registerOnChange === 'function'
-    );
-  }
   ngOnDestroy(): void {
     this._destroy$.next();
   }

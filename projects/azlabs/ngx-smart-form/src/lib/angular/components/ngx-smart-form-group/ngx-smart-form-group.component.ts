@@ -7,14 +7,16 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  TemplateRef
+  TemplateRef,
 } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import {
-  controlAttributesDataBindings, setControlsAttributes, useHiddenAttributeSetter
+  controlAttributesDataBindings,
+  setControlsAttributes,
+  useHiddenAttributeSetter,
 } from '../../helpers';
 import { BindingInterface } from '../../types';
 
@@ -27,7 +29,7 @@ export class NgxSmartFormGroupComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
   //#region Component inputs definitions
-  @Input() formGroup!: UntypedFormGroup;
+  @Input() formGroup!: FormGroup;
   @Input() controls!: InputConfigInterface[];
   @Input() template!: TemplateRef<any>;
   @Input() autoupload: boolean = false;
@@ -41,14 +43,14 @@ export class NgxSmartFormGroupComponent
   //#endregion Component internal properties
 
   //#region Component output
-  @Output() formGroupChange = new EventEmitter<UntypedFormGroup>();
+  @Output() formGroupChange = new EventEmitter<FormGroup>();
   //#endregion Component outputs
 
   //
   ngOnInit(): void {
     // Simulate formgroup changes
     this.formGroup.valueChanges
-      .pipe(tap((state) => this.formGroupChange.emit(this.formGroup)))
+      .pipe(tap(() => this.formGroupChange.emit(this.formGroup)))
       .subscribe();
   }
 
@@ -62,7 +64,7 @@ export class NgxSmartFormGroupComponent
         this.controls
       )(this.formGroup);
       this.controls = controls as InputConfigInterface[];
-      this.formGroup = formgroup as UntypedFormGroup;
+      this.formGroup = formgroup as FormGroup;
       // Get control entries from the formgroup
       const entries = Object.entries(this.formGroup.controls);
       // Handle form control value changes
@@ -97,7 +99,7 @@ export class NgxSmartFormGroupComponent
           event,
           useHiddenAttributeSetter
         )(this.formGroup);
-        this.formGroup = control as UntypedFormGroup;
+        this.formGroup = control as FormGroup;
         this.controls = controls;
       }
     }

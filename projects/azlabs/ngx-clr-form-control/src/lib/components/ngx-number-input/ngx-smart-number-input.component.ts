@@ -1,5 +1,5 @@
 import { Component, Input, ContentChild, TemplateRef } from '@angular/core';
-import { UntypedFormControl } from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
 import { getObjectProperty } from '@azlabsjs/js-object';
 import { NumberInput } from '@azlabsjs/smart-form-core';
 
@@ -10,7 +10,7 @@ import { NumberInput } from '@azlabsjs/smart-form-core';
 })
 export class NgxNumberInputComponent {
   //#region Component inputs
-  @Input() control!: UntypedFormControl;
+  @Input() control!: AbstractControl;
   @Input() describe = true;
   @Input() inputConfig!: NumberInput;
   @ContentChild('input') inputRef!: TemplateRef<any>;

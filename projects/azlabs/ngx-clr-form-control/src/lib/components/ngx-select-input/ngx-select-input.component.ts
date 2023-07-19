@@ -8,7 +8,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { UntypedFormControl } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import {
   InputOptionsInterface,
   OptionsInputConfigInterface,
@@ -46,7 +46,7 @@ import { FetchOptionsDirective } from '@azlabsjs/ngx-options-input';
 })
 export class NgxSelectInputComponent implements AfterViewInit {
   //
-  @Input() control!: UntypedFormControl;
+  @Input() control!: FormControl<any>;
   @Input() describe = true;
   // tslint:disable-next-line: variable-name
   _state$ = new BehaviorSubject<{

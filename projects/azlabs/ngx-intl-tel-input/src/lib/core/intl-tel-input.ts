@@ -1,21 +1,16 @@
 import { Inject, Injectable, Optional } from '@angular/core';
 import { Country } from './model';
-import {
-  PhoneNumberUtil,
-  PhoneNumberFormat,
-  PhoneNumber,
-} from 'google-libphonenumber';
 import { COUNTRIES, SUPPORTED_COUNTRIES } from './tokens';
 import {
   getPhoneNumberPlaceholder,
   phoneNumberAsString,
   safeValidatePhoneNumber,
 } from './internal';
+import { parsePhoneNumber, ParsedPhoneNumber } from 'awesome-phonenumber';
 
 @Injectable()
 export class IntlTelInput {
   //
-  private instance: PhoneNumberUtil;
 
   /**
    * Create and instance of Intel Input Service
@@ -27,9 +22,7 @@ export class IntlTelInput {
     @Inject(SUPPORTED_COUNTRIES)
     @Optional()
     private supportedCountries: Country[] = []
-  ) {
-    this.instance = PhoneNumberUtil.getInstance();
-  }
+  ) {}
 
   /**
    * @description Returns a list of supported countries
@@ -48,9 +41,9 @@ export class IntlTelInput {
    * @param input
    */
   public getCountryCode(input: string) {
-    const instance = this.parse(input);
-    return typeof instance !== 'undefined' && instance !== null
-      ? instance.getCountryCode()
+    const result = this.parse(input);
+    return typeof result !== 'undefined' && result !== null
+      ? result.countryCode
       : undefined;
   }
 
@@ -60,16 +53,16 @@ export class IntlTelInput {
    *
    * @param input
    */
-  public parse(input: string) {
+  public parse(input: string, regionCode?: string) {
     if (typeof input === 'undefined' || input === null) {
       return undefined;
     }
     try {
-      return this.instance.parseAndKeepRawInput(
+      input =
         input.toString().startsWith('+') || input.toString().startsWith('00')
           ? input
-          : `+${input}`
-      );
+          : `+${input}`;
+      return parsePhoneNumber(input, regionCode ? { regionCode } : undefined);
     } catch (e) {
       return undefined;
     }
@@ -79,38 +72,36 @@ export class IntlTelInput {
    * @description Returns true if the phone number is a valid phone number
    * based on intl/local phone number format
    *
-   * @param n Phone number to ve validated
+   * @param num Phone number to ve validated
    */
-  public isValidPhoneNumber(n: PhoneNumber): boolean {
-    return this.instance.isValidNumber(n);
+  public isValidPhoneNumber(num: ParsedPhoneNumber): boolean {
+    return num.valid;
   }
 
   /**
    * Format a phone number object as string
    *
-   * @param phoneNumber
-   * @param format
+   * @param num
    */
-  public format(phoneNumber: PhoneNumber, format: PhoneNumberFormat) {
-    return phoneNumberAsString(this.instance, phoneNumber, format);
+  public format(num: ParsedPhoneNumber) {
+    return phoneNumberAsString(num);
   }
 
   /**
    * @description Add or remove unwanted character from the phone number string
    *
-   * @param phoneNumber
+   * @param num
    */
-  public isSafeValidPhoneNumber(phoneNumber: string) {
-    return safeValidatePhoneNumber(this.instance, phoneNumber);
+  public isSafeValidPhoneNumber(num: string, regionCode?: string) {
+    return safeValidatePhoneNumber(num, regionCode);
   }
 
   /**
-   * @description Get phone number place holder based on user
-   * provided country code
+   * @description Get phone number place holder based on user provided country code
    *
    * @param countryCode
    */
-  protected getPhoneNumberPlaceHolder(countryCode: string) {
-    return getPhoneNumberPlaceholder(countryCode, PhoneNumberFormat.NATIONAL);
+  getPhoneNumberPlaceHolder(countryCode: string) {
+    return getPhoneNumberPlaceholder(countryCode);
   }
 }

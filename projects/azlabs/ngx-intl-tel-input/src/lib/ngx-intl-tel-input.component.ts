@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ContentChild,
@@ -26,7 +27,8 @@ type StateType = {
   selector: 'ngx-intl-tel-input',
   templateUrl: './ngx-intl-tel-input.component.html',
   styleUrls: ['./ngx-intl-tel-input.component.css'],
-  providers: [IntlTelInput]
+  providers: [IntlTelInput],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxIntlTelInputComponent implements OnChanges {
   // #region Component Inputs
@@ -152,13 +154,19 @@ export class NgxIntlTelInputComponent implements OnChanges {
       typeof state === 'function'
         ? state(this._state)
         : { ...this._state, ...state };
-    this.error.emit(
-      this._state.value &&
-        this._state.selected &&
-        !this.service.isSafeValidPhoneNumber(this.getPhonenumber())
-        ? true
-        : false
-    );
+
+    if (this._state.selected?.iso2) {
+      this.error.emit(
+        this._state.value &&
+          this._state.selected &&
+          !this.service.isSafeValidPhoneNumber(
+            this.getPhonenumber(),
+            this._state.selected.iso2
+          )
+          ? true
+          : false
+      );
+    }
     this.changeRef.markForCheck();
   }
 

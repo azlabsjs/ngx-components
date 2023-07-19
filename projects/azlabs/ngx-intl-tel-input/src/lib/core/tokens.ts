@@ -2,7 +2,6 @@ import { InjectionToken } from '@angular/core';
 import { Country } from './model';
 import { ISO3166 } from './ios3166';
 import { getPhoneNumberPlaceholder } from './internal';
-import { PhoneNumberFormat } from 'google-libphonenumber';
 
 /**
  * @description ISO3166 Injectable instance
@@ -20,8 +19,7 @@ export const COUNTRIES = new InjectionToken<Country[]>(
         areaCode: +country[4] || undefined,
         flagClass: country[1].toString().toLocaleLowerCase(),
         placeHolder: `${getPhoneNumberPlaceholder(
-          country[1].toString().toUpperCase(),
-          PhoneNumberFormat.NATIONAL
+          country[1].toString().toUpperCase()
         )}`,
       }));
     },
@@ -31,4 +29,6 @@ export const COUNTRIES = new InjectionToken<Country[]>(
 /**
  * @description Injection token allowing applications to configure supported countries
  */
-export const SUPPORTED_COUNTRIES = new InjectionToken<Country[]>("Injection Token for supported countries");
+export const SUPPORTED_COUNTRIES = new InjectionToken<Country[]>(
+  'Injection Token for supported countries'
+);
