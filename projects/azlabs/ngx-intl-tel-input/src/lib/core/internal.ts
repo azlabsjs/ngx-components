@@ -34,16 +34,13 @@ export function safeValidatePhoneNumber(
   regionCode?: string
 ) {
   try {
-    const num =  parsePhoneNumber(
+    const num = parsePhoneNumber(
       phoneNumber,
       regionCode ? { regionCode } : undefined
     );
 
-    console.log(num);
-    
     return num.valid;
   } catch (e) {
-    console.log(e);
     return false;
   }
 }
