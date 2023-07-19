@@ -5,16 +5,17 @@ import {
   Input,
   OnDestroy,
   OnInit,
-  TemplateRef
+  TemplateRef,
 } from '@angular/core';
 import {
   AbstractControl,
-  FormArray, UntypedFormArray, UntypedFormBuilder,
-  UntypedFormControl
+  FormArray,
+  FormBuilder,
+  FormControl,
 } from '@angular/forms';
 import {
   InputOptionsInterface,
-  OptionsInputConfigInterface
+  OptionsInputConfigInterface,
 } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import {
@@ -22,7 +23,7 @@ import {
   filter,
   map,
   takeUntil,
-  tap
+  tap,
 } from 'rxjs/operators';
 
 function project(options: InputOptionsInterface, state: boolean[]) {
@@ -91,7 +92,7 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
   //#endregion Component inputs
 
   // #region Component properties
-  formgroup = this.builder.group({});
+  formgroup = this.builder.group<{ [key: string]: AbstractControl<any> }>({});
   options!: InputOptionsInterface;
   loaded: boolean = false;
   private _destroy$ = new Subject<void>();
@@ -104,7 +105,7 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
    * @param changes
    */
   constructor(
-    private builder: UntypedFormBuilder,
+    private builder: FormBuilder,
     private changes: ChangeDetectorRef
   ) {}
 
@@ -120,9 +121,9 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
         tap((state) => {
           const value = arraywrap_filter(state);
           if (this.options.length !== 0 && this.formgroup.get('options')) {
-            (this.formgroup.get('options') as FormArray).setValue(
-              compilevalue(this.options, value)
-            );
+            (
+              this.formgroup.get('options') as FormArray<AbstractControl<any>>
+            ).setValue(compilevalue(this.options, value));
           }
         })
       )
@@ -147,14 +148,14 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
    * Append a form array to the form group instance
    */
   private addFormArray() {
-    const array = new UntypedFormArray([]);
+    const array = new FormArray<AbstractControl>([]);
     // We get the value of the injected control
     // if the value is not an array we wrap it as array
     const value = arraywrap_filter(this.control.value);
     // We add controls to the form array element
     if (this.options.length !== 0) {
       for (const option of this.options) {
-        array.push(new UntypedFormControl());
+        array.push(new FormControl());
       }
       // Set the value of the form array
       array.setValue(compilevalue(this.options, value));

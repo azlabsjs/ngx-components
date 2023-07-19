@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy, Component, ContentChild, Input, TemplateRef
 } from '@angular/core';
-import { AbstractControl, UntypedFormControl } from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
 import { getObjectProperty } from '@azlabsjs/js-object';
 import { TextInput } from '@azlabsjs/smart-form-core';
 import { BehaviorSubject } from 'rxjs';
@@ -14,7 +14,7 @@ import { map } from 'rxjs/operators';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxPasswordInputComponent {
-  @Input() control!: AbstractControl & UntypedFormControl;
+  @Input() control!: AbstractControl;
   @Input() describe = true;
   // Configuration parameters of the input
   @Input() inputConfig!: TextInput;

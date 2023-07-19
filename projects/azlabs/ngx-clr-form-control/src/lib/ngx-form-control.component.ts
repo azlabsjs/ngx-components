@@ -8,7 +8,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { AbstractControl, UntypedFormControl } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
 import { Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -29,7 +29,7 @@ export class NgxFormControlComponent implements OnDestroy, OnInit {
   @Input() inline: boolean = false;
   @Input() describe = true;
   @Input() inputConfig!: InputConfigInterface;
-  @Input('control') formcontrol!: AbstractControl & UntypedFormControl;
+  @Input('control') formcontrol!: FormControl<any>;
   //#endregion Component inputs
 
   //#region Component outputs

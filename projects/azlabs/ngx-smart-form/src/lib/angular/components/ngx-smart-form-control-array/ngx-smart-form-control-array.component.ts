@@ -11,16 +11,16 @@ import {
   SimpleChanges,
   TemplateRef,
   ViewChild,
-  ViewContainerRef
+  ViewContainerRef,
 } from '@angular/core';
-import { UntypedFormArray, UntypedFormControl } from '@angular/forms';
+import { AbstractControl, FormArray } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { cloneAbstractControl } from '../../helpers';
 import {
   AngularReactiveFormBuilderBridge,
-  ANGULAR_REACTIVE_FORM_BRIDGE
+  ANGULAR_REACTIVE_FORM_BRIDGE,
 } from '../../types';
 import { NgxSmartFormControlArrayChildComponent } from './ngx-smart-form-control-array-child.component';
 
@@ -41,13 +41,13 @@ import { NgxSmartFormControlArrayChildComponent } from './ngx-smart-form-control
       ></ngx-smart-array-add-button>
     </ng-template>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFormControlArrayComponent
   implements AfterContentInit, OnDestroy
 {
   //#region Component inputs definitions
-  @Input() formArray!: UntypedFormArray;
+  @Input() formArray!: FormArray<AbstractControl>;
   @Input() inputConfig!: InputConfigInterface;
   @Input() template!: TemplateRef<any>;
   @Input() addButtonRef!: TemplateRef<any>;
@@ -112,12 +112,12 @@ export class NgxSmartFormControlArrayComponent
   addNewComponent(index: number) {
     const control = cloneAbstractControl(
       this.builder.control(this.inputConfig)
-    ) as UntypedFormControl;
+    ) as AbstractControl;
     this.addComponent(control, index);
     this.formArray.push(control);
   }
 
-  addComponent(control: UntypedFormControl, index: number) {
+  addComponent(control: AbstractControl, index: number) {
     const componentRef = this.viewContainerRef.createComponent(
       NgxSmartFormControlArrayChildComponent
     );
@@ -164,7 +164,7 @@ export class NgxSmartFormControlArrayComponent
       this.viewContainerRef.clear();
       let index = 0;
       for (const control of this.formArray.controls) {
-        this.addComponent(control as UntypedFormControl, index);
+        this.addComponent(control as AbstractControl, index);
         index++;
       }
     }

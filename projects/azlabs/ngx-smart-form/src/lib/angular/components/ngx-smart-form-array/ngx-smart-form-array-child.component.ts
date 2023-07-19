@@ -6,7 +6,7 @@ import {
   Output,
   TemplateRef,
 } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 
 @Component({
@@ -62,7 +62,7 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 })
 export class NgxSmartFormArrayChildComponent {
   //#region Component inputs
-  @Input() formGroup!: UntypedFormGroup;
+  @Input() formGroup!: FormGroup;
   @Input() controls!: InputConfigInterface[];
   @Input() template!: TemplateRef<HTMLElement>;
   @Input() autoupload: boolean = false;

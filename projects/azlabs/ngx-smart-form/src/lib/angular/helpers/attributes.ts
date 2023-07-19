@@ -1,4 +1,4 @@
-import { AbstractControl, UntypedFormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { isNumber } from '@azlabsjs/utilities';
 import { BindingInterface } from '../types';
@@ -34,9 +34,9 @@ export function useHiddenAttributeSetter(
             : _control.requiredIf?.values || [];
           _control.hidden = !requiredIfValues.includes(value) ? true : false;
           if (_control.hidden) {
-            (formgroup as UntypedFormGroup).removeControl(bidings.key);
+            (formgroup as FormGroup).removeControl(bidings.key);
           } else {
-            (formgroup as UntypedFormGroup).addControl(
+            (formgroup as FormGroup).addControl(
               bidings.key,
               cloneAbstractControl(bidings.abstractControl)
             );
@@ -85,7 +85,7 @@ export function controlAttributesDataBindings(
             value.abstractControl.value,
             useHiddenAttributeSetter
           )(formgroup);
-          formgroup = control as UntypedFormGroup;
+          formgroup = control as FormGroup;
           controls = _controls;
         }
       }

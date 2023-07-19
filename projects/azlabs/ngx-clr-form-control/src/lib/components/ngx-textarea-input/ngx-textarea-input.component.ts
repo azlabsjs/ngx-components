@@ -1,5 +1,5 @@
 import { Component, Input, ContentChild, TemplateRef } from '@angular/core';
-import { AbstractControl, UntypedFormControl } from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
 import { TextAreaInput } from '@azlabsjs/smart-form-core';
 
 @Component({
@@ -9,7 +9,7 @@ import { TextAreaInput } from '@azlabsjs/smart-form-core';
 })
 export class NgxTextAreaInputComponent {
   //#region Component inputs
-  @Input() control!: AbstractControl & UntypedFormControl;
+  @Input() control!: AbstractControl;
   @Input() describe = true;
   @Input() inputConfig!: TextAreaInput;
   @ContentChild('input') inputRef!: TemplateRef<any>;

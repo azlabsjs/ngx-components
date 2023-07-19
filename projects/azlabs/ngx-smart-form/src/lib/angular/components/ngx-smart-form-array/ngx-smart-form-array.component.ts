@@ -11,16 +11,16 @@ import {
   SimpleChanges,
   TemplateRef,
   ViewChild,
-  ViewContainerRef
+  ViewContainerRef,
 } from '@angular/core';
-import { UntypedFormArray, UntypedFormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { cloneAbstractControl } from '../../helpers';
 import {
   AngularReactiveFormBuilderBridge,
-  ANGULAR_REACTIVE_FORM_BRIDGE
+  ANGULAR_REACTIVE_FORM_BRIDGE,
 } from '../../types';
 import { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array-child.component';
 
@@ -72,7 +72,7 @@ import { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array-child.co
 })
 export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
   //#region Component inputs definitions
-  @Input() formArray!: UntypedFormArray;
+  @Input() formArray!: FormArray<AbstractControl<any>>;
   private _controls!: InputConfigInterface[];
   @Input() set controls(value: InputConfigInterface | InputConfigInterface[]) {
     this._controls = Array.isArray(value)
@@ -148,12 +148,12 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
   private _addComponent(index: number) {
     const formGroup = cloneAbstractControl(
       this.builder.group(this._controls)
-    ) as UntypedFormGroup;
+    ) as FormGroup;
     this.addComponent(formGroup, index);
     this.formArray.push(formGroup);
   }
 
-  addComponent(formGroup: UntypedFormGroup, index: number) {
+  addComponent(formGroup: FormGroup, index: number) {
     if (this._controls) {
       const componentRef = this.viewContainerRef.createComponent(
         NgxSmartFormArrayChildComponent
@@ -204,7 +204,7 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
       // reference
       let index = 0;
       for (const control of this.formArray.controls) {
-        this.addComponent(control as UntypedFormGroup, index);
+        this.addComponent(control as FormGroup, index);
         index++;
       }
     }
