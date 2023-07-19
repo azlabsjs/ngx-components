@@ -46,6 +46,11 @@ import {
   OptionsQueryConfigType,
 } from '@azlabsjs/ngx-options-input';
 import { ClarityModule } from '@clr/angular';
+import '@cds/core/icon/register.js';
+import { ClarityIcons, eyeHideIcon, eyeIcon } from '@cds/core/icon';
+
+// Register clarity icons
+ClarityIcons.addIcons(eyeHideIcon, eyeIcon);
 
 type ConfigType = {
   translationsProvider?: Provider;
