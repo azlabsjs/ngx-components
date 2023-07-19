@@ -13,9 +13,7 @@ import {
  *
  * @returns {AbstractControl}
  */
-export function cloneAbstractControl<
-  T extends AbstractControl | FormGroup | FormArray | FormControl
->(control: T): T {
+export function cloneAbstractControl<T extends AbstractControl>(control: T): T {
   let newControl: T;
 
   if (control instanceof UntypedFormGroup) {

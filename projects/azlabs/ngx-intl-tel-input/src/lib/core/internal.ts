@@ -1,4 +1,6 @@
-import {parsePhoneNumber, PhoneNumber, PhoneNumberFormat} from 'awesome-phonenumber';
+import { parsePhoneNumber, ParsedPhoneNumber } from 'awesome-phonenumber';
+
+import { getExample } from 'awesome-phonenumber';
 
 // @internal
 export function sanitize(value: string) {
@@ -12,42 +14,36 @@ export function sanitize(value: string) {
 }
 
 // @internal
-export function getPhoneNumberPlaceholder(
-  region: string,
-  format: PhoneNumberFormat
-) {
-  // const instance = PhoneNumberUtil.getInstance();
+export function getPhoneNumberPlaceholder(regionCode: string) {
   try {
-    const phoneNumber = parsePhoneNumber('90000505', region);
-    return phoneNumberAsString(phoneNumber, format);
+    const phoneNumber = getExample(regionCode, 'mobile');
+    return phoneNumberAsString(phoneNumber);
   } catch (e) {
     return e;
   }
 }
 
 // @internal
-export function phoneNumberAsString(
-  number: PhoneNumber,
-  format: PhoneNumberFormat
-) {
-  // instance = instance || PhoneNumberUtil.getInstance();
-  // return instance.format(number, format);
-  return number.getNumber(format);
+export function phoneNumberAsString(number: ParsedPhoneNumber) {
+  return number.number?.national;
 }
 
 // @internal
 export function safeValidatePhoneNumber(
-  // instance: PhoneNumberUtil,
-  phoneNumber: string
+  phoneNumber: string,
+  regionCode?: string
 ) {
   try {
-    // return !instance.isValidNumber(
-    //   instance.parseAndKeepRawInput(sanitize(String(phoneNumber) as string))
-    // )
-    //   ? false
-    //   : true;
-    return parsePhoneNumber(phoneNumber).isValid();
+    const num =  parsePhoneNumber(
+      phoneNumber,
+      regionCode ? { regionCode } : undefined
+    );
+
+    console.log(num);
+    
+    return num.valid;
   } catch (e) {
+    console.log(e);
     return false;
   }
 }

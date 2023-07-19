@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "tslib": "^2.3.0",
-    "awesome-phonenumber": "^3.3",
+    "awesome-phonenumber": "^5.0",
     "@azlabsjs/js-object": "^0.1.10"
   },
   "repository": {
