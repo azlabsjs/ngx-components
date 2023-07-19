@@ -1,13 +1,10 @@
-import {
-  useRequestClient,
-  HTTPRequestMethods,
-  HTTPResponseType,
-  Interceptor,
-  HTTPRequest,
-} from '@azlabsjs/requests';
+import { useRequestClient } from '@azlabsjs/requests';
 import { from } from 'rxjs';
+import { RequestOptionsType } from './types';
 
 /**
+ * @internal
+ * 
  * Makes an http request using rxjs fetch wrapper
  *
  * **Note**
@@ -17,18 +14,7 @@ import { from } from 'rxjs';
  * @param request
  * @returns
  */
-export function rxRequest(
-  request:
-    | {
-        url: string;
-        method: HTTPRequestMethods;
-        body?: any;
-        headers?: HeadersInit;
-        responseType?: HTTPResponseType;
-        interceptors?: Interceptor<HTTPRequest>[];
-      }
-    | string
-) {
+export function rxRequest(request: RequestOptionsType) {
   if (typeof request === 'string') {
     request = {
       url: request,

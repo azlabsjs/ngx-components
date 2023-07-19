@@ -1,52 +1,61 @@
 <ng-container *ngIf="formGroup">
-  <ng-container
-    *ngTemplateOutlet="
+  <ng-container *ngTemplateOutlet="
       recursiveTemplate;
       context: { group: formGroup, controls }
-    "
-  ></ng-container>
+    "></ng-container>
 </ng-container>
 
 <ng-template #recursiveTemplate let-controls="controls" let-group="group">
-  <div class="clr-row">
+  <div class="input-row" *ngIf="!!!noGridLayout">
+    <ng-container *ngTemplateOutlet="recursivePreviewTemplate; context: {controls, group}"></ng-container>
+  </div>
+  <ng-container *ngIf="!!noGridLayout">
+    <ng-container *ngTemplateOutlet="recursivePreviewTemplate; context: {controls, group}"></ng-container>
+  </ng-container>
+  <ng-template #recursivePreviewTemplate let-controls="controls" let-group="group">
     <ng-container *ngFor="let value of controls">
       <ng-container *ngIf="(value!.children || []).length > 0">
-        <div class="clr-row" [hidden]="value.hidden">
-          <div [class]="value.containerClass">
-            <div [innerHTML]="value.label | safeHtml"></div>
-            <ng-container
-              *ngTemplateOutlet="
-                recursiveTemplate;
-                context: {
-                  controls: value!.children || [],
-                  group: group.get(value.name)
-                }
-              "
-            ></ng-container>
+        <ng-container *ngIf="!!!noGridLayout">
+          <div class="input-row" [hidden]="value.hidden">
+            <ng-container *ngTemplateOutlet="previewTemplate; context: {value, group}"></ng-container>
           </div>
-        </div>
+        </ng-container>
+        <ng-container *ngIf="!!noGridLayout">
+          <div [hidden]="value.hidden">
+            <ng-container *ngTemplateOutlet="previewTemplate; context: {value, group}"></ng-container>
+          </div>
+        </ng-container>
+        <ng-template #previewTemplate let-value="value" let-group="group">
+          <div [class]="noGridLayout ? 'ngx-form-no-grid' : value.containerClass">
+            <div [innerHTML]="value.label | safeHtml"></div>
+            <ng-container *ngTemplateOutlet="
+                  recursiveTemplate;
+                  context: {
+                    controls: value!.children || [],
+                    group: group.get(value.name)
+                  }
+                "></ng-container>
+          </div>
+        </ng-template>
       </ng-container>
       <ng-container *ngIf="(value!.children || []).length === 0">
-        <div [class]="value.containerClass" [hidden]="value.hidden">
-          <ng-container
-            *ngTemplateOutlet="
-            formTemplate;
-            context: {
-              value,
-              group
-            }
-          "
-          ></ng-container>
+        <div [class]="noGridLayout ? 'ngx-form-no-grid' : value.containerClass" [hidden]="value.hidden">
+          <ng-container *ngTemplateOutlet="
+          controlTemplate;
+              context: {
+                value,
+                group
+              }
+            "></ng-container>
         </div>
       </ng-container>
     </ng-container>
-  </div>
+
+  </ng-template>
 </ng-template>
 
-<ng-template #formTemplate let-group="group" let-value="value">
+<ng-template #controlTemplate let-group="group" let-value="value">
   <ng-container *ngIf="group.get(value.name) as control">
-    <ng-container
-      *ngTemplateOutlet="template; context: { control, value }"
-    ></ng-container>
+    <ng-container *ngTemplateOutlet="template; context: { control, value, autoupload }"></ng-container>
   </ng-container>
 </ng-template>

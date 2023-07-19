@@ -1,31 +1,44 @@
-import { Inject, Injectable } from '@angular/core';
+import { Inject, Injectable, Optional } from '@angular/core';
 import { Country } from './model';
-import { COUNTRIES } from './types';
+import {
+  PhoneNumberFormat,
+  PhoneNumber,
+  PhoneNumberUtil,
+} from 'google-libphonenumber';
+import { COUNTRIES } from './tokens';
 import {
   getPhoneNumberPlaceholder,
   phoneNumberAsString,
   safeValidatePhoneNumber,
 } from './internal';
-import {parsePhoneNumber, PhoneNumber, PhoneNumberFormat} from 'awesome-phonenumber';
 
 @Injectable()
 export class IntlTelInput {
   //
-  // private instance: PhoneNumberUtil;
+  private instance!: PhoneNumberUtil;
 
   /**
    * Create and instance of Intel Input Service
    *
    * @param countries
    */
-  constructor(@Inject(COUNTRIES) private countries: Country[]) {
-    // this.instance = PhoneNumberUtil.getInstance();
+  constructor(
+    @Inject(COUNTRIES) private countries: Country[],
+    @Inject(SUPPORTED_COUNTRIES)
+    @Optional()
+    private supportedCountries: Country[] = []
+  ) {
+    this.instance = PhoneNumberUtil.getInstance();
   }
 
   /**
    * @description Returns a list of supported countries
    */
-  public fetchCountries(): Array<Country> {
+  public fetchCountries(): Country[] {
+    const supportedCountries = this.supportedCountries ?? [];
+    if (supportedCountries?.length > 0) {
+      return supportedCountries;
+    }
     return this.countries;
   }
 

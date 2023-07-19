@@ -1,24 +1,26 @@
 import {
+  AfterContentInit,
+  ChangeDetectionStrategy,
   Component,
   ComponentRef,
   EventEmitter,
   Inject,
   Input,
   OnDestroy,
-  OnInit,
   Output,
+  SimpleChanges,
   TemplateRef,
   ViewChild,
-  ViewContainerRef,
+  ViewContainerRef
 } from '@angular/core';
-import { FormArray, FormControl } from '@angular/forms';
+import { UntypedFormArray, UntypedFormControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
-import { tap, takeUntil } from 'rxjs/operators';
+import { takeUntil, tap } from 'rxjs/operators';
 import { cloneAbstractControl } from '../../helpers';
 import {
   AngularReactiveFormBuilderBridge,
-  ANGULAR_REACTIVE_FORM_BRIDGE,
+  ANGULAR_REACTIVE_FORM_BRIDGE
 } from '../../types';
 import { NgxSmartFormControlArrayChildComponent } from './ngx-smart-form-control-array-child.component';
 
@@ -39,13 +41,16 @@ import { NgxSmartFormControlArrayChildComponent } from './ngx-smart-form-control
       ></ngx-smart-array-add-button>
     </ng-template>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
+export class NgxSmartFormControlArrayComponent
+  implements AfterContentInit, OnDestroy
+{
   //#region Component inputs definitions
-  @Input() formArray!: FormArray;
+  @Input() formArray!: UntypedFormArray;
   @Input() inputConfig!: InputConfigInterface;
   @Input() template!: TemplateRef<any>;
-  @Input() addButtonRef!: TemplateRef<Node>;
+  @Input() addButtonRef!: TemplateRef<any>;
   @Input() name!: string;
   private _autoupload: boolean = false;
   @Input() set autoupload(value: boolean) {
@@ -56,18 +61,8 @@ export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
       (ref) => (ref.instance.autoupload = this._autoupload)
     );
   }
-  private _submitupload: boolean = false;
-  @Input() set submitupload(value: boolean) {
-    this._submitupload = !!value;
-    // update child component instance submitupload values
-    this.componentRefs.forEach(
-      (ref) => (ref.instance.submitupload = this._submitupload)
-    );
-  }
   //#endregion Component inputs definitions
 
-  //@internal
-  private abstractControl!: FormControl;
   @ViewChild('container', { read: ViewContainerRef, static: true })
   viewContainerRef!: ViewContainerRef;
 
@@ -87,25 +82,23 @@ export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
     private builder: AngularReactiveFormBuilderBridge
   ) {}
 
-  ngOnInit(): void {
-    this.abstractControl = this.builder.control(
-      this.inputConfig
-    ) as FormControl;
+  ngAfterContentInit(): void {
     if (this.formArray.getRawValue().length === 0) {
-      this.addNewComponent(this.componentRefCount);
-    } else {
-      // Add elements
-      let index = 0;
-      for (const control of this.formArray.controls) {
-        this.addComponent(control as FormControl, index);
-        index++;
-      }
+      return this.addNewComponent(this.componentRefCount);
     }
+    // Add elements
+    this.addArrayControls();
 
     // Simulate form array
     this.formArray.valueChanges
       .pipe(tap((state) => this.formArrayChange.emit(state)))
       .subscribe();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if ('formArray' in changes) {
+      this.addArrayControls();
+    }
   }
 
   onTemplateButtonClicked(event: Event) {
@@ -117,12 +110,14 @@ export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
 
   // tslint:disable-next-line: typedef
   addNewComponent(index: number) {
-    const control = cloneAbstractControl(this.abstractControl) as FormControl;
+    const control = cloneAbstractControl(
+      this.builder.control(this.inputConfig)
+    ) as UntypedFormControl;
     this.addComponent(control, index);
     this.formArray.push(control);
   }
 
-  addComponent(control: FormControl, index: number) {
+  addComponent(control: UntypedFormControl, index: number) {
     const componentRef = this.viewContainerRef.createComponent(
       NgxSmartFormControlArrayChildComponent
     );
@@ -131,7 +126,6 @@ export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
     componentRef.instance.control = control;
     componentRef.instance.template = this.template;
     componentRef.instance.autoupload = this._autoupload;
-    componentRef.instance.submitupload = this._submitupload;
     componentRef.instance.index = index;
     // Ends child component properties initialization
 
@@ -163,5 +157,16 @@ export class NgxSmartFormControlArrayComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this._destroy$.next();
+  }
+
+  private addArrayControls() {
+    if (this.formArray.getRawValue().length !== 0) {
+      this.viewContainerRef.clear();
+      let index = 0;
+      for (const control of this.formArray.controls) {
+        this.addComponent(control as UntypedFormControl, index);
+        index++;
+      }
+    }
   }
 }

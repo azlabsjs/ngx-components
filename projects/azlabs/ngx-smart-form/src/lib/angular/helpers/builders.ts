@@ -1,10 +1,9 @@
 import {
   AbstractControl,
   AsyncValidatorFn,
-  FormArray,
-  FormBuilder,
-  FormControl,
-  FormGroup,
+  UntypedFormArray,
+  UntypedFormBuilder,
+  UntypedFormGroup,
   ValidatorFn,
   Validators,
 } from '@angular/forms';
@@ -38,14 +37,14 @@ export class ComponentReactiveFormHelpers {
    * @param inputs dynamic input configuration
    */
   static buildFormGroupFromInputConfig(
-    builder: FormBuilder,
+    builder: UntypedFormBuilder,
     inputs: InputConfigType[]
   ) {
     // Build the outer form group
     const group = builder.group({});
     for (const input of inputs) {
       if (input.isRepeatable) {
-        group.addControl(input.name, new FormArray([]));
+        group.addControl(input.name, new UntypedFormArray([]));
         continue;
       }
       const config = input as InputGroup;
@@ -73,7 +72,7 @@ export class ComponentReactiveFormHelpers {
   }
 
   public static buildGroup(
-    builder: FormBuilder,
+    builder: UntypedFormBuilder,
     inputs: InputConfigInterface[]
   ) {
     const group = builder.group({});
@@ -94,7 +93,7 @@ export class ComponentReactiveFormHelpers {
   }
 
   public static buildControl(
-    builder: FormBuilder,
+    builder: UntypedFormBuilder,
     config: InputConfigInterface
   ) {
     const validators = [
@@ -217,15 +216,15 @@ export class ComponentReactiveFormHelpers {
     return control;
   }
 
-  public static buildArray(builder: FormBuilder, config: InputConfigInterface) {
-    const array = new FormArray<FormControl>([]);
+  public static buildArray(builder: UntypedFormBuilder, config: InputConfigInterface) {
+    const array = new UntypedFormArray([]);
     of((config as OptionsInputConfigInterface).options)
       .pipe(
         tap((options) => {
           (options as InputOptionsInterface).map(
             (current: InputOption, index: number) => {
               // Added validation rule to checkbox array
-              (array as FormArray).push(builder.control(current.selected));
+              (array as UntypedFormArray).push(builder.control(current.selected));
             }
           );
         })
@@ -238,12 +237,9 @@ export class ComponentReactiveFormHelpers {
     return array;
   }
 
-  public static validateFormGroupFields(control: FormGroup | FormArray): void {
+  public static validateFormGroupFields(control: UntypedFormGroup | UntypedFormArray): void {
     for (const value of Object.values(control.controls)) {
-      if (
-        (value instanceof FormGroup || value instanceof FormArray) &&
-        !value.valid
-      ) {
+      if ((value instanceof UntypedFormGroup || value instanceof UntypedFormArray) && (!value.valid)) {
         ComponentReactiveFormHelpers.validateFormGroupFields(value);
       } else {
         ComponentReactiveFormHelpers.markControlAsTouched(value);
@@ -264,13 +260,13 @@ export class ComponentReactiveFormHelpers {
   }
 
   public static clearControlValidators(control?: AbstractControl): void {
-    if (control instanceof FormGroup) {
+    if (control instanceof UntypedFormGroup) {
       for (const prop in control.controls) {
         ComponentReactiveFormHelpers.clearControlValidators(
           control.get(prop) || undefined
         );
       }
-    } else if (control instanceof FormArray) {
+    } else if (control instanceof UntypedFormArray) {
       for (const item of control.controls) {
         ComponentReactiveFormHelpers.clearControlValidators(item);
       }
@@ -281,13 +277,13 @@ export class ComponentReactiveFormHelpers {
   }
 
   public static clearAsyncValidators(control?: AbstractControl): void {
-    if (control instanceof FormGroup) {
+    if (control instanceof UntypedFormGroup) {
       for (const prop in control.controls) {
         ComponentReactiveFormHelpers.clearAsyncValidators(
           control.get(prop) || undefined
         );
       }
-    } else if (control instanceof FormArray) {
+    } else if (control instanceof UntypedFormArray) {
       for (const item of control.controls) {
         ComponentReactiveFormHelpers.clearAsyncValidators(item);
       }
@@ -309,7 +305,7 @@ export class ComponentReactiveFormHelpers {
 }
 
 export const createAngularAbstractControl = (
-  builder: FormBuilder,
+  builder: UntypedFormBuilder,
   form?: FormConfigInterface
 ) => {
   return form

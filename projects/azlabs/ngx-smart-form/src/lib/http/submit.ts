@@ -1,10 +1,11 @@
 import { Injector } from '@angular/core';
 import {
-  getHttpHost,
   HTTPRequest,
   HTTPRequestMethods,
   HTTPResponseType,
+  getHttpHost,
 } from '@azlabsjs/requests';
+import { isValidHttpUrl } from '@azlabsjs/smart-form-core';
 import { ObservableInput } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { rxRequest } from './helpers';
@@ -48,9 +49,16 @@ export function createSubmitHttpHandler(
       responseType?: HTTPResponseType;
     }
   ) {
-    const url = host
+    // We construct the request submit handler to use the request path if
+    // it is a valid HTTP request path, else compose it with configured request host
+    const url = isValidHttpUrl(path)
+      ? path
+      : host
       ? `${host}/${path.startsWith('/') ? path.slice(1) : path}`
       : path;
+
+    // Provides at least HTTP request options if none provided
+    // by the library user
     options = options || {
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',

@@ -6,7 +6,7 @@ import {
   Output,
   TemplateRef,
 } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 
 @Component({
@@ -19,11 +19,11 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
       <div class="ngx__form_array__card__card_block">
         <ng-container *ngIf="formGroup">
           <ngx-smart-form-group
+            [no-grid-layout]="noGridLayout"
             [formGroup]="formGroup"
             [controls]="controls"
             [template]="template"
             [autoupload]="autoupload"
-            [submitupload]="submitupload"
           ></ngx-smart-form-group>
         </ng-container>
       </div>
@@ -33,19 +33,21 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
     `
       .ngx__form_array__card {
         position: relative;
-        border: 1px solid #e6e6e6;
+        border-width: var(--ngx-form-array-card-border-width, 1px);
+        border-style: var(--ngx-form-array-card-border-style, solid);
+        border-color: var(--ngx-form-array-card-border-color, #e6e6e6);
         border-radius: 2px;
         display: inline-block;
-        margin-top: 0.8rem;
+        margin-top: var(--ngx-form-array-card-margin-top, 0.8rem);
         display: block;
         width: 100%;
-        margin-top: 1.2rem;
+        margin-top: var(--ngx-form-array-card-border-margin-top, 1.2rem);
         border-bottom: 1px solid #f3f3f3;
       }
 
       .ngx__form_array__card__card_block {
-        padding: 0.6rem 0.9rem;
-        border-bottom-width: 0.05rem;
+        padding: var(--ngx-form-array-card-padding, 0.6rem .9rem);
+        border-bottom-width: var(--ngx-form-array-card-width, 0.05rem);
         border-bottom-style: solid;
       }
 
@@ -60,12 +62,12 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 })
 export class NgxSmartFormArrayChildComponent {
   //#region Component inputs
-  @Input() formGroup!: FormGroup;
+  @Input() formGroup!: UntypedFormGroup;
   @Input() controls!: InputConfigInterface[];
   @Input() template!: TemplateRef<HTMLElement>;
   @Input() autoupload: boolean = false;
-  @Input() submitupload: boolean = false;
   @Input() index!: number;
+  @Input('no-grid-layout') noGridLayout = false;
   //#endregion Component inputs
 
   // #region Component outputs

@@ -7,16 +7,14 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  TemplateRef,
+  TemplateRef
 } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
+import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import {
-  controlAttributesDataBindings,
-  useHiddenAttributeSetter,
-  setControlsAttributes,
+  controlAttributesDataBindings, setControlsAttributes, useHiddenAttributeSetter
 } from '../../helpers';
 import { BindingInterface } from '../../types';
 
@@ -29,11 +27,11 @@ export class NgxSmartFormGroupComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
   //#region Component inputs definitions
-  @Input() formGroup!: FormGroup;
+  @Input() formGroup!: UntypedFormGroup;
   @Input() controls!: InputConfigInterface[];
-  @Input() template!: TemplateRef<HTMLElement>;
+  @Input() template!: TemplateRef<any>;
   @Input() autoupload: boolean = false;
-  @Input() submitupload: boolean = false;
+  @Input('no-grid-layout') noGridLayout = false;
   //#endregion Component inputs definitions
 
   //#region Component internal properties
@@ -43,7 +41,7 @@ export class NgxSmartFormGroupComponent
   //#endregion Component internal properties
 
   //#region Component output
-  @Output() formGroupChange = new EventEmitter<FormGroup>();
+  @Output() formGroupChange = new EventEmitter<UntypedFormGroup>();
   //#endregion Component outputs
 
   //
@@ -64,7 +62,7 @@ export class NgxSmartFormGroupComponent
         this.controls
       )(this.formGroup);
       this.controls = controls as InputConfigInterface[];
-      this.formGroup = formgroup as FormGroup;
+      this.formGroup = formgroup as UntypedFormGroup;
       // Get control entries from the formgroup
       const entries = Object.entries(this.formGroup.controls);
       // Handle form control value changes
@@ -99,12 +97,11 @@ export class NgxSmartFormGroupComponent
           event,
           useHiddenAttributeSetter
         )(this.formGroup);
-        this.formGroup = control as FormGroup;
+        this.formGroup = control as UntypedFormGroup;
         this.controls = controls;
       }
     }
   }
-
   //#region Destructor
   ngOnDestroy(): void {
     this._destroy$.next();

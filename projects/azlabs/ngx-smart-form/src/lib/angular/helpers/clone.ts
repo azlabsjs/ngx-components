@@ -1,8 +1,8 @@
 import {
   AbstractControl,
-  FormArray,
-  FormControl,
-  FormGroup,
+  UntypedFormArray,
+  UntypedFormControl,
+  UntypedFormGroup,
 } from '@angular/forms';
 
 /**
@@ -18,8 +18,8 @@ export function cloneAbstractControl<
 >(control: T): T {
   let newControl: T;
 
-  if (control instanceof FormGroup) {
-    const formGroup = new FormGroup(
+  if (control instanceof UntypedFormGroup) {
+    const formGroup = new UntypedFormGroup(
       {},
       control.validator,
       control.asyncValidator
@@ -30,8 +30,8 @@ export function cloneAbstractControl<
     });
 
     newControl = formGroup as any;
-  } else if (control instanceof FormArray) {
-    const formArray = new FormArray<any>(
+  } else if (control instanceof UntypedFormArray) {
+    const formArray = new UntypedFormArray(
       [],
       control.validator,
       control.asyncValidator
@@ -40,8 +40,8 @@ export function cloneAbstractControl<
       formArray.push(cloneAbstractControl(formControl))
     );
     newControl = formArray as any;
-  } else if (control instanceof FormControl) {
-    newControl = new FormControl(
+  } else if (control instanceof UntypedFormControl) {
+    newControl = new UntypedFormControl(
       control.value,
       control.validator,
       control.asyncValidator

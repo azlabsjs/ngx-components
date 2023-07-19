@@ -28,17 +28,15 @@
               "projects/app/src/assets"
             ],
             "styles": [
-              "node_modules/@clr/icons/clr-icons.min.css",
               "node_modules/@clr/ui/clr-ui.min.css",
               "projects/app/src/styles.scss"
             ],
-            "scripts": [
-              "node_modules/@clr/icons/clr-icons.min.js"
-            ]
+            "scripts": []
           },
           "configurations": {
             "production": {
-              "budgets": [{
+              "budgets": [
+                {
                   "type": "initial",
                   "maximumWarning": "500kb",
                   "maximumError": "1mb"
@@ -49,10 +47,12 @@
                   "maximumError": "4kb"
                 }
               ],
-              "fileReplacements": [{
-                "replace": "projects/app/src/environments/environment.ts",
-                "with": "projects/app/src/environments/environment.prod.ts"
-              }],
+              "fileReplacements": [
+                {
+                  "replace": "projects/app/src/environments/environment.ts",
+                  "with": "projects/app/src/environments/environment.prod.ts"
+                }
+              ],
               "outputHashing": "all"
             },
             "development": {
@@ -258,6 +258,139 @@
           }
         }
       }
+    },
+    "@azlabsjs/ngx-dropdown": {
+      "projectType": "library",
+      "root": "projects/azlabs/ngx-dropdown",
+      "sourceRoot": "projects/azlabs/ngx-dropdown/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/azlabs/ngx-dropdown/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/azlabs/ngx-dropdown/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/azlabs/ngx-dropdown/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/azlabs/ngx-dropdown/src/test.ts",
+            "tsConfig": "projects/azlabs/ngx-dropdown/tsconfig.spec.json",
+            "karmaConfig": "projects/azlabs/ngx-dropdown/karma.conf.js"
+          }
+        }
+      }
+    },
+    "@azlabsjs/ngx-file-input": {
+      "projectType": "library",
+      "root": "projects/azlabs/ngx-file-input",
+      "sourceRoot": "projects/azlabs/ngx-file-input/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/azlabs/ngx-file-input/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/azlabs/ngx-file-input/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/azlabs/ngx-file-input/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/azlabs/ngx-file-input/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
+    },
+    "@azlabsjs/ngx-clr-form-control": {
+      "projectType": "library",
+      "root": "projects/azlabs/ngx-clr-form-control",
+      "sourceRoot": "projects/azlabs/ngx-clr-form-control/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/azlabs/ngx-clr-form-control/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/azlabs/ngx-clr-form-control/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/azlabs/ngx-clr-form-control/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/azlabs/ngx-clr-form-control/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
+    },
+    "@azlabsjs/ngx-options-input": {
+      "projectType": "library",
+      "root": "projects/azlabs/ngx-options-input",
+      "sourceRoot": "projects/azlabs/ngx-options-input/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/azlabs/ngx-options-input/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/azlabs/ngx-options-input/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/azlabs/ngx-options-input/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/azlabs/ngx-options-input/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
     }
+  },
+  "cli": {
+    "analytics": "35e09b6e-8bf7-4656-be07-5367358a9e3d"
   }
 }

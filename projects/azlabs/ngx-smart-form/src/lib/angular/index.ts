@@ -1,47 +1,36 @@
 export {
-  cloneAbstractControl,
+  NgxSmartFormArrayChildComponent,
+  NgxSmartFormArrayComponent,
+  NgxSmartFormComponent,
+  NgxSmartFormGroupComponent,
+} from './components';
+// Fetch and HTML File directive exports
+export {
   ComponentReactiveFormHelpers,
+  cloneAbstractControl,
   createAngularAbstractControl,
 } from './helpers';
 // Module & component & services exports
 export { NgxSmartFormModule } from './ngx-smart-form.module';
-// Type helper export
-export { InputTypeHelper } from './services/input-type';
-
+// Pipes exports
+export { SafeHTMLPipe } from './pipes';
+// Ng Services
+export { DefaultFormsLoader } from './services';
 // Ng forms helpers classes & interfaces
 export {
+  ANGULAR_REACTIVE_FORM_BRIDGE,
+  API_HOST,
   AngularReactiveFormBuilderBridge,
-  FormComponentInterface,
   Builder,
-  InputEventArgs,
+  CacheProvider,
+  FORM_CLIENT,
+  FormComponentInterface,
   FormsClient,
   FormsLoader,
-  CacheProvider,
+  HTTP_REQUEST_CLIENT,
+  InputEventArgs,
   InputOptionsClient,
-  UploadOptionsType,
-  API_BINDINGS_ENDPOINT,
-  API_HOST,
-  FORM_CLIENT,
-  ANGULAR_REACTIVE_FORM_BRIDGE,
-  TEMPLATE_DICTIONARY,
+  ReactiveFormComponentInterface,
 } from './types';
-
-// Ng Services
-export { DYNAMIC_FORM_LOADER, FormHttpLoader } from './services';
-
 // Validators
 export { CustomValidators } from './validators';
-
-export {
-  NgxSmartFormComponent,
-  NgxSmartFormGroupComponent,
-  NgxSmartFormArrayComponent,
-  NgxSmartFormArrayChildComponent,
-  NgxSmartFormControlComponent,
-} from './components';
-
-// Fetch and HTML File directive exports
-export { FetchOptionsDirective, HTMLFileInputDirective } from './directives';
-
-// Pipes exports
-export { SafeHTMLPipe, TemplateMessagesPipe } from './pipes';

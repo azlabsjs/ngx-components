@@ -4,6 +4,7 @@ import {
   Interceptor,
   HTTPRequestMethods,
   HTTPResponseType,
+  HTTPRequest,
 } from '@azlabsjs/requests';
 
 export type InterceptorFactory<T> = (injector: Injector) => Interceptor<T>;
@@ -29,4 +30,14 @@ export interface RequestClient {
   ): ObservableInput<T>;
 }
 
+export type RequestOptionsType =
+  | {
+      url: string;
+      method: HTTPRequestMethods;
+      body?: any;
+      headers?: HeadersInit;
+      responseType?: HTTPResponseType;
+      interceptors?: Interceptor<HTTPRequest>[];
+    }
+  | string;
 // TODO: Add a REST CLIENT interface with methods like get(), post(), put(), delete(), path(), options(), head(), etc...

@@ -10,5 +10,7 @@ export interface InputOptionsClient {
    * @description Query list of select options from forms provider database
    *
    */
-  request(optionsConfig: OptionsConfig): Observable<InputOptionsInterface>;
+  request(
+    optionsConfig: OptionsConfig & { name?: string }
+  ): Observable<InputOptionsInterface>;
 }

@@ -1,9 +1,9 @@
-import { AbstractControl } from '@angular/forms';
-import { Observable, ObservableInput } from 'rxjs';
+import { AbstractControl, FormGroup } from '@angular/forms';
 import {
   FormConfigInterface,
-  InputConfigInterface,
+  InputConfigInterface
 } from '@azlabsjs/smart-form-core';
+import { Observable, ObservableInput } from 'rxjs';
 
 export type ControlsStateMap = {
   [index: string]: { onlySelf: boolean; emitEvent: boolean } | undefined;
@@ -113,4 +113,38 @@ export interface FormComponentInterface {
    * removing any validation failure, and modifications
    */
   reset(): void;
+}
+
+/**
+ * Provides extended interface of the base {@see FormComponentInterface} type for
+ * angular reactive form based components
+ */
+export interface ReactiveFormComponentInterface extends FormComponentInterface {
+  /**
+   * Internal reactive form component interface
+   */
+  readonly formGroup: FormGroup;
+
+  /**
+   * Set the form group value imperative
+   * import {ViewChild, Component, OnInit} from '@angular/core';
+   * 
+   * ```ts
+   * @Component({
+   *  // ...
+   * })
+   * export class MyComponent implements OnInit {
+   *    @ViewChild('#form', {static: false}) smartform: ReactiveFormComponentInterface;
+   * 
+   *    onFormReadyState(state: unknown) {
+   *      setTimeOut(() => {
+   *        this.smartform.setValue({ ... })
+   *      }, 3000);
+   *    }
+   * }
+   * ```
+   * 
+   * @param state 
+   */
+  setValue(state: {[k: string]: unknown}): void;
 }

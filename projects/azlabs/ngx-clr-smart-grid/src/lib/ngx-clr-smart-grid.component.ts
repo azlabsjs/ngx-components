@@ -4,23 +4,39 @@ import {
   EventEmitter,
   Input,
   Output,
-  TemplateRef,
+  TemplateRef
 } from '@angular/core';
+import { JSObject } from '@azlabsjs/js-object';
 import { ClrDatagridSortOrder } from '@clr/angular';
+import { PaginateResult, ProjectPaginateQueryParamType } from './core/paginate';
 import { GridColumnType, GridConfigType } from './core/types';
 
 @Component({
   selector: 'ngx-clr-smart-grid',
   templateUrl: './ngx-clr-smart-grid.component.html',
-  styles: [],
+  styles: [
+    `
+      .cell-value {
+        display: inline-block;
+      }
+    `,
+  ],
 })
 export class NgxClrSmartGridComponent {
-  // Input properties
+  // #region Input properties
+  @Input() set pageResult(result: PaginateResult<any> | undefined | null) {
+    if (result) {
+      this.data = result.data ?? [];
+      this.total = result.total ?? this.data.length;
+    }
+  }
   @Input() selected!: unknown[] | any;
   @Input() data: { [index: string]: any }[] = [];
   @Input() loading: boolean = false;
   @Input() currentDetail!: unknown;
   @Input() total!: number;
+  @Input() placeholder!: string | undefined | null;
+  // #endregion Input properties
 
   // Projected Templates
   @ContentChild('dgActionOverflow', { static: false })
@@ -33,6 +49,8 @@ export class NgxClrSmartGridComponent {
   dgDetailBodyRef!: TemplateRef<any>;
   @ContentChild('dgActionBar', { static: false })
   dgActionBarRef!: TemplateRef<any>;
+  @ContentChild('dgRow', { static: false })
+  dgRowRef!: TemplateRef<any>;
   //! Projected Templates
 
   // Datagrid configuration Input
@@ -40,7 +58,7 @@ export class NgxClrSmartGridComponent {
     selectable: false,
     class: '',
     sizeOptions: [20, 50, 100, 150],
-    pageSize: 50,
+    pageSize: 20,
     selectableProp: '',
     preserveSelection: false,
     singleSelection: false,
@@ -50,6 +68,7 @@ export class NgxClrSmartGridComponent {
     useServerPagination: false,
     useCustomFilters: false,
     totalItemLabel: 'Total',
+    projectRowClass: '',
   };
   @Input() set config(value: Partial<GridConfigType>) {
     if (value) {
@@ -65,7 +84,7 @@ export class NgxClrSmartGridComponent {
   //! Datagrid configuration Input
 
   // Datagrid columns configuraiton inputs
-  private _columns: Required<GridColumnType>[] = [];
+  private _columns: Omit<Required<GridColumnType>, 'sortPropertyName'>[] = [];
   @Input() set columns(values: GridColumnType[]) {
     if (values) {
       // Map input value to typeof Required<GridColumn>
@@ -80,7 +99,7 @@ export class NgxClrSmartGridComponent {
                 : column.style.class || '',
               styles: Array.isArray(column.style.styles)
                 ? column.style.styles.join(' ')
-                : column.style.class || '',
+                : column.style.styles || '',
             }
           : {},
         type: column.type || 'string',
@@ -90,10 +109,11 @@ export class NgxClrSmartGridComponent {
             return Number(ClrDatagridSortOrder.DESC);
           },
         },
+        sortable: column.sortable ?? true,
       }));
     }
   }
-  get columns(): Required<GridColumnType>[] {
+  get columns(): Omit<Required<GridColumnType>, 'sortPropertyName'>[] {
     return this._columns;
   }
   //! Datagrid columns configuraiton inputs
@@ -102,11 +122,29 @@ export class NgxClrSmartGridComponent {
 
   // Output definitions
   @Output() selectedChange = new EventEmitter<unknown[] | unknown>();
-  @Output() dgRefresh = new EventEmitter<unknown>();
+  @Output() dgRefresh = new EventEmitter<
+    ProjectPaginateQueryParamType<unknown>
+  >();
   @Output() detailChange = new EventEmitter<unknown>();
 
   // Listen to internal grid component select changes and notify parent component
   onSelectedStateChanges(state: unknown[] | unknown) {
     this.selectedChange.emit(state);
+  }
+
+  getCellValue(element: Record<string, any>, key: string) {
+    return JSObject.getProperty(element, key) ?? '';
+  }
+
+  getrowclass(config: GridConfigType, current: { [index: string]: any }) {
+    return config && config.projectRowClass
+      ? typeof config.projectRowClass === 'function'
+        ? config.projectRowClass(current)
+        : config.projectRowClass
+      : '';
+  }
+
+  onClrDgRefresh(event: ProjectPaginateQueryParamType) {
+    this.dgRefresh.emit(event);
   }
 }

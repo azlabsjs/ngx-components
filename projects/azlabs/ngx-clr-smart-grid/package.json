@@ -1,22 +1,23 @@
 {
   "name": "@azlabsjs/ngx-clr-smart-grid",
-  "version": "0.14.12",
+  "version": "0.16.0",
   "peerDependencies": {
-    "@angular/common": "^14.0",
-    "@angular/core": "^14.0",
-    "@clr/angular": "^13.0"
+    "@angular/common": "^16.0",
+    "@angular/core": "^16.0",
+    "@clr/angular": "^16.0",
+    "@azlabsjs/js-object": "^0.1.11",
+    "@azlabsjs/js-datetime": "^0.1.10"
   },
   "dependencies": {
-    "tslib": "^2.3.0",
-    "@azlabsjs/str": "^0.1.10",
-    "@azlabsjs/js-datetime": "^0.1.10"
+    "tslib": "^2.3.0"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/azlabsjs/ngx-components.git",
-    "directory": "projects/azlabs/ngx-clr-smart-grid"
+    "directory": "/projects/azlabs/ngx-clr-smart-grid"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/@azlabsjs"
-  }
+  },
+  "homepage": "https://github.com/azlabsjs/ngx-components/blob/ng-14/projects/azlabs/ngx-clr-smart-grid/README.md"
 }

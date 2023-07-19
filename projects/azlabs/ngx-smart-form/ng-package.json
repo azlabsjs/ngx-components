@@ -4,14 +4,5 @@
   "lib": {
     "entryFile": "src/public-api.ts"
   },
-  "allowedNonPeerDependencies": [
-    "@azlabsjs/built-value",
-    "@azlabsjs/collections",
-    "@azlabsjs/utilities",
-    "@azlabsjs/functional",
-    "@azlabsjs/smart-form-core",
-    "@azlabsjs/requests",
-    "@azlabsjs/uploader"
-  ],
-  "assets": ["assets/**/*.*"]
+  "allowedNonPeerDependencies": []
 }

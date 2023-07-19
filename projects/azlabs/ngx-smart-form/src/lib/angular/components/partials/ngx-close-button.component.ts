@@ -30,6 +30,9 @@ import { Component, EventEmitter, Output } from '@angular/core';
       .ngx__form_array__card__close_btn svg path {
         fill: #707070;
       }
+      :host {
+        display: 'inline';
+      }
     `
   ]
 })

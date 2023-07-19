@@ -1,23 +1,14 @@
-import { ModuleWithProviders, NgModule } from '@angular/core';
-import { DropdownModule } from './dropdown';
-import { Country, IntlTelInput, ISO3166 } from './core';
-import { NgxIntlTelInputComponent } from './ngx-intl-tel-input.component';
-import { COUNTRIES } from './core/types';
-import { getPhoneNumberPlaceholder } from './core/internal';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
+import { ModuleWithProviders, NgModule } from '@angular/core';
+import { DropdownModule } from '@azlabsjs/ngx-dropdown';
+import { Country, SUPPORTED_COUNTRIES } from './core';
+import { NgxIntlTelInputComponent } from './ngx-intl-tel-input.component';
 
 @NgModule({
   declarations: [NgxIntlTelInputComponent],
-  imports: [
-    DropdownModule,
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    ScrollingModule,
-  ],
-  exports: [NgxIntlTelInputComponent, DropdownModule],
+  imports: [CommonModule, ScrollingModule, DropdownModule],
+  exports: [DropdownModule, NgxIntlTelInputComponent],
 })
 export class NgxIntlTelInputModule {
   static forRoot(configs?: {
@@ -26,17 +17,17 @@ export class NgxIntlTelInputModule {
     return {
       ngModule: NgxIntlTelInputModule,
       providers: [
-        IntlTelInput,
         {
-          provide: COUNTRIES,
+          provide: SUPPORTED_COUNTRIES,
           useFactory: () => {
             if (configs) {
               const { countries } = configs;
-              if (typeof countries === 'function') {
-                return (countries as () => Country[])();
-              }
+              const _countries =
+                typeof countries === 'function'
+                  ? (countries as () => Country[])()
+                  : (countries as Country[]);
               if (countries instanceof Array) {
-                return (countries as Country[]).filter(
+                return _countries.filter(
                   (country) =>
                     typeof country === 'object' &&
                     typeof country.iso2 !== 'undefined' &&
@@ -45,18 +36,7 @@ export class NgxIntlTelInputModule {
                 );
               }
             }
-            return ISO3166.map((country) => ({
-              name: country[0].toString(),
-              iso2: country[1].toString(),
-              dialCode: country[2].toString(),
-              priority: +country[3] || 0,
-              areaCode: +country[4] || undefined,
-              flagClass: country[1].toString().toLocaleLowerCase(),
-              placeHolder: `${getPhoneNumberPlaceholder(
-                country[1].toString().toUpperCase(),
-                'national'
-              )}`,
-            }));
+            return [] as Country[];
           },
         },
       ],

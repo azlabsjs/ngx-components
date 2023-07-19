@@ -6,7 +6,7 @@ import {
   Output,
   TemplateRef,
 } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 
 @Component({
@@ -21,8 +21,7 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
               context: {
                 control: this.control,
                 value: inputConfig,
-                autoupload: this.autoupload,
-                submitupload: this.submitupload
+                autoupload: this.autoupload
               }
             "
           ></ng-container>
@@ -41,12 +40,12 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
       }
 
       .ngx__form_array__card__card_block {
-        padding: 0.6rem 0.9rem;
+        padding: var(--ngx-form-array-card-padding, 0.6rem 0rem);
         flex-grow: 1;
       }
       :host ::ng-deep .ngx__form_array__card__close_btn {
         position: absolute;
-        top: 44px;
+        top: 32px;
         right: -8px;
       }
     `,
@@ -55,11 +54,10 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 })
 export class NgxSmartFormControlArrayChildComponent {
   //#region Component inputs
-  @Input() control!: FormControl;
+  @Input() control!: UntypedFormControl;
   @Input() inputConfig!: InputConfigInterface;
-  @Input() template!: TemplateRef<HTMLElement>;
+  @Input() template!: TemplateRef<any>;
   @Input() autoupload: boolean = false;
-  @Input() submitupload: boolean = false;
   @Input() index!: number;
   //#endregion Component inputs
 

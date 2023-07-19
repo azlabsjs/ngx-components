@@ -1,11 +1,11 @@
 {
   "name": "@azlabsjs/ngx-intl-tel-input",
-  "version": "0.14.12",
+  "version": "0.16.0",
   "peerDependencies": {
-    "@angular/common": "^14.0",
-    "@angular/core": "^14.0",
-    "@angular/cdk": "^14.0",
-    "@angular/forms": "^14.0"
+    "@angular/common": "^16.0",
+    "@angular/core": "^16.0",
+    "@angular/cdk": "^16.0",
+    "@azlabsjs/ngx-dropdown": "^0.16.0"
   },
   "dependencies": {
     "tslib": "^2.3.0",
@@ -15,9 +15,10 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/azlabsjs/ngx-components.git",
-    "directory": "projects/azlabs/ngx-intl-tel-input"
+    "directory": "/projects/azlabs/ngx-intl-tel-input"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/@azlabsjs"
-  }
+  },
+  "homepage": "https://github.com/azlabsjs/ngx-components/blob/ng-v16/projects/azlabs/ngx-intl-tel-input/README.md"
 }

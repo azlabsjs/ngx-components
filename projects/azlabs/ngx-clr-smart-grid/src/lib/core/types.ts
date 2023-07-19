@@ -7,7 +7,7 @@ export type Comparator<T> =
   | ClrDatagridComparatorInterface<unknown>;
 
 /**
- * @descritpion Type definition of a smart grid column
+ * Type definition of a smart grid column.
  * It represents each column of the smart grid
  */
 export type GridColumnType = {
@@ -20,12 +20,23 @@ export type GridColumnType = {
   };
   type?: 'string' | 'number';
   field?: string;
-  sort?: Comparator<unknown> | undefined;
+  /**
+   * Comparator function when sorting datagrid items
+   */
+  sort?: Comparator<unknown> | undefined
+  /**
+   * The sortable property makes the column available for sorting
+   */;
+  sortable?: boolean;
+  /**
+   * Property name used during sort queries
+   *
+   */
+  sortPropertyName?: string;
 };
 
 /**
- * @description Type definition of Smart datagrid configuration
- * value
+ * Type definition of Smart datagrid configuration value.
  */
 export type GridConfigType = {
   selectable: boolean;
@@ -41,6 +52,7 @@ export type GridConfigType = {
   useServerPagination: boolean;
   useCustomFilters: boolean;
   totalItemLabel?: string;
+  projectRowClass?: string | ((element: any) => string);
 };
 
 export type GriSelectDirectiveInputType = {

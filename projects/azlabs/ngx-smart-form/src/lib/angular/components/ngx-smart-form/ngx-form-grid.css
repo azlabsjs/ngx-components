@@ -1,0 +1,461 @@
+:host ::ng-deep .input-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -0.6rem;
+    margin-left: -0.6rem;
+}
+
+
+:host ::ng-deep .input-no-gutters>.input-col,
+:host ::ng-deep .input-no-gutters>[class*=input-col-] {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+:host ::ng-deep .input-col-xl,
+:host ::ng-deep .input-col-xl-auto,
+:host ::ng-deep .input-col-xl-12,
+:host ::ng-deep .input-col-xl-11,
+:host ::ng-deep .input-col-xl-10,
+:host ::ng-deep .input-col-xl-9,
+:host ::ng-deep .input-col-xl-8,
+:host ::ng-deep .input-col-xl-7,
+:host ::ng-deep .input-col-xl-6,
+:host ::ng-deep .input-col-xl-5,
+:host ::ng-deep .input-col-xl-4,
+:host ::ng-deep .input-col-xl-3,
+:host ::ng-deep .input-col-xl-2,
+:host ::ng-deep .input-col-xl-1,
+:host ::ng-deep .input-col-lg,
+:host ::ng-deep .input-col-lg-auto,
+:host ::ng-deep .input-col-lg-12,
+:host ::ng-deep .input-col-lg-11,
+:host ::ng-deep .input-col-lg-10,
+:host ::ng-deep .input-col-lg-9,
+:host ::ng-deep .input-col-lg-8,
+:host ::ng-deep .input-col-lg-7,
+:host ::ng-deep .input-col-lg-6,
+:host ::ng-deep .input-col-lg-5,
+:host ::ng-deep .input-col-lg-4,
+:host ::ng-deep .input-col-lg-3,
+:host ::ng-deep .input-col-lg-2,
+:host ::ng-deep .input-col-lg-1,
+:host ::ng-deep .input-col-md,
+:host ::ng-deep .input-col-md-auto,
+:host ::ng-deep .input-col-md-12,
+:host ::ng-deep .input-col-md-11,
+:host ::ng-deep .input-col-md-10,
+:host ::ng-deep .input-col-md-9,
+:host ::ng-deep .input-col-md-8,
+:host ::ng-deep .input-col-md-7,
+:host ::ng-deep .input-col-md-6,
+:host ::ng-deep .input-col-md-5,
+:host ::ng-deep .input-col-md-4,
+:host ::ng-deep .input-col-md-3,
+:host ::ng-deep .input-col-md-2,
+:host ::ng-deep .input-col-md-1,
+:host ::ng-deep .input-col-sm,
+:host ::ng-deep .input-col-sm-auto,
+:host ::ng-deep .input-col-sm-12,
+:host ::ng-deep .input-col-sm-11,
+:host ::ng-deep .input-col-sm-10,
+:host ::ng-deep .input-col-sm-9,
+:host ::ng-deep .input-col-sm-8,
+:host ::ng-deep .input-col-sm-7,
+:host ::ng-deep .input-col-sm-6,
+:host ::ng-deep .input-col-sm-5,
+:host ::ng-deep .input-col-sm-4,
+:host ::ng-deep .input-col-sm-3,
+:host ::ng-deep .input-col-sm-2,
+:host ::ng-deep .input-col-sm-1,
+:host ::ng-deep .input-col,
+:host ::ng-deep .input-col-auto,
+:host ::ng-deep .input-col-12,
+:host ::ng-deep .input-col-11,
+:host ::ng-deep .input-col-10,
+:host ::ng-deep .input-col-9,
+:host ::ng-deep .input-col-8,
+:host ::ng-deep .input-col-7,
+:host ::ng-deep .input-col-6,
+:host ::ng-deep .input-col-5,
+:host ::ng-deep .input-col-4,
+:host ::ng-deep .input-col-3,
+:host ::ng-deep .input-col-2,
+:host ::ng-deep .input-col-1 {
+    width: 100%;
+    min-height: 0.05rem;
+    padding-right: 0.6rem;
+    padding-left: 0.6rem;
+}
+
+:host ::ng-deep .input-col {
+    flex-basis: 0;
+    flex-grow: 1;
+    max-width: 100%;
+}
+
+:host ::ng-deep .input-col-auto {
+    flex: 0 0 auto;
+    width: auto;
+    max-width: none;
+}
+
+:host ::ng-deep .input-col-1 {
+    flex: 0 0 8.3333333333%;
+    max-width: 8.3333333333%;
+}
+
+:host ::ng-deep .input-col-2 {
+    flex: 0 0 16.6666666667%;
+    max-width: 16.6666666667%;
+}
+
+:host ::ng-deep .input-col-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+}
+
+:host ::ng-deep .input-col-4 {
+    flex: 0 0 33.3333333333%;
+    max-width: 33.3333333333%;
+}
+
+:host ::ng-deep .input-col-5 {
+    flex: 0 0 41.6666666667%;
+    max-width: 41.6666666667%;
+}
+
+:host ::ng-deep .input-col-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+:host ::ng-deep .input-col-7 {
+    flex: 0 0 58.3333333333%;
+    max-width: 58.3333333333%;
+}
+
+:host ::ng-deep .input-col-8 {
+    flex: 0 0 66.6666666667%;
+    max-width: 66.6666666667%;
+}
+
+:host ::ng-deep .input-col-9 {
+    flex: 0 0 75%;
+    max-width: 75%;
+}
+
+:host ::ng-deep .input-col-10 {
+    flex: 0 0 83.3333333333%;
+    max-width: 83.3333333333%;
+}
+
+:host ::ng-deep .input-col-11 {
+    flex: 0 0 91.6666666667%;
+    max-width: 91.6666666667%;
+}
+
+:host ::ng-deep .input-col-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+
+/* stylelint-enable */
+@media (min-width: 576px) {
+    :host ::ng-deep .input-col-sm {
+        flex-basis: 0;
+        flex-grow: 1;
+        max-width: 100%;
+    }
+
+    :host ::ng-deep .input-col-sm-auto {
+        flex: 0 0 auto;
+        width: auto;
+        max-width: none;
+    }
+
+    :host ::ng-deep .input-col-sm-1 {
+        flex: 0 0 8.3333333333%;
+        max-width: 8.3333333333%;
+    }
+
+    :host ::ng-deep .input-col-sm-2 {
+        flex: 0 0 16.6666666667%;
+        max-width: 16.6666666667%;
+    }
+
+    :host ::ng-deep .input-col-sm-3 {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+
+    :host ::ng-deep .input-col-sm-4 {
+        flex: 0 0 33.3333333333%;
+        max-width: 33.3333333333%;
+    }
+
+    :host ::ng-deep .input-col-sm-5 {
+        flex: 0 0 41.6666666667%;
+        max-width: 41.6666666667%;
+    }
+
+    :host ::ng-deep .input-col-sm-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    :host ::ng-deep .input-col-sm-7 {
+        flex: 0 0 58.3333333333%;
+        max-width: 58.3333333333%;
+    }
+
+    :host ::ng-deep .input-col-sm-8 {
+        flex: 0 0 66.6666666667%;
+        max-width: 66.6666666667%;
+    }
+
+    :host ::ng-deep .input-col-sm-9 {
+        flex: 0 0 75%;
+        max-width: 75%;
+    }
+
+    :host ::ng-deep .input-col-sm-10 {
+        flex: 0 0 83.3333333333%;
+        max-width: 83.3333333333%;
+    }
+
+    :host ::ng-deep .input-col-sm-11 {
+        flex: 0 0 91.6666666667%;
+        max-width: 91.6666666667%;
+    }
+
+    :host ::ng-deep .input-col-sm-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+@media (min-width: 768px) {
+    :host ::ng-deep .input-col-md {
+        flex-basis: 0;
+        flex-grow: 1;
+        max-width: 100%;
+    }
+
+    :host ::ng-deep .input-col-md-auto {
+        flex: 0 0 auto;
+        width: auto;
+        max-width: none;
+    }
+
+    :host ::ng-deep .input-col-md-1 {
+        flex: 0 0 8.3333333333%;
+        max-width: 8.3333333333%;
+    }
+
+    :host ::ng-deep .input-col-md-2 {
+        flex: 0 0 16.6666666667%;
+        max-width: 16.6666666667%;
+    }
+
+    :host ::ng-deep .input-col-md-3 {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+
+    :host ::ng-deep .input-col-md-4 {
+        flex: 0 0 33.3333333333%;
+        max-width: 33.3333333333%;
+    }
+
+    :host ::ng-deep .input-col-md-5 {
+        flex: 0 0 41.6666666667%;
+        max-width: 41.6666666667%;
+    }
+
+    :host ::ng-deep .input-col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    :host ::ng-deep .input-col-md-7 {
+        flex: 0 0 58.3333333333%;
+        max-width: 58.3333333333%;
+    }
+
+    :host ::ng-deep .input-col-md-8 {
+        flex: 0 0 66.6666666667%;
+        max-width: 66.6666666667%;
+    }
+
+    :host ::ng-deep .input-col-md-9 {
+        flex: 0 0 75%;
+        max-width: 75%;
+    }
+
+    :host ::ng-deep .input-col-md-10 {
+        flex: 0 0 83.3333333333%;
+        max-width: 83.3333333333%;
+    }
+
+    :host ::ng-deep .input-col-md-11 {
+        flex: 0 0 91.6666666667%;
+        max-width: 91.6666666667%;
+    }
+
+    :host ::ng-deep .input-col-md-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    /* stylelint-enable */
+}
+
+@media (min-width: 992px) {
+    :host ::ng-deep .input-col-lg {
+        flex-basis: 0;
+        flex-grow: 1;
+        max-width: 100%;
+    }
+
+    :host ::ng-deep .input-col-lg-auto {
+        flex: 0 0 auto;
+        width: auto;
+        max-width: none;
+    }
+
+    :host ::ng-deep .input-col-lg-1 {
+        flex: 0 0 8.3333333333%;
+        max-width: 8.3333333333%;
+    }
+
+    :host ::ng-deep .input-col-lg-2 {
+        flex: 0 0 16.6666666667%;
+        max-width: 16.6666666667%;
+    }
+
+    :host ::ng-deep .input-col-lg-3 {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+
+    :host ::ng-deep .input-col-lg-4 {
+        flex: 0 0 33.3333333333%;
+        max-width: 33.3333333333%;
+    }
+
+    :host ::ng-deep .input-col-lg-5 {
+        flex: 0 0 41.6666666667%;
+        max-width: 41.6666666667%;
+    }
+
+    :host ::ng-deep .input-col-lg-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    :host ::ng-deep .input-col-lg-7 {
+        flex: 0 0 58.3333333333%;
+        max-width: 58.3333333333%;
+    }
+
+    :host ::ng-deep .input-col-lg-8 {
+        flex: 0 0 66.6666666667%;
+        max-width: 66.6666666667%;
+    }
+
+    :host ::ng-deep .input-col-lg-9 {
+        flex: 0 0 75%;
+        max-width: 75%;
+    }
+
+    :host ::ng-deep .input-col-lg-10 {
+        flex: 0 0 83.3333333333%;
+        max-width: 83.3333333333%;
+    }
+
+    :host ::ng-deep .input-col-lg-11 {
+        flex: 0 0 91.6666666667%;
+        max-width: 91.6666666667%;
+    }
+
+    :host ::ng-deep .input-col-lg-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+@media (min-width: 1200px) {
+    :host ::ng-deep .input-col-xl {
+        flex-basis: 0;
+        flex-grow: 1;
+        max-width: 100%;
+    }
+
+    :host ::ng-deep .input-col-xl-auto {
+        flex: 0 0 auto;
+        width: auto;
+        max-width: none;
+    }
+
+    :host ::ng-deep .input-col-xl-1 {
+        flex: 0 0 8.3333333333%;
+        max-width: 8.3333333333%;
+    }
+
+    :host ::ng-deep .input-col-xl-2 {
+        flex: 0 0 16.6666666667%;
+        max-width: 16.6666666667%;
+    }
+
+    :host ::ng-deep .input-col-xl-3 {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+
+    :host ::ng-deep .input-col-xl-4 {
+        flex: 0 0 33.3333333333%;
+        max-width: 33.3333333333%;
+    }
+
+    :host ::ng-deep .input-col-xl-5 {
+        flex: 0 0 41.6666666667%;
+        max-width: 41.6666666667%;
+    }
+
+    :host ::ng-deep .input-col-xl-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    :host ::ng-deep .input-col-xl-7 {
+        flex: 0 0 58.3333333333%;
+        max-width: 58.3333333333%;
+    }
+
+    :host ::ng-deep .input-col-xl-8 {
+        flex: 0 0 66.6666666667%;
+        max-width: 66.6666666667%;
+    }
+
+    :host ::ng-deep .input-col-xl-9 {
+        flex: 0 0 75%;
+        max-width: 75%;
+    }
+
+    :host ::ng-deep .input-col-xl-10 {
+        flex: 0 0 83.3333333333%;
+        max-width: 83.3333333333%;
+    }
+
+    :host ::ng-deep .input-col-xl-11 {
+        flex: 0 0 91.6666666667%;
+        max-width: 91.6666666667%;
+    }
+
+    :host ::ng-deep .input-col-xl-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}

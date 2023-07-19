@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@angular/core';
 import { from, Observable, ObservableInput } from 'rxjs';
-import { CACHE_PROVIDER } from './cache';
 import { map } from 'rxjs/operators';
 import {
   buildFormSync,
@@ -8,7 +7,7 @@ import {
   FormConfigInterface,
   FormInterface,
 } from '@azlabsjs/smart-form-core';
-import { FormsClient } from '../types';
+import { CACHE_PROVIDER, FormsClient } from '../types';
 
 @Injectable()
 export class JSONFormsClient implements FormsClient {
@@ -24,7 +23,7 @@ export class JSONFormsClient implements FormsClient {
 
   get(id: string | number): Observable<FormConfigInterface> {
     return from(this.provider.get(id) as ObservableInput<FormInterface>).pipe(
-      map((state) => buildFormSync(state) as FormConfigInterface),
+      map((state) => buildFormSync(state) as FormConfigInterface)
     );
   }
 

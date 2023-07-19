@@ -7,7 +7,7 @@ import {
   DropzoneConfig,
   DropzoneDict,
   DROPZONE_CONFIG,
-  DROPZONE_DICT,
+  DROPZONE_DICT
 } from './types';
 
 @NgModule({

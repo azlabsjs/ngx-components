@@ -1,16 +1,75 @@
-import { Pipe, PipeTransform } from '@angular/core';
 import {
-  UpperCasePipe,
-  LowerCasePipe,
+  AsyncPipe,
   CurrencyPipe,
   DecimalPipe,
   JsonPipe,
+  LowerCasePipe,
   PercentPipe,
   SlicePipe,
-  AsyncPipe,
+  UpperCasePipe
 } from '@angular/common';
-import { after, before } from '@azlabsjs/str';
+import { Inject, Injector, Pipe, PipeTransform } from '@angular/core';
 import { GetTimeAgo, JSDate, ParseMonth } from '@azlabsjs/js-datetime';
+import { PIPE_TRANSFORMS } from '../tokens';
+import { PipeTransformTokenMapType } from '../types';
+
+/**
+ * Returns the strings after the first occurence the specified character
+ *
+ * @example
+ * const substr = after('o', 'Hello World!'); // output " World!"
+ *
+ * @param char
+ * @param haystack
+ * @returns
+ */
+export function after(char: string, haystack: string) {
+  const index = haystack.indexOf(char);
+  return haystack.slice(index + char.length);
+}
+
+/**
+ * Returns the strings before the first occurence the specified character
+ *
+ * @example
+ * const substr = before('W', 'Hello World!'); // outputs -> "Hello "
+ *
+ * @param char
+ * @param haystack
+ * @returns
+ */
+export function before(char: string, haystack: string) {
+  return haystack.slice(0, haystack.indexOf(char));
+}
+
+/**
+ * Creates pipe transform parameter from provided transform definition rules
+ */
+export function createParams(transform: string) {
+  const hasParams = transform.indexOf(':') !== -1;
+  const pipe = hasParams ? before(':', transform) : transform;
+  let params = hasParams
+    ? after(':', transform)
+        .split(';')
+        .map((x) => x.trim()) ?? []
+    : [];
+  params = params.map((item) => {
+    if (item.indexOf('json:') !== -1) {
+      return JSON.parse(after('json:', item));
+    }
+    if (item.indexOf('js:') !== -1) {
+      return JSON.parse(after('js:', item));
+    }
+    return item;
+  });
+
+  return [pipe, ...params];
+}
+
+/**
+ * Supported pipe transform type
+ */
+type PipeTransformType = string | ((value: unknown) => unknown) | undefined;
 
 function substr(value: string, start: number, length?: number) {
   if (typeof value !== 'string') {
@@ -30,6 +89,9 @@ function substr(value: string, start: number, length?: number) {
   name: 'data',
 })
 export class NgxGridDataPipe implements PipeTransform {
+  /**
+   * Creates an instance {@see NgxGridDataPipe} pipe
+   */
   constructor(
     private uppercasePipe: UpperCasePipe,
     private lowerCasePipe: LowerCasePipe,
@@ -38,7 +100,9 @@ export class NgxGridDataPipe implements PipeTransform {
     private jsonPipe: JsonPipe,
     private percentPipe: PercentPipe,
     private slicePipe: SlicePipe,
-    private asyncPipe: AsyncPipe
+    private asyncPipe: AsyncPipe,
+    private injector: Injector,
+    @Inject(PIPE_TRANSFORMS) private pipeTransform?: PipeTransformTokenMapType
   ) {}
 
   /**
@@ -48,23 +112,22 @@ export class NgxGridDataPipe implements PipeTransform {
    * @param transform
    * @returns
    */
-  transform(
-    value: any,
-    transform: string | ((value: unknown) => unknown) | undefined
-  ) {
+  transform(value: any, transform: PipeTransformType) {
     if (typeof transform === 'function') {
       return transform(value);
     }
     if (typeof transform === 'undefined' || transform === null) {
-      return value;
+      return value ?? '';
     }
-    const hasParams = transform.includes(':');
-    const pipe = hasParams ? before(':', transform) : transform;
-    const params = hasParams
-      ? after(':', transform)
-          ?.split(',')
-          ?.map((x) => x.trim()) ?? []
-      : [];
+    // Return an empty string if the value is not defined
+    if (typeof value === 'undefined' || value === null) {
+      return '';
+    }
+    // Create pipe transform name and parameter
+    const [pipe, ...params] = createParams(transform as string);
+
+    // Switch branch on pipe name and call the matching transformation function
+    // TODO: In  future release replace the swith statement with a call to pipe transform
     switch (pipe) {
       case 'date':
         return this.formatDate(value, ...params);
@@ -97,21 +160,15 @@ export class NgxGridDataPipe implements PipeTransform {
       case 'async':
         return this.asyncPipe.transform(value);
       default:
-        return value;
+        return this.getDefault(pipe, value, ...params);
     }
   }
 
-  /**
-   * Returns the masked content
-   *
-   * @param value
-   * @param length
-   */
-  mask(value?: string, length: number = 5): string {
+  private mask(value?: string, length: number = 5): string {
     return value ? `*******${substr(value, -length)}` : '*******';
   }
 
-  timeAgo(value: any, locale: string = 'fr-FR'): string {
+  private timeAgo(value: any, locale: string = 'fr-FR'): string {
     return typeof value === 'undefined' || value === null
       ? ''
       : JSDate.isValid(value)
@@ -119,7 +176,7 @@ export class NgxGridDataPipe implements PipeTransform {
       : value;
   }
 
-  dateTime(value: any, args?: any): any {
+  private dateTime(value: any, args?: any): any {
     return typeof value === 'undefined' || value === null
       ? ''
       : JSDate.isValid(value)
@@ -127,7 +184,7 @@ export class NgxGridDataPipe implements PipeTransform {
       : value;
   }
 
-  formatDate(value: any, args?: any): any {
+  private formatDate(value: any, args?: any): any {
     return typeof value === 'undefined' || value === null
       ? ''
       : JSDate.isValid(value)
@@ -135,9 +192,27 @@ export class NgxGridDataPipe implements PipeTransform {
       : value;
   }
 
-  getMonth(value: any): any {
+  private getMonth(value: any): any {
     return typeof value === 'undefined' || value === null
       ? ''
       : ParseMonth(value);
+  }
+
+  private getDefault(pipename: string, value: unknown, ...params: any[]) {
+    if (
+      typeof this.pipeTransform === 'undefined' ||
+      this.pipeTransform === null
+    ) {
+      return value;
+    }
+    const pipeToken = this.pipeTransform[pipename];
+    if (typeof pipeToken === 'undefined' || pipeToken === null) {
+      return value;
+    }
+    const pipe = this.injector.get(pipeToken);
+    if (pipe) {
+      return pipe.transform(value, ...params);
+    }
+    return value;
   }
 }
