@@ -31,7 +31,7 @@ export function createInputConfig(
     controlIndex: input['controlIndex'],
     value: input['value'],
     requiredIf: input['requiredIf'],
-    children: ((input['children'] as Record<string, unknown>[]) ?? []).map(
+    children: ((input['children'] as Record<string, unknown>[]) ?? [])?.map(
       createInputConfig
     ),
     uniqueOn: input['uniqueOn'],
@@ -71,12 +71,13 @@ export function createInputConfig(
  * Form configuration factory function
  */
 export function createFormConfig(value: Record<string, unknown>) {
+
   return {
     id: value['id'],
     title: value['title'],
     parentId: value['parentId'] ?? undefined,
     description: value['description'] ?? undefined,
-    controls: (value['controls'] as Array<Record<string, unknown>>).map(
+    controls: (value['controls'] as Array<Record<string, unknown>>)?.map(
       createInputConfig
     ),
     url: value['url'] ?? undefined,
@@ -118,17 +119,15 @@ export class DefaultFormsLoader implements FormsLoader {
       map((state) => {
         if (state && Array.isArray(state)) {
           return (state as any[]).map((value: { [index: string]: any }) => {
-            let controls = value ? (value['formControls'] as any[]) ?? [] : [];
-            if (controls.length === 0) {
-              controls = value ? (value['controls'] as any[]) ?? [] : [];
+            let controls: Record<string, unknown>[] = value
+              ? value['formControls']
+              : undefined;
+            if (typeof controls === 'undefined' || controls === null) {
+              controls = value ? value['controls'] ?? [] : [];
             }
-            if (controls.length !== 0) {
-              value = {
-                ...value,
-                controls: controls,
-              };
-            }
-            return createFormConfig(value);
+            value = { ...value, controls: controls ?? [] };
+            const result = createFormConfig(value);
+            return result;
           });
         }
         return [];
