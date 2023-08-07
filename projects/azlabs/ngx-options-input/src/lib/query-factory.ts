@@ -25,7 +25,10 @@ type _OptionsRequestFunction = <T>(
   url?: string
 ) => ObservableInput<T>;
 
-type OptionsQueryParams = OptionsConfig & { url: string };
+type OptionsQueryParams = OptionsConfig & {
+  url: string;
+  search?: Record<string, unknown>;
+};
 
 /**
  * Makes an http request using rxjs fetch wrapper
@@ -182,37 +185,42 @@ export function optionsQueryClient(
 ) {
   const _requestClient = queryOptions;
   Object.defineProperty(_requestClient, 'request', {
-    value: (optionsConfig: OptionsConfig & { name?: string }) => {
+    value: (
+      optionsConfig: OptionsConfig & { name?: string },
+      searchParams?: Record<string, unknown>
+    ) => {
       let _endpoint: string | undefined = endpoint;
+      const { source, name } = optionsConfig;
       // We build the request query
       //#region For custom URL configurations, we attempt to build the final URL and update the
       // the resource entry if source property of the option configurations
-      let url = optionsConfig.source.resource;
+      let url = source.resource;
       if (isCustomURL(url ?? '')) {
         const hostConfig =
           typeof queriesConfig?.queries !== 'undefined' &&
           queriesConfig?.queries !== null &&
-          typeof optionsConfig.name !== 'undefined' &&
-          optionsConfig.name !== null
-            ? resolveURLHost(queriesConfig, optionsConfig.name, _endpoint ?? '')
+          typeof name !== 'undefined' &&
+          name !== null
+            ? resolveURLHost(queriesConfig, name, _endpoint ?? '')
             : _endpoint ?? '';
         url = customToResourceURL(url, hostConfig);
         url = url[0] === '/' ? url.substring(1) : url;
         optionsConfig = {
           ...optionsConfig,
-          source: { ...(optionsConfig.source ?? {}), resource: url },
+          source: { ...(source ?? {}), resource: url },
         };
       }
       //#endregion
       const request = {
         ...optionsConfig,
         url: createRequestURL(optionsConfig, _endpoint ?? ''),
+        searchParams,
       };
       return _requestClient(
         request,
         injector,
-        queriesConfig?.queries && optionsConfig.name
-          ? resolveRequestInterceptorFactory(queriesConfig, optionsConfig.name)
+        queriesConfig?.queries && name
+          ? resolveRequestInterceptorFactory(queriesConfig, name)
           : queriesConfig?.interceptorFactory
       );
     },
@@ -222,27 +230,35 @@ export function optionsQueryClient(
 
 /**
  * function for querying options value from server
- * 
- * @param optionsConfig 
- * @param injector 
- * @param interceptorFactory 
- * @returns 
+ *
+ * @param optionsConfig
+ * @param injector
+ * @param interceptorFactory
+ * @returns
  */
 export function queryOptions(
   optionsConfig: OptionsQueryParams,
   injector: Injector,
   interceptorFactory?: InterceptorFactory<HTTPRequest>
 ) {
+  const { source, url, search } = optionsConfig;
   // We provides a request body only if the resource object is not a valid
   // HTTP URI because in such case the request is being send to form API server
   // instead of any resource server
-  const body = isValidHttpUrl(optionsConfig.source.resource)
-    ? undefined
+  const body = isValidHttpUrl(source.resource)
+    ? typeof search !== 'undefined' && search !== null
+      ? search
+      : undefined
+    : typeof search !== 'undefined' && search !== null
+    ? {
+        ...search,
+        table_config: source.raw,
+      }
     : {
-        table_config: optionsConfig.source.raw,
+        table_config: source.raw,
       };
   return rxRequest({
-    url: optionsConfig.url,
+    url,
     method: 'GET',
     body,
     headers: {

@@ -1,5 +1,5 @@
 <div fetchOptions (optionsChange)="onOptionsChange($event)" [loaded]="loaded"
-  [optionsConfig]="inputConfig.optionsConfig" [name]="inputConfig.name">
+  [config]="inputConfig.optionsConfig" [name]="inputConfig.name">
   <ng-container *ngIf="inputConfig.options as options">
     <ng-container *ngIf="options!.length > 0">
       <ng-container *ngTemplateOutlet="

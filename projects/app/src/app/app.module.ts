@@ -73,6 +73,9 @@ ClarityIcons.addIcons(uploadCloudIcon);
     // Configure clr control module
     NgxClrFormControlModule.forRoot({
       options: {
+        url: 'http://127.0.0.1:3000/control-bindings',
+        refreshInterval: 60,
+        cacheTTL: 90,
         requests: {
           interceptorFactory: (injector: Injector) => {
             // Replace the interceptor function by using the injector
@@ -80,6 +83,9 @@ ClarityIcons.addIcons(uploadCloudIcon);
               const response = await (next(request) as Promise<HTTPResponse>);
               return response.clone({
                 setBody: (body: Record<string, unknown>) => {
+                  if (typeof body === 'undefined' || body === null) {
+                    return [];
+                  }
                   return typeof body['data'] !== 'undefined' &&
                     body['data'] !== null
                     ? body['data']

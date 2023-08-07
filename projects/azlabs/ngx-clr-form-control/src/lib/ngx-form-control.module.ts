@@ -42,12 +42,15 @@ import {
 import {
   INPUT_OPTIONS_CLIENT,
   NgxOptionsInputModule,
+  OPTIONS_CACHE,
+  OptionsCache,
   optionsQueryClient,
   OptionsQueryConfigType,
 } from '@azlabsjs/ngx-options-input';
 import { ClarityModule } from '@clr/angular';
 import '@cds/core/icon/register.js';
 import { ClarityIcons, eyeHideIcon, eyeIcon } from '@cds/core/icon';
+import { deepEqual } from '@azlabsjs/utilities';
 
 // Register clarity icons
 ClarityIcons.addIcons(eyeHideIcon, eyeIcon);
@@ -57,6 +60,14 @@ type ConfigType = {
   options?: {
     url?: string;
     requests: OptionsQueryConfigType;
+    /**
+     * Number of seconds after which item is automatically refetch
+     */
+    refreshInterval?: number;
+    /**
+     * Number of seconds after which item is no more valid in cache
+     */
+    cacheTTL?: number;
   };
   uploads?: {
     options: UploadOptionsType<any, any>;
@@ -119,6 +130,16 @@ export class NgxClrFormControlModule {
           );
         },
         deps: [Injector],
+      },
+      {
+        provide: OPTIONS_CACHE,
+        useFactory: () => {
+          return new OptionsCache(
+            deepEqual,
+            config?.options?.refreshInterval,
+            config?.options?.cacheTTL
+          );
+        },
       },
     ];
 

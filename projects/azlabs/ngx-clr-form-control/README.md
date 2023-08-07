@@ -60,6 +60,7 @@ import { NgxClrFormControlModule } from "@azlabsjs/ngx-clr-form-control";
   imports: [
     NgxClrFormControlModule.forRoot({
       options: {
+        // url: '<HOST>/<BINDINGS_PATH>', // Case using table:table_name configuration option, this configuration is required for sending queries to the server
         requests: {
           interceptorFactory: (injector: Injector) => {
             // TODO: Provide request interceptors

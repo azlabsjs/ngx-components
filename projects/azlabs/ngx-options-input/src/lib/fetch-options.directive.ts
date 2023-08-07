@@ -17,11 +17,12 @@ import {
   mapStringListToInputOptions,
   OptionsConfig,
 } from '@azlabsjs/smart-form-core';
-import { lastValueFrom } from 'rxjs';
-import { first, tap } from 'rxjs/operators';
+import { Subject, Subscription, from, lastValueFrom, of } from 'rxjs';
+import { debounceTime, first, map, switchMap, tap } from 'rxjs/operators';
 import { InputOptionsClient } from './types';
 import { createIntersectionObserver } from './observers';
-import { INPUT_OPTIONS_CLIENT } from './tokens';
+import { INPUT_OPTIONS_CLIENT, OPTIONS_CACHE } from './tokens';
+import { CacheType } from './cache';
 
 @Directive({
   selector: '[fetchOptions]',
@@ -29,8 +30,11 @@ import { INPUT_OPTIONS_CLIENT } from './tokens';
 export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   //#region Directive inputs
   @Input() loaded!: boolean;
-  @Input() optionsConfig!: OptionsConfig | undefined;
+  @Input('config') options!: OptionsConfig | undefined;
   @Input() name!: string;
+  @Input() auto: boolean = true;
+  @Input('query') search: string = 'label';
+  @Input('limit') limit!: number;
   //#endregion Directive inputs
 
   //#region Directive outputs
@@ -40,45 +44,85 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
 
   // Directive properties
   private observer!: IntersectionObserver;
+  _search$ = new Subject<[Record<string, unknown>, OptionsConfig]>();
+  private _subscriptions: Subscription[] = [];
 
   // Directive constructor
   constructor(
     private elemRef: ElementRef,
     @Inject(INPUT_OPTIONS_CLIENT) private client: InputOptionsClient,
-    @Inject(DOCUMENT) private document: Document
-  ) {}
-
-  ngAfterViewInit() {
-    const { defaultView } = this.document ?? ({} as Document);
-    const view = defaultView as any;
-    // If The intersection API is missing we execute the load query
-    // When the view initialize
-    view &&
-    !('IntersectionObserver' in view) &&
-    !('IntersectionObserverEntry' in view) &&
-    !('intersectionRatio' in view.IntersectionObserverEntry.prototype)
-      ? this.query()
-      : this.observeView();
+    @Inject(DOCUMENT) private document: Document,
+    @Inject(OPTIONS_CACHE)
+    private cache: CacheType<Record<string, unknown>, InputOptionsInterface>
+  ) {
+    this._subscriptions.push(
+      this._search$
+        .asObservable()
+        .pipe(
+          debounceTime(500),
+          switchMap(([params, options]) => {
+            const key: Record<string, unknown> = { ...options, ...params };
+            const result = this.cache.get(key);
+            return result
+              ? of({ key, params, options, values: result })
+              : from(this.sendRequest(options, params)).pipe(
+                  map((values) => ({ key, params, options, values }))
+                );
+          }),
+          tap((state) => {
+            const { key, options, params, values } = state;
+            // Put value into cache and configure the update fonction to equal
+            this.cache.put(key, values, (_values) => {
+              return this.sendRequest(options, params);
+            });
+            this.loadingChange.emit(false);
+            this.optionsChange.emit(values);
+          })
+        )
+        .subscribe()
+    );
   }
 
+  ngAfterViewInit() {
+    if (this.auto) {
+      const { defaultView } = this.document ?? ({} as Document);
+      const view = defaultView as any;
+      // If The intersection API is missing we execute the load query
+      // When the view initialize
+      view &&
+      !('IntersectionObserver' in view) &&
+      !('IntersectionObserverEntry' in view) &&
+      !('intersectionRatio' in view.IntersectionObserverEntry.prototype)
+        ? this.query()
+        : this.observeView();
+    }
+  }
+
+  /**
+   * @internal A private API method that might not be used externally
+   */
   async query() {
     if (
       this.loaded ||
-      typeof this.optionsConfig === 'undefined' ||
-      this.optionsConfig === null
+      typeof this.options === 'undefined' ||
+      this.options === null
     ) {
       return;
     }
     this.loadingChange.emit(true);
-    if (
-      isCustomURL(this.optionsConfig.source.resource) ||
-      isValidHttpUrl(this.optionsConfig.source.resource) ||
-      (this.optionsConfig.source.raw.match(/table:/) &&
-        this.optionsConfig.source.raw.match(/keyfield:/))
-    ) {
-      return this.asyncFetch(this.optionsConfig);
+    return isCustomURL(this.options.source.resource) ||
+      isValidHttpUrl(this.options.source.resource) ||
+      (this.options.source.raw.match(/table:/) &&
+        this.options.source.raw.match(/keyfield:/))
+      ? this.fetchAsync(this.options)
+      : this.fetchSync(this.options);
+  }
+
+  fetch(value?: string) {
+    if (typeof this.options !== 'undefined' && this.options !== null) {
+      this.loadingChange.emit(true);
+      this.fetchAsync(this.options, value ? { [this.search]: value } : {});
     }
-    return this.syncFetch(this.optionsConfig);
   }
 
   private observeView() {
@@ -97,21 +141,35 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     this.observer.observe(this.elemRef.nativeElement);
   }
 
-  private syncFetch(optionsConfig: OptionsConfig) {
-    const options = mapStringListToInputOptions(optionsConfig.source.raw);
+  private fetchSync(options: OptionsConfig) {
     this.loadingChange.emit(false);
-    this.optionsChange.emit(options);
+    this.optionsChange.emit(mapStringListToInputOptions(options.source.raw));
   }
 
-  private async asyncFetch(optionsConfig: OptionsConfig) {
-    await lastValueFrom(
-      this.client.request({ ...optionsConfig, name: this.name }).pipe(
+  /**
+   * @interal
+   */
+  private async fetchAsync(
+    options: OptionsConfig,
+    params: Record<string, unknown> = {}
+  ) {
+    this._search$.next([
+      typeof this.limit !== 'undefined' && this.limit !== null
+        ? { page: 1, per_page: this.limit, ...params }
+        : { ...params },
+      options,
+    ]);
+  }
+
+  /**
+   * @internal
+   */
+  private sendRequest(options: OptionsConfig, params: Record<string, unknown>) {
+    return lastValueFrom(
+      this.client.request({ ...options, name: this.name }, params).pipe(
         first(),
-        tap((state) => {
-          this.loadingChange.emit(false);
-          if (state) {
-            this.optionsChange.emit(mapIntoInputOptions(optionsConfig, state));
-          }
+        map((state) => {
+          return state ? mapIntoInputOptions(options, state) : [];
         })
       )
     );
@@ -120,5 +178,9 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     // Disconnect from the observer
     this.observer.disconnect();
+
+    for (const subscripton of this._subscriptions) {
+      subscripton.unsubscribe();
+    }
   }
 }

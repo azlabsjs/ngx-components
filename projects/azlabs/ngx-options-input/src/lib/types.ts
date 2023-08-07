@@ -13,7 +13,8 @@ export type InputOptionsClient = {
    *
    */
   request(
-    optionsConfig: OptionsConfig & { name?: string }
+    optionsConfig: OptionsConfig & { name?: string },
+    searchParams?: Record<string, unknown>
   ): Observable<InputOptionsInterface>;
 };
 
