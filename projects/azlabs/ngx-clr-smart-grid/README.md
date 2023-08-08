@@ -4,11 +4,17 @@ Smart grid component is an angular component, using clarity datagrid component u
 
 ## Dependencies
 
-| @azlabsjs/ngx-clr-smart-grid | @azlabsjs/js-object | @azlabsjs/js-datetime | Angular |
-| ---------------------------- | ------------------- | --------------------- | ------- |
-| ^0.13.x                      | ^0.1.x              | ^0.1.x                | ^13.0   |
-| ^0.14.x                      | ^0.1.x              | ^0.1.x                | ^14.0   |
-| ^0.15.x                      | ^0.1.x              | ^0.1.x                | ^15.0   |
+| @azlabsjs/ngx-clr-smart-grid | @clr/angular | @azlabsjs/js-object | @azlabsjs/js-datetime | Angular |
+| ---------------------------- | ------------ | ------------------- | --------------------- | ------- |
+| ^0.13.x                      | ^13.x        | ^0.1.x              | ^0.1.x                | ^13.0   |
+| ^0.14.x                      | ^13.x        | ^0.1.x              | ^0.1.x                | ^14.0   |
+| ^0.15.x                      | ^15.x        | ^0.1.x              | ^0.1.x                | ^15.0   |
+
+## Installation
+
+To install the package with all peer dependencies:
+
+> npm install --save @azlabsjs/js-object @azlabsjs/js-datetime @azlabsjs/ngx-clr-smart-grid
 
 ## Usage
 
@@ -68,13 +74,7 @@ At it basic usage we simply add the component to our html template as most compo
 // app.component.html
 <!-- Code -->
 <!-- configure the smart grid using basic configurations -->
-<ngx-clr-smart-grid
-  [columns]="columns"
-  [data]="data"
-  (dgRefresh)="onDgRefresh($event)"
-  (selectedChange)="onSelectedChanges($event)"
->
-</ngx-clr-smart-grid>
+<ngx-clr-smart-grid [columns]="columns" [data]="data" (dgRefresh)="onDgRefresh($event)" (selectedChange)="onSelectedChanges($event)"> </ngx-clr-smart-grid>
 ```
 
 ```ts
@@ -555,14 +555,7 @@ Projecting row class allow developpers to set or apply a `css class` to a datagr
 ```ts
 @Component({
   // ...
-  template: `
-    <ngx-clr-smart-grid
-      [config]="gridConfig"
-      (dgRefresh)="onDgRefresh($event)"
-      (selectedChange)="onSelectedChanges($event)"
-    >
-    </ngx-clr-smart-grid>
-  `,
+  template: ` <ngx-clr-smart-grid [config]="gridConfig" (dgRefresh)="onDgRefresh($event)" (selectedChange)="onSelectedChanges($event)"> </ngx-clr-smart-grid> `,
 })
 export class MyComponent {
   gridConfig: Partial<GridConfigType> = {

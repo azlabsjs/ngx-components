@@ -14,7 +14,7 @@ import { CdsModule } from '@cds/angular';
 import { ClarityIcons, uploadCloudIcon } from '@cds/core/icon';
 import { AppComponent } from './app.component';
 import { TestPipe } from './test.pipe';
-import { NgxClrFormControlModule } from '@azlabsjs/ngx-clr-form-control';
+import { NgxClrFormControlModule, useOptionsInterceptor } from '@azlabsjs/ngx-clr-form-control';
 import { FormControlComponent } from './form-control/form-control.component';
 
 ClarityIcons.addIcons(uploadCloudIcon);
@@ -77,23 +77,7 @@ ClarityIcons.addIcons(uploadCloudIcon);
         refreshInterval: 60,
         cacheTTL: 90,
         requests: {
-          interceptorFactory: (injector: Injector) => {
-            // Replace the interceptor function by using the injector
-            return async (request, next) => {
-              const response = await (next(request) as Promise<HTTPResponse>);
-              return response.clone({
-                setBody: (body: Record<string, unknown>) => {
-                  if (typeof body === 'undefined' || body === null) {
-                    return [];
-                  }
-                  return typeof body['data'] !== 'undefined' &&
-                    body['data'] !== null
-                    ? body['data']
-                    : body;
-                },
-              });
-            };
-          },
+          interceptorFactory: useOptionsInterceptor(),
           queries: {
             // category_id : 'https://coopecclients.lik.tg/',
             zone_id: () => 'https://coopecclients.liksoft.tg/', // TODO: In future release pass the form id to the function

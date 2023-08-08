@@ -1,5 +1,5 @@
 import { Injector } from '@angular/core';
-import { HTTPRequest, Interceptor } from '@azlabsjs/requests';
+import { HTTPRequest, HTTPResponse, Interceptor } from '@azlabsjs/requests';
 import {
   InputOptionsInterface,
   OptionsConfig,
@@ -27,16 +27,28 @@ type QueryConfigType = {
     | (() => string)
     | {
         host?: string | (() => string);
-        interceptor?: InterceptorFactory<HTTPRequest>;
+        interceptor?: InterceptorFactory<
+          HTTPRequest,
+          HTTPResponse | Promise<HTTPResponse> | unknown | Promise<unknown>
+        >;
       };
 };
 
-export type InterceptorFactory<T> = (injector: Injector) => Interceptor<T>;
+/**
+ * Options query request interceptor type definition
+ */
+export type InterceptorFactory<T, R = unknown> = (
+  injector: Injector
+) => Interceptor<T, R>;
+
 
 /**
- * @internal
+ * Options query configuration type definition
  */
 export type OptionsQueryConfigType = {
-  interceptorFactory?: InterceptorFactory<HTTPRequest>;
+  interceptorFactory?: InterceptorFactory<
+    HTTPRequest,
+    Promise<HTTPResponse> | HTTPResponse | Promise<unknown> | unknown
+  >;
   queries?: QueryConfigType;
 };

@@ -13,6 +13,12 @@ The module also makes use of angular services injector to provide mechanism for 
 | ^0.14.x                  | ^0.1.x                    | ^0.2.x             | ^14.0   |
 | ^0.15.x                  | ^0.2.x                    | ^0.2.x             | ^15.0   |
 
+## Installation
+
+To install the package with all required dependencies:
+
+> npm install --save @azlabsjs/smart-form-core @azlabsjs/requests @azlabsjs/ngx-smart-form
+
 ## Usage
 
 To include the API in your angular project, you must import it module into the root of your application.

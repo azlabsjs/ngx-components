@@ -8,6 +8,13 @@ The `ngx-clr-form-control` library provide angular UI component for rendering in
 | ------------------------------ | ------------------------- | ---------------------------- | --------------------------- | ------------------------ | ------- |
 | ^0.15.x                        | ^0.2.0                    | ^0.15.x                      | ^0.15.x                     | ^0.15.x                  | ^15.0   |
 
+## Installation
+
+To install the package with all peer dependencies:
+
+> npm install --save @azlabsjs/ngx-file-input @azlabsjs/ngx-options-input @azlabsjs/ngx-intl-tel-input @azlabsjs/smart-form-core @azlabsjs/ngx-clr-form-control
+
+
 ## Usage
 
 To use the `ngx-clr-form-control` in angular projects, we must import the library module which export required component, and pipes and directives:
