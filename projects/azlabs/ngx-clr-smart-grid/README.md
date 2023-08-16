@@ -140,12 +140,12 @@ export class AppComponent {
 
   // Listen to datagrid refresh events
   onDgRefresh(event: unknown) {
-    console.log(event);
+    // code...
   }
 
   // Listen to data grid selection changes events
   onSelectedChanges(event: unknown | unknown[]) {
-    console.log(event);
+    // code...
   }
 }
 ```

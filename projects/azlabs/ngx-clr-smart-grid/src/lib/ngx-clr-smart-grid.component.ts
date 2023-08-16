@@ -77,7 +77,6 @@ export class NgxClrSmartGridComponent {
     projectRowClass: '',
   };
   @Input() set config(value: Partial<GridConfigType>) {
-    console.log(value);
     if (value) {
       this._config = {
         ...this._config,
