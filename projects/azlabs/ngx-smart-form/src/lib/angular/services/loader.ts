@@ -6,6 +6,24 @@ import {
 } from '@azlabsjs/smart-form-core';
 import { LoadFormsRequestHandler } from '../types';
 
+/**
+ * @internal
+ */
+type ControlsType = Record<string, unknown>;
+
+/**
+ * @internal
+ */
+type FormConfigType = Record<string, unknown> & {
+  controls: Array<ControlsType>;
+};
+/**
+ * @internal
+ */
+type LegacyFormConfigType = Record<string, unknown> & {
+  formControls?: Array<ControlsType>;
+};
+
 // #region Factory functions
 /**
  * Input configuration factory function
@@ -35,7 +53,9 @@ export function createInputConfig(
       createInputConfig
     ),
     uniqueOn: input['uniqueOn'],
-    containerClass: input['containerClass'],
+    containerClass:
+      // Added support legacy `dynamicControlContainerClass` property
+      input['containerClass'] ?? input['dynamicControlContainerClass'],
     valuefield: input['valuefield'],
     groupfield: input['groupfield'],
     keyfield: input['keyfield'],
@@ -70,16 +90,13 @@ export function createInputConfig(
 /**
  * Form configuration factory function
  */
-export function createFormConfig(value: Record<string, unknown>) {
-
+export function createFormConfig(value: FormConfigType) {
   return {
     id: value['id'],
     title: value['title'],
     parentId: value['parentId'] ?? undefined,
     description: value['description'] ?? undefined,
-    controls: (value['controls'] as Array<Record<string, unknown>>)?.map(
-      createInputConfig
-    ),
+    controls: value.controls?.map(createInputConfig),
     url: value['url'] ?? undefined,
     status: Number(value['status']),
     appcontext: value['appcontext'] ?? undefined,
@@ -118,17 +135,19 @@ export class DefaultFormsLoader implements FormsLoader {
     return this.requestHandler(endpoint, options).pipe(
       map((state) => {
         if (state && Array.isArray(state)) {
-          return (state as any[]).map((value: { [index: string]: any }) => {
-            let controls: Record<string, unknown>[] = value
-              ? value['formControls']
-              : undefined;
-            if (typeof controls === 'undefined' || controls === null) {
-              controls = value ? value['controls'] ?? [] : [];
+          return (state as any[]).map(
+            (value: FormConfigType | LegacyFormConfigType) => {
+              let controls = (
+                value ? value['formControls'] : undefined
+              ) as ControlsType[];
+              if (typeof controls === 'undefined' || controls === null) {
+                controls = (
+                  value ? value['controls'] ?? [] : []
+                ) as ControlsType[];
+              }
+              return createFormConfig({ ...value, controls: controls ?? [] });
             }
-            value = { ...value, controls: controls ?? [] };
-            const result = createFormConfig(value);
-            return result;
-          });
+          );
         }
         return [];
       })

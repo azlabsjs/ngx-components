@@ -1,4 +1,3 @@
-// Export paginator types
 export {
   createDateQueryParamPipe,
   PaginateItem,
@@ -6,16 +5,12 @@ export {
   projectPaginateQuery,
   ProjectPaginateQueryOutputType,
   ProjectPaginateQueryParamType,
-  QueryFiltersType
-} from './core/paginate';
-// Export datagrid types
-export {
+  QueryFiltersType,
   GridColumnType,
   GridConfigType,
-  GriSelectDirectiveInputType
-} from './core/types';
+  GriSelectDirectiveInputType,
+} from './core';
 export { NgxClrGridSelectDirective } from './directives';
 export { NgxClrSmartGridComponent } from './ngx-clr-smart-grid.component';
 export { NgxClrSmartGridModule } from './ngx-clr-smart-grid.module';
-export { createPipeTransform, NgxGridDataPipe } from './pipes';
-
+export { createPipeTransform, NgxGridTransformPipe } from './pipes';

@@ -2,7 +2,7 @@ import { JSDate } from '@azlabsjs/js-datetime';
 import {
   ProjectPaginateQueryOutputType,
   ProjectPaginateQueryParamType,
-  QueryFiltersType
+  QueryFiltersType,
 } from './types';
 
 /**

@@ -10,7 +10,7 @@
   <!-- DATA GRID COLUMNS -->
   <ng-container *ngFor="let column of columns">
     <clr-dg-column [clrDgColType]="column.type" [clrDgField]="column.field" [clrDgSortBy]="column.sort || ''">
-      {{ column.title }}
+      {{ column.title |transform : (column.transformTitle ?? config.transformColumnTitle) }}
       <clr-dg-filter *ngIf="config.useCustomFilters">
         <ng-content select=".dg-filter"></ng-content>
       </clr-dg-filter>
@@ -22,19 +22,19 @@
   <!-- IF USER SPECIFY TO SERVER SIDE PAGINATION WE USE DEFAULT *ngFor directive -->
   <ng-container *ngIf="config.useServerPagination; else smart">
     <ng-container *ngFor="let item of data || []">
-      <ng-container *ngTemplateOutlet="dgRowRef ?? rowTemplate; context: { $implicit: item }"
+      <ng-container *ngTemplateOutlet="dgRowRef ?? defaultRowRef; context: { $implicit: item }"
         ngProjectAs="clr-dg-row"></ng-container>
     </ng-container>
   </ng-container>
   <!-- ELSE WE FALL BACK TO *clrDgItems smart iterator directive directive -->
   <ng-template #smart>
     <ng-container *clrDgItems="let item of data || []">
-      <ng-container *ngTemplateOutlet="dgRowRef ?? rowTemplate; context: { $implicit: item }"
+      <ng-container *ngTemplateOutlet="dgRowRef ?? defaultRowRef; context: { $implicit: item }"
         ngProjectAs="clr-dg-row"></ng-container>
     </ng-container>
   </ng-template>
   <!-- DATA GRID ROWS -->
-  <ng-template #rowTemplate let-current>
+  <ng-template #defaultRowRef let-current>
     <clr-dg-row [class]="getrowclass(config, current)" [clrDgItem]="current"
       [clrDgSelectable]="current[config.selectableProp || ''] || true">
       <clr-dg-action-overflow *ngIf="config.hasActionOverflow">
@@ -47,7 +47,7 @@
       <ng-container *ngFor="let column of columns">
         <clr-dg-cell>
           <span class="cell-value" [ngClass]="column.style.class ?? ''" [style]="column.style.styles">{{
-            getCellValue(current, column.label) | data: column.transform }}</span>
+            getCellValue(current, column.label) | transform: column.transform }}</span>
         </clr-dg-cell>
       </ng-container>
       <!-- USING ngProjectAs as recommended by the documentation -->

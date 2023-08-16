@@ -1,10 +1,10 @@
-<div class="container">
+<!-- <div class="container">
   <app-form-control></app-form-control>
-</div>
+</div> -->
 <div class="container">
   <h3>Form Group</h3>
   <ng-container *ngIf="state$ | async as form">
-    <ngx-smart-form #smartform [no-grid-layout]="true" (ready)="onFormReadyState(form)" (changes)="afterChanges()"
+    <ngx-smart-form #smartform [no-grid-layout]="false" (ready)="onFormReadyState(form)" (changes)="afterChanges()"
       (error)="onError($event)" [submitable]="true" [autoupload]="true" (submit)="ngxFormSubmit($event)" [form]="form"
       [autoSubmit]="true" [path]="'http://localhost:3000/customers'" [template]="controlTemplate">
       <ng-template #controlTemplate let-config="value" let-control="control">
@@ -14,9 +14,9 @@
     </ngx-smart-form>
   </ng-container>
 </div>
-<!-- <div class="container">
+<div class="container">
   <h3>Data Grid</h3>
   <ngx-clr-smart-grid [columns]="columns" [placeholder]="placeholder" [pageResult]="(pageResult$ | async)"
     (dgRefresh)="onDgRefresh($event)" (selectedChange)="onSelectedChanges($event)"
-    [config]="{useServerPagination: true}"></ngx-clr-smart-grid>
-</div> -->
+    [config]="gridConfig"></ngx-clr-smart-grid>
+</div>

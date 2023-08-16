@@ -6,12 +6,13 @@ import {
   LowerCasePipe,
   PercentPipe,
   SlicePipe,
-  UpperCasePipe
+  UpperCasePipe,
 } from '@angular/common';
 import { Inject, Injector, Pipe, PipeTransform } from '@angular/core';
 import { GetTimeAgo, JSDate, ParseMonth } from '@azlabsjs/js-datetime';
 import { PIPE_TRANSFORMS } from '../tokens';
 import { PipeTransformTokenMapType } from '../types';
+import { PipeTransformType } from '../core';
 
 /**
  * Returns the strings after the first occurence the specified character
@@ -66,11 +67,6 @@ export function createParams(transform: string) {
   return [pipe, ...params];
 }
 
-/**
- * Supported pipe transform type
- */
-type PipeTransformType = string | ((value: unknown) => unknown) | undefined;
-
 function substr(value: string, start: number, length?: number) {
   if (typeof value !== 'string') {
     return '';
@@ -86,9 +82,9 @@ function substr(value: string, start: number, length?: number) {
 }
 
 @Pipe({
-  name: 'data',
+  name: 'transform',
 })
-export class NgxGridDataPipe implements PipeTransform {
+export class NgxGridTransformPipe implements PipeTransform {
   /**
    * Creates an instance {@see NgxGridDataPipe} pipe
    */
@@ -107,12 +103,17 @@ export class NgxGridDataPipe implements PipeTransform {
 
   /**
    * Transform template value to it corresponding converted value using the user pipe
-   *
-   * @param value
-   * @param transform
-   * @returns
    */
-  transform(value: any, transform: PipeTransformType) {
+  transform(value: any, transform: PipeTransformType | PipeTransformType[]) {
+    if (Array.isArray(transform)) {
+      return transform.reduce((carry, current) => {
+        carry = this.transformValue(carry, current);
+      }, value);
+    }
+    return this.transformValue(value, transform);
+  }
+
+  private transformValue(value: any, transform: PipeTransformType) {
     if (typeof transform === 'function') {
       return transform(value);
     }

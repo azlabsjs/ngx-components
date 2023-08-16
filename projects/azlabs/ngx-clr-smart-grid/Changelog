@@ -1,0 +1,5 @@
+# Changelogs
+
+## v0.15.x
+
+- Rename `data` pipe into `transform` to be more explicit about the intent

@@ -7,29 +7,26 @@ import {
   LowerCasePipe,
   PercentPipe,
   SlicePipe,
-  UpperCasePipe
+  UpperCasePipe,
 } from '@angular/common';
-import {
-  ModuleWithProviders,
-  NgModule
-} from '@angular/core';
+import { ModuleWithProviders, NgModule } from '@angular/core';
 import { ClarityModule } from '@clr/angular';
 import { NgxClrGridSelectDirective } from './directives';
 import { NgxClrSmartGridComponent } from './ngx-clr-smart-grid.component';
-import { NgxGridDataPipe } from './pipes';
+import { NgxGridTransformPipe } from './pipes';
 import { PIPE_TRANSFORMS } from './tokens';
 import { PipeTransformTokenMapType } from './types';
 
 @NgModule({
   declarations: [
     NgxClrSmartGridComponent,
-    NgxGridDataPipe,
+    NgxGridTransformPipe,
     NgxClrGridSelectDirective,
   ],
   imports: [CommonModule, ClarityModule],
   exports: [
     NgxClrSmartGridComponent,
-    NgxGridDataPipe,
+    NgxGridTransformPipe,
     NgxClrGridSelectDirective,
   ],
   providers: [

@@ -4,12 +4,17 @@ import {
   EventEmitter,
   Input,
   Output,
-  TemplateRef
+  TemplateRef,
 } from '@angular/core';
 import { JSObject } from '@azlabsjs/js-object';
 import { ClrDatagridSortOrder } from '@clr/angular';
-import { PaginateResult, ProjectPaginateQueryParamType } from './core/paginate';
-import { GridColumnType, GridConfigType } from './core/types';
+import {
+  PaginateResult,
+  ProjectPaginateQueryParamType,
+  GridColumnType,
+  GridConfigType,
+  PipeTransformType,
+} from './core';
 
 @Component({
   selector: 'ngx-clr-smart-grid',
@@ -55,6 +60,7 @@ export class NgxClrSmartGridComponent {
 
   // Datagrid configuration Input
   private _config: Required<GridConfigType> = {
+    transformColumnTitle: 'default',
     selectable: false,
     class: '',
     sizeOptions: [20, 50, 100, 150],
@@ -71,6 +77,7 @@ export class NgxClrSmartGridComponent {
     projectRowClass: '',
   };
   @Input() set config(value: Partial<GridConfigType>) {
+    console.log(value);
     if (value) {
       this._config = {
         ...this._config,
@@ -84,7 +91,13 @@ export class NgxClrSmartGridComponent {
   //! Datagrid configuration Input
 
   // Datagrid columns configuraiton inputs
-  private _columns: Omit<Required<GridColumnType>, 'sortPropertyName'>[] = [];
+  private _columns: (Omit<
+    Required<GridColumnType>,
+    'sortPropertyName' | 'transformTitle'
+  > & {
+    sortPropertyName?: string;
+    transformTitle?: PipeTransformType | PipeTransformType[];
+  })[] = [];
   @Input() set columns(values: GridColumnType[]) {
     if (values) {
       // Map input value to typeof Required<GridColumn>
@@ -113,7 +126,13 @@ export class NgxClrSmartGridComponent {
       }));
     }
   }
-  get columns(): Omit<Required<GridColumnType>, 'sortPropertyName'>[] {
+  get columns(): (Omit<
+    Required<GridColumnType>,
+    'sortPropertyName' | 'transformTitle'
+  > & {
+    sortPropertyName?: string;
+    transformTitle?: PipeTransformType | PipeTransformType[];
+  })[] {
     return this._columns;
   }
   //! Datagrid columns configuraiton inputs

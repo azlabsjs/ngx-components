@@ -1,5 +1,18 @@
 import { ClrDatagridComparatorInterface } from '@clr/angular';
 
+/**
+ * @internal
+ *
+ * Supported pipe transform type
+ */
+export type PipeTransformType =
+  | string
+  | ((value: unknown) => unknown)
+  | undefined;
+
+/**
+ * Comparator function type declaration
+ */
 export type Comparator<T> =
   | {
       compare: (a: T, b: T) => number;
@@ -13,7 +26,8 @@ export type Comparator<T> =
 export type GridColumnType = {
   title: string;
   label: string;
-  transform?: string | ((state: unknown) => unknown) | undefined;
+  transformTitle?: PipeTransformType | PipeTransformType[];
+  transform?: PipeTransformType | PipeTransformType[];
   style?: {
     class?: string | string[];
     styles?: string[] | string;
@@ -28,11 +42,8 @@ export type GridColumnType = {
    * The sortable property makes the column available for sorting
    */
   sortable?: boolean;
-  
   /**
-   * @deprecated
    * Property name used during sort queries
-   *
    */
   sortPropertyName?: string;
 };
@@ -41,6 +52,7 @@ export type GridColumnType = {
  * Type definition of Smart datagrid configuration value.
  */
 export type GridConfigType = {
+  transformColumnTitle?: PipeTransformType | PipeTransformType[];
   selectable: boolean;
   class: string;
   sizeOptions: number[];
@@ -61,3 +73,56 @@ export type GriSelectDirectiveInputType = {
   selectable: boolean;
   singleSelection: boolean;
 };
+
+
+// #region Pagination type declarations
+/**
+ * Paginate query result type definition
+ */
+export type PaginateResult<T> = {
+  total?: number;
+  data: T[];
+  lastPage?: number;
+  nextPageURL?: string;
+  lastPageURL?: string;
+  page?: number;
+};
+
+/**
+ * paginate result single item type definition. To make it easy for developpers
+ * for identify paginate result items
+ */
+export type PaginateItem = { id: string | number } & Record<string, unknown>;
+
+/**
+ * Project query function query filters type
+ */
+export type QueryFiltersType = { [index: string]: any }[];
+
+/**
+ * Parameter type for projectPaginateQuery() query function
+ */
+export type ProjectPaginateQueryParamType<T = any> = {
+  page?: {
+    from?: number;
+    to?: number;
+    size?: number;
+    current?: number;
+  };
+  sort?: {
+    by: string | { compare: (a: T, b: T) => number };
+    reverse: boolean;
+  };
+  filters?: any[];
+};
+
+/**
+ * projectPaginateQuery() query function output type
+ */
+export type ProjectPaginateQueryOutputType = {
+  page: number;
+  per_page: number | undefined;
+  _query: string | object;
+  [index: string]: any;
+};
+// #endregion Pagination type declarations

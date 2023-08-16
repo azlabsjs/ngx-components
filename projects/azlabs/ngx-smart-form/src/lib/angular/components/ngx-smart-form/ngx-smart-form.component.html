@@ -26,15 +26,12 @@
   <!--\ submit area -->
 </ng-container>
 <!--\ Main Template -->
-
 <ng-template #recursiveTemplate let-controls="controls" let-group="group" let-autoupload="autoupload">
-  <div class="input-row" *ngIf="!!!noGridLayout">
-    <ng-container
-      *ngTemplateOutlet="previewTemplate; context: {controls, group, autoupload}"></ng-container>
+  <div class="input-row" *ngIf="!noGridLayout">
+    <ng-container *ngTemplateOutlet="previewTemplate; context: {controls, group, autoupload}"></ng-container>
   </div>
   <ng-container *ngIf="!!noGridLayout">
-    <ng-container
-      *ngTemplateOutlet="previewTemplate; context: {controls, group, autoupload}"></ng-container>
+    <ng-container *ngTemplateOutlet="previewTemplate; context: {controls, group, autoupload}"></ng-container>
   </ng-container>
   <ng-template #previewTemplate let-controls="controls" let-group="group" let-autoupload="autoupload">
     <ng-container *ngFor="let value of controls">
