@@ -9,6 +9,9 @@
       "@azlabsjs/ngx-dropdown": [
         "dist/azlabs/ngx-dropdown"
       ],
+      "@azlabsjs/ngx-common": [
+        "dist/azlabs/ngx-common"
+      ],
       "@azlabsjs/ngx-file-input": [
         "dist/azlabs/ngx-file-input"
       ],

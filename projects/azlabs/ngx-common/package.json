@@ -1,0 +1,14 @@
+{
+  "name": "@azlabsjs/ngx-common",
+  "version": "0.15.15",
+  "peerDependencies": {
+    "@angular/common": "^15.2.0",
+    "@angular/core": "^15.2.0",
+    "@azlabsjs/js-object": "^0.1.11",
+    "@azlabsjs/js-datetime": "^0.1.10"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false
+}

@@ -9,7 +9,6 @@ import { NgxDropzoneModule } from '@azlabsjs/ngx-dropzone';
 import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
 import { NgxSlidesModule } from '@azlabsjs/ngx-slides';
 import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
-import { HTTPResponse } from '@azlabsjs/requests';
 import { CdsModule } from '@cds/angular';
 import { ClarityIcons, uploadCloudIcon } from '@cds/core/icon';
 import { AppComponent } from './app.component';

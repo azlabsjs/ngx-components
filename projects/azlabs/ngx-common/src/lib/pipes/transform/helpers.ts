@@ -1,5 +1,8 @@
 import { PipeTransform } from '@angular/core';
 
+/**
+ * @internal
+ */
 type ExceptFirst<T extends unknown[]> = T extends [any, ...infer U] ? U : never;
 
 /**
@@ -21,7 +24,5 @@ export function createPipeTransform<T extends PipeTransform>(
   pipe: T,
   ...args: ExceptFirst<Parameters<T['transform']>>
 ) {
-  return (value: any) => {
-    return pipe.transform(value, ...args);
-  };
+  return (value: any) => pipe.transform(value, ...args);
 }

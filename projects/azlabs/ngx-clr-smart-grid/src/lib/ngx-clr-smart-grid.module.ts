@@ -13,21 +13,20 @@ import { ModuleWithProviders, NgModule } from '@angular/core';
 import { ClarityModule } from '@clr/angular';
 import { NgxClrGridSelectDirective } from './directives';
 import { NgxClrSmartGridComponent } from './ngx-clr-smart-grid.component';
-import { NgxGridTransformPipe } from './pipes';
-import { PIPE_TRANSFORMS } from './tokens';
-import { PipeTransformTokenMapType } from './types';
+import {
+  NgxCommonModule,
+  PIPE_TRANSFORMS,
+  PipeTransformTokenMapType,
+} from '@azlabsjs/ngx-common';
 
 @NgModule({
-  declarations: [
-    NgxClrSmartGridComponent,
-    NgxGridTransformPipe,
-    NgxClrGridSelectDirective,
-  ],
-  imports: [CommonModule, ClarityModule],
+  declarations: [NgxClrSmartGridComponent, NgxClrGridSelectDirective],
+  imports: [CommonModule, ClarityModule, NgxCommonModule],
   exports: [
     NgxClrSmartGridComponent,
-    NgxGridTransformPipe,
     NgxClrGridSelectDirective,
+    NgxCommonModule,
+    ClarityModule,
   ],
   providers: [
     UpperCasePipe,

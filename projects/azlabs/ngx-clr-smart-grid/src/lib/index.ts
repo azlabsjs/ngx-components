@@ -13,4 +13,3 @@ export {
 export { NgxClrGridSelectDirective } from './directives';
 export { NgxClrSmartGridComponent } from './ngx-clr-smart-grid.component';
 export { NgxClrSmartGridModule } from './ngx-clr-smart-grid.module';
-export { createPipeTransform, NgxGridTransformPipe } from './pipes';

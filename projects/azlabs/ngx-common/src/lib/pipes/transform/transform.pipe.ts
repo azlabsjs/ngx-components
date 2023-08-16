@@ -10,9 +10,8 @@ import {
 } from '@angular/common';
 import { Inject, Injector, Pipe, PipeTransform } from '@angular/core';
 import { GetTimeAgo, JSDate, ParseMonth } from '@azlabsjs/js-datetime';
-import { PIPE_TRANSFORMS } from '../tokens';
-import { PipeTransformTokenMapType } from '../types';
-import { PipeTransformType } from '../core';
+import { PipeTransformTokenMapType, PipeTransformType } from './types';
+import { PIPE_TRANSFORMS } from './tokens';
 
 /**
  * Returns the strings after the first occurence the specified character
@@ -84,7 +83,7 @@ function substr(value: string, start: number, length?: number) {
 @Pipe({
   name: 'transform',
 })
-export class NgxGridTransformPipe implements PipeTransform {
+export class NgxTransformPipe implements PipeTransform {
   /**
    * Creates an instance {@see NgxGridDataPipe} pipe
    */

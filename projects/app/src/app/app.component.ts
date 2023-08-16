@@ -1,11 +1,8 @@
 import { LowerCasePipe } from '@angular/common';
 import { Component, Inject, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import {
-  createPipeTransform,
-  GridColumnType,
-  GridConfigType,
-} from '@azlabsjs/ngx-clr-smart-grid';
+import { GridColumnType, GridConfigType } from '@azlabsjs/ngx-clr-smart-grid';
+import { createPipeTransform } from '@azlabsjs/ngx-common';
 import { createSlide } from '@azlabsjs/ngx-slides';
 import {
   FormsClient,
