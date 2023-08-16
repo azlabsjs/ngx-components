@@ -24,8 +24,8 @@ export class NgxCommonModule {
     return {
       ngModule: NgxCommonModule,
       providers: [
+        ...pipeTransformProvider,
         {
-          ...pipeTransformProvider,
           provide: PIPE_TRANSFORMS,
           useFactory: () => {
             return config?.pipeTransformMap ?? {};

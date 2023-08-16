@@ -18,6 +18,7 @@ import {
   useOptionsInterceptor,
 } from '@azlabsjs/ngx-clr-form-control';
 import { FormControlComponent } from './form-control/form-control.component';
+import { NgxCommonModule } from '@azlabsjs/ngx-common';
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
@@ -63,11 +64,13 @@ ClarityIcons.addIcons(uploadCloudIcon);
       // This path will be used the http handler to load the forms in cache
       formsAssets: '/assets/forms.json',
     }),
-    NgxClrSmartGridModule.forRoot({
+
+    NgxCommonModule.forRoot({
       pipeTransformMap: {
         testPipe: TestPipe,
       },
     }),
+    NgxClrSmartGridModule,
     NgxSlidesModule.forRoot(),
 
     NgxDropzoneModule.forRoot(),
