@@ -23,12 +23,14 @@ export type GridColumnType = {
   /**
    * Comparator function when sorting datagrid items
    */
-  sort?: Comparator<unknown> | undefined
+  sort?: Comparator<unknown> | string | undefined;
   /**
    * The sortable property makes the column available for sorting
-   */;
+   */
   sortable?: boolean;
+  
   /**
+   * @deprecated
    * Property name used during sort queries
    *
    */
