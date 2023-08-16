@@ -5,10 +5,7 @@ import { ClrDatagridComparatorInterface } from '@clr/angular';
  *
  * Supported pipe transform type
  */
-export type PipeTransformType =
-  | string
-  | ((value: unknown) => unknown)
-  | undefined;
+export type PipeTransformType = string | ((value: any) => any) | undefined;
 
 /**
  * Comparator function type declaration
@@ -73,7 +70,6 @@ export type GriSelectDirectiveInputType = {
   selectable: boolean;
   singleSelection: boolean;
 };
-
 
 // #region Pagination type declarations
 /**

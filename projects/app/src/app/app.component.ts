@@ -4,22 +4,20 @@ import { FormControl } from '@angular/forms';
 import {
   createPipeTransform,
   GridColumnType,
-  GridConfigType
+  GridConfigType,
 } from '@azlabsjs/ngx-clr-smart-grid';
 import { createSlide } from '@azlabsjs/ngx-slides';
 import {
   FormsClient,
   FORM_CLIENT,
-  ReactiveFormComponentInterface
+  ReactiveFormComponentInterface,
 } from '@azlabsjs/ngx-smart-form';
 import {
   FileInput,
   FormConfigInterface,
-  InputTypes
+  InputTypes,
 } from '@azlabsjs/smart-form-core';
 import { BehaviorSubject, filter, Subject, takeUntil, tap } from 'rxjs';
-
-
 
 const _values = {
   data: [
@@ -59,7 +57,7 @@ const _values = {
       },
       test: 'Test value 3',
     },
-  ]
+  ],
 };
 
 type ValuesType = typeof _values;
@@ -101,6 +99,11 @@ export class AppComponent {
     {
       title: 'Prénoms',
       label: 'firstname',
+      transform: [
+        'uppercase',
+        (value: string) =>
+          `${value.substring(0, 1).toLowerCase()}${value.substring(1)}`,
+      ],
     },
     {
       title: 'Type',
@@ -129,9 +132,9 @@ export class AppComponent {
     },
   ];
 
-  pageResult = new Subject<ValuesType|undefined>();
+  pageResult = new Subject<ValuesType | undefined>();
   pageResult$ = this.pageResult.asObservable();
-  placeholder: string|undefined = 'Loading, Please wait...';
+  placeholder: string | undefined = 'Loading, Please wait...';
 
   gridConfig: Partial<GridConfigType> = {
     transformColumnTitle: 'uppercase',

@@ -108,6 +108,7 @@ export class NgxGridTransformPipe implements PipeTransform {
     if (Array.isArray(transform)) {
       return transform.reduce((carry, current) => {
         carry = this.transformValue(carry, current);
+        return carry;
       }, value);
     }
     return this.transformValue(value, transform);
