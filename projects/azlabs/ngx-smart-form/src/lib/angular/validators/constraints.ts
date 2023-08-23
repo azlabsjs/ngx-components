@@ -113,8 +113,6 @@ export function equalsValidator(name: string) {
 
     const [value1, value2] = [control.value, control2.value ?? ''];
 
-    console.log('Value 2', value2);
-
     if (String(value2).trim() === '') {
       return null;
     }
