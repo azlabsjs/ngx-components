@@ -9,6 +9,9 @@ export {
   ComponentReactiveFormHelpers,
   cloneAbstractControl,
   createAngularAbstractControl,
+  createFormGroup,
+  createFormControl,
+  createFormArray,
 } from './helpers';
 // Module & component & services exports
 export { NgxSmartFormModule } from './ngx-smart-form.module';

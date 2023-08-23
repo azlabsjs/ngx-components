@@ -1,7 +1,12 @@
-import { AbstractControl, FormGroup } from '@angular/forms';
+import {
+  AbstractControl,
+  AsyncValidatorFn,
+  FormGroup,
+  ValidatorFn,
+} from '@angular/forms';
 import {
   FormConfigInterface,
-  InputConfigInterface
+  InputConfigInterface,
 } from '@azlabsjs/smart-form-core';
 import { Observable, ObservableInput } from 'rxjs';
 
@@ -128,14 +133,14 @@ export interface ReactiveFormComponentInterface extends FormComponentInterface {
   /**
    * Set the form group value imperative
    * import {ViewChild, Component, OnInit} from '@angular/core';
-   * 
+   *
    * ```ts
    * @Component({
    *  // ...
    * })
    * export class MyComponent implements OnInit {
    *    @ViewChild('#form', {static: false}) smartform: ReactiveFormComponentInterface;
-   * 
+   *
    *    onFormReadyState(state: unknown) {
    *      setTimeOut(() => {
    *        this.smartform.setValue({ ... })
@@ -143,8 +148,24 @@ export interface ReactiveFormComponentInterface extends FormComponentInterface {
    *    }
    * }
    * ```
-   * 
-   * @param state 
+   *
+   * @param state
    */
-  setValue(state: {[k: string]: unknown}): void;
+  setValue(state: { [k: string]: unknown }): void;
+
+  /**
+   * Add an async validator to the form group or the a form group control
+   *
+   * **Note** Case `control` argument is passed as parameter, the component
+   * attempt to add an async validation rule to the matching control with name
+   */
+  addAsyncValidator(validator: AsyncValidatorFn, control?: string): void;
+
+  /**
+   * Add a validator to the form group or the a form group control
+   *
+   * **Note** Case `control` argument is passed as parameter, the component
+   * attempt to add the validation rule to the matching control with name
+   */
+  addValidator(validator: ValidatorFn, control?: string): void;
 }

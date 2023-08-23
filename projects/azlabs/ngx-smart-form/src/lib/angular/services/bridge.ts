@@ -1,37 +1,47 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { AbstractControl, FormBuilder } from '@angular/forms';
 import {
   FormConfigInterface,
   InputConfigInterface,
 } from '@azlabsjs/smart-form-core';
-import { ComponentReactiveFormHelpers } from '../helpers';
+import {
+  createFormGroup,
+  createFormArray,
+  createFormControl,
+} from '../helpers';
 import { AngularReactiveFormBuilderBridge } from '../types';
 
 @Injectable()
 export class ReactiveFormBuilderBrige
   implements AngularReactiveFormBuilderBridge
 {
-  // Creates and instance of the Angular reactive form bridge
-  constructor(public readonly builder: FormBuilder) {}
+  get builder() {
+    return this.injector.get(FormBuilder);
+  }
+
+  /**
+   * Class constuctor
+   */
+  constructor(public readonly injector: Injector) {}
 
   group(state: FormConfigInterface | InputConfigInterface[]): AbstractControl {
+    let inputConfigs = [] as InputConfigInterface[];
     if (state) {
-      const values = ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(
-        this.builder,
-        !Array.isArray(state)
-          ? [...(state as FormConfigInterface).controlConfigs]
-          : state
-      );
-      return values;
+      inputConfigs = !Array.isArray(state)
+        ? [...(state as FormConfigInterface).controlConfigs]
+        : state;
     }
-    return this.builder.group({});
+    const _result = createFormGroup(this.injector, inputConfigs);
+
+    // Return the created form group
+    return _result;
   }
 
   control(state: InputConfigInterface) {
-    return ComponentReactiveFormHelpers.buildControl(this.builder, state);
+    return createFormControl(this.injector, state);
   }
 
   array(state: InputConfigInterface) {
-    return ComponentReactiveFormHelpers.buildArray(this.builder, state);
+    return createFormArray(this.injector, state);
   }
 }

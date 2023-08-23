@@ -84,6 +84,21 @@ export function createInputConfig(
     uploadURL: input['uploadURL'],
     autoupload: Boolean(input['autoupload'] ?? false),
     uploadAs: input['uploadAs'],
+
+    equals: input['equals'],
+
+    exists: input['exists']
+      ? {
+          url:
+            typeof input['exists'] === 'string'
+              ? input['exists']
+              : (input['exists'] as any)['url'],
+          conditions:
+            typeof input['exists'] === 'string'
+              ? []
+              : (input['exists'] as any)['conditions'],
+        }
+      : undefined,
   } as ControlInterface;
 }
 

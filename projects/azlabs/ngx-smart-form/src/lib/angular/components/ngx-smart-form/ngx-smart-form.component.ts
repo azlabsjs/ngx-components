@@ -15,7 +15,13 @@ import {
   SimpleChanges,
   TemplateRef,
 } from '@angular/core';
-import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
+import {
+  AbstractControl,
+  AsyncValidatorFn,
+  FormArray,
+  FormGroup,
+  ValidatorFn,
+} from '@angular/forms';
 import { HTTPRequestMethods } from '@azlabsjs/requests';
 import {
   FormConfigInterface,
@@ -151,6 +157,20 @@ export class NgxSmartFormComponent
     }
   }
 
+  addAsyncValidator(validator: AsyncValidatorFn, control?: string) {
+    const _control = control ? this._formGroup.get(control) : this._formGroup;
+    if (_control) {
+      _control.addAsyncValidators(validator);
+    }
+  }
+
+  addValidator(validator: ValidatorFn, control?: string) {
+    const _control = control ? this._formGroup.get(control) : this._formGroup;
+    if (_control) {
+      _control.addValidators(validator);
+    }
+  }
+
   //
   enableControls(controls: ControlsStateMap): void {
     for (const [key, entry] of Object.entries(controls)) {
@@ -243,7 +263,7 @@ export class NgxSmartFormComponent
     }
   }
 
-  setBindings() {
+  private setBindings() {
     if (this.form && this._formGroup) {
       const [bindings, formgroup, controls] = controlAttributesDataBindings(
         this.form.controlConfigs ?? []
@@ -272,7 +292,7 @@ export class NgxSmartFormComponent
   }
 
   // tslint:disable-next-line: typedef
-  handleControlChanges(
+  private handleControlChanges(
     event: any,
     name: string,
     bindings: Map<string, BindingInterface>

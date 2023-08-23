@@ -1,4 +1,8 @@
-import { CommonModule, LocationStrategy, PlatformLocation } from '@angular/common';
+import {
+  CommonModule,
+  LocationStrategy,
+  PlatformLocation,
+} from '@angular/common';
 import {
   APP_INITIALIZER,
   Injector,
@@ -10,7 +14,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HTTPRequest } from '@azlabsjs/requests';
 import { CacheProvider } from '@azlabsjs/smart-form-core';
 import { from, lastValueFrom, map, ObservableInput, of } from 'rxjs';
-import { createSubmitHttpHandler } from '../http';
+import { createRequestClient, createSubmitHttpHandler } from '../http';
 import {
   NgxSmartArrayAddButtonComponent,
   NgxSmartArrayCloseButtonComponent,
@@ -99,7 +103,12 @@ export function preloadAppForms(service: CacheProvider, assetsURL: string) {
 })
 export class NgxSmartFormModule {
   static forRoot(configs: ConfigType): ModuleWithProviders<NgxSmartFormModule> {
-    let { formsAssets: assets, loadFormsHandler } = configs;
+    let {
+      formsAssets: assets,
+      loadFormsHandler,
+      serverConfigs,
+      submitRequest,
+    } = configs;
     const _assets = assets ?? '/assets/resources/app-forms.json';
     const _loadFormsHandler =
       loadFormsHandler ??
@@ -124,11 +133,18 @@ export class NgxSmartFormModule {
       ReactiveFormBuilderBrige,
       {
         provide: FORMS_LOADER,
-        useFactory: (location: LocationStrategy, platformLocation: PlatformLocation) => {
+        useFactory: (
+          location: LocationStrategy,
+          platformLocation: PlatformLocation
+        ) => {
           return new DefaultFormsLoader(_loadFormsHandler, (path?: string) => {
-            const _base = `${platformLocation.protocol}//${platformLocation.hostname}${platformLocation.port ? `:${platformLocation.port}` : ''}`;
+            const _base = `${platformLocation.protocol}//${
+              platformLocation.hostname
+            }${platformLocation.port ? `:${platformLocation.port}` : ''}`;
             const _path = location.prepareExternalUrl(path ?? '/');
-            return `${_base.endsWith('/') ? _base.substring(0, _base.length - 1): _base}/${_path.startsWith('/') ? _path.substring(1) : _path}`;
+            return `${
+              _base.endsWith('/') ? _base.substring(0, _base.length - 1) : _base
+            }/${_path.startsWith('/') ? _path.substring(1) : _path}`;
           });
         },
         deps: [LocationStrategy, PlatformLocation],
@@ -143,7 +159,7 @@ export class NgxSmartFormModule {
       },
       {
         provide: API_HOST,
-        useValue: configs!.serverConfigs!.api.host || undefined,
+        useValue: serverConfigs?.api.host || undefined,
       },
       {
         provide: APP_INITIALIZER,
@@ -159,10 +175,10 @@ export class NgxSmartFormModule {
       {
         provide: HTTP_REQUEST_CLIENT,
         useFactory: (injector: Injector) =>
-          createSubmitHttpHandler(
+          createRequestClient(
             injector,
-            configs!.serverConfigs!.api.host,
-            configs.submitRequest?.interceptorFactory
+            serverConfigs?.api.host,
+            submitRequest?.interceptorFactory
           ),
         deps: [Injector],
       },

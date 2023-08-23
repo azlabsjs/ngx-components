@@ -9,7 +9,7 @@ import { getObjectProperty } from '@azlabsjs/js-object';
 import { map, of } from 'rxjs';
 import { TRANSLATIONS_DICTIONARY } from '../tokens';
 import { Translations } from '../types';
-import { defaultTranslations } from '../constants';
+import { defaultStrings } from '../constants';
 
 /**
  * Determines if two objects or two values are equivalent.
@@ -64,7 +64,7 @@ export function equals(o1: any, o2: any): boolean {
   return false;
 }
 
-function queryValidationMessage(
+function createString(
   state: Record<string, any>,
   key: string,
   interpolateParams: { [index: string]: any }
@@ -76,13 +76,13 @@ function queryValidationMessage(
         value = value.replace('{{' + prop + '}}', current);
       }
     }
-    return value;
   }
-  return value ?? '';
+  return value;
 }
 
 @Pipe({
   name: 'translate',
+  pure: false,
 })
 export class TranslatePipe implements PipeTransform {
   //
@@ -103,12 +103,12 @@ export class TranslatePipe implements PipeTransform {
     @Optional()
     _translations?: Translations
   ) {
-    this.translations = _translations ?? of(defaultTranslations());
+    this.translations = _translations ?? of(defaultStrings);
   }
 
   //
   updateValue(key: string, interpolateParams?: object) {
-    let onTranslation = (res: string | string[]) => {
+    let onTranslation = (res: string | undefined) => {
       this.value = res !== undefined && res !== null ? res : key;
       this.lastKey = key;
       this.cdRef.markForCheck();
@@ -120,19 +120,15 @@ export class TranslatePipe implements PipeTransform {
     if (typeof key === 'undefined' || key === null || !key.length) {
       throw new Error(`Parameter "key" required`);
     }
-    const isArrayKeys = Array.isArray(key);
-    const keys = (isArrayKeys ? key : [key]) as string[];
+    const keys = Array.isArray(key) ? key : [key];
 
     return this.translations.pipe(
-      map((state) => {
-        const transalations = keys.map((key) =>
-          queryValidationMessage(state, key, interpolateParams ?? {})
-        );
-        if (transalations && !isArrayKeys) {
-          return transalations[0];
-        }
-        return transalations;
-      })
+      map(
+        (state) =>
+          keys.map((key) =>
+            createString(state, key, interpolateParams ?? {})
+          )[0]
+      )
     );
   }
 
@@ -167,6 +163,7 @@ export class TranslatePipe implements PipeTransform {
     this.lastKey = query;
     this.lastParams = args;
     this.updateValue(query, interpolateParams);
-    return this.value;
+
+    return this.value ?? query;
   }
 }

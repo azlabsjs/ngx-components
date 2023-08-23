@@ -4,6 +4,9 @@ export { cloneAbstractControl } from './clone';
 export {
   ComponentReactiveFormHelpers,
   createAngularAbstractControl,
+  createFormGroup,
+  createFormControl,
+  createFormArray
 } from './builders';
 
 // Attributes builder helper functions

@@ -24,17 +24,18 @@ export interface RequestClient {
     method: HTTPRequestMethods,
     body: unknown,
     options?: {
+      query?: { [prop: string]: unknown };
       headers?: HeadersInit;
       responseType?: HTTPResponseType;
     }
   ): ObservableInput<T>;
 }
 
-export type RequestOptionsType =
+export type RequestOptionsType<T = unknown> =
   | {
       url: string;
       method: HTTPRequestMethods;
-      body?: any;
+      body?: T;
       headers?: HeadersInit;
       responseType?: HTTPResponseType;
       interceptors?: Interceptor<HTTPRequest>[];

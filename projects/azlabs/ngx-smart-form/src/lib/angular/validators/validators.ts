@@ -3,15 +3,13 @@ import { JSDate } from '@azlabsjs/js-datetime';
 
 export class CustomValidators {
   static match(control: string, other: string) {
-    return (controlGroup: AbstractControl) => {
+    return (group: AbstractControl) => {
       const first =
-        controlGroup.get(control)?.value === ''
+        group.get(control)?.value === ''
           ? undefined
-          : controlGroup.get(control)?.value;
+          : group.get(control)?.value;
       const second =
-        controlGroup.get(other)?.value === ''
-          ? undefined
-          : controlGroup.get(other)?.value;
+        group.get(other)?.value === '' ? undefined : group.get(other)?.value;
       if (
         (typeof first === 'undefined' || first === null) &&
         (typeof second === 'undefined' || second === null)

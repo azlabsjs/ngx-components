@@ -28,6 +28,9 @@ export const API_HOST = new InjectionToken<string>(
   'API HOST FOR FORM MANAGEMENT'
 );
 
+/**
+ * HTTP requests client injection token
+ */
 export const HTTP_REQUEST_CLIENT = new InjectionToken<RequestClient>(
   'CLIENT INSTANCE FOR HANDLING FORM SUBMISSION'
 );

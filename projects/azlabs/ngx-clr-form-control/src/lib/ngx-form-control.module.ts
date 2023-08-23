@@ -5,13 +5,6 @@ import {
   Provider,
 } from '@angular/core';
 import { NgxFormControlComponent } from './ngx-form-control.component';
-import { DateInputPipe } from './pipes/date-input.pipe';
-import { FileInputPipe } from './pipes/file-input.pipe';
-import { NumberInputPipe } from './pipes/number-input.pipe';
-import { SelectInputPipe } from './pipes/select-input.pipe';
-import { TextAreaInputPipe } from './pipes/text-area.input.pipe';
-import { TextInputPipe } from './pipes/text-input.pipe';
-import { TimeInputPipe } from './pipes/time-input.pipe';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
@@ -25,12 +18,11 @@ import {
   NgxTextInputComponent,
   NgxTextAreaInputComponent,
   NgxTimeInputComponent,
+  NgxInputErrorModule,
 } from './components';
 import { TRANSLATIONS_DICTIONARY } from './tokens';
-import { defaultTranslations } from './constants';
+import { defaultStrings } from './constants';
 import { of } from 'rxjs';
-import { TranslatePipe } from './pipes/translate.pipe';
-import { TrustHTMLPipe } from './pipes/safe-html.pipe';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
 import {
@@ -51,6 +43,7 @@ import { ClarityModule } from '@clr/angular';
 import '@cds/core/icon/register.js';
 import { ClarityIcons, eyeHideIcon, eyeIcon } from '@cds/core/icon';
 import { deepEqual } from '@azlabsjs/utilities';
+import { NgxCommonModule } from './common';
 
 // Register clarity icons
 ClarityIcons.addIcons(eyeHideIcon, eyeIcon);
@@ -78,15 +71,6 @@ type ConfigType = {
 @NgModule({
   declarations: [
     NgxFormControlComponent,
-    DateInputPipe,
-    FileInputPipe,
-    NumberInputPipe,
-    SelectInputPipe,
-    TextAreaInputPipe,
-    TextInputPipe,
-    TimeInputPipe,
-    TranslatePipe,
-    TrustHTMLPipe,
     NgxCheckBoxInputComponent,
     NgxDateInputComponent,
     NgxNumberInputComponent,
@@ -100,6 +84,7 @@ type ConfigType = {
   ],
   imports: [
     CommonModule,
+    NgxCommonModule,
     FormsModule,
     ReactiveFormsModule,
     NgSelectModule,
@@ -107,6 +92,7 @@ type ConfigType = {
     NgxFileInputModule,
     NgxOptionsInputModule,
     ClarityModule,
+    NgxInputErrorModule,
   ],
   exports: [NgxFormControlComponent],
 })
@@ -118,7 +104,7 @@ export class NgxClrFormControlModule {
       NgxUploadsEventsService,
       config?.translationsProvider ?? {
         provide: TRANSLATIONS_DICTIONARY,
-        useValue: of(defaultTranslations()),
+        useValue: of(defaultStrings),
       },
       {
         provide: INPUT_OPTIONS_CLIENT,

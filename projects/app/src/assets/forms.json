@@ -3,6 +3,49 @@
     "controls": [
       {
         "formId": 220,
+        "controlName": "password",
+        "controlIndex": 1,
+        "required": true,
+        "disabled": false,
+        "readonly": false,
+        "unique": false,
+        "isRepeatable": false,
+        "dynamicControlContainerClass": "clr-col-6",
+        "id": 1939,
+        "label": "MOT DE PASSE",
+        "placeholder": "Saisir...",
+        "type": "password",
+        "classes": "clr-input",
+        "minLength": 8,
+        "multiple": 0,
+        "options": [],
+        "children": [],
+        "equals": "password_confirmation"
+      },
+      {
+        "formId": 220,
+        "controlName": "password_confirmation",
+        "controlIndex": 2,
+        "required": true,
+        "disabled": false,
+        "readonly": false,
+        "unique": false,
+        "isRepeatable": false,
+        "dynamicControlContainerClass": "clr-col-6",
+        "id": 1940,
+        "label": "MOT DE PASSE (CONFIRMATION)",
+        "placeholder": "Saisir...",
+        "type": "password",
+        "classes": "clr-input",
+        "description": "Veuillez saisir le mot de passe à nouveau",
+        "minLength": 8,
+        "multiple": 0,
+        "options": [],
+        "children": [],
+        "equals": "password"
+      },
+      {
+        "formId": 220,
         "controlName": "fruits",
         "controlIndex": 1,
         "required": true,
@@ -31,7 +74,8 @@
         "required": true,
         "disabled": false,
         "readonly": false,
-        "unique": false,
+        "unique": true,
+        "uniqueOn": "http://127.0.0.1:3000/professions",
         "isRepeatable": false,
         "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-3",
         "id": 1237,
@@ -39,7 +83,7 @@
         "placeholder": "...",
         "type": "select",
         "classes": "clr-input",
-        "selectableModel": "table:hr_persons|model:App\\Models\\Hr_person|keyfield:id|groupfield:id|valuefield:label",
+        "selectableModel": "http://127.0.0.1:3000/professions",
         "multiple": 0,
         "children": [],
         "keyfield": "",
@@ -104,6 +148,10 @@
         "classes": "clr-input",
         "selectableModel": "http://127.0.0.1:3000/professions",
         "maxLength": 145,
+        "exists": {
+          "url": "http://127.0.0.1:3000/categories",
+          "conditions": []
+        },
         "multiple": 0,
         "options": [],
         "children": []
@@ -268,6 +316,27 @@
             "children": []
           }
         ]
+      },
+      
+      {
+        "formId": 220,
+        "controlName": "completed_at",
+        "controlIndex": 17,
+        "required": true,
+        "disabled": false,
+        "readonly": false,
+        "unique": false,
+        "isRepeatable": false,
+        "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-4",
+        "id": 1278,
+        "label": "Date Fin.",
+        "placeholder": "...",
+        "type": "time",
+        "classes": "clr-input",
+        "maxLength": 100,
+        "multiple": 0,
+        "options": [],
+        "children": []
       }
     ],
     "id": 220,

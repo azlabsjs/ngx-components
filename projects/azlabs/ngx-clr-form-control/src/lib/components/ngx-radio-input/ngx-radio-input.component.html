@@ -1,14 +1,12 @@
-<div fetchOptions (optionsChange)="onOptionsChange($event)" [loaded]="loaded"
-  [config]="inputConfig.optionsConfig" [name]="inputConfig.name">
+<div fetchOptions (optionsChange)="onOptionsChange($event)" [loaded]="loaded" [config]="inputConfig.optionsConfig"
+  [name]="inputConfig.name">
   <ng-container *ngIf="inputConfig.options as options">
     <ng-container *ngIf="options!.length > 0">
       <ng-container *ngTemplateOutlet="
           inputRef;
           context: { options: options, config: inputConfig, control }
         "></ng-container>
-      <span [class]="'input__subtext input__error_text'" *ngIf="control.hasError('required') && control.touched">
-        {{ 'validation.required' | translate }}
-      </span>
+      <!-- Control description -->
       <span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="inputConfig.description || '' | trustHtml"></span>
     </ng-container>
   </ng-container>

@@ -9,3 +9,4 @@ export { NgxSelectInputComponent } from './ngx-select-input/ngx-select-input.com
 export { NgxTextInputComponent } from './ngx-text-input/ngx-text-input.component';
 export { NgxTextAreaInputComponent } from './ngx-textarea-input/ngx-textarea-input.component';
 export { NgxTimeInputComponent } from './ngx-time-input/ngx-time-input.component';
+export { NgxInputErrorModule } from './ngx-input-error';

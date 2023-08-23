@@ -1,10 +1,10 @@
 import { useRequestClient } from '@azlabsjs/requests';
-import { from } from 'rxjs';
+import { from, mergeMap, of, throwError } from 'rxjs';
 import { RequestOptionsType } from './types';
 
 /**
  * @internal
- * 
+ *
  * Makes an http request using rxjs fetch wrapper
  *
  * **Note**
@@ -57,6 +57,7 @@ export function rxRequest(request: RequestOptionsType) {
     };
   }
   const client = useRequestClient();
+
   return from(
     client.request({
       url,
@@ -64,10 +65,15 @@ export function rxRequest(request: RequestOptionsType) {
       body,
       options: {
         headers: _headers,
-        // withCredentials: true,
         responseType,
         interceptors,
       },
     })
+  ).pipe(
+    mergeMap((response) =>
+      response.statusText?.toLowerCase() === 'ok' || response.ok === true
+        ? of(response)
+        : throwError(() => response)
+    )
   );
 }

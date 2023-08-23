@@ -7,22 +7,28 @@ import {
   Validators,
   FormArray,
 } from '@angular/forms';
-import { CustomValidators } from '../validators';
+import {
+  CustomValidators,
+  equalsValidator,
+  existsValidator,
+  uniqueValidator,
+} from '../validators';
 import {
   DateInput,
   NumberInput,
   TextInput,
   OptionsInputConfigInterface,
   FormConfigInterface,
-  InputConfigInterface,
   InputTypes,
   InputGroup,
   InputOptionsInterface,
   InputOption,
+  InputConfigInterface,
 } from '@azlabsjs/smart-form-core';
 import { tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { JSDate } from '@azlabsjs/js-datetime';
+import { Injector } from '@angular/core';
 
 type InputConfigType = InputConfigInterface | InputGroup;
 
@@ -37,11 +43,11 @@ export class ComponentReactiveFormHelpers {
    * @param inputs dynamic input configuration
    */
   static buildFormGroupFromInputConfig(
-    builder: FormBuilder,
+    injector: Injector,
     inputs: InputConfigType[]
   ) {
     // Build the outer form group
-    const group = builder.group({});
+    const group = injector.get(FormBuilder).group({});
     for (const input of inputs) {
       if (input.isRepeatable) {
         group.addControl(input.name, new FormArray<AbstractControl>([]));
@@ -54,7 +60,7 @@ export class ComponentReactiveFormHelpers {
       ) {
         const formgroup =
           ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(
-            builder,
+            injector,
             config.children
           );
         if (input?.rules?.isRequired) {
@@ -65,43 +71,39 @@ export class ComponentReactiveFormHelpers {
       }
       group.addControl(
         config.name,
-        ComponentReactiveFormHelpers.buildControl(builder, config)
+        ComponentReactiveFormHelpers.buildControl(injector, config)
       );
     }
     return group;
   }
 
-  public static buildGroup(
-    builder: FormBuilder,
-    inputs: InputConfigInterface[]
-  ) {
-    const group = builder.group({});
+  public static buildGroup(injector: Injector, inputs: InputConfigInterface[]) {
+    const group = injector.get(FormBuilder).group({});
     for (const config of inputs) {
       if (config.type !== InputTypes.CHECKBOX_INPUT) {
         group.addControl(
           config.name,
-          ComponentReactiveFormHelpers.buildControl(builder, config)
+          ComponentReactiveFormHelpers.buildControl(injector, config)
         );
       } else {
         group.addControl(
           config.name,
-          ComponentReactiveFormHelpers.buildArray(builder, config)
+          ComponentReactiveFormHelpers.buildArray(injector, config)
         );
       }
     }
     return group;
   }
 
-  public static buildControl(
-    builder: FormBuilder,
-    config: InputConfigInterface
-  ) {
+  public static buildControl(injector: Injector, config: InputConfigInterface) {
     const validators = [
       config.rules && config.rules.isRequired
         ? Validators.required
         : Validators.nullValidator,
     ];
     const asyncValidators: AsyncValidatorFn[] = [];
+    let hasEqualsConstraint = false;
+    let hasEmailConstraint = false;
     if (
       config.type === InputTypes.TEXT_INPUT ||
       config.type === InputTypes.EMAIL_INPUT ||
@@ -144,6 +146,7 @@ export class ComponentReactiveFormHelpers {
     // We add an email validator if the input type is email
     if (config.type === InputTypes.EMAIL_INPUT) {
       validators.push(Validators.email);
+      hasEmailConstraint = true;
     }
     // Check for min an max rules on number inputs and apply validation to the input
     if (config.type === InputTypes.NUMBER_INPUT) {
@@ -197,26 +200,50 @@ export class ComponentReactiveFormHelpers {
           : // tslint:disable-next-line:no-unused-expression
             null;
     }
+
+    // #region Add constraint rule
+    if (config.constraints && config.constraints.unique) {
+      asyncValidators.push(
+        uniqueValidator(injector, config.constraints.unique)
+      );
+    }
+
+    if (config.constraints && config.constraints.exists) {
+      asyncValidators.push(
+        existsValidator(injector, config.constraints.exists)
+      );
+    }
+
+    if (config.constraints && config.constraints.equals) {
+      validators.push(equalsValidator(config.constraints.equals.fn));
+      hasEqualsConstraint = true;
+    }
+    // #endregion Add constraint rule
+
     // Add formControl to the form group with the generated validation rules
-    const control = builder.control(
+    const control = injector.get(FormBuilder).control(
       {
         value: config.value,
         disabled: config.disabled,
       },
-      asyncValidators.length > 0 || config.type === InputTypes.DATE_INPUT
-        ? {
-            validators: Validators.compose(validators),
-            updateOn: 'blur',
-            asyncValidators,
-          }
-        : {
-            validators: Validators.compose(validators),
-          }
+      {
+        validators: Validators.compose(validators),
+        updateOn:
+        // Case the control is an email or the control is a date input or the control has equals constraint
+        // or the control has async validators, we update only on blur else, we update on submit
+          asyncValidators.length > 0 ||
+          config.type === InputTypes.DATE_INPUT ||
+          hasEqualsConstraint ||
+          hasEmailConstraint
+            ? 'blur'
+            : 'change',
+        asyncValidators,
+      }
     );
     return control;
   }
 
-  public static buildArray(builder: FormBuilder, config: InputConfigInterface) {
+  public static buildArray(injector: Injector, config: InputConfigInterface) {
     const array = new FormArray<AbstractControl>([]);
     of((config as OptionsInputConfigInterface).options)
       .pipe(
@@ -225,7 +252,7 @@ export class ComponentReactiveFormHelpers {
             (current: InputOption, index: number) => {
               // Added validation rule to checkbox array
               (array as FormArray<AbstractControl>).push(
-                builder.control(current.selected)
+                injector.get(FormBuilder).control(current.selected)
               );
             }
           );
@@ -309,13 +336,49 @@ export class ComponentReactiveFormHelpers {
   }
 }
 
-export const createAngularAbstractControl = (
-  builder: FormBuilder,
+/**
+ * @deprecated
+ */
+export function createAngularAbstractControl(
+  injector: Injector,
   form?: FormConfigInterface
-) => {
+) {
   return form
-    ? ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(builder, [
+    ? ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(injector, [
         ...form?.controlConfigs,
       ])
     : undefined;
-};
+}
+
+/**
+ * Create angular form group instance from input configurations
+ */
+export function createFormGroup(
+  injector: Injector,
+  inputConfigs?: InputConfigInterface[]
+) {
+  return ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(
+    injector,
+    inputConfigs ?? []
+  );
+}
+
+/**
+ * Creates angular form control instance from input configuration
+ */
+export function createFormControl(
+  injector: Injector,
+  inputConfig: InputConfigInterface
+) {
+  return ComponentReactiveFormHelpers.buildControl(injector, inputConfig);
+}
+
+/**
+ * Creates angular form control instance from input configuration
+ */
+export function createFormArray(
+  injector: Injector,
+  inputConfig: InputConfigInterface
+) {
+  return ComponentReactiveFormHelpers.buildArray(injector, inputConfig);
+}

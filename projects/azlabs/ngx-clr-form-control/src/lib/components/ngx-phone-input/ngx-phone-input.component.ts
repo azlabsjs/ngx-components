@@ -99,8 +99,10 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
     }));
   }
 
-  onError(value: boolean) {
-    this.control.setErrors({ invalidPhoneNumber: value });
+  onError(_: boolean, value: unknown) {
+    if (_ === true) {
+      this.control.setErrors({ phone: value });
+    }
   }
 
   setState(state: SetStateParam<StateType>) {

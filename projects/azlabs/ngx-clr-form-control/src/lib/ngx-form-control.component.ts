@@ -89,6 +89,22 @@ export class NgxFormControlComponent implements OnDestroy, OnInit {
     return `${name}_${value}`;
   }
 
+  onBlur(event: Event, name: string) {
+    this.blur.emit({ name, value: event });
+  }
+
+  onKeyPress(event: Event, name: string) {
+    this.keypress.emit({ name, value: event });
+  }
+
+  onKeyDown(event: Event, name: string) {
+    this.keydown.emit({ name, value: event });
+  }
+
+  onKeyUp(event: Event, name: string) {
+    this.keyup.emit({ name, value: event });
+  }
+
   ngOnDestroy() {
     for (const subscription of this.subscriptions) {
       subscription.unsubscribe();

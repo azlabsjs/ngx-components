@@ -60,7 +60,7 @@ export class FormControlComponent implements OnInit, OnDestroy {
 
   dateInputControl = new FormControl();
   dateInput: DateInput = {
-    minDate: 'now',
+    minDate: '',
     maxDate: '',
     currentDate: new Date().toLocaleDateString(),
     label: 'Date',
