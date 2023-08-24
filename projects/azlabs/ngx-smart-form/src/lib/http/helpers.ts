@@ -1,4 +1,6 @@
-import { useRequestClient } from '@azlabsjs/requests';
+import {
+  useRequestClient,
+} from '@azlabsjs/requests';
 import { from, mergeMap, of, throwError } from 'rxjs';
 import { RequestOptionsType } from './types';
 

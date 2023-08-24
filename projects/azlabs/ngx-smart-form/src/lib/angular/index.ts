@@ -12,6 +12,7 @@ export {
   createFormGroup,
   createFormControl,
   createFormArray,
+  useBearerTokenInterceptor
 } from './helpers';
 // Module & component & services exports
 export { NgxSmartFormModule } from './ngx-smart-form.module';

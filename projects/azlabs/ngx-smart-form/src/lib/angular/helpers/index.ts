@@ -6,7 +6,7 @@ export {
   createAngularAbstractControl,
   createFormGroup,
   createFormControl,
-  createFormArray
+  createFormArray,
 } from './builders';
 
 // Attributes builder helper functions
@@ -16,3 +16,5 @@ export {
   setControlsAttributes,
 } from './attributes';
 
+// Export interceptor helpers
+export { useBearerTokenInterceptor } from './interceptors';
