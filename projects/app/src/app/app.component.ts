@@ -1,5 +1,5 @@
 import { LowerCasePipe } from '@angular/common';
-import { Component, Inject, ViewChild } from '@angular/core';
+import { Component, Inject, Injector, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { GridColumnType, GridConfigType } from '@azlabsjs/ngx-clr-smart-grid';
 import { createPipeTransform } from '@azlabsjs/ngx-common';
@@ -8,6 +8,7 @@ import {
   FormsClient,
   FORM_CLIENT,
   ReactiveFormComponentInterface,
+  uniqueValidator,
 } from '@azlabsjs/ngx-smart-form';
 import {
   FileInput,
@@ -153,7 +154,7 @@ export class AppComponent {
     category_id: 1,
     lastname: 'AZOMEDOH',
     firstname: 'KOMI SIDOINE',
-    profession: 'INFORMATIQUE',
+    // profession: 'INFORMATIQUE',
     stakeholders: [
       {
         lastname: 'AYI',
@@ -170,7 +171,8 @@ export class AppComponent {
 
   public constructor(
     @Inject(FORM_CLIENT) private client: FormsClient,
-    private lowercasePipe: LowerCasePipe
+    private lowercasePipe: LowerCasePipe,
+    private injector: Injector
   ) {
     this.client
       .get(220)
@@ -220,10 +222,24 @@ export class AppComponent {
       //     takeUntil(this._destroy$)
       //   )
       //   .subscribe();
-    }, 5000);
+    }, 3000);
+
+    setTimeout(() => {
+      this.smartForm?.addAsyncValidator(
+        uniqueValidator(this.injector, {
+          query: 'user_details__email',
+          fn: `http://127.0.0.1:3000/professions`,
+          conditions: (value: unknown) => {
+            return true;
+          },
+        }),
+        'email'
+      );
+    }, 1000);
 
     setTimeout(() => {
       this.smartForm.setValue(this.fromState);
+      console.log(this.smartForm?.getControl('email')?.errors);
     }, 5000);
   }
 

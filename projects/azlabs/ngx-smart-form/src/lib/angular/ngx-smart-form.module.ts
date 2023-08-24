@@ -58,6 +58,18 @@ type ConfigType = {
   formsAssets?: string;
   clientFactory?: Function;
   templateTextProvider?: Provider;
+  /**
+   * Provides configurations that are used by the module during API requests
+   */
+  requests?: {
+    interceptorFactory?: InterceptorFactory<HTTPRequest>;
+  };
+  /**
+   * submitRequest is deprecated and will be removed in future releases. use
+   * `requests` option instead
+   *
+   * @deprecated v0.15.15
+   */
   submitRequest?: {
     interceptorFactory?: InterceptorFactory<HTTPRequest>;
   };
@@ -107,6 +119,7 @@ export class NgxSmartFormModule {
       formsAssets: assets,
       loadFormsHandler,
       serverConfigs,
+      requests,
       submitRequest,
     } = configs;
     const _assets = assets ?? '/assets/resources/app-forms.json';
@@ -178,7 +191,7 @@ export class NgxSmartFormModule {
           createRequestClient(
             injector,
             serverConfigs?.api.host,
-            submitRequest?.interceptorFactory
+            requests?.interceptorFactory ?? submitRequest?.interceptorFactory
           ),
         deps: [Injector],
       },

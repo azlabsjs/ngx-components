@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ContentChild,
@@ -24,6 +25,7 @@ type StateType = {
   selector: 'ngx-phone-input',
   templateUrl: './ngx-phone-input.component.html',
   styles: [],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
   //#region Component inputs

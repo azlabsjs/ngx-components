@@ -11,7 +11,7 @@ import {
 import { FormControl } from '@angular/forms';
 import { InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
 import { Subscription } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { InputEventArgs } from './types';
 
 @Component({
@@ -47,7 +47,7 @@ export class NgxFormControlComponent implements OnDestroy, OnInit {
   //#endregion Component outputs
 
   //#region Class properties
-  subscriptions: Subscription[] = [];
+  private subscriptions: Subscription[] = [];
   //#endregion Class properties
 
   /**
@@ -61,16 +61,17 @@ export class NgxFormControlComponent implements OnDestroy, OnInit {
     this.subscriptions.push(
       this.formcontrol.valueChanges
         .pipe(
-          tap((source) => {
-            this.valueChange.emit({
-              name: this.inputConfig.name,
-              value: source,
-            });
-            // Trigger a change detection to insure update tge UI component
+          map((source) => ({ name: this.inputConfig.name, value: source })),
+          tap((event) => {
+            this.valueChange.emit(event);
+            // Trigger a change detection to insure update the UI component
             this.changes.markForCheck();
           })
         )
-        .subscribe()
+        .subscribe(),
+      this.formcontrol.statusChanges.subscribe(() =>
+        this.changes.markForCheck()
+      )
     );
   }
 
