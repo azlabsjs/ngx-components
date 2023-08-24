@@ -36,4 +36,10 @@ export {
   ReactiveFormComponentInterface,
 } from './types';
 // Validators
-export { CustomValidators } from './validators';
+export {
+  CustomValidators,
+  uniqueValidator,
+  existsValidator,
+  equalsValidator,
+  patternValidator,
+} from './validators';
