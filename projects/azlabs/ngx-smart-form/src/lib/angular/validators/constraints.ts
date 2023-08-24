@@ -9,10 +9,22 @@ import {
   createExistsConstraint,
   createPatternConstraint,
   createUniqueConstraint,
-  AsyncConstraint,
 } from '@azlabsjs/smart-form-core';
 import { HTTP_REQUEST_CLIENT } from '../types';
 import { from, lastValueFrom } from 'rxjs';
+
+export type AsyncConstraint<T = boolean> = {
+  query?: string;
+  /**
+   * Constraint handler function
+   */
+  fn: string | ((control: string, value: unknown) => T | Promise<T>);
+  /**
+   * Provides the list of conditions applied on properties of the return value of the
+   * `fn` function.
+   */
+  conditions?: string[] | ((result: unknown, source: unknown) => boolean);
+};
 
 function isDefined(value: unknown): value is AbstractControl {
   return !!value;
@@ -52,17 +64,26 @@ export function existsValidator(
 ): AsyncValidatorFn {
   return async (control: AbstractControl) => {
     try {
+      const _value = control.value;
       const { fn, conditions, query } = constraint;
       const _fn =
         typeof fn === 'string'
-          ? restQueryFactory(injector, fn, control.value, query)
+          ? restQueryFactory(injector, fn, _value, query)
           : fn;
+      // Transform the function provided by the developper into one compatible with
+      // exists async constraint required type
+      const _conditions =
+        typeof conditions === 'function'
+          ? (value: unknown) => {
+              return conditions(value, _value);
+            }
+          : (conditions as string[]);
 
       // Call the exist constaint on the _fn function
-      const _result = await createExistsConstraint(conditions ?? [])(_fn);
+      const _result = await createExistsConstraint(_conditions)(_fn);
 
       // Returns validation error if _result evaluate to true
-      return _result ? null : { exists: control.value };
+      return _result ? null : { exists: _value };
     } catch (_) {
       return { exists: control.value };
     }
@@ -78,17 +99,26 @@ export function uniqueValidator(
 ): AsyncValidatorFn {
   return async (control: AbstractControl) => {
     try {
+      const _value = control.value;
       const { fn, conditions, query } = constraint;
       const _fn =
         typeof fn === 'string'
-          ? restQueryFactory(injector, fn, control.value, query)
+          ? restQueryFactory(injector, fn, _value, query)
           : fn;
+      // Transform the function provided by the developper into one compatible with
+      // exists async constraint required type
+      const _conditions =
+        typeof conditions === 'function'
+          ? (value: unknown) => {
+              return conditions(value, _value);
+            }
+          : (conditions as string[]);
 
       // Call the exist constaint on the _fn function
-      const _result = await createUniqueConstraint(conditions ?? [])(_fn);
+      const _result = await createUniqueConstraint(_conditions ?? [])(_fn);
 
       // Returns validation error if _result evaluate to true
-      return _result ? null : { unique: control.value };
+      return _result ? null : { unique: _value };
     } catch (_) {
       return null;
     }
