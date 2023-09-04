@@ -1,6 +1,6 @@
 {
   "name": "@azlabsjs/ngx-clr-form-control",
-  "version": "0.15.27",
+  "version": "0.15.28",
   "peerDependencies": {
     "@angular/common": "^15.2.0",
     "@angular/core": "^15.2.0",
