@@ -14,26 +14,61 @@ type CreateControlAttributeSetterType = (
   value: any
 ) => CreateControlAttributeSetterReturnType;
 
+/**
+ * @internal Returns the required if configured values
+ */
+function getRequiredIfValues(input: InputConfigInterface) {
+  return input.requiredIf?.values ?? [];
+}
+
+/**
+ * @internal check if the input should be hidden or not
+ */
+function shouldHideInput(values: unknown[], value: unknown, _name: string) {
+  if (values.includes('*')) {
+    return !(
+      typeof value !== 'undefined' &&
+      value !== null &&
+      String(value).trim() !== ''
+    );
+  }
+  if (
+    values.includes('__null__') ||
+    values.includes('__undefined__') ||
+    values.includes('__empty__')
+  ) {
+    return (
+      typeof value !== 'undefined' &&
+      value !== null &&
+      String(value).trim() !== ''
+    );
+  }
+  value = isNaN(value as any) ? value : +(value as string);
+  console.log(values, value, _name);
+  const _values = isNumber(value)
+    ? values.map((value) =>
+        isNaN(value as number) ? value : +(value as string)
+      )
+    : values || [];
+  return !_values.includes(value) ? true : false;
+}
+
+/**
+ * Hidden attribute setter
+ */
 export function useHiddenAttributeSetter(
   controls: InputConfigInterface[],
   bidings: BindingInterface,
   value: string | number
 ): CreateControlAttributeSetterReturnType {
-  return (formgroup: AbstractControl) => {
+  return (formgroup) => {
     const hasControls = Array.isArray(controls) && controls.length !== 0;
     if (hasControls) {
-      controls = controls.map((_control) => {
-        if (_control.name === bidings.key) {
-          value = isNaN(value as any) ? value : +value;
-          const requiredIfValues = isNumber(value)
-            ? _control.requiredIf
-              ? _control.requiredIf.values.map((value) => {
-                  return isNaN(value) ? value : +value;
-                })
-              : []
-            : _control.requiredIf?.values || [];
-          _control.hidden = !requiredIfValues.includes(value) ? true : false;
-          if (_control.hidden) {
+      controls = controls.map((_input) => {
+        if (_input.name === bidings.key) {
+          const values = getRequiredIfValues(_input);
+          _input.hidden = shouldHideInput(values, value, _input.name);
+          if (_input.hidden) {
             (formgroup as FormGroup).removeControl(bidings.key);
           } else {
             (formgroup as FormGroup).addControl(
@@ -42,7 +77,7 @@ export function useHiddenAttributeSetter(
             );
           }
         }
-        return _control;
+        return _input;
       });
     }
     return [formgroup, controls];

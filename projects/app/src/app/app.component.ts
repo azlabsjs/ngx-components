@@ -237,18 +237,19 @@ export class AppComponent {
       );
     }, 1000);
 
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       this.smartForm.setValue(this.fromState);
-      console.log(this.smartForm?.getControl('email')?.errors);
+      clearTimeout(timeout);
     }, 5000);
   }
 
   afterChanges() {
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       this.smartForm
         ?.controlValueChanges('profession')
         .pipe(tap((state) => console.log('State changes:', state)))
         .subscribe();
+      clearTimeout(timeout);
     }, 300);
   }
 
