@@ -13,8 +13,8 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HTTPRequest } from '@azlabsjs/requests';
 import { CacheProvider } from '@azlabsjs/smart-form-core';
-import { from, lastValueFrom, map, ObservableInput, of } from 'rxjs';
-import { createRequestClient, createSubmitHttpHandler } from '../http';
+import { from, lastValueFrom, map, ObservableInput } from 'rxjs';
+import { createRequestClient } from '../http';
 import {
   NgxSmartArrayAddButtonComponent,
   NgxSmartArrayCloseButtonComponent,
@@ -43,8 +43,12 @@ import {
   InterceptorFactory,
   LoadFormsRequestHandler,
 } from './types';
-import { rxRequest } from '../http/helpers';
+import { isValidURL, rxRequest } from '../http';
 
+/**
+ * @internal
+ * API server configuration type declaration
+ */
 type FormApiServerConfigs = {
   api: {
     host?: string;
@@ -53,6 +57,10 @@ type FormApiServerConfigs = {
   };
 };
 
+/**
+ * @internal
+ * Module configuration type declaration
+ */
 type ConfigType = {
   serverConfigs: FormApiServerConfigs;
   formsAssets?: string;
@@ -151,13 +159,24 @@ export class NgxSmartFormModule {
           platformLocation: PlatformLocation
         ) => {
           return new DefaultFormsLoader(_loadFormsHandler, (path?: string) => {
-            const _base = `${platformLocation.protocol}//${
-              platformLocation.hostname
-            }${platformLocation.port ? `:${platformLocation.port}` : ''}`;
-            const _path = location.prepareExternalUrl(path ?? '/');
-            return `${
-              _base.endsWith('/') ? _base.substring(0, _base.length - 1) : _base
-            }/${_path.startsWith('/') ? _path.substring(1) : _path}`;
+            if (path && isValidURL(path)) {
+              return path;
+            }
+            let { hostname, port } = platformLocation;
+            port = port ? `:${port}` : '';
+            hostname = hostname.endsWith('#')
+              ? hostname.substring(0, hostname.length - 1)
+              : hostname;
+            const _base = `${platformLocation.protocol}//${hostname}${port}`;
+            path  = location.prepareExternalUrl(path ?? '/');
+            const _path = path.startsWith('#') ? path.substring(1) : path;
+            const _hostname = _base.endsWith('/')
+              ? _base.substring(0, _base.length - 1)
+              : _base;
+            const hostPath = _path.startsWith('/') ? _path.substring(1) : _path;
+
+            // return the constructed url as an output
+            return `${_hostname}/${hostPath}`;
           });
         },
         deps: [LocationStrategy, PlatformLocation],

@@ -149,7 +149,7 @@
         "selectableModel": "http://127.0.0.1:3000/professions",
         "maxLength": 145,
         "exists": {
-          "url": "http://127.0.0.1:3000/categories",
+          "url": "http://127.0.0.1:3000/professions",
           "conditions": []
         },
         "multiple": 0,

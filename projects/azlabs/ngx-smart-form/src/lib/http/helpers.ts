@@ -6,6 +6,19 @@ import { RequestOptionsType } from './types';
 
 /**
  * @internal
+ * Basic URL validation logic
+ */
+export function isValidURL(url: string) {
+  try {
+    const _url = new URL(url);
+    return typeof _url.protocol !== 'undefined' && _url.protocol !== null;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * @internal
  *
  * Makes an http request using rxjs fetch wrapper
  *

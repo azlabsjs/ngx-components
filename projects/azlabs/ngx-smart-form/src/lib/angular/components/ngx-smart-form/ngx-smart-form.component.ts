@@ -20,6 +20,7 @@ import {
   AsyncValidatorFn,
   FormArray,
   FormGroup,
+  ValidationErrors,
   ValidatorFn,
 } from '@angular/forms';
 import { HTTPRequestMethods } from '@azlabsjs/requests';
@@ -28,8 +29,15 @@ import {
   InputConfigInterface,
   InputGroup,
 } from '@azlabsjs/smart-form-core';
-import { EMPTY, from, lastValueFrom, Observable, Subject } from 'rxjs';
-import { takeUntil, tap } from 'rxjs/operators';
+import {
+  EMPTY,
+  firstValueFrom,
+  from,
+  lastValueFrom,
+  Observable,
+  Subject,
+} from 'rxjs';
+import { filter, takeUntil, tap } from 'rxjs/operators';
 import { RequestClient } from '../../../http';
 import {
   ComponentReactiveFormHelpers,
@@ -45,6 +53,37 @@ import {
   HTTP_REQUEST_CLIENT,
   ReactiveFormComponentInterface,
 } from '../../types';
+
+/**
+ * Recursively get errors from an angular reactive control
+ * (eg: FormGroup, FormControl, FormArray)
+ */
+function getFormErrors(control: AbstractControl) {
+  const errors: ValidationErrors[] = [];
+  const getErrors = (c: AbstractControl, _name?: string) => {
+    if (c instanceof FormGroup) {
+      for (const name of Object.keys(c.controls)) {
+        const current = c.get(name);
+        if (current) {
+          getErrors(current, name);
+        }
+      }
+    } else if (c instanceof FormArray) {
+      for (const _c of c.controls) {
+        getErrors(_c);
+      }
+    } else {
+      if (c.invalid && c.errors) {
+        errors.push(c.errors);
+      }
+    }
+  };
+
+  getErrors(control);
+
+  // Return the list of error from the control element
+  return errors;
+}
 
 @Component({
   selector: 'ngx-smart-form',
@@ -193,13 +232,28 @@ export class NgxSmartFormComponent
 
   //
   async onSubmit(event: Event) {
+    event.preventDefault();
+    if (!this.formGroup) {
+      return;
+    }
+
     // Validate the formgroup object to ensure it passes
     // validation before submitting
     this.validateForm();
+    // Wait the for status changes to be non pending before handling submit action
+    await firstValueFrom(
+      this.formGroup.statusChanges.pipe(
+        filter((status) => status !== 'PENDING')
+      )
+    );
     this.changesRef.detectChanges();
     // We simply return without performing any further action
     // if the validation fails
-    if (!this._formGroup.valid) {
+    // Due to some issue with form group being invalid while all controls does not
+    // have error, we are adding a check that verifies if all controls has error before
+    // breaking out of the function
+    const errors = getFormErrors(this.formGroup);
+    if (!this._formGroup.valid && errors.length > 0) {
       return;
     }
     const path = this.path || this.form.endpointURL;
@@ -219,7 +273,6 @@ export class NgxSmartFormComponent
     } else {
       this.submit.emit(this._formGroup.getRawValue());
     }
-    event.preventDefault();
   }
 
   setComponentForm(value: FormConfigInterface): void {

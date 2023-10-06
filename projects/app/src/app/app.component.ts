@@ -229,8 +229,8 @@ export class AppComponent {
         uniqueValidator(this.injector, {
           query: 'user_details__email',
           fn: `http://127.0.0.1:3000/professions`,
-          conditions: (value: unknown) => {
-            return true;
+          conditions: (_: unknown) => {
+            return false;
           },
         }),
         'email'

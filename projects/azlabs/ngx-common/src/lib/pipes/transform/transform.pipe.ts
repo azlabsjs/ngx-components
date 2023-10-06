@@ -82,6 +82,7 @@ function substr(value: string, start: number, length?: number) {
 
 @Pipe({
   name: 'transform',
+  pure: false
 })
 export class NgxTransformPipe implements PipeTransform {
   /**

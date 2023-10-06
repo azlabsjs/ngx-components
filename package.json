@@ -3,7 +3,7 @@
   "version": "0.15.27",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --port 12800",
+    "start": "ng serve --port 8756",
     "build:all": "ng build --configuration production @azlabsjs/ngx-common && ng build --configuration production @azlabsjs/ngx-dropzone && ng build --configuration production @azlabsjs/ngx-dropdown && ng build --configuration production @azlabsjs/ngx-intl-tel-input && ng build --configuration production @azlabsjs/ngx-file-input && ng build --configuration production @azlabsjs/ngx-options-input && ng build --configuration production @azlabsjs/ngx-clr-form-control && ng build --configuration production @azlabsjs/ngx-smart-form && ng build --configuration production @azlabsjs/ngx-clr-smart-grid && ng build --configuration production @azlabsjs/ngx-slides",
     "watch": "ng build --watch",
     "test": "ng test",

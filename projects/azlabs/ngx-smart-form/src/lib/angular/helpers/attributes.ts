@@ -44,7 +44,6 @@ function shouldHideInput(values: unknown[], value: unknown, _name: string) {
     );
   }
   value = isNaN(value as any) ? value : +(value as string);
-  console.log(values, value, _name);
   const _values = isNumber(value)
     ? values.map((value) =>
         isNaN(value as number) ? value : +(value as string)

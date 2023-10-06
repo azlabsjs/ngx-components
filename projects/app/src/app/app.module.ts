@@ -19,6 +19,7 @@ import {
 } from '@azlabsjs/ngx-clr-form-control';
 import { FormControlComponent } from './form-control/form-control.component';
 import { NgxCommonModule } from '@azlabsjs/ngx-common';
+import { RouterModule } from '@angular/router';
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
@@ -30,6 +31,7 @@ ClarityIcons.addIcons(uploadCloudIcon);
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
+    RouterModule.forRoot([], { useHash: true }),
     CdsModule,
     NgxIntlTelInputModule.forRoot(),
     NgxSmartFormModule.forRoot({
