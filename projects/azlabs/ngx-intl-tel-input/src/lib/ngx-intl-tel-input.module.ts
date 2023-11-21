@@ -1,45 +1,33 @@
-import { ScrollingModule } from '@angular/cdk/scrolling';
-import { CommonModule } from '@angular/common';
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { DropdownModule } from '@azlabsjs/ngx-dropdown';
-import { Country, SUPPORTED_COUNTRIES } from './core';
+import { Country } from './core';
 import { NgxIntlTelInputComponent } from './ngx-intl-tel-input.component';
+import { provideSupportedCountries } from './providers';
 
+/**
+ * @deprecated 0.15.5x
+ *
+ * In future (0.16.x) release, the component will be converted into a standalone component
+ * therefore there will be no need to use the `NgxIntlTelInputModule` anymore
+ */
 @NgModule({
-  declarations: [NgxIntlTelInputComponent],
-  imports: [CommonModule, ScrollingModule, DropdownModule],
-  exports: [DropdownModule, NgxIntlTelInputComponent],
+  imports: [NgxIntlTelInputComponent],
+  exports: [NgxIntlTelInputComponent],
 })
 export class NgxIntlTelInputModule {
+  /**
+   * @deprecated 0.15.5x
+   *
+   * forRoot() is deprecated, consider using `provideSupportedCountries()`, `provideCountries()`
+   * and `providePreferredCountries()` for provides module configurations
+   */
   static forRoot(configs?: {
     countries: Country[] | (() => Country[]);
   }): ModuleWithProviders<NgxIntlTelInputModule> {
+    const countries = configs?.countries ?? ([] as Country[]);
+    const values = typeof countries === 'function' ? countries() : countries;
     return {
       ngModule: NgxIntlTelInputModule,
-      providers: [
-        {
-          provide: SUPPORTED_COUNTRIES,
-          useFactory: () => {
-            if (configs) {
-              const { countries } = configs;
-              const _countries =
-                typeof countries === 'function'
-                  ? (countries as () => Country[])()
-                  : (countries as Country[]);
-              if (countries instanceof Array) {
-                return _countries.filter(
-                  (country) =>
-                    typeof country === 'object' &&
-                    typeof country.iso2 !== 'undefined' &&
-                    typeof country.name !== 'undefined' &&
-                    typeof country.dialCode !== 'undefined'
-                );
-              }
-            }
-            return [] as Country[];
-          },
-        },
-      ],
+      providers: [provideSupportedCountries(values.map((v) => v.iso2))],
     };
   }
 }

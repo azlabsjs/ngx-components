@@ -25,7 +25,7 @@ type StateType = {
   selector: 'ngx-phone-input',
   templateUrl: './ngx-phone-input.component.html',
   styles: [],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
   //#region Component inputs
@@ -33,6 +33,7 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
   @Input() describe = true;
   @Input('inputConfig') config!: InputConfigInterface;
   @Input('class') cssClass!: string;
+  @Input('countries') preferredCountries!: string[];
   @ContentChild('input') inputRef!: TemplateRef<any>;
   //#endregion Component inputs
 

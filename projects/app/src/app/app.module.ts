@@ -6,7 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxClrSmartGridModule } from '@azlabsjs/ngx-clr-smart-grid';
 import { NgxDropzoneModule } from '@azlabsjs/ngx-dropzone';
-import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
+import { NgxIntlTelInputModule, providePreferredCountries, provideSupportedCountries } from '@azlabsjs/ngx-intl-tel-input';
 import { NgxSlidesModule } from '@azlabsjs/ngx-slides';
 import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
 import { CdsModule } from '@cds/angular';
@@ -120,6 +120,10 @@ ClarityIcons.addIcons(uploadCloudIcon);
         url: 'https://storage.lik.tg/api/storage/object/upload',
       },
     }),
+  ],
+  providers: [
+    provideSupportedCountries(['tg', 'ci', 'gh']),
+    providePreferredCountries(['ci'])
   ],
   bootstrap: [AppComponent],
 })

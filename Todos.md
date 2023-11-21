@@ -10,3 +10,4 @@
 - Remove dependency to clr-icon [x]
 - Move HTTP loaders and Submit handlers to dedicated packages [x]
 - Remove reactive forms depedency from intl-tel-input [x]
+- Fix issue with custom submit button on smart form component []

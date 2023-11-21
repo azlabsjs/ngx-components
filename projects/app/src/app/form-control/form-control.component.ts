@@ -116,6 +116,16 @@ export class FormControlComponent implements OnInit, OnDestroy {
     containerClass: 'clr-col-12',
   };
 
+  phoneInputControl = new FormControl();
+  phoneInput: TextInput = {
+    label: 'Phone number',
+    type: 'phone',
+    name: 'phone_number',
+    classes: 'clr-input',
+    isRepeatable: false,
+    containerClass: 'clr-col-6',
+  };
+
   private subscriptions: Subscription[] = [];
 
   ngOnInit(): void {

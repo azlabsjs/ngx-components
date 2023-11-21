@@ -50,7 +50,7 @@
           </label>
 
           <ngx-phone-input [control]="formcontrol" [inputConfig]="inputConfig" [describe]="describe"
-            [class]="'clr-input'">
+            [class]="'clr-input'" [countries]="preferredCountries">
             <ng-template #input let-config="config" let-onBlur="onBlur" let-onFocus="onFocus" let-keypress="keypress"
               let-selected="selected" let-change="change" let-required="required" let-disabled="disabled"
               let-value="value">

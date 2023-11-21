@@ -26,7 +26,12 @@ import {
   NgxSmartFormGroupComponent,
   NgxSmartFormGroupHeaderPipe,
 } from './components';
-import { SafeHTMLPipe } from './pipes';
+import {
+  SafeHTMLPipe,
+  HasChildrenPipe,
+  IsRepeatablePipe,
+  IsHiddenPipe,
+} from './pipes';
 import {
   DefaultFormsLoader,
   FormsCacheProvider,
@@ -107,6 +112,9 @@ export function preloadAppForms(service: CacheProvider, assetsURL: string) {
     NgxSmartFormArrayChildComponent,
     NgxSmartFormGroupHeaderPipe,
     SafeHTMLPipe,
+    HasChildrenPipe,
+    IsRepeatablePipe,
+    IsHiddenPipe,
     NgxSmartArrayCloseButtonComponent,
     NgxSmartArrayAddButtonComponent,
     NgxSmartFormControlArrayChildComponent,
@@ -168,7 +176,7 @@ export class NgxSmartFormModule {
               ? hostname.substring(0, hostname.length - 1)
               : hostname;
             const _base = `${platformLocation.protocol}//${hostname}${port}`;
-            path  = location.prepareExternalUrl(path ?? '/');
+            path = location.prepareExternalUrl(path ?? '/');
             const _path = path.startsWith('#') ? path.substring(1) : path;
             const _hostname = _base.endsWith('/')
               ? _base.substring(0, _base.length - 1)

@@ -1,6 +1,6 @@
 import { Inject, Injectable, Optional } from '@angular/core';
 import { Country } from './model';
-import { COUNTRIES, SUPPORTED_COUNTRIES } from './tokens';
+import { COUNTRIES, PREFERRED_COUNTRIES, SUPPORTED_COUNTRIES } from './tokens';
 import {
   getPhoneNumberPlaceholder,
   phoneNumberAsString,
@@ -18,10 +18,13 @@ export class IntlTelInput {
    * @param countries
    */
   constructor(
-    @Inject(COUNTRIES) private countries: Country[],
+    @Inject(COUNTRIES) private countries: Country[] = [],
     @Inject(SUPPORTED_COUNTRIES)
     @Optional()
-    private supportedCountries: Country[] = []
+    private supportedCountries: string[] = [],
+    @Inject(PREFERRED_COUNTRIES)
+    @Optional()
+    private preferredCountries: string[] = []
   ) {}
 
   /**
@@ -30,9 +33,22 @@ export class IntlTelInput {
   public fetchCountries(): Country[] {
     const supportedCountries = this.supportedCountries ?? [];
     if (supportedCountries?.length > 0) {
-      return supportedCountries;
+      return supportedCountries
+        .map((v) => this.countries.find((c) => c.iso2 === v))
+        .filter((v) => typeof v !== 'undefined' && v !== null) as Country[];
     }
     return this.countries;
+  }
+
+  /**
+   * Returns the list of preferred countries for the application
+   */
+  public fetchPreferredCountries(): string[] {
+    const countries = this.preferredCountries;
+    if (countries && countries.length > 0) {
+      return countries;
+    }
+    return ['tg', 'bj', 'gh'];
   }
 
   /**

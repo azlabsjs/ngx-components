@@ -29,6 +29,11 @@ export const COUNTRIES = new InjectionToken<Country[]>(
 /**
  * @description Injection token allowing applications to configure supported countries
  */
-export const SUPPORTED_COUNTRIES = new InjectionToken<Country[]>(
+export const SUPPORTED_COUNTRIES = new InjectionToken<string[]>(
   'Injection Token for supported countries'
 );
+
+/**
+ * List of preferred countries
+ */
+export const PREFERRED_COUNTRIES = new InjectionToken<string[]>('Preferred countries injection token');

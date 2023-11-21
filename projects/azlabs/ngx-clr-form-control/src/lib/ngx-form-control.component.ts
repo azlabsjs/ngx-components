@@ -30,6 +30,7 @@ export class NgxFormControlComponent implements OnDestroy, OnInit {
   @Input() describe = true;
   @Input() inputConfig!: InputConfigInterface;
   @Input('control') formcontrol!: FormControl<any>;
+  @Input('countries') preferredCountries!: string[];
   //#endregion Component inputs
 
   //#region Component outputs

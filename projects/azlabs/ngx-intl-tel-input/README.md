@@ -68,6 +68,66 @@ To use the `ngx-intl-tel-input` in your angular template:
 </ngx-intl-tel-input>
 ```
 
+## API version > 0.15.30 changes
+
+From version `0.15.30`, NgxIntlTelInputModule is marked as deprecated for update to standalone component.
+The `NgxIntlTelInputComponent` is marked standalone and can now be directly imported in your modules.
+
+The library now also comes with some providers that allow application developpers to globally register supported countries and preferred countries on the intel input element.
+
+To override the default provided list of countries, simply add at the root of your angular application:
+
+```ts
+import { provideSupportedCountries } from '@azlabsjs/ngx-intl-tel-input';
+
+// app.module.ts
+@NgModule({
+  providers: [
+    provideSupportedCountries(['tg', 'ci', 'gh']) // This only show countries TG, CI, and GH on the phone input
+  ]
+})
+export class AppModule {
+}
+```
+
+Also to provide the list of preferred countries that is shown on top of all other countries:
+
+
+```ts
+import { providePreferredCountries } from '@azlabsjs/ngx-intl-tel-input';
+
+// app.module.ts
+@NgModule({
+  providers: [
+    providePreferredCountries(['tg']) // This only show countries TG,  on top of the scrollable list
+  ]
+})
+export class AppModule {
+}
+```
+
+- Using the standalone component
+
+Now developpers working with new angular standalone component API can directly import the `intel-tel-input`
+directly in their standalone component or module as follow:
+
+```ts
+
+import { NgxIntlTelInputComponent } from '@azlabsjs/ngx-intl-tel-input';
+
+@Component({
+  //...
+  standalone: true,
+  import: [
+    // ....
+    NgxIntlTelInputComponent
+  ]
+})
+export class MyComponent {
+
+}
+```
+
 ## APIs
 
 API documentation is under development. Please consult the current page for any changes.

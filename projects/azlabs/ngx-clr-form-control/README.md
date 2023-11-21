@@ -14,7 +14,6 @@ To install the package with all peer dependencies:
 
 > npm install --save @azlabsjs/ngx-file-input @azlabsjs/ngx-options-input @azlabsjs/ngx-intl-tel-input @azlabsjs/smart-form-core @azlabsjs/ngx-clr-form-control
 
-
 ## Usage
 
 To use the `ngx-clr-form-control` in angular projects, we must import the library module which export required component, and pipes and directives:
@@ -105,11 +104,20 @@ import { NgxClrFormControlModule } from "@azlabsjs/ngx-clr-form-control";
         },
         // Files upload url
         url: 'https://127.0.0.1/api/storage/object/upload',
-      
+
     }),
   ],
 })
 export class AppModule {}
+```
+
+## Version >= 0.15.30 changes
+
+From version `0.15.30`, the component now support a `countries` input that allows developpers to configure
+list of preferred countries of the phone input component:
+
+```html
+<ngx-clr-form-control [countries]="['tg', 'gh']" [control]="control" [inputConfig]="phoneInput"></ngx-clr-form-control>
 ```
 
 **Note** Library is still under development and API might change. Please consult the current page for any version update.

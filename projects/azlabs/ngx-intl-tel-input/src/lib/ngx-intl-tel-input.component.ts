@@ -11,9 +11,18 @@ import {
   TemplateRef,
 } from '@angular/core';
 import { IntlTelInput, Country } from './core';
+import { CommonModule } from '@angular/common';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { DropdownModule } from '@azlabsjs/ngx-dropdown';
 
+/**
+ * Set state parameter type definition
+ */
 type SetStateParam<T> = Partial<T> | ((state: T) => T);
 
+/**
+ * Component state type declaration
+ */
 type StateType = {
   disabled: boolean;
   required: boolean;
@@ -24,21 +33,24 @@ type StateType = {
 };
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, ScrollingModule, DropdownModule],
   selector: 'ngx-intl-tel-input',
   templateUrl: './ngx-intl-tel-input.component.html',
   styleUrls: ['./ngx-intl-tel-input.component.css'],
   providers: [IntlTelInput],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxIntlTelInputComponent implements OnChanges {
   // #region Component Inputs
   @Input() required = false;
   @Input() country!: string;
   @Input() class!: string;
-  @Input() preferredCountries: string[] = [];
+  @Input() preferredCountries!: string[];
   @Input() index!: number;
   @Input() value!: string;
-  @Input() disabled: boolean = false;
+  @Input() disabled = false;
+  @Input() name!: string;
   // #endregion Component Inputs
 
   // #region Child content selectors
@@ -58,11 +70,7 @@ export class NgxIntlTelInputComponent implements OnChanges {
     required: false,
     value: undefined as string | undefined,
     countries: [...this._countries],
-    preferredCountries: ['tg', 'bj', 'gh']
-      .map((iso2) => this._countries.find((c) => c.iso2 === iso2))
-      .filter(
-        (current) => typeof current !== 'undefined' && current !== null
-      ) as Country[],
+    preferredCountries: this.getPreferredCountries(),
     selected: undefined as Country | undefined,
   };
   get state() {
@@ -111,6 +119,7 @@ export class NgxIntlTelInputComponent implements OnChanges {
             : this._state.value,
         disabled: this.disabled,
         required: this.required,
+        preferredCountries: this.getPreferredCountries(),
         selected,
       }));
     }
@@ -176,11 +185,7 @@ export class NgxIntlTelInputComponent implements OnChanges {
       return this.setState((state) => ({
         ...state,
         countries: this._countries,
-        preferredCountries: this.preferredCountries
-          .map((iso2) => this._countries.find((c) => c.iso2 === iso2))
-          .filter(
-            (current) => typeof current !== 'undefined' && current !== null
-          ) as Country[],
+        preferredCountries: this.getPreferredCountries(),
       }));
     }
     const countries = this._countries.filter((state) => {
@@ -224,5 +229,29 @@ export class NgxIntlTelInputComponent implements OnChanges {
 
   private getCountryCode(value: string) {
     return this.service.getCountryCode(value);
+  }
+
+  /**
+   * Returns the list of preferred countries
+   */
+  private getPreferredCountries(
+    callback?: (v: string[]) => Country[]
+  ): Country[] {
+    const values =
+      this.preferredCountries ??
+      this.service
+        .fetchPreferredCountries()
+        .filter((v) => typeof v !== 'undefined' && v !== null) ??
+      [];
+    callback =
+      callback ??
+      ((v) => {
+        return v
+          .map((iso2) => this._countries.find((c) => c.iso2 === iso2))
+          .filter(
+            (current) => typeof current !== 'undefined' && current !== null
+          ) as Country[];
+      });
+    return callback(values);
   }
 }
