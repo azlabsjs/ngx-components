@@ -29,14 +29,7 @@ import {
   InputConfigInterface,
   InputGroup,
 } from '@azlabsjs/smart-form-core';
-import {
-  EMPTY,
-  firstValueFrom,
-  from,
-  lastValueFrom,
-  Observable,
-  Subject,
-} from 'rxjs';
+import { EMPTY, from, lastValueFrom, Observable, Subject } from 'rxjs';
 import { filter, takeUntil, tap } from 'rxjs/operators';
 import { RequestClient } from '../../../http';
 import {
@@ -84,6 +77,9 @@ function getFormErrors(control: AbstractControl) {
   // Return the list of error from the control element
   return errors;
 }
+
+const AUTO_SUBMIT_ERROR_MESSAGE =
+  'autoSubmit input property must only be true if the form endpointURL is configured or an Http Client has been registered!';
 
 @Component({
   selector: 'ngx-smart-form',
@@ -233,20 +229,22 @@ export class NgxSmartFormComponent
   //
   async onSubmit(event: Event) {
     event.preventDefault();
+
     if (!this.formGroup) {
       return;
     }
 
-    // Validate the formgroup object to ensure it passes
-    // validation before submitting
+    // Validate the formgroup object to ensure it passes validation before submitting
     this.validateForm();
-    // Wait the for status changes to be non pending before handling submit action
-    await firstValueFrom(
-      this.formGroup.statusChanges.pipe(
-        filter((status) => status !== 'PENDING')
+
+    // Wait the for status changes of the formgroup
+    // To make sure UI update error message
+    this.formGroup.statusChanges
+      .pipe(
+        filter((status) => status !== 'PENDING'),
+        takeUntil(this._destroy$)
       )
-    );
-    this.changesRef.detectChanges();
+      .subscribe(() => this.changesRef.detectChanges());
     // We simply return without performing any further action
     // if the validation fails
     // Due to some issue with form group being invalid while all controls does not
@@ -256,23 +254,29 @@ export class NgxSmartFormComponent
     if (!this._formGroup.valid && errors.length > 0) {
       return;
     }
+    // #region Configure bool values for controlling auto submission
     const path = this.path || this.form.endpointURL;
-    const clientIsDefined =
+    const clientDefined =
       typeof this.client !== 'undefined' && this.client !== null;
-    const pathIsDefined = path !== null && path !== 'undefined';
-    if (this.autoSubmit && clientIsDefined && pathIsDefined) {
+    const pathDefined = path !== null && path !== 'undefined';
+    const shouldSubmit = this.autoSubmit && clientDefined;
+    // #endregion Configure bool values for controlling auto submission
+
+    // Case component is configured to auto submit form values, we send
+    // request using the configured client object
+    if (shouldSubmit && pathDefined) {
       await this.sendRequest(path || 'http://localhost');
-    } else if (
-      (this.autoSubmit && !clientIsDefined) ||
-      (this.autoSubmit && !pathIsDefined)
-    ) {
-      // We throw an error if developper misconfigured the smart form component
-      throw new Error(
-        'autoSubmit input property must only be true if the form endpointURL is configured or an Http Client has been registered!'
-      );
-    } else {
+      return;
+    }
+    const configError =
+      (this.autoSubmit && !clientDefined) || (this.autoSubmit && !pathDefined);
+
+    // Case there is no configuration error, emit a submit event
+    if (!configError) {
       this.submit.emit(this._formGroup.getRawValue());
     }
+    // We throw an error if developper misconfigured the smart form component
+    throw new Error(AUTO_SUBMIT_ERROR_MESSAGE);
   }
 
   setComponentForm(value: FormConfigInterface): void {
@@ -327,19 +331,21 @@ export class NgxSmartFormComponent
       };
       this._formGroup = formgroup as FormGroup;
       for (const name in this._formGroup.controls) {
-        this._formGroup
-          .get(name)
-          ?.valueChanges.pipe(
-            tap((state) =>
-              this.handleControlChanges(
-                state,
-                name,
-                bindings as Map<string, BindingInterface>
-              )
-            ),
-            takeUntil(this._destroy$)
-          )
-          .subscribe();
+        const control = this._formGroup.get(name);
+        if (control) {
+          control.valueChanges
+            .pipe(
+              tap((state) =>
+                this.handleControlChanges(
+                  state,
+                  name,
+                  bindings as Map<string, BindingInterface>
+                )
+              ),
+              takeUntil(this._destroy$)
+            )
+            .subscribe();
+        }
       }
     }
   }

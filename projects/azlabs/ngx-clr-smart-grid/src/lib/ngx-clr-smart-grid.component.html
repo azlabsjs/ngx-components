@@ -35,7 +35,7 @@
   </ng-template>
   <!-- DATA GRID ROWS -->
   <ng-template #defaultRowRef let-current>
-    <clr-dg-row [class]="getrowclass(config, current)" [clrDgItem]="current"
+    <clr-dg-row (click)="onClrItemClick($event, current)" [class]="getrowclass(config, current)" [clrDgItem]="current"
       [clrDgSelectable]="current[config.selectableProp || ''] || true">
       <clr-dg-action-overflow *ngIf="config.hasActionOverflow">
         <!-- ACTION OVERFLOW BUTTON PROJECTION -->

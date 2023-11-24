@@ -138,12 +138,14 @@ export class NgxClrSmartGridComponent {
 
   public readonly defaultSort = ClrDatagridSortOrder.DESC;
 
-  // Output definitions
+  // #region Component outputs
   @Output() selectedChange = new EventEmitter<unknown[] | unknown>();
   @Output() dgRefresh = new EventEmitter<
     ProjectPaginateQueryParamType<unknown>
   >();
   @Output() detailChange = new EventEmitter<unknown>();
+  @Output() dgItemClick = new EventEmitter<unknown>();
+  // #endregion Component outputs
 
   // Listen to internal grid component select changes and notify parent component
   onSelectedStateChanges(state: unknown[] | unknown) {
@@ -164,5 +166,10 @@ export class NgxClrSmartGridComponent {
 
   onClrDgRefresh(event: ProjectPaginateQueryParamType) {
     this.dgRefresh.emit(event);
+  }
+
+  onClrItemClick(event: Event, item: unknown) {
+    this.dgItemClick.emit(item);
+    event?.preventDefault();
   }
 }

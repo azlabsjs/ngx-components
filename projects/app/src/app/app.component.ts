@@ -198,30 +198,6 @@ export class AppComponent {
     setTimeout(() => {
       this.pageResult.next(_values);
       this.placeholder = undefined;
-      // this.smartForm.setControlValue('category_id', 1);
-      // this.smartForm.setControlValue('fruits', [2, 4]);
-      // this.client
-      //   .get(234)
-      //   .pipe(
-      //     filter((state) => typeof state !== 'undefined' && state !== null),
-      //     tap((state) => {
-      //       const { controlConfigs } = event;
-      //       let values = [...controlConfigs];
-      //       const index = values.findIndex(
-      //         (current) => current.name === 'stakeholders'
-      //       );
-      //       if (index !== -1) {
-      //         const stakeHolders = {
-      //           ...(values[index] as InputGroup),
-      //           children: state.controlConfigs,
-      //         } as InputGroup;
-      //         values.splice(index, 1, stakeHolders);
-      //       }
-      //       this._state$.next({ ...event, controlConfigs: values });
-      //     }),
-      //     takeUntil(this._destroy$)
-      //   )
-      //   .subscribe();
     }, 3000);
 
     setTimeout(() => {
@@ -267,5 +243,9 @@ export class AppComponent {
 
   ngxFormSubmit(event: Record<string, any>) {
     console.log(JSON.stringify(event));
+  }
+
+  ondgItemClick(value: unknown) {
+    console.log('Item clicked:', value);
   }
 }

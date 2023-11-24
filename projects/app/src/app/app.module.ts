@@ -81,8 +81,8 @@ ClarityIcons.addIcons(uploadCloudIcon);
     NgxClrFormControlModule.forRoot({
       options: {
         url: 'http://127.0.0.1:3000/control-bindings',
-        refreshInterval: 60,
-        cacheTTL: 90,
+        refreshInterval: 1800,
+        cacheTTL: 1820,
         requests: {
           interceptorFactory: useOptionsInterceptor((request) =>
             request.clone({})

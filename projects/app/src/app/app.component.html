@@ -11,12 +11,18 @@
         <ngx-clr-form-control class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control"
           [inputConfig]="config"></ngx-clr-form-control>
       </ng-template>
+      <ng-template #submitButton let-handler>
+        <button class="btn btn-primary" (click)="handler($event)">
+          <cds-icon shape="circle-arrow" dir="up"></cds-icon>
+          SOUMETTRE
+        </button>
+      </ng-template>
     </ngx-smart-form>
   </ng-container>
 </div>
 <div class="container">
   <h3>Data Grid</h3>
-  <ngx-clr-smart-grid [columns]="columns" [placeholder]="placeholder" [pageResult]="(pageResult$ | async)"
-    (dgRefresh)="onDgRefresh($event)" (selectedChange)="onSelectedChanges($event)"
+  <ngx-clr-smart-grid (dgItemClick)="ondgItemClick($event)" [columns]="columns" [placeholder]="placeholder"
+    [pageResult]="(pageResult$ | async)" (dgRefresh)="onDgRefresh($event)" (selectedChange)="onSelectedChanges($event)"
     [config]="gridConfig"></ngx-clr-smart-grid>
 </div>

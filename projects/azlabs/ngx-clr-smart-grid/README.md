@@ -570,3 +570,23 @@ export class MyComponent {
   };
 }
 ```
+
+- Listen for item click
+
+From version `0.15.23`, support was added for click event on datagrid row. To implement the listener in their application, developpers simply should add a custom event listener to the datagrid component as follow:
+
+```html
+<ngx-clr-smart-grid (dgItemClick)="onDgItemClick($event)">
+</ngx-clr-smart-grid>
+```
+
+Then add a the event handler in the typescript code as follow:
+
+```ts
+export class MyComponent {
+
+  onDgItemClick(value: unknown) {
+    // TODO: Add click handler
+  }
+}
+```
