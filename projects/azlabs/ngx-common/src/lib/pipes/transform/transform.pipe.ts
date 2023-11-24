@@ -146,7 +146,7 @@ export class NgxTransformPipe implements PipeTransform {
       case 'lowercase':
         return this.lowerCasePipe.transform(value); //
       case 'currency':
-        return this.currencyPipe.transform(value); //
+        return this.currencyPipe.transform(value, ...params); //
       case 'decimal':
         return this.decimalPipe.transform(value, ...params);
       case 'json':
