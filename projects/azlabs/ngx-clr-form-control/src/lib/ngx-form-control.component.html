@@ -2,6 +2,7 @@
   <ng-container [ngSwitch]="inputConfig.type">
     <ng-container *ngSwitchCase="inputTypes.FILE_INPUT">
       <ngx-file-input (addedEvent)="fileAdded.emit($event)" (removedEvent)="fileRemoved.emit($event)"
+        [read]="(inputConfig | fileInput).read"
         [describe]="describe" [autoupload]="(inputConfig | fileInput).autoupload ?? false"
         [upload-as]="(inputConfig | fileInput).uploadAs" [placeholder]="inputConfig.placeholder"
         [class]="inputConfig.classes" [multiple]="(inputConfig | fileInput).multiple"

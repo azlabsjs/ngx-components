@@ -274,6 +274,7 @@ export class NgxSmartFormComponent
     // Case there is no configuration error, emit a submit event
     if (!configError) {
       this.submit.emit(this._formGroup.getRawValue());
+      return;
     }
     // We throw an error if developper misconfigured the smart form component
     throw new Error(AUTO_SUBMIT_ERROR_MESSAGE);

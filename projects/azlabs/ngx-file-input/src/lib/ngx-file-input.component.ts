@@ -14,9 +14,14 @@ import {
   RequestClient,
 } from '@azlabsjs/requests';
 import { Uploader, UploadOptions } from '@azlabsjs/uploader';
-import { isValidHttpUrl, uuidv4 } from './helpers';
+import {
+  decorateFile,
+  isValidHttpUrl,
+  readPropertyValue,
+  uuidv4,
+} from './helpers';
 import { NgxUploadsEventsService } from './ngx-uploads-events.service';
-import { SetStateParam, UploadOptionsType } from './types';
+import { EventArgType, SetStateParam, UploadOptionsType } from './types';
 import { UPLOADER_OPTIONS } from './tokens';
 
 type StateType = {
@@ -67,6 +72,13 @@ export class NgxSmartFileInputComponent {
   @Input('max-files') maxFiles: number = 50;
   @Input('has-error') hasError: boolean = false;
 
+  /**
+   * Read the id property of the uploaded file result
+   * or the entire object
+   */
+  @Input() read: 'id' | 'object' | undefined = 'id';
+
+  // Error input property declaration
   @Input('required-error') requiredError!: string;
   @Input('file-size-error') fileSizeError!: string;
   @Input('file-upload-error') fileUploadError!: string;
@@ -102,16 +114,12 @@ export class NgxSmartFileInputComponent {
 
   // #region component outputs
   @Output() reset = new EventEmitter<void>();
-  @Output() value = new EventEmitter<File | File[]>();
+  @Output() value = new EventEmitter<
+    EventArgType | EventArgType[] | string | string[]
+  >();
   // #endregion component outputs
 
-  /**
-   * Creates a File Input component
-   *
-   * @param uploadOptions
-   * @param uploadEvents
-   * @param injector
-   */
+  // Class constructor
   constructor(
     @Inject(UPLOADER_OPTIONS)
     private uploadOptions: UploadOptionsType<HTTPRequest, HTTPResponse>,
@@ -191,6 +199,8 @@ export class NgxSmartFileInputComponent {
         uploading: true,
         hasError: false,
       }));
+
+      // Wait for all uploads to complete
       let results = await Promise.all(
         _files.map(async (file) => {
           this.uploadEvents.startUpload({
@@ -201,18 +211,30 @@ export class NgxSmartFileInputComponent {
           // Creating a new uploader instance each time for bug in current version of the uploader
           const uploader = Uploader(options);
           const result = await uploader.upload(file.content);
-          let _result!: Record<string, any>;
+          let _result!: EventArgType;
           if (typeof result === 'string') {
             try {
               // If parsing the string throws an error, then request may have
               // failed
-              _result = JSON.parse(result);
+              _result = decorateFile(file.content, {
+                upload: {
+                  result: JSON.parse(result),
+                },
+              });
             } catch (error) {
-              _result = {} as Record<string, any>;
-              _result['error'] = error;
+              _result = decorateFile(file.content, {
+                upload: {
+                  result: result,
+                  error: error,
+                },
+              });
             }
           } else {
-            _result = result as any;
+            _result = decorateFile(file.content, {
+              upload: {
+                result: result,
+              },
+            });
           }
           this.uploadEvents.completeUpload(file.uuid, _result);
           return _result;
@@ -222,7 +244,8 @@ export class NgxSmartFileInputComponent {
       // has been marked errored
       results = results.filter(
         (result) =>
-          typeof result['error'] === 'undefined' || result['error'] === null
+          typeof result.upload?.error === 'undefined' ||
+          result.upload?.error === null
       );
       // Set the uploading state of the current component
       this.setState((_state) => ({
@@ -230,19 +253,17 @@ export class NgxSmartFileInputComponent {
         uploading: false,
         hasError: false,
       }));
-      // After all files has been uploaded, we set the form control value to
-      // ids returned by the uploader request
-      this.value.emit(
-        multiple
-          ? results.map((result) =>
-              typeof result['id'] === 'undefined' || result['id'] === null
-                ? result
-                : result['id']
-            )
-          : typeof results[0]['id'] === 'undefined' || results[0]['id'] === null
-          ? results[0]
-          : results[0]['id']
-      );
+
+      const _eventArgs = multiple
+        ? results.map((result) =>
+            readPropertyValue<EventArgType>(result, this.read ?? 'id')
+          )
+        : readPropertyValue<EventArgType>(results[0], this.read ?? 'id');
+
+      console.log('Emitting event: ', _eventArgs);
+
+      // Emit the list of values
+      this.value.emit(_eventArgs);
     } catch (error) {
       this.setState((_state) => ({
         ..._state,

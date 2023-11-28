@@ -1,3 +1,5 @@
+import { EventArgType } from './types';
+
 /**
  * UUID version 4 string generator
  *
@@ -37,4 +39,35 @@ export function isValidHttpUrl(uri: string) {
   } catch (_) {
     return false;
   }
+}
+
+/**
+ * Get object id property value if read equals `id`
+ * and entire object, case the read property is object
+ */
+export function readPropertyValue<T extends EventArgType>(
+  value: T | undefined | null,
+  read: 'id' | 'object'
+) {
+  if (read === 'object') {
+    return value;
+  }
+  return value && value.upload?.result
+    ? value.upload?.result['id'] ?? undefined
+    : undefined;
+}
+
+/**
+ * Provides a javascript file instance decorator
+ */
+export function decorateFile<T extends Record<string, unknown>>(
+  value: File,
+  decorate: T
+) {
+  for (const prop of Object.keys(decorate)) {
+    Object.defineProperty(value, prop, {
+      value: decorate[prop],
+    });
+  }
+  return value as File & T;
 }

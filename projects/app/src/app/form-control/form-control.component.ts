@@ -34,6 +34,7 @@ export class FormControlComponent implements OnInit, OnDestroy {
     hidden: false,
     isRepeatable: false,
     containerClass: 'clr-col-4',
+    read: 'object',
     rules: {
       isRequired: false,
     },
@@ -141,6 +142,14 @@ export class FormControlComponent implements OnInit, OnDestroy {
         .pipe(
           tap((state) => {
             console.log('Time value changes...', state);
+          })
+        )
+        .subscribe(),
+
+      this.autoUploadFileControl.valueChanges
+        .pipe(
+          tap((state) => {
+            console.log('Auto upload control value changes...', state);
           })
         )
         .subscribe(),
