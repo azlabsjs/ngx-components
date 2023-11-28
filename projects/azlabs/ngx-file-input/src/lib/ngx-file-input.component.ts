@@ -254,13 +254,12 @@ export class NgxSmartFileInputComponent {
         hasError: false,
       }));
 
+      // Resolve input based on the what is requested by developper
       const _eventArgs = multiple
         ? results.map((result) =>
             readPropertyValue<EventArgType>(result, this.read ?? 'id')
           )
         : readPropertyValue<EventArgType>(results[0], this.read ?? 'id');
-
-      console.log('Emitting event: ', _eventArgs);
 
       // Emit the list of values
       this.value.emit(_eventArgs);
