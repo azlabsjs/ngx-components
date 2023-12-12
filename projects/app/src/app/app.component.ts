@@ -135,6 +135,8 @@ export class AppComponent {
   placeholder: string | undefined = 'Loading, Please wait...';
 
   gridConfig: Partial<GridConfigType> = {
+    selectable: true,
+    singleSelection: false,
     transformColumnTitle: 'uppercase',
     useServerPagination: true,
     projectRowClass: (current: { id: number }) => {
