@@ -34,7 +34,7 @@ export class FormControlComponent implements OnInit, OnDestroy {
     hidden: false,
     isRepeatable: false,
     containerClass: 'clr-col-4',
-    read: 'object',
+    read: 'url',
     rules: {
       isRequired: false,
     },

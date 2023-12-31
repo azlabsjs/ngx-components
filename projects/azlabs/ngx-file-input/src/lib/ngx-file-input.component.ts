@@ -76,7 +76,7 @@ export class NgxSmartFileInputComponent {
    * Read the id property of the uploaded file result
    * or the entire object
    */
-  @Input() read: 'id' | 'object' | undefined = 'id';
+  @Input() read: 'id'| 'url' | 'object' | undefined = 'id';
 
   // Error input property declaration
   @Input('required-error') requiredError!: string;

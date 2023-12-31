@@ -3,6 +3,27 @@
     "controls": [
       {
         "formId": 220,
+        "uploadUrl": "https://storagev2.lik.tg/api/storage/object/upload",
+        "controlName": "document_id",
+        "controlIndex": 1,
+        "autoupload": true,
+        "uploadAs": "content",
+        "required": true,
+        "disabled": false,
+        "readonly": false,
+        "unique": false,
+        "pattern": "image/*",
+        "isRepeatable": false,
+        "dynamicControlContainerClass": "clr-col-12 pb-1",
+        "id": 2116,
+        "type": "file",
+        "read": "url",
+        "classes": "clr-input",
+        "multiple": false,
+        "children": []
+      },
+      {
+        "formId": 220,
         "controlName": "password",
         "controlIndex": 1,
         "required": true,

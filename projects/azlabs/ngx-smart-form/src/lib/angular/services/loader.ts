@@ -77,16 +77,12 @@ export function createInputConfig(
     options: input['options'],
     multiple: input['multiple'],
     isRepeatable: input['isRepeatable'],
-
     min: input['min'],
     max: input['max'],
-
     uploadURL: input['uploadURL'],
     autoupload: Boolean(input['autoupload'] ?? false),
     uploadAs: input['uploadAs'],
-
     equals: input['equals'],
-
     exists: input['exists']
       ? {
           url:
@@ -99,6 +95,8 @@ export function createInputConfig(
               : (input['exists'] as any)['conditions'],
         }
       : undefined,
+    // Add support for read property
+    read: input['read']
   } as ControlInterface;
 }
 

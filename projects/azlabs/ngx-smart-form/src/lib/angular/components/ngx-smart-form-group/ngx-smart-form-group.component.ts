@@ -68,8 +68,8 @@ export class NgxSmartFormGroupComponent
       // Get control entries from the formgroup
       const entries = Object.entries(this.formGroup.controls);
       // Handle form control value changes
-      for (const [name, abstractControl] of entries) {
-        abstractControl.valueChanges
+      for (const [name, element] of entries) {
+        element.valueChanges
           .pipe(
             tap((state) =>
               this.handleControlChanges(

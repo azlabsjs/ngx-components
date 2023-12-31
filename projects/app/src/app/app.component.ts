@@ -180,6 +180,7 @@ export class AppComponent {
       .get(220)
       .pipe(
         filter((state) => typeof state !== 'undefined' && state !== null),
+        tap(state => console.log('Form: ', state)),
         tap((state) => this._state$.next(state)),
         takeUntil(this._destroy$)
       )

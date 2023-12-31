@@ -47,13 +47,13 @@ export function isValidHttpUrl(uri: string) {
  */
 export function readPropertyValue<T extends EventArgType>(
   value: T | undefined | null,
-  read: 'id' | 'object'
+  read: 'id' | 'url' | 'object'
 ) {
   if (read === 'object') {
     return value;
   }
   return value && value.upload?.result
-    ? value.upload?.result['id'] ?? undefined
+    ? value.upload?.result[read] ?? undefined
     : undefined;
 }
 

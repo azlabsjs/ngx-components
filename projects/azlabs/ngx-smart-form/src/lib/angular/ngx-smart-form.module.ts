@@ -48,7 +48,7 @@ import {
   InterceptorFactory,
   LoadFormsRequestHandler,
 } from './types';
-import { isValidURL, rxRequest } from '../http';
+import { useDefaultFormLoader } from './factories';
 
 /**
  * @internal
@@ -139,22 +139,7 @@ export class NgxSmartFormModule {
       submitRequest,
     } = configs;
     const _assets = assets ?? '/assets/resources/app-forms.json';
-    const _loadFormsHandler =
-      loadFormsHandler ??
-      ((url: string) => {
-        return rxRequest({
-          url,
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-          },
-          responseType: 'json',
-        }).pipe(
-          map(
-            (response) => response.body as unknown as Record<string, unknown>[]
-          )
-        );
-      });
+    
 
     const providers: Provider[] = [
       FormsCacheProvider,
@@ -165,28 +150,7 @@ export class NgxSmartFormModule {
         useFactory: (
           location: LocationStrategy,
           platformLocation: PlatformLocation
-        ) => {
-          return new DefaultFormsLoader(_loadFormsHandler, (path?: string) => {
-            if (path && isValidURL(path)) {
-              return path;
-            }
-            let { hostname, port } = platformLocation;
-            port = port ? `:${port}` : '';
-            hostname = hostname.endsWith('#')
-              ? hostname.substring(0, hostname.length - 1)
-              : hostname;
-            const _base = `${platformLocation.protocol}//${hostname}${port}`;
-            path = location.prepareExternalUrl(path ?? '/');
-            const _path = path.startsWith('#') ? path.substring(1) : path;
-            const _hostname = _base.endsWith('/')
-              ? _base.substring(0, _base.length - 1)
-              : _base;
-            const hostPath = _path.startsWith('/') ? _path.substring(1) : _path;
-
-            // return the constructed url as an output
-            return `${_hostname}/${hostPath}`;
-          });
-        },
+        ) => useDefaultFormLoader(location, platformLocation, loadFormsHandler),
         deps: [LocationStrategy, PlatformLocation],
       },
       {
