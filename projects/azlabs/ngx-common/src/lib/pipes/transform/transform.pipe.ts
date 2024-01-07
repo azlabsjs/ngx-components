@@ -1,5 +1,4 @@
 import {
-  AsyncPipe,
   CurrencyPipe,
   DecimalPipe,
   JsonPipe,
@@ -36,7 +35,6 @@ export function after(char: string, haystack: string) {
  *
  * @param char
  * @param haystack
- * @returns
  */
 export function before(char: string, haystack: string) {
   return haystack.slice(0, haystack.indexOf(char));
@@ -66,6 +64,9 @@ export function createParams(transform: string) {
   return [pipe, ...params];
 }
 
+/**
+ * Compute the substring of the `value` string
+ */
 function substr(value: string, start: number, length?: number) {
   if (typeof value !== 'string') {
     return '';
@@ -82,7 +83,7 @@ function substr(value: string, start: number, length?: number) {
 
 @Pipe({
   name: 'transform',
-  pure: false
+  pure: true,
 })
 export class NgxTransformPipe implements PipeTransform {
   /**
@@ -96,9 +97,8 @@ export class NgxTransformPipe implements PipeTransform {
     private jsonPipe: JsonPipe,
     private percentPipe: PercentPipe,
     private slicePipe: SlicePipe,
-    private asyncPipe: AsyncPipe,
     private injector: Injector,
-    @Inject(PIPE_TRANSFORMS) private pipeTransform?: PipeTransformTokenMapType
+    @Inject(PIPE_TRANSFORMS) private transforms?: PipeTransformTokenMapType
   ) {}
 
   /**
@@ -130,40 +130,24 @@ export class NgxTransformPipe implements PipeTransform {
 
     // Switch branch on pipe name and call the matching transformation function
     // TODO: In  future release replace the swith statement with a call to pipe transform
-    switch (pipe) {
-      case 'date':
-        return this.formatDate(value, ...params);
-      case 'datetime':
-        return this.dateTime(value, ...params);
-      case 'timeago':
-        return this.timeAgo(value, ...params);
-      case 'month':
-        return this.getMonth(value);
-      case 'masked':
-        return this.mask(value, ...params.map((x) => Number(x)));
-      case 'uppercase':
-        return this.uppercasePipe.transform(value);
-      case 'lowercase':
-        return this.lowerCasePipe.transform(value); //
-      case 'currency':
-        return this.currencyPipe.transform(value, ...params); //
-      case 'decimal':
-        return this.decimalPipe.transform(value, ...params);
-      case 'json':
-        return this.jsonPipe.transform(value);
-      case 'percent':
-        return this.percentPipe.transform(value, ...params);
-      case 'slice':
-        return this.slicePipe.transform(
-          value,
-          +params[0],
-          +params[1] ?? undefined
-        );
-      case 'async':
-        return this.asyncPipe.transform(value);
-      default:
-        return this.getDefault(pipe, value, ...params);
-    }
+    const transforms: Record<string, () => any> = {
+      date: () => this.formatDate(value, ...params),
+      datetime: () => this.dateTime(value, ...params),
+      timeago: () => this.timeAgo(value, ...params),
+      month: () => this.getMonth(value),
+      masked: () => this.mask(value, ...params.map((x) => Number(x))),
+      uppercase: () => this.uppercasePipe.transform(value),
+      lowercase: () => this.lowerCasePipe.transform(value),
+      currency: () => this.currencyPipe.transform(value, ...params),
+      decimal: () => this.decimalPipe.transform(value, ...params),
+      json: () => this.jsonPipe.transform(value),
+      percent: () => this.percentPipe.transform(value, ...params),
+      slice: () =>
+        this.slicePipe.transform(value, +params[0], +params[1] ?? undefined),
+    };
+    return transforms[pipe]
+      ? transforms[pipe]()
+      : this.getDefault(pipe, value, ...params);
   }
 
   private mask(value?: string, length: number = 5): string {
@@ -201,13 +185,10 @@ export class NgxTransformPipe implements PipeTransform {
   }
 
   private getDefault(pipename: string, value: unknown, ...params: any[]) {
-    if (
-      typeof this.pipeTransform === 'undefined' ||
-      this.pipeTransform === null
-    ) {
+    if (typeof this.transforms === 'undefined' || this.transforms === null) {
       return value;
     }
-    const pipeToken = this.pipeTransform[pipename];
+    const pipeToken = this.transforms[pipename];
     if (typeof pipeToken === 'undefined' || pipeToken === null) {
       return value;
     }

@@ -1,0 +1,1 @@
+export { HTTPValuePipe } from './http-value.pipe';

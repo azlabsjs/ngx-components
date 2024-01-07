@@ -24,6 +24,7 @@ import {
 import { FormControlComponent } from './form-control/form-control.component';
 import { NgxCommonModule } from '@azlabsjs/ngx-common';
 import { RouterModule } from '@angular/router';
+import { HTTPValuePipe } from './pipes';
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
@@ -36,6 +37,7 @@ ClarityIcons.addIcons(uploadCloudIcon);
     ReactiveFormsModule,
     HttpClientModule,
     RouterModule.forRoot([], { useHash: true }),
+    HTTPValuePipe,
     CdsModule,
     NgxIntlTelInputModule.forRoot(),
     NgxSmartFormModule.forRoot({
@@ -81,6 +83,7 @@ ClarityIcons.addIcons(uploadCloudIcon);
     NgxCommonModule.forRoot({
       pipeTransformMap: {
         testPipe: TestPipe,
+        httpValue: HTTPValuePipe
       },
     }),
     NgxClrSmartGridModule,

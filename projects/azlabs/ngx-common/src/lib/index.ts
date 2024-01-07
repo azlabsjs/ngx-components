@@ -10,5 +10,15 @@ export {
   provideCommonStrings,
   provideCommonStringsFactory,
   COMMON_STRINGS,
-} from './pipes/common-strings';
+} from './pipes/strings';
+
+export {
+  IsAsyncPipe,
+  PipeResultPipe,
+  ParseIntPipe,
+  ParseStrPipe,
+  PropertyValuePipe,
+} from './pipes/common';
+
+// Exported module
 export { NgxCommonModule } from './ngx-common.module';

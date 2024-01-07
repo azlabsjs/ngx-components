@@ -5,12 +5,36 @@ import {
   PIPE_TRANSFORMS,
   PipeTransformTokenMapType,
 } from './pipes/transform';
-import { CommonStringsPipe } from './pipes/common-strings';
+import { CommonStringsPipe } from './pipes/strings';
+import {
+  IsAsyncPipe,
+  ParseIntPipe,
+  ParseStrPipe,
+  PipeResultPipe,
+  PropertyValuePipe,
+} from './pipes/common';
 
 @NgModule({
-  declarations: [NgxTransformPipe, CommonStringsPipe],
+  declarations: [
+    NgxTransformPipe,
+    CommonStringsPipe,
+    IsAsyncPipe,
+    PipeResultPipe,
+    ParseIntPipe,
+    ParseStrPipe,
+    PropertyValuePipe,
+  ],
   imports: [CommonModule],
-  exports: [CommonModule, NgxTransformPipe, CommonStringsPipe],
+  exports: [
+    CommonModule,
+    NgxTransformPipe,
+    CommonStringsPipe,
+    IsAsyncPipe,
+    PipeResultPipe,
+    ParseIntPipe,
+    ParseStrPipe,
+    PropertyValuePipe,
+  ],
 })
 export class NgxCommonModule {
   static forRoot(config: {
