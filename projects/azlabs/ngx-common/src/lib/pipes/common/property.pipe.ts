@@ -1,11 +1,12 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { JSObject } from '@azlabsjs/js-object';
 
 /**
  * Resolve the value for a given property
  */
 @Pipe({
-  name: 'value',
-  pure: true
+  name: 'propValue',
+  pure: true,
 })
 export class PropertyValuePipe implements PipeTransform {
   // Resolve property value for a given object
@@ -14,9 +15,6 @@ export class PropertyValuePipe implements PipeTransform {
     property: string,
     _default: string | undefined | null = ''
   ) {
-    if (value) {
-      return value[property] ?? _default;
-    }
-    return _default;
+    return value ? JSObject.getProperty(value, property) ?? _default : _default;
   }
 }

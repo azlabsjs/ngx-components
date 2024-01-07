@@ -10,7 +10,11 @@
   <!-- DATA GRID COLUMNS -->
   <ng-container *ngFor="let column of columns">
     <clr-dg-column [clrDgColType]="column.type" [clrDgField]="column.field" [clrDgSortBy]="column.sort || ''">
-      {{ column.title |transform : (column.transformTitle ?? config.transformColumnTitle) }}
+      <ng-container
+        *ngIf="column.title | transform : (column.transformTitle ?? config.transformColumnTitle) | pipeResult as result">
+        <ng-container *ngIf="result.value | isAsync; else noAsyncRef">{{ result.value | async }} </ng-container>
+        <ng-template #noAsyncRef>{{ result.value }} </ng-template>
+      </ng-container>
       <clr-dg-filter *ngIf="config.useCustomFilters">
         <ng-content select=".dg-filter"></ng-content>
       </clr-dg-filter>
@@ -46,8 +50,12 @@
       </clr-dg-action-overflow>
       <ng-container *ngFor="let column of columns">
         <clr-dg-cell (click)="onClrItemClick($event, current)">
-          <span class="cell-value" [ngClass]="column.style.class ?? ''" [style]="column.style.styles">{{
-            getCellValue(current, column.label) | transform: column.transform }}</span>
+          <span class="cell-value" [ngClass]="column.style.class ?? ''" [style]="column.style.styles">
+            <ng-container *ngIf="current|propValue:column.label | transform: column.transform | pipeResult as result">
+              <ng-container *ngIf="result.value | isAsync; else noAsyncRef">{{result.value | async}}</ng-container>
+              <ng-template #noAsyncRef>{{ result.value }}</ng-template>
+            </ng-container>
+          </span>
         </clr-dg-cell>
       </ng-container>
       <!-- USING ngProjectAs as recommended by the documentation -->
