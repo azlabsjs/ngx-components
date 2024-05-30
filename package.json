@@ -30,7 +30,7 @@
     "@azlabsjs/smart-form-core": "^0.2.12",
     "@azlabsjs/uploader": "^0.2.1",
     "@azlabsjs/utilities": "^0.2.0",
-    "@ng-select/ng-select": "^10.0.3",
+    "@ng-select/ng-select": "^11.2.0",
     "@ngx-translate/core": "^14.0.0",
     "awesome-phonenumber": "^5.0",
     "dropzone": "^6.0.0-beta.2",
