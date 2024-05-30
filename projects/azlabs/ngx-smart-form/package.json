@@ -2,11 +2,11 @@
   "name": "@azlabsjs/ngx-smart-form",
   "version": "0.15.35",
   "peerDependencies": {
-    "@angular/common": "^15.0",
-    "@angular/core": "^15.0",
-    "@angular/forms": "^15.0",
-    "@azlabsjs/smart-form-core": "^0.2.12",
-    "@azlabsjs/requests": "^0.2.0"
+    "@angular/common": "^17.3.0",
+    "@angular/core": "^17.3.0",
+    "@angular/forms": "^17.3.0",
+    "@azlabsjs/smart-form-core": "^0.2.19",
+    "@azlabsjs/requests": "^0.2.4"
   },
   "dependencies": {
     "tslib": "^2.3.0"
