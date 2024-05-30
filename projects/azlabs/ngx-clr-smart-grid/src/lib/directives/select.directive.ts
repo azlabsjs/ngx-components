@@ -12,7 +12,7 @@ import { ClrDatagrid } from '@clr/angular';
 import { Subject, takeUntil, tap } from 'rxjs';
 import { GriSelectDirectiveInputType } from '../core/types';
 
-@Directive({ selector: '[clrGridSelect]' })
+@Directive({ selector: '[clrGridSelect]', standalone: true })
 export class NgxClrGridSelectDirective
   implements AfterViewInit, OnInit, OnDestroy
 {

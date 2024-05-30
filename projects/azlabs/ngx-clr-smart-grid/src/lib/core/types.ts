@@ -64,6 +64,7 @@ export type GridConfigType = {
   useCustomFilters: boolean;
   totalItemLabel?: string;
   projectRowClass?: string | ((element: any) => string);
+  columnHeadersClass?: string | string[];
 };
 
 export type GriSelectDirectiveInputType = {

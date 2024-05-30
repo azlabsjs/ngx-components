@@ -1,1 +1,1 @@
-export { NgxClrGridSelectDirective } from './clr-grid-select.directive';
+export { NgxClrGridSelectDirective } from './select.directive';

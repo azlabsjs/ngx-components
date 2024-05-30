@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NgxClrSmartGridComponent } from './ngx-clr-smart-grid.component';
+import { NgxClrSmartGridComponent } from './grid.component';
 
 describe('NgxClrSmartGridComponent', () => {
   let component: NgxClrSmartGridComponent;

@@ -9,7 +9,8 @@
   </clr-dg-action-bar>
   <!-- DATA GRID COLUMNS -->
   <ng-container *ngFor="let column of columns">
-    <clr-dg-column [clrDgColType]="column.type" [clrDgField]="column.field" [clrDgSortBy]="column.sort || ''">
+    <clr-dg-column [ngClass]="config.columnHeadersClass" [clrDgColType]="column.type" [clrDgField]="column.field"
+      [clrDgSortBy]="column.sort || ''">
       <ng-container
         *ngIf="column.title | transform : (column.transformTitle ?? config.transformColumnTitle) | pipeResult as result">
         <ng-container *ngIf="result.value | isAsync; else noAsyncRef">{{ result.value | async }} </ng-container>

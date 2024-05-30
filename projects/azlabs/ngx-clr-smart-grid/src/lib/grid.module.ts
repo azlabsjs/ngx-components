@@ -1,45 +1,20 @@
-import {
-  AsyncPipe,
-  CommonModule,
-  CurrencyPipe,
-  DecimalPipe,
-  JsonPipe,
-  LowerCasePipe,
-  PercentPipe,
-  SlicePipe,
-  UpperCasePipe,
-} from '@angular/common';
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { ClarityModule } from '@clr/angular';
-import { NgxClrGridSelectDirective } from './directives';
-import { NgxClrSmartGridComponent } from './ngx-clr-smart-grid.component';
 import {
-  NgxCommonModule,
   PIPE_TRANSFORMS,
   PipeTransformTokenMapType,
 } from '@azlabsjs/ngx-common';
+import { DIRECTIVES } from './common';
+import { PROVIDERS } from './providers';
 
+/** @deprecated use exported `DIRECTIVES` array to use the exported directives */
 @NgModule({
-  declarations: [NgxClrSmartGridComponent, NgxClrGridSelectDirective],
-  imports: [CommonModule, ClarityModule, NgxCommonModule],
-  exports: [
-    NgxClrSmartGridComponent,
-    NgxClrGridSelectDirective,
-    NgxCommonModule,
-    ClarityModule,
-  ],
-  providers: [
-    UpperCasePipe,
-    LowerCasePipe,
-    CurrencyPipe,
-    DecimalPipe,
-    JsonPipe,
-    PercentPipe,
-    SlicePipe,
-    AsyncPipe,
-  ],
+  // declarations: [],
+  imports: [...DIRECTIVES],
+  exports: [...DIRECTIVES],
+  providers: [...PROVIDERS],
 })
 export class NgxClrSmartGridModule {
+  /** @deprecated */
   static forRoot(config: {
     pipeTransformMap: PipeTransformTokenMapType;
     debug?: boolean;

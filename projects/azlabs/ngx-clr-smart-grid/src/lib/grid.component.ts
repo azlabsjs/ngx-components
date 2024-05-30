@@ -7,7 +7,7 @@ import {
   TemplateRef,
 } from '@angular/core';
 import { JSObject } from '@azlabsjs/js-object';
-import { ClrDatagridSortOrder } from '@clr/angular';
+import { ClarityModule, ClrDatagridSortOrder } from '@clr/angular';
 import {
   PaginateResult,
   ProjectPaginateQueryParamType,
@@ -15,10 +15,29 @@ import {
   GridConfigType,
   PipeTransformType,
 } from './core';
+import { CommonModule } from '@angular/common';
+import { NgxCommonModule } from '@azlabsjs/ngx-common';
+import { NgxClrGridSelectDirective } from './directives';
+
+/** @internal */
+type ColumnType = Omit<
+  Required<GridColumnType>,
+  'sortPropertyName' | 'transformTitle'
+> & {
+  sortPropertyName?: string;
+  transformTitle?: PipeTransformType | PipeTransformType[];
+};
 
 @Component({
+  standalone: true,
+  imports: [
+    CommonModule,
+    ClarityModule,
+    NgxCommonModule,
+    NgxClrGridSelectDirective,
+  ],
   selector: 'ngx-clr-smart-grid',
-  templateUrl: './ngx-clr-smart-grid.component.html',
+  templateUrl: './grid.component.html',
   styles: [
     `
       .cell-value {
@@ -75,13 +94,12 @@ export class NgxClrSmartGridComponent {
     useCustomFilters: false,
     totalItemLabel: 'Total',
     projectRowClass: '',
+    columnHeadersClass: '',
   };
   @Input() set config(value: Partial<GridConfigType>) {
     if (value) {
-      this._config = {
-        ...this._config,
-        ...value,
-      };
+      const { _config } = this;
+      this._config = { ..._config, ...value };
     }
   }
   public get config(): Required<GridConfigType> {
@@ -90,20 +108,14 @@ export class NgxClrSmartGridComponent {
   //! Datagrid configuration Input
 
   // Datagrid columns configuraiton inputs
-  private _columns: (Omit<
-    Required<GridColumnType>,
-    'sortPropertyName' | 'transformTitle'
-  > & {
-    sortPropertyName?: string;
-    transformTitle?: PipeTransformType | PipeTransformType[];
-  })[] = [];
+  private _columns: ColumnType[] = [];
   @Input() set columns(values: GridColumnType[]) {
     if (values) {
       // Map input value to typeof Required<GridColumn>
       // type definitions
       this._columns = values.map((column) => ({
         ...column,
-        field: column.field || column.label || '',
+        field: column.field ?? '',
         style: column.style
           ? {
               class: Array.isArray(column.style.class)
@@ -125,13 +137,7 @@ export class NgxClrSmartGridComponent {
       }));
     }
   }
-  get columns(): (Omit<
-    Required<GridColumnType>,
-    'sortPropertyName' | 'transformTitle'
-  > & {
-    sortPropertyName?: string;
-    transformTitle?: PipeTransformType | PipeTransformType[];
-  })[] {
+  get columns(): ColumnType[] {
     return this._columns;
   }
   //! Datagrid columns configuraiton inputs

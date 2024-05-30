@@ -11,5 +11,5 @@ export {
   GriSelectDirectiveInputType,
 } from './core';
 export { NgxClrGridSelectDirective } from './directives';
-export { NgxClrSmartGridComponent } from './ngx-clr-smart-grid.component';
-export { NgxClrSmartGridModule } from './ngx-clr-smart-grid.module';
+export { NgxClrSmartGridComponent } from './grid.component';
+export { NgxClrSmartGridModule } from './grid.module';
