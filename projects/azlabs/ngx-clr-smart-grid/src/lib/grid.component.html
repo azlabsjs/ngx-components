@@ -1,7 +1,7 @@
 <clr-datagrid clrGridSelect [selectionConfig]="{
     selectable: config.selectable,
     singleSelection: config.singleSelection
-  }" [(selectState)]="selected" [class]="config.class || ''" (clrDgRefresh)="onClrDgRefresh($event)"
+  }" [(selectState)]="selected" [class]="config.class || ''" (clrDgRefresh)="onDgRefresh($event)"
   [clrDgPreserveSelection]="config.preserveSelection || false" [clrDgLoading]="loading"
   (selectStateChange)="onSelectedStateChanges($event)">
   <clr-dg-action-bar>
@@ -26,21 +26,21 @@
   <!-- DATA GRID ROWS -->
   <!-- IF USER SPECIFY TO SERVER SIDE PAGINATION WE USE DEFAULT *ngFor directive -->
   <ng-container *ngIf="config.useServerPagination; else smart">
-    <ng-container *ngFor="let item of data || []">
+    <ng-container *ngFor="let item of state().data ?? []">
       <ng-container *ngTemplateOutlet="dgRowRef ?? defaultRowRef; context: { $implicit: item }"
         ngProjectAs="clr-dg-row"></ng-container>
     </ng-container>
   </ng-container>
   <!-- ELSE WE FALL BACK TO *clrDgItems smart iterator directive directive -->
   <ng-template #smart>
-    <ng-container *clrDgItems="let item of data || []">
+    <ng-container *clrDgItems="let item of state().data ?? []">
       <ng-container *ngTemplateOutlet="dgRowRef ?? defaultRowRef; context: { $implicit: item }"
         ngProjectAs="clr-dg-row"></ng-container>
     </ng-container>
   </ng-template>
   <!-- DATA GRID ROWS -->
   <ng-template #defaultRowRef let-current>
-    <clr-dg-row [class]="getrowclass(config, current)" [clrDgItem]="current"
+    <clr-dg-row [class]="config|gridRowClass:current" [clrDgItem]="current"
       [clrDgSelectable]="current[config.selectableProp || ''] || true">
       <clr-dg-action-overflow *ngIf="config.hasActionOverflow">
         <!-- ACTION OVERFLOW BUTTON PROJECTION -->
@@ -50,7 +50,7 @@
           "></ng-container>
       </clr-dg-action-overflow>
       <ng-container *ngFor="let column of columns">
-        <clr-dg-cell (click)="onClrItemClick($event, current)">
+        <clr-dg-cell (click)="onItemClick($event, current)">
           <span class="cell-value" [ngClass]="column.style.class ?? ''" [style]="column.style.styles">
             <ng-container *ngIf="current|propValue:column.label | transform: column.transform | pipeResult as result">
               <ng-container *ngIf="result.value | isAsync; else noAsyncRef">{{result.value | async}}</ng-container>
@@ -96,8 +96,9 @@
 
   <!-- Data grid footer definitions -->
   <clr-dg-footer>
-    {{ total || data.length }} {{ config.totalItemLabel }}
-    <clr-dg-pagination [clrDgPageSize]="config.pageSize" #pagination [clrDgTotalItems]="total || data.length">
+    {{ state().total || state().data.length }} {{ config.totalItemLabel }}
+    <clr-dg-pagination [clrDgPageSize]="config.pageSize" #pagination
+      [clrDgTotalItems]="state().total || state().data.length">
       <clr-dg-page-size [clrPageSizeOptions]="config.sizeOptions"></clr-dg-page-size>
     </clr-dg-pagination>
   </clr-dg-footer>

@@ -1,11 +1,4 @@
-/**
- * @internal
- *
- * @param cssClass
- * @param noHover
- * @param active
- * @param disabled
- */
+/** @internal */
 export function computeCssClass(
   cssClass: string | undefined,
   noHover: boolean,
@@ -25,12 +18,7 @@ export function computeCssClass(
   };
 }
 
-/**
- * @internal
- * 
- * @param orientation 
- * @param animation 
- */
+/** @internal */
 export function computeMenuClass(
   orientation: string | undefined,
   animation: string | undefined

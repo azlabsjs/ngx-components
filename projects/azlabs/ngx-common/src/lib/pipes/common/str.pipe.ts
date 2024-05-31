@@ -1,8 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'parseStr',
   pure: true,
+  standalone: true,
+  name: 'parseStr',
 })
 export class ParseStrPipe implements PipeTransform {
   // Parses a string replacing template variable `[name]`
@@ -20,5 +21,19 @@ export class ParseStrPipe implements PipeTransform {
     // We return the string with template properties replaced
     // with the corresponding properties values
     return value;
+  }
+}
+
+@Pipe({
+  pure: true,
+  standalone: true,
+  name: 'strlen',
+})
+export class StrLengthPipe implements PipeTransform {
+  /** @description Returns the length of string object */
+  transform(value: any): number {
+    return typeof value === 'undefined' || value === null
+      ? 0
+      : String(value).length;
   }
 }

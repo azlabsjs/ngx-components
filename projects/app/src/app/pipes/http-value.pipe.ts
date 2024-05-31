@@ -1,17 +1,7 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, Pipe, PipeTransform } from '@angular/core';
-import { as, useQuery } from '@azlabsjs/ngx-query';
-import { QueryState } from '@azlabsjs/rx-query';
-import {
-  EMPTY,
-  Observable,
-  catchError,
-  filter,
-  first,
-  firstValueFrom,
-  map,
-  tap,
-} from 'rxjs';
+import { QueryStateType, useQuery, as } from '@azlabsjs/rx-query';
+import { EMPTY, Observable, catchError, filter, map } from 'rxjs';
 
 /**
  * Creates an HTTP value query that return the value matchin the provided param
@@ -27,7 +17,7 @@ export function createHTTPValueQuery(
         url.endsWith('/') ? url.substring(0, url.length - 1) : url
       }/${param}?_columns[]=${select}&_hidden[]=id`
     : `${url}?_columns[]=${select}&_hidden[]=id`;
-  const response$ = as<Observable<QueryState>>(
+  const response$ = as<Observable<QueryStateType>>(
     useQuery(
       () => {
         return client
@@ -48,15 +38,15 @@ export function createHTTPValueQuery(
     )
   ).pipe(
     filter(
-      (value: QueryState) =>
+      (value: QueryStateType) =>
         typeof value.response != 'undefined' && value.response != null
     ),
-    map(value => value.response),
+    map((value) => value.response)
   );
   return response$;
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 @Pipe({
   name: 'httpValue',
   pure: true,

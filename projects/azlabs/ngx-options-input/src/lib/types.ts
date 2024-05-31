@@ -1,26 +1,19 @@
 import { Injector } from '@angular/core';
 import { HTTPRequest, HTTPResponse, Interceptor } from '@azlabsjs/requests';
-import {
-  InputOptionsInterface,
-  OptionsConfig,
-} from '@azlabsjs/smart-form-core';
+import { InputOptions, OptionsConfig } from '@azlabsjs/smart-form-core';
 import { Observable } from 'rxjs';
 
+/** @description Type declaration of option query client */
 export type InputOptionsClient = {
   //
-  /**
-   * @description Query list of select options from forms provider database
-   *
-   */
+  /** @description Query list of select options from forms provider database */
   request(
     optionsConfig: OptionsConfig & { name?: string },
     searchParams?: Record<string, unknown>
-  ): Observable<InputOptionsInterface>;
+  ): Observable<InputOptions>;
 };
 
-/**
- * @internal
- */
+/**  @internal */
 type QueryConfigType = {
   [name: string]:
     | string
@@ -34,17 +27,12 @@ type QueryConfigType = {
       };
 };
 
-/**
- * Options query request interceptor type definition
- */
+/** @description Options query request interceptor type definition */
 export type InterceptorFactory<T, R = unknown> = (
   injector: Injector
 ) => Interceptor<T, R>;
 
-
-/**
- * Options query configuration type definition
- */
+/** @description Options query configuration type definition */
 export type OptionsQueryConfigType = {
   interceptorFactory?: InterceptorFactory<
     HTTPRequest,

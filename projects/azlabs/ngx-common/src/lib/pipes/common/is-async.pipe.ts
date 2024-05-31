@@ -25,8 +25,9 @@ export function isAsync<T = any>(value: unknown): value is T {
 }
 
 @Pipe({
-  name: 'isAsync',
   pure: true,
+  standalone: true,
+  name: 'isAsync',
 })
 export class IsAsyncPipe implements PipeTransform {
   // Transform function that returns true if value is a promise, or an observable

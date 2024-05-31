@@ -5,8 +5,9 @@ import { JSObject } from '@azlabsjs/js-object';
  * Resolve the value for a given property
  */
 @Pipe({
-  name: 'propValue',
   pure: true,
+  standalone: true,
+  name: 'propValue',
 })
 export class PropertyValuePipe implements PipeTransform {
   // Resolve property value for a given object

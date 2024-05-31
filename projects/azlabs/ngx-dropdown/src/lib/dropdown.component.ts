@@ -1,7 +1,6 @@
-import { DOCUMENT } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import {
   AfterViewInit,
-  ChangeDetectorRef,
   Component,
   ContentChild,
   ElementRef,
@@ -13,10 +12,12 @@ import {
   SimpleChanges,
   TemplateRef,
   ViewChild,
+  signal,
 } from '@angular/core';
 import { computeCssClass, computeMenuClass } from './helpers';
-import { Animation, Orientation, SetStateParam } from './types';
+import { Animation, Orientation } from './types';
 
+/** @internal */
 type StateType = {
   active: boolean;
   cssClass: Record<string, boolean>;
@@ -24,39 +25,18 @@ type StateType = {
 };
 
 @Component({
+  standalone: true,
+  imports: [CommonModule],
   selector: 'ngx-azl-dropdown',
   templateUrl: './dropdown.component.html',
-  styleUrls: ['./dropdown.component.css'],
+  styleUrls: ['./dropdown.component.scss'],
 })
 export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
-  /**
-   * @attr orientation
-   */
   @Input() orientation: Orientation = 'right';
-
-  /**
-   * @attr animation
-   */
   @Input() animation: Animation = 'scaleY';
-
-  /**
-   * @attr text
-   */
   @Input() text!: string;
-
-  /**
-   * @attr class
-   */
-  @Input('class') cssClass!: string;
-
-  /**
-   * @attr no-hover
-   */
-  @Input('no-hover') noHover: boolean = false;
-
-  /**
-   * @attr disabled
-   */
+  @Input({ alias: 'class' }) cssClass!: string;
+  @Input({ alias: 'no-hover' }) noHover: boolean = false;
   @Input() disabled: boolean = false;
 
   // #region component view children
@@ -65,26 +45,15 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
   @ContentChild('dropdownToggle') dropdownToggleRef!: TemplateRef<any>;
   // #endregion component view children
 
-  private _state: StateType = {
+  state = signal<StateType>({
     active: false,
     cssClass: {} as Record<string, boolean>,
     menuClass: {} as Record<string, boolean>,
-  };
-
-  get state() {
-    return this._state;
-  }
-
+  });
   private defaultView!: Window;
 
-  /**
-   * Creates component instances
-   *
-   */
-  constructor(
-    private changeRef: ChangeDetectorRef,
-    @Inject(DOCUMENT) @Optional() document?: Document
-  ) {
+  /** @description Creates component instances */
+  constructor(@Inject(DOCUMENT) @Optional() document?: Document) {
     const { defaultView } = document ?? ({} as Document);
     if (defaultView) {
       this.defaultView = defaultView;
@@ -98,7 +67,7 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
       'active' in changes ||
       'disabled' in changes
     ) {
-      this.setState((state) => ({
+      this.state.update((state) => ({
         ...state,
         menuClass: computeMenuClass(this.orientation, this.animation),
         cssClass: computeCssClass(
@@ -118,9 +87,9 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
     );
   }
 
-  onToggleDropdown(event: Event) {
+  onToggleDropdown(e: Event) {
     if (this.noHover && !this.disabled) {
-      this.setState((state) => ({
+      this.state.update((state) => ({
         ...state,
         active: !state.active,
         menuClass: computeMenuClass(this.orientation, this.animation),
@@ -132,8 +101,8 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
         ),
       }));
     }
-    event.preventDefault();
-    event.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
   }
 
   ngOnDestroy(): void {
@@ -143,15 +112,8 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
     );
   }
 
-  private setState(state: SetStateParam<StateType>) {
-    if (typeof state === 'function') {
-      this._state = state(this._state);
-    }
-    this._state = { ...this._state, ...state };
-    this.changeRef.markForCheck();
-  }
-
-  private onDefaultViewClick(event: MouseEvent) {
+  private onDefaultViewClick(e: MouseEvent) {
+    const { active } = this.state();
     if (this.dropdownHeaderRef?.nativeElement) {
       const {
         left: x,
@@ -159,16 +121,17 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
         width,
         height,
       } = this.dropdownHeaderRef?.nativeElement.getBoundingClientRect();
+      const { clientX, clientY } = e;
       if (
         !(
-          event.clientX >= x &&
-          event.clientX <= x + width &&
-          event.clientY >= y &&
-          event.clientY <= y + height
+          clientX >= x &&
+          clientX <= x + width &&
+          clientY >= y &&
+          clientY <= y + height
         ) &&
-        this._state.active === true
+        active === true
       ) {
-        this.setState((state) => ({
+        this.state.update((state) => ({
           ...state,
           active: !state.active,
           menuClass: computeMenuClass(this.orientation, this.animation),
@@ -181,6 +144,7 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
         }));
       }
     }
-    event.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
   }
 }

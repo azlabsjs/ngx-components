@@ -1,4 +1,4 @@
-<div class="dropdown-container">
+<div class="dropdown-container" *ngIf="state() as state">
   <div class="ngx-azl-dropdown" [ngClass]="state.cssClass">
     <a
       title="dropdown toggle"

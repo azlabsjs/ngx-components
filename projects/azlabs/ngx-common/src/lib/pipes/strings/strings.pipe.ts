@@ -10,12 +10,13 @@ import { Observable, Subscription, map } from 'rxjs';
 import { getObjectProperty } from '@azlabsjs/js-object';
 
 @Pipe({
-  name: 'commonString',
   pure: false,
+  standalone: true,
+  name: 'commonString',
 })
 export class CommonStringsPipe implements PipeTransform {
   // #region Class properties
-  private _latestValue: string | unknown = '...';
+  private _latestValue: string | unknown;
   private _ref: ChangeDetectorRef | null;
   private _subscription!: Subscription | null;
   private _search!: string | null;
@@ -33,15 +34,14 @@ export class CommonStringsPipe implements PipeTransform {
   private updateResult(query: string) {
     // Set the current search string to equals the search argument value
     this._search = query;
-
     this._subscription = this.commonStrings
       .pipe(map((value) => getObjectProperty(value, query)))
-      .subscribe((result) => this._updateLatestValue(query, result));
+      .subscribe((result) => this._updateLatestValue(query, result, query));
   }
 
-  private _updateLatestValue(search: string, value: unknown): void {
+  private _updateLatestValue(search: string, value: unknown, q?: string): void {
     if (search === this._search) {
-      this._latestValue = value ?? '...';
+      this._latestValue = value ?? q ?? '...';
       // Note: `this._ref` is only cleared in `ngOnDestroy` so is known to be available when a
       // value is being updated.
       this._ref?.markForCheck();
@@ -73,7 +73,6 @@ export class CommonStringsPipe implements PipeTransform {
       this.dispose();
       this.transform(query, _default);
     }
-
     return this._latestValue ?? _default;
   }
 

@@ -1,5 +1,4 @@
 import { parsePhoneNumber, ParsedPhoneNumber } from 'awesome-phonenumber';
-
 import { getExample } from 'awesome-phonenumber';
 
 // @internal

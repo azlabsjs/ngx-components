@@ -1,12 +1,10 @@
-import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { DropdownComponent } from './dropdown.component';
 import { DropdownSearchComponent } from './search.component';
 
+/** @deprecated Use exported `DROPDOWN_DIRECTIVES` instead in your module, as it provided `DropdownComponent` and `DropdownSearchComponent`  standalone directives */
 @NgModule({
-  declarations: [DropdownComponent, DropdownSearchComponent],
-  imports: [CommonModule, FormsModule],
+  imports: [DropdownComponent, DropdownSearchComponent],
   exports: [DropdownComponent, DropdownSearchComponent],
 })
 export class DropdownModule {}

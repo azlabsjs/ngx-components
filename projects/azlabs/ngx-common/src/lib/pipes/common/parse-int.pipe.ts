@@ -1,8 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'parseInt',
   pure: true,
+  standalone: true,
+  name: 'parseInt',
 })
 export class ParseIntPipe implements PipeTransform {
   // Convert string value to integer

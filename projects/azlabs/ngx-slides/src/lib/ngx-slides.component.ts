@@ -6,6 +6,7 @@ import {
   Input,
   ContentChild,
   TemplateRef,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { interval, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
@@ -84,6 +85,7 @@ import { Slide } from './models/slide';
       ]),
     ]),
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxSlidesComponent implements OnInit, OnDestroy {
   //# Component Properties

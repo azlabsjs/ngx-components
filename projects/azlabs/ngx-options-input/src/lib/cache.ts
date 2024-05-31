@@ -1,27 +1,19 @@
-/**
- * @interal Disposable performs object cleanup
- */
+/**  @interal Disposable performs object cleanup */
 type Disposable = {
   dispose(): void;
 };
 
-/**
- * @internal
- */
+/**  @internal */
 type ValueResolver<TValue> = (value: TValue) => Promise<TValue> | TValue;
 
-/**
- * Cache instance type definition
- */
+/** @description Cache instance type definition */
 export type CacheType<TKey, TValue> = {
   put(key: TKey, value: TValue, update?: ValueResolver<TValue>): void;
   get(key: TKey): TValue | undefined;
   delete(key: TKey): void;
 };
 
-/**
- * @intrenal Cached value type definition
- */
+/** @intrenal Cached value type definition */
 type ValueType<TValue = unknown> = {
   getValue: () => TValue;
   refresh: () => void;
@@ -29,17 +21,13 @@ type ValueType<TValue = unknown> = {
   update: (value: TValue) => Promise<TValue>;
 } & Disposable;
 
-/**
- * @internal Key value pair instance of cached value
- */
+/** @internal Key value pair instance of cached value */
 type Pair<K, T> = {
   key: () => K;
   getValue: () => T;
 };
 
-/**
- * @internal Key value pair factory function
- */
+/** @internal Key value pair factory function */
 function createPair<TKey, TValue>(key: TKey, value?: TValue) {
   return {
     key: () => key,
@@ -47,11 +35,7 @@ function createPair<TKey, TValue>(key: TKey, value?: TValue) {
   } as Pair<TKey, TValue>;
 }
 
-/**
- * @internal
- *
- * Checks if a value is a Promise A+ instance
- */
+/** @internal Checks if a value is a Promise A+ instance */
 function isPromise(p: unknown): p is Promise<unknown> {
   if (
     typeof p === 'object' &&

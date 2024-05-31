@@ -1,24 +1,28 @@
-export {
-  PipeTransformTokenMapType,
-  NgxTransformPipe,
-  createPipeTransform,
-  PIPE_TRANSFORMS,
-} from './pipes/transform';
-export {
-  CommonStringsPipe,
-  ProvideCommonStringsType,
-  provideCommonStrings,
-  provideCommonStringsFactory,
-  COMMON_STRINGS,
-} from './pipes/strings';
-
+/** Library exported pipe instances */
 export {
   IsAsyncPipe,
   PipeResultPipe,
   ParseIntPipe,
   ParseStrPipe,
   PropertyValuePipe,
-} from './pipes/common';
+  COMMON_PIPES,
+  ArrayLengthPipe,
+  IsArrayPipe,
+  ArrayPipe,
+  StrLengthPipe,
+  CommonStringsPipe,
+  ProvideCommonStringsType,
+  provideCommonStrings,
+  provideCommonStringsFactory,
+  COMMON_STRINGS,
+  PipeTransformTokenMapType,
+  NgxTransformPipe,
+  createPipeTransform,
+  PIPE_TRANSFORMS,
+} from './pipes';
 
 // Exported module
 export { NgxCommonModule } from './ngx-common.module';
+
+/** Exported library providers */
+export { providePipes } from './providers';

@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import { Country } from './model';
+import { Country } from './types';
 import { ISO3166 } from './ios3166';
 import { getPhoneNumberPlaceholder } from './internal';
 

@@ -1,42 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import {
-  NgxTransformPipe,
-  PIPE_TRANSFORMS,
-  PipeTransformTokenMapType,
-} from './pipes/transform';
-import { CommonStringsPipe } from './pipes/strings';
-import {
-  IsAsyncPipe,
-  ParseIntPipe,
-  ParseStrPipe,
-  PipeResultPipe,
-  PropertyValuePipe,
-} from './pipes/common';
+import { PIPE_TRANSFORMS, PipeTransformTokenMapType } from './pipes/transform';
+import { COMMON_PIPES } from './pipes';
 
+/** @deprecated To use the common custom directives and pipes simply import the exported `COMMON_PIPES` constant  */
 @NgModule({
-  declarations: [
-    NgxTransformPipe,
-    CommonStringsPipe,
-    IsAsyncPipe,
-    PipeResultPipe,
-    ParseIntPipe,
-    ParseStrPipe,
-    PropertyValuePipe,
-  ],
-  imports: [CommonModule],
-  exports: [
-    CommonModule,
-    NgxTransformPipe,
-    CommonStringsPipe,
-    IsAsyncPipe,
-    PipeResultPipe,
-    ParseIntPipe,
-    ParseStrPipe,
-    PropertyValuePipe,
-  ],
+  imports: [CommonModule, ...COMMON_PIPES],
+  exports: [CommonModule, ...COMMON_PIPES],
 })
 export class NgxCommonModule {
+  /** @deprecated Use `providePipes(...)` in your module or component to register custom pipes */
   static forRoot(config: {
     pipeTransformMap: PipeTransformTokenMapType;
   }): ModuleWithProviders<NgxCommonModule> {

@@ -1,5 +1,5 @@
 import { Inject, Injectable, Optional } from '@angular/core';
-import { Country } from './model';
+import { Country } from './types';
 import { COUNTRIES, PREFERRED_COUNTRIES, SUPPORTED_COUNTRIES } from './tokens';
 import {
   getPhoneNumberPlaceholder,

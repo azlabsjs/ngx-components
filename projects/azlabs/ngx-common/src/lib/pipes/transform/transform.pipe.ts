@@ -7,7 +7,14 @@ import {
   SlicePipe,
   UpperCasePipe,
 } from '@angular/common';
-import { Inject, Injector, Pipe, PipeTransform } from '@angular/core';
+import {
+  EnvironmentInjector,
+  Inject,
+  Pipe,
+  PipeTransform,
+  inject,
+  runInInjectionContext,
+} from '@angular/core';
 import { GetTimeAgo, JSDate, ParseMonth } from '@azlabsjs/js-datetime';
 import { PipeTransformTokenMapType, PipeTransformType } from './types';
 import { PIPE_TRANSFORMS } from './tokens';
@@ -20,7 +27,6 @@ import { PIPE_TRANSFORMS } from './tokens';
  *
  * @param char
  * @param haystack
- * @returns
  */
 export function after(char: string, haystack: string) {
   const index = haystack.indexOf(char);
@@ -82,10 +88,13 @@ function substr(value: string, start: number, length?: number) {
 }
 
 @Pipe({
-  name: 'transform',
   pure: true,
+  standalone: true,
+  name: 'transform',
 })
 export class NgxTransformPipe implements PipeTransform {
+  private injector = inject(EnvironmentInjector);
+
   /**
    * Creates an instance {@see NgxGridDataPipe} pipe
    */
@@ -97,7 +106,6 @@ export class NgxTransformPipe implements PipeTransform {
     private jsonPipe: JsonPipe,
     private percentPipe: PercentPipe,
     private slicePipe: SlicePipe,
-    private injector: Injector,
     @Inject(PIPE_TRANSFORMS) private transforms?: PipeTransformTokenMapType
   ) {}
 
@@ -185,17 +193,15 @@ export class NgxTransformPipe implements PipeTransform {
   }
 
   private getDefault(pipename: string, value: unknown, ...params: any[]) {
-    if (typeof this.transforms === 'undefined' || this.transforms === null) {
+    return runInInjectionContext(this.injector, () => {
+      if (!this.transforms) {
+        return value;
+      }
+      const pipeToken = this.transforms[pipename];
+      if (pipeToken) {
+        return inject(pipeToken)?.transform(value, ...params) ?? value;
+      }
       return value;
-    }
-    const pipeToken = this.transforms[pipename];
-    if (typeof pipeToken === 'undefined' || pipeToken === null) {
-      return value;
-    }
-    const pipe = this.injector.get(pipeToken);
-    if (pipe) {
-      return pipe.transform(value, ...params);
-    }
-    return value;
+    });
   }
 }

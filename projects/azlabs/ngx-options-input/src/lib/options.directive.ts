@@ -10,7 +10,7 @@ import {
   Output,
 } from '@angular/core';
 import {
-  InputOptionsInterface,
+  InputOptions,
   isCustomURL,
   isValidHttpUrl,
   mapIntoInputOptions,
@@ -20,25 +20,44 @@ import {
 import { Subject, Subscription, from, lastValueFrom, of } from 'rxjs';
 import { debounceTime, first, map, switchMap, tap } from 'rxjs/operators';
 import { InputOptionsClient } from './types';
-import { createIntersectionObserver } from './observers';
 import { INPUT_OPTIONS_CLIENT, OPTIONS_CACHE } from './tokens';
 import { CacheType } from './cache';
 
+/** @internal */
+type ObservationOptions = {
+  root: HTMLElement;
+  rootMargin: string;
+  threshold: number;
+};
+
+/** @description Creates a browser intersection observer instance
+ *
+ * @param callback
+ * @param options
+ */
+export function createIntersectionObserver(
+  callback: IntersectionObserverCallback,
+  options?: ObservationOptions | undefined
+) {
+  return new IntersectionObserver(callback, options);
+}
+
 @Directive({
+  standalone: true,
   selector: '[fetchOptions]',
 })
 export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   //#region Directive inputs
   @Input() loaded!: boolean;
-  @Input('config') options!: OptionsConfig | undefined;
+  @Input({ alias: 'config' }) options!: OptionsConfig | undefined;
   @Input() name!: string;
   @Input() auto: boolean = true;
-  @Input('query') search: string = 'label';
-  @Input('limit') limit!: number;
+  @Input({ alias: 'query' }) search: string = 'label';
+  @Input({ alias: 'limit' }) limit!: number;
   //#endregion Directive inputs
 
   //#region Directive outputs
-  @Output() optionsChange = new EventEmitter<InputOptionsInterface>();
+  @Output() optionsChange = new EventEmitter<InputOptions>();
   @Output() loadingChange = new EventEmitter<boolean>();
   //#endregion Directive outputs
 
@@ -53,7 +72,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     @Inject(INPUT_OPTIONS_CLIENT) private client: InputOptionsClient,
     @Inject(DOCUMENT) private document: Document,
     @Inject(OPTIONS_CACHE)
-    private cache: CacheType<Record<string, unknown>, InputOptionsInterface>
+    private cache: CacheType<Record<string, unknown>, InputOptions>
   ) {
     this._subscriptions.push(
       this._search$
@@ -146,9 +165,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     this.optionsChange.emit(mapStringListToInputOptions(options.source.raw));
   }
 
-  /**
-   * @interal
-   */
+  /** @interal */
   private async fetchAsync(
     options: OptionsConfig,
     params: Record<string, unknown> = {}
@@ -161,9 +178,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     ]);
   }
 
-  /**
-   * @internal
-   */
+  /** @internal */
   private sendRequest(options: OptionsConfig, params: Record<string, unknown>) {
     return lastValueFrom(
       this.client.request({ ...options, name: this.name }, params).pipe(

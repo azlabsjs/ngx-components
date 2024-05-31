@@ -6,8 +6,8 @@ export {
   SUPPORTED_COUNTRIES,
   PREFERRED_COUNTRIES,
 } from './lib/core';
-export { NgxIntlTelInputComponent } from './lib/ngx-intl-tel-input.component';
-export { NgxIntlTelInputModule } from './lib/ngx-intl-tel-input.module';
+export { NgxIntlTelInputComponent } from './lib/intl-tel-input.component';
+export { NgxIntlTelInputModule } from './lib/intl-tel-input.module';
 export {
   provideCountries,
   providePreferredCountries,

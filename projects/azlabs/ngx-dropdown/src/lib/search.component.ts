@@ -1,21 +1,27 @@
 import {
-  ChangeDetectorRef,
+  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Input,
   Output,
+  signal,
 } from '@angular/core';
-import { SetStateParam } from './types';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
+/** @internal */
 type StateType = {
   value: string;
   disabled: boolean;
 };
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   selector: 'ngx-azl-dropdown-search',
   templateUrl: './search.component.html',
-  styleUrls: ['./search.component.css'],
+  styleUrls: ['./search.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DropdownSearchComponent {
   // #region component outputs
@@ -26,24 +32,19 @@ export class DropdownSearchComponent {
   @Input() placeholder: string = 'Search...';
   // #endregion component output
 
-  private _state: StateType = {
+  private state = signal<StateType>({
     value: '',
     disabled: false,
-  };
-
-  /**
-   * Creates component instances
-   *
-   */
-  constructor(private changeRef: ChangeDetectorRef) {}
+  });
 
   onInputChange(event?: Event) {
+    const { value: v } = this.state();
     const value = (event?.target as HTMLInputElement).value.trim();
     // Case the value does not change we doe not fire any change event
-    if (value === this._state.value) {
+    if (v === value) {
       return;
     }
-    this.setState((state) => ({ ...state, value }));
+    this.state.update((state) => ({ ...state, value }));
     this.dispatchValueChange();
     event?.stopPropagation();
   }
@@ -54,15 +55,8 @@ export class DropdownSearchComponent {
     event?.stopPropagation();
   }
 
-  setState(state: SetStateParam<StateType>) {
-    if (typeof state === 'function') {
-      this._state = state(this._state);
-    }
-    this._state = { ...this._state, ...state };
-    this.changeRef.markForCheck();
-  }
-
   private dispatchValueChange() {
-    this.valueChange.emit(this._state.value);
+    const { value } = this.state();
+    this.valueChange.emit(value);
   }
 }

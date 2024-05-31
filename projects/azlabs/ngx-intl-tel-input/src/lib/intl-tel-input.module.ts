@@ -1,6 +1,6 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { Country } from './core';
-import { NgxIntlTelInputComponent } from './ngx-intl-tel-input.component';
+import { NgxIntlTelInputComponent } from './intl-tel-input.component';
 import { provideSupportedCountries } from './providers';
 
 /**

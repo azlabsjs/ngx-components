@@ -13,3 +13,4 @@ export {
 export { NgxClrGridSelectDirective } from './directives';
 export { NgxClrSmartGridComponent } from './grid.component';
 export { NgxClrSmartGridModule } from './grid.module';
+export { DIRECTIVES } from './common';

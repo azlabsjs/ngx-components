@@ -6,11 +6,7 @@ import {
   SUPPORTED_COUNTRIES,
 } from './core';
 
-/**
- * Resolve the list of country using angular injector
- *
- * @internal
- */
+/**  @internal Resolve the list of country using angular injector */
 function resolveCountries(
   injector: Injector,
   values: Country[] | ((injector: Injector) => Country[])
@@ -28,11 +24,7 @@ function resolveCountries(
   return [];
 }
 
-/**
- * Provides a global list of preferred countries for the application
- *
- * @param values
- */
+/** @description Provides a global list of preferred countries for the application */
 export function providePreferredCountries(values: string[]) {
   return {
     provide: PREFERRED_COUNTRIES,
@@ -40,9 +32,7 @@ export function providePreferredCountries(values: string[]) {
   } as Provider;
 }
 
-/**
- * Provide a global list of supported countries to be displayed by the phone input dropdown
- */
+/** @description Provide a global list of supported countries to be displayed by the phone input dropdown */
 export function provideSupportedCountries(
   values: string[] | ((injector: Injector) => string[])
 ) {
@@ -54,9 +44,7 @@ export function provideSupportedCountries(
   } as Provider;
 }
 
-/**
- * Provide a global list of countries to be displayed by the phone input dropdown
- */
+/** @description Provide a global list of countries to be displayed by the phone input dropdown */
 export function provideCountries(
   values: Country[] | ((injector: Injector) => Country[])
 ) {

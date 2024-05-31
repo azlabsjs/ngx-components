@@ -1,31 +1,52 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   ContentChild,
   EventEmitter,
   Input,
   Output,
   TemplateRef,
+  signal,
 } from '@angular/core';
-import { JSObject } from '@azlabsjs/js-object';
 import { ClarityModule, ClrDatagridSortOrder } from '@clr/angular';
 import {
   PaginateResult,
   ProjectPaginateQueryParamType,
   GridColumnType,
   GridConfigType,
-  PipeTransformType,
 } from './core';
 import { CommonModule } from '@angular/common';
 import { NgxCommonModule } from '@azlabsjs/ngx-common';
 import { NgxClrGridSelectDirective } from './directives';
+import { GridRowClassPipe } from './pipes';
+import {
+  AsyncPipe,
+  CurrencyPipe,
+  DecimalPipe,
+  JsonPipe,
+  LowerCasePipe,
+  PercentPipe,
+  SlicePipe,
+  UpperCasePipe,
+} from '@angular/common';
 
-/** @internal */
-type ColumnType = Omit<
-  Required<GridColumnType>,
-  'sortPropertyName' | 'transformTitle'
-> & {
-  sortPropertyName?: string;
-  transformTitle?: PipeTransformType | PipeTransformType[];
+const GRID_CONFIG: Required<GridConfigType> = {
+  transformColumnTitle: 'default',
+  selectable: false,
+  class: '',
+  sizeOptions: [20, 50, 100, 150],
+  pageSize: 20,
+  selectableProp: '',
+  preserveSelection: false,
+  singleSelection: false,
+  hasActionOverflow: false,
+  hasDetails: false,
+  hasExpandableRows: false,
+  useServerPagination: false,
+  useCustomFilters: false,
+  totalItemLabel: 'Total',
+  projectRowClass: '',
+  columnHeadersClass: '',
 };
 
 @Component({
@@ -35,6 +56,17 @@ type ColumnType = Omit<
     ClarityModule,
     NgxCommonModule,
     NgxClrGridSelectDirective,
+    GridRowClassPipe,
+  ],
+  providers: [
+    UpperCasePipe,
+    LowerCasePipe,
+    CurrencyPipe,
+    DecimalPipe,
+    JsonPipe,
+    PercentPipe,
+    SlicePipe,
+    AsyncPipe,
   ],
   selector: 'ngx-clr-smart-grid',
   templateUrl: './grid.component.html',
@@ -45,75 +77,49 @@ type ColumnType = Omit<
       }
     `,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxClrSmartGridComponent {
-  // #region Input properties
+  //#region Component properties
+  public readonly defaultSort = ClrDatagridSortOrder.DESC;
+  state = signal({
+    data: [] as { [index: string]: any }[],
+    total: 0 as number,
+  });
+  //#endregion Component properties
+
+  // #region Component inputs
   @Input() set pageResult(result: PaginateResult<any> | undefined | null) {
     if (result) {
-      this.data = result.data ?? [];
-      this.total = result.total ?? this.data.length;
+      this.state.update((state) => ({
+        ...state,
+        data: result.data ?? [],
+        total: result.total ?? result.data.length,
+      }));
     }
+  }
+  @Input() set data(values: { [index: string]: any }[]) {
+    this.state.update((state) => ({ ...state, data: values }));
+  }
+  @Input() set total(total: number) {
+    this.state.update((state) => ({ ...state, total }));
   }
   @Input() selected!: unknown[] | any;
-  @Input() data: { [index: string]: any }[] = [];
   @Input() loading: boolean = false;
   @Input() currentDetail!: unknown;
-  @Input() total!: number;
   @Input() placeholder!: string | undefined | null;
-  // #endregion Input properties
-
-  // Projected Templates
-  @ContentChild('dgActionOverflow', { static: false })
-  dgActionOverflowRef!: TemplateRef<any>;
-  @ContentChild('dgRowDetail', { static: false })
-  dgRowDetailRef!: TemplateRef<any>;
-  @ContentChild('dgPlaceHolder', { static: false })
-  dgPlaceHolderRef!: TemplateRef<any>;
-  @ContentChild('dgDetailBody', { static: false })
-  dgDetailBodyRef!: TemplateRef<any>;
-  @ContentChild('dgActionBar', { static: false })
-  dgActionBarRef!: TemplateRef<any>;
-  @ContentChild('dgRow', { static: false })
-  dgRowRef!: TemplateRef<any>;
-  //! Projected Templates
-
-  // Datagrid configuration Input
-  private _config: Required<GridConfigType> = {
-    transformColumnTitle: 'default',
-    selectable: false,
-    class: '',
-    sizeOptions: [20, 50, 100, 150],
-    pageSize: 20,
-    selectableProp: '',
-    preserveSelection: false,
-    singleSelection: false,
-    hasActionOverflow: false,
-    hasDetails: false,
-    hasExpandableRows: false,
-    useServerPagination: false,
-    useCustomFilters: false,
-    totalItemLabel: 'Total',
-    projectRowClass: '',
-    columnHeadersClass: '',
-  };
-  @Input() set config(value: Partial<GridConfigType>) {
-    if (value) {
-      const { _config } = this;
-      this._config = { ..._config, ...value };
-    }
-  }
-  public get config(): Required<GridConfigType> {
-    return this._config;
-  }
-  //! Datagrid configuration Input
-
-  // Datagrid columns configuraiton inputs
-  private _columns: ColumnType[] = [];
-  @Input() set columns(values: GridColumnType[]) {
-    if (values) {
-      // Map input value to typeof Required<GridColumn>
-      // type definitions
-      this._columns = values.map((column) => ({
+  @Input({
+    required: true,
+    transform: (value: Partial<GridConfigType>) => ({
+      ...GRID_CONFIG,
+      ...value,
+    }),
+  })
+  config: Required<GridConfigType> = GRID_CONFIG;
+  @Input({
+    required: true,
+    transform: (values: GridColumnType[]) =>
+      values.map((column) => ({
         ...column,
         field: column.field ?? '',
         style: column.style
@@ -134,15 +140,25 @@ export class NgxClrSmartGridComponent {
           },
         },
         sortable: column.sortable ?? true,
-      }));
-    }
-  }
-  get columns(): ColumnType[] {
-    return this._columns;
-  }
-  //! Datagrid columns configuraiton inputs
+      })),
+  })
+  columns: Required<GridColumnType>[] = [];
+  //#endregion Component inputs
 
-  public readonly defaultSort = ClrDatagridSortOrder.DESC;
+  // Projected Templates
+  @ContentChild('dgActionOverflow', { static: false })
+  dgActionOverflowRef!: TemplateRef<any>;
+  @ContentChild('dgRowDetail', { static: false })
+  dgRowDetailRef!: TemplateRef<any>;
+  @ContentChild('dgPlaceHolder', { static: false })
+  dgPlaceHolderRef!: TemplateRef<any>;
+  @ContentChild('dgDetailBody', { static: false })
+  dgDetailBodyRef!: TemplateRef<any>;
+  @ContentChild('dgActionBar', { static: false })
+  dgActionBarRef!: TemplateRef<any>;
+  @ContentChild('dgRow', { static: false })
+  dgRowRef!: TemplateRef<any>;
+  //! Projected Templates
 
   // #region Component outputs
   @Output() selectedChange = new EventEmitter<unknown[] | unknown>();
@@ -158,24 +174,21 @@ export class NgxClrSmartGridComponent {
     this.selectedChange.emit(state);
   }
 
-  getCellValue(element: Record<string, any>, key: string) {
-    return JSObject.getProperty(element, key) ?? '';
+  onDgRefresh(e: ProjectPaginateQueryParamType) {
+    this.dgRefresh.emit(e);
   }
 
-  getrowclass(config: GridConfigType, current: { [index: string]: any }) {
-    return config && config.projectRowClass
-      ? typeof config.projectRowClass === 'function'
-        ? config.projectRowClass(current)
-        : config.projectRowClass
-      : '';
-  }
-
-  onClrDgRefresh(event: ProjectPaginateQueryParamType) {
-    this.dgRefresh.emit(event);
-  }
-
-  onClrItemClick(event: Event, item: unknown) {
+  onItemClick(event: Event, item: unknown) {
     this.dgItemClick.emit(item);
     event?.preventDefault();
+  }
+
+  /** @deprecated */
+  onClrDgRefresh(e: ProjectPaginateQueryParamType) {
+    this.onDgRefresh(e);
+  }
+  /** @deprecated */
+  onClrItemClick(e: Event, item: unknown) {
+    this.onItemClick(e, item);
   }
 }

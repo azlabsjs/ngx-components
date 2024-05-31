@@ -1,11 +1,7 @@
-/**
- * Dropdown animation types
- */
+/** @description Dropdown animation types */
 export type Animation = 'scaleY' | 'translateX'; // | 'scaleReverseY';
 
-/**
- * Dropdown orientation
- */
+/** @description Dropdown orientation */
 export type Orientation = 'left' | 'right';
 
 /**

@@ -1,5 +1,5 @@
 import { LowerCasePipe } from '@angular/common';
-import { Component, Inject, Injector, ViewChild } from '@angular/core';
+import { Component, Inject, Injector, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { GridColumnType, GridConfigType } from '@azlabsjs/ngx-clr-smart-grid';
 import { createPipeTransform } from '@azlabsjs/ngx-common';
@@ -64,8 +64,9 @@ type ValuesType = typeof _values;
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  providers: [LowerCasePipe],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   formControl = new FormControl<string | undefined>(undefined);
   input: FileInput = {
     uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
@@ -130,8 +131,8 @@ export class AppComponent {
     },
   ];
 
-  pageResult = new Subject<ValuesType | undefined>();
-  pageResult$ = this.pageResult.asObservable();
+  _pageResult$ = new Subject<ValuesType | undefined>();
+  pageResult$ = this._pageResult$.asObservable();
   placeholder: string | undefined = 'Loading, Please wait...';
 
   gridConfig: Partial<GridConfigType> = {
@@ -180,16 +181,22 @@ export class AppComponent {
       .get(220)
       .pipe(
         filter((state) => typeof state !== 'undefined' && state !== null),
-        tap(state => console.log('Form: ', state)),
+        tap((state) => console.log('Form: ', state)),
         tap((state) => this._state$.next(state)),
         takeUntil(this._destroy$)
       )
       .subscribe();
   }
+  ngOnInit(): void {
+    setTimeout(() => {
+      this._pageResult$.next(_values);
+      this.placeholder = undefined;
+    }, 3000);
+  }
 
   // Listen to datagrid refresh events
-  onDgRefresh(event: unknown) {
-    console.log(event);
+  onDgRefresh(_: unknown) {
+    // console.log(event);
   }
 
   // Listen to data grid selection changes events
@@ -198,11 +205,6 @@ export class AppComponent {
   }
 
   onFormReadyState(event: FormConfigInterface) {
-    setTimeout(() => {
-      this.pageResult.next(_values);
-      this.placeholder = undefined;
-    }, 3000);
-
     setTimeout(() => {
       this.smartForm?.addAsyncValidator(
         uniqueValidator(this.injector, {

@@ -6,3 +6,8 @@
 - Fixed bugs related to radio and checkbox input types
 - Add support for smart grid row class projection
 - Review change detection implementation for smart form control, smart form array, etc...
+
+
+## [v0.17.0] [2024-05-31]
+
+- Reviewed smart-grid, ngx-dropdown, ngx-common, and ngx-options, ngx-intl-tel-input library integration in angular 17

@@ -4,14 +4,11 @@ import {
   PipeTransformTokenMapType,
 } from '@azlabsjs/ngx-common';
 import { DIRECTIVES } from './common';
-import { PROVIDERS } from './providers';
 
 /** @deprecated use exported `DIRECTIVES` array to use the exported directives */
 @NgModule({
-  // declarations: [],
   imports: [...DIRECTIVES],
   exports: [...DIRECTIVES],
-  providers: [...PROVIDERS],
 })
 export class NgxClrSmartGridModule {
   /** @deprecated */

@@ -4,7 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgxClrSmartGridModule } from '@azlabsjs/ngx-clr-smart-grid';
+import { DIRECTIVES } from '@azlabsjs/ngx-clr-smart-grid';
 import { NgxDropzoneModule } from '@azlabsjs/ngx-dropzone';
 import {
   NgxIntlTelInputModule,
@@ -13,16 +13,15 @@ import {
 } from '@azlabsjs/ngx-intl-tel-input';
 import { NgxSlidesModule } from '@azlabsjs/ngx-slides';
 import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
-import { CdsModule } from '@cds/angular';
 import { ClarityIcons, uploadCloudIcon } from '@cds/core/icon';
 import { AppComponent } from './app.component';
-import { TestPipe } from './test.pipe';
+import { TestPipe } from './pipes/test.pipe';
 import {
   NgxClrFormControlModule,
   useOptionsInterceptor,
 } from '@azlabsjs/ngx-clr-form-control';
 import { FormControlComponent } from './form-control/form-control.component';
-import { NgxCommonModule } from '@azlabsjs/ngx-common';
+import { COMMON_PIPES, providePipes } from '@azlabsjs/ngx-common';
 import { RouterModule } from '@angular/router';
 import { HTTPValuePipe } from './pipes';
 
@@ -38,7 +37,7 @@ ClarityIcons.addIcons(uploadCloudIcon);
     HttpClientModule,
     RouterModule.forRoot([], { useHash: true }),
     HTTPValuePipe,
-    CdsModule,
+    // CdsModule,
     NgxIntlTelInputModule.forRoot(),
     NgxSmartFormModule.forRoot({
       // Optional : Required only to get data dynamically from the server
@@ -80,15 +79,15 @@ ClarityIcons.addIcons(uploadCloudIcon);
       formsAssets: '/assets/forms.json',
     }),
 
-    NgxCommonModule.forRoot({
-      pipeTransformMap: {
-        testPipe: TestPipe,
-        httpValue: HTTPValuePipe
-      },
-    }),
-    NgxClrSmartGridModule,
+    // NgxCommonModule.forRoot({
+    //   pipeTransformMap: {
+    //     testPipe: TestPipe,
+    //     httpValue: HTTPValuePipe
+    //   },
+    // }),
+    ...DIRECTIVES,
+    ...COMMON_PIPES,
     NgxSlidesModule.forRoot(),
-
     NgxDropzoneModule.forRoot(),
 
     // Configure clr control module
@@ -138,6 +137,12 @@ ClarityIcons.addIcons(uploadCloudIcon);
   providers: [
     provideSupportedCountries(['tg', 'ci', 'gh']),
     providePreferredCountries(['ci']),
+    providePipes({
+      pipes: {
+        testPipe: TestPipe,
+        httpValue: HTTPValuePipe,
+      },
+    }),
   ],
   bootstrap: [AppComponent],
 })
