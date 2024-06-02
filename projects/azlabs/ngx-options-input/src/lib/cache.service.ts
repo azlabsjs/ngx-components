@@ -1,11 +1,12 @@
 import { InputOptions } from '@azlabsjs/smart-form-core';
 import { CacheType, _Cache } from './cache';
 
+/** @internal */
 type KeyType = { [index: string]: unknown };
 
 export class OptionsCache implements CacheType<KeyType, InputOptions> {
   // Properties
-  private internal: CacheType<KeyType, InputOptions>;
+  private cache: CacheType<KeyType, InputOptions>;
 
   /** @description Options cache constructor */
   constructor(
@@ -13,7 +14,7 @@ export class OptionsCache implements CacheType<KeyType, InputOptions> {
     refreshInterval?: number,
     defaultTTL?: number
   ) {
-    this.internal = new _Cache(equals, refreshInterval, defaultTTL);
+    this.cache = new _Cache(equals, refreshInterval, defaultTTL);
   }
 
   put(
@@ -23,14 +24,14 @@ export class OptionsCache implements CacheType<KeyType, InputOptions> {
       | ((value: InputOptions) => InputOptions | Promise<InputOptions>)
       | undefined
   ): void {
-    return this.internal.put(key, value, update);
+    return this.cache.put(key, value, update);
   }
 
   get(key: KeyType): InputOptions | undefined {
-    return this.internal.get(key);
+    return this.cache.get(key);
   }
 
   delete(key: KeyType): void {
-    return this.internal.delete(key);
+    return this.cache.delete(key);
   }
 }

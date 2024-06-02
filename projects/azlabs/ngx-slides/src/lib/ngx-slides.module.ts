@@ -1,39 +1,27 @@
-import { CommonModule } from '@angular/common';
-import { APP_INITIALIZER, ModuleWithProviders, NgModule } from '@angular/core';
-import { SlideContentLoader } from './slide-content-loader.service';
+import { ModuleWithProviders, NgModule } from '@angular/core';
 import { NgxSlidesComponent } from './ngx-slides.component';
-import { SlideContentDataLoader } from './types';
 
+/** @internal */
 export type ModuleConfig = {
   assets: string;
 };
 
+/** @deprecated Use provided initialization `provideSlides()` function at component or module level
+ * to provide default slides without passing them though input properties
+ */
 @NgModule({
-  declarations: [NgxSlidesComponent],
-  imports: [CommonModule],
+  declarations: [],
+  imports: [NgxSlidesComponent],
   exports: [NgxSlidesComponent],
 })
 export class NgxSlidesModule {
-  /**
-   * Register providers at the application root level
-   *
-   * @param config
+  /** @deprecated Use provided initialization `provideSlides()` function at component or module level
+   * to provide default slides without passing them though input properties
    */
   static forRoot(config?: ModuleConfig): ModuleWithProviders<NgxSlidesModule> {
     return {
       ngModule: NgxSlidesModule,
-      providers: [
-        {
-          provide: APP_INITIALIZER,
-          useFactory: (loader: SlideContentDataLoader) => {
-            return async () => {
-              return await loader.load(config?.assets);
-            };
-          },
-          multi: true,
-          deps: [SlideContentLoader],
-        },
-      ],
+      providers: [],
     };
   }
 }

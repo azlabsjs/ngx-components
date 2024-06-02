@@ -3,9 +3,7 @@ import { Country } from './types';
 import { ISO3166 } from './ios3166';
 import { getPhoneNumberPlaceholder } from './internal';
 
-/**
- * @description ISO3166 Injectable instance
- */
+/** @description ISO3166 Injectable instance */
 export const COUNTRIES = new InjectionToken<Country[]>(
   'ISO3166 countries injectable token',
   {
@@ -26,14 +24,10 @@ export const COUNTRIES = new InjectionToken<Country[]>(
   }
 );
 
-/**
- * @description Injection token allowing applications to configure supported countries
- */
+/** @description Injection token allowing applications to configure supported countries */
 export const SUPPORTED_COUNTRIES = new InjectionToken<string[]>(
   'Injection Token for supported countries'
 );
 
-/**
- * List of preferred countries
- */
+/** @description List of preferred countries */
 export const PREFERRED_COUNTRIES = new InjectionToken<string[]>('Preferred countries injection token');

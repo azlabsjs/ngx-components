@@ -7,20 +7,23 @@ import {
   ContentChild,
   TemplateRef,
   ChangeDetectionStrategy,
+  signal,
+  inject,
 } from '@angular/core';
 import { interval, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { createSlide } from './helpers';
-import { SlideContentLoader } from './slide-content-loader.service';
-import { Slide } from './models/slide';
+import { SLIDES, Slide } from './types';
+import { CommonModule } from '@angular/common';
 
 @Component({
+  standalone: true,
+  imports: [CommonModule],
   selector: 'ngx-slides',
   template: `
     <div class="carousel">
-      <ng-container *ngFor="let slide of slides; let i = index">
-        <ng-container *ngIf="i === current">
-          <div class="slide" [@slideIn]="slideLeft ? 'left' : 'right'">
+      <ng-container *ngFor="let slide of slides(); let i = index">
+        <ng-container *ngIf="i === current()">
+          <div class="slide" [@slideIn]="slideLeft() ? 'left' : 'right'">
             <ng-container
               *ngTemplateOutlet="templateRef; context: { $implicit: slide }"
             ></ng-container>
@@ -85,39 +88,49 @@ import { Slide } from './models/slide';
       ]),
     ]),
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSlidesComponent implements OnInit, OnDestroy {
-  //# Component Properties
+  //#region Component properties
   private _destroy$ = new Subject<void>();
+  readonly slideLeft = signal(false);
+  readonly current = signal(0);
+  readonly slides = signal<Slide[]>([]);
+  readonly state = signal<{ timer: number; slides: Slide[] }>({
+    timer: 0,
+    slides: [],
+  });
+  //#endregion Component properties
 
   //#region Component inputs
-  @Input() timer = 1000;
-  @Input() slides: Slide[] = [];
-  @Input() current: number = 0;
-  @Input() autostart: boolean = false;
+  @Input({ alias: 'timer' }) timer: number = 1000;
+  @Input({ alias: 'slides' }) setSlides(values: Slide[]) {
+    this.slides.set(values);
+  }
+  @Input({ alias: 'current' }) setCurrent(value: number) {
+    this.current.set(value);
+  }
+  @Input() autostart = false;
   @ContentChild('ngxSlide') templateRef!: TemplateRef<any>;
   @ContentChild('next') nextRef!: TemplateRef<any>;
   @ContentChild('previous') previousRef!: TemplateRef<any>;
   //#endregion Component inputs
-  slideLeft: boolean = false;
 
-  constructor(private contentLoader: SlideContentLoader) {}
+  /** @description Class constructor */
+  constructor() {
+    inject(SLIDES)?.pipe(
+      takeUntil(this._destroy$),
+      tap(({ timer, slides }) => {
+        this.timer = timer;
+        const s = this.slides();
+        if (s.length <= 0) {
+          this.slides.set(slides);
+        }
+      })
+    );
+  }
 
   async ngOnInit() {
-    // Load the slides only if not set by the parent component
-    if (this.slides.length === 0) {
-      const contents = this.contentLoader!.contents;
-      if (contents) {
-        this.timer = contents.timer;
-        this.slides = contents.slides.map((value, index: number) =>
-          createSlide(
-            index,
-            typeof value.data === 'string' ? value.data : value.data!.toString()
-          )
-        );
-      }
-    }
     if (this.autostart) {
       this.runLoop();
     }
@@ -133,16 +146,18 @@ export class NgxSlidesComponent implements OnInit, OnDestroy {
   }
 
   previous() {
-    const previous = this.current - 1;
-    this.slideLeft = true;
-    this.current = previous < 0 ? this.slides.length - 1 : previous;
+    const [slides, current] = [this.slides(), this.current()];
+    const previous = current - 1;
+    this.slideLeft.set(true);
+    this.current.set(previous < 0 ? slides.length - 1 : previous);
     this.restartLoop();
   }
 
   next() {
-    const next = this.current + 1;
-    this.slideLeft = false;
-    this.current = next === this.slides.length ? 0 : next;
+    const [slides, current] = [this.slides(), this.current()];
+    const next = current + 1;
+    this.slideLeft.set(false);
+    this.current.set(next === slides.length ? 0 : next);
     this.restartLoop();
   }
 

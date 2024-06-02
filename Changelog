@@ -11,3 +11,4 @@
 ## [v0.17.0] [2024-05-31]
 
 - Reviewed smart-grid, ngx-dropdown, ngx-common, and ngx-options, ngx-intl-tel-input library integration in angular 17
+- Cleanup ngx-slides migration implementations
