@@ -1,9 +1,10 @@
 <ng-content select="label"></ng-content>
-<ng-container *ngIf="state">
+<ng-container *ngIf="state() as state">
   <div [class]="state.hasError ? '' : ''" class="flex-files-input">
-    <input type="file" [placeholder]="placeholder" fileInput [class]="cssClass || ''" [maxFileSize]="maxFilesize || 10"
+    <input type="file" [placeholder]="placeholder" fileInput [class]="cssClass ?? ''" [maxFileSize]="maxFilesize || 10"
       [maxFiles]="multiple ? maxFiles : 1" [multiple]="multiple" (sizeError)="onTooLargeFilesEvent($event)"
-      (acceptedFiles)="onAcceptedFiles($event, multiple, autoupload, uploadAs)" (reset)="onReset()" />
+      (acceptedFiles)="onAcceptedFiles($event, url, uploadOptions, multiple, autoupload, uploadAs)"
+      (reset)="onReset()" />
     <span *ngIf="state.uploading" class="spinner spinner-inline"></span>
     <a *ngIf="state.hasError" href="#" role="tooltip" aria-haspopup="true" class="tooltip tooltip-sm input__error_text">
       <!-- Error SVG icon -->
@@ -28,5 +29,5 @@
   <span [class]="'input__subtext input__error_text'" *ngIf="hasError">
     {{ requiredError }}
   </span>
-  <span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="description || '' | safeHtml"></span>
+  <span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="description ?? '' | safeHtml"></span>
 </ng-container>

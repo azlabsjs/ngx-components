@@ -1,11 +1,12 @@
 import {
-  ChangeDetectorRef,
+  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Inject,
   Injector,
   Input,
   Output,
+  signal,
 } from '@angular/core';
 import {
   HTTPRequest,
@@ -15,15 +16,20 @@ import {
 } from '@azlabsjs/requests';
 import { Uploader, UploadOptions } from '@azlabsjs/uploader';
 import {
-  decorateFile,
+  decorateBlob,
   isValidHttpUrl,
   readPropertyValue,
   uuidv4,
 } from './helpers';
-import { NgxUploadsEventsService } from './ngx-uploads-events.service';
+import { NgxUploadsEventsService } from './uploads-events.service';
 import { EventArgType, SetStateParam, UploadOptionsType } from './types';
 import { UPLOADER_OPTIONS } from './tokens';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HTMLFileInputDirective } from './file-input.directive';
+import { SafeHTMLPipe } from './safe-html.pipe';
 
+/** @internal */
 type StateType = {
   uploading: boolean;
   hasError: boolean;
@@ -31,8 +37,10 @@ type StateType = {
 };
 
 @Component({
+  standalone: true,
   selector: 'ngx-file-input',
-  templateUrl: './ngx-file-input.component.html',
+  imports: [CommonModule, FormsModule, HTMLFileInputDirective, SafeHTMLPipe],
+  templateUrl: './file-input.component.html',
   styles: [
     `
       .flex-files-input {
@@ -59,57 +67,44 @@ type StateType = {
       }
     `,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFileInputComponent {
   //#region Component inputs
-  @Input() describe = true;
-  @Input('upload-as') uploadAs!: string | undefined;
-  @Input('placeholder') placeholder!: string | undefined;
-  @Input('class') cssClass!: string | undefined;
-  @Input('description') description!: string | undefined;
-  @Input('multiple') multiple: boolean = false;
-  @Input('max-file-size') maxFilesize: number = 10;
-  @Input('max-files') maxFiles: number = 50;
-  @Input('has-error') hasError: boolean = false;
-
-  /**
-   * Read the id property of the uploaded file result
-   * or the entire object
-   */
-  @Input() read: 'id'| 'url' | 'object' | undefined = 'id';
-
-  // Error input property declaration
-  @Input('required-error') requiredError!: string;
-  @Input('file-size-error') fileSizeError!: string;
-  @Input('file-upload-error') fileUploadError!: string;
+  @Input({ alias: 'upload-as' }) uploadAs!: string | undefined;
+  @Input({ alias: 'placeholder' }) placeholder!: string | undefined;
+  @Input({ alias: 'class' }) cssClass!: string | undefined;
+  @Input({ alias: 'description' }) description!: string | undefined;
+  @Input({ alias: 'multiple' }) multiple: boolean = false;
+  @Input({ alias: 'max-file-size' }) maxFilesize: number = 10;
+  @Input({ alias: 'max-files' }) maxFiles: number = 50;
+  @Input({ alias: 'has-error' }) hasError: boolean = false;
+  @Input() describe: boolean = true;
+  /** @description Read the id property of the uploaded file result or the entire object */
+  @Input() read: 'id' | 'url' | 'object' | undefined = 'id';
+  @Input({ alias: 'required-error' }) requiredError!: string;
+  @Input({ alias: 'file-size-error' }) fileSizeError!: string;
+  @Input({ alias: 'file-upload-error' }) fileUploadError!: string;
 
   /**
    * Ng Input attribute that defines whether files must
    * automatically be uploaded when the get accepted by the
    * component
    *
-   * @property
    */
-  @Input('autoupload') autoupload: boolean = false;
+  @Input({ alias: 'autoupload' }) autoupload: boolean = false;
 
-  /**
-   * @attr
-   *
-   * Uploader submit url
-   */
+  /** @description Uploader submit url */
   @Input() url!: string | undefined;
   //#endregion Component inputs
 
   // #region Component properties
   // Property for handling File Input types
-  private _state: StateType = {
+  state = signal<StateType>({
     uploading: false,
     hasError: false,
     tooLargeFiles: [] as File[],
-  };
-  get state() {
-    return this._state;
-  }
+  });
   // #endregion Component properties
 
   // #region component outputs
@@ -122,10 +117,9 @@ export class NgxSmartFileInputComponent {
   // Class constructor
   constructor(
     @Inject(UPLOADER_OPTIONS)
-    private uploadOptions: UploadOptionsType<HTTPRequest, HTTPResponse>,
+    public readonly uploadOptions: UploadOptionsType<HTTPRequest, HTTPResponse>,
     private uploadEvents: NgxUploadsEventsService,
-    private injector: Injector,
-    private changeRef: ChangeDetectorRef
+    private injector: Injector
   ) {}
 
   onTooLargeFilesEvent(event: File[]) {
@@ -134,24 +128,29 @@ export class NgxSmartFileInputComponent {
 
   async onAcceptedFiles(
     event: File[],
+    url: string | undefined,
+    o: UploadOptionsType<HTTPRequest, HTTPResponse>,
     multiple: boolean = false,
     autoupload: boolean = false,
     uploadAs: string = 'file'
   ) {
-    autoupload || this.autoupload
-      ? this.processUploads(event, multiple, uploadAs)
-      : this.value.emit(multiple ? event : event[0]);
+    if (autoupload) {
+      return this.processUploads(event, url, o, multiple, uploadAs);
+    }
+    this.value.emit(multiple ? event : event[0]);
   }
 
   private async processUploads(
     event: File[],
+    url: string | undefined,
+    o: UploadOptionsType<HTTPRequest, HTTPResponse>,
     multiple: boolean = false,
     uploadAs: string = 'file'
   ) {
     // When the autoupload is set on the current component, we send an upload request
     // to configured url or server url for each accepted files
     try {
-      const path = this.url ?? this.uploadOptions.path;
+      const path = url ?? o.path;
 
       if (
         typeof path === 'undefined' ||
@@ -165,20 +164,20 @@ export class NgxSmartFileInputComponent {
         content: file,
         uuid: uuidv4(),
       }));
-
       //#region execute the interceptor factory and backend factory function
       let interceptor!: Interceptor<HTTPRequest>;
       let backend!: RequestClient<HTTPRequest, HTTPResponse>;
-      if (typeof this.uploadOptions.interceptorFactory === 'function') {
-        interceptor = this.uploadOptions.interceptorFactory(this.injector);
+      const { interceptorFactory, backendFactory, name, responseType } = o;
+      if (typeof interceptorFactory === 'function') {
+        interceptor = interceptorFactory(this.injector);
       }
-      if (typeof this.uploadOptions.backendFactory === 'function') {
-        backend = this.uploadOptions.backendFactory(this.injector);
+      if (typeof backendFactory === 'function') {
+        backend = backendFactory(this.injector);
       }
       //#endregion execute the interceptor factory and backend factory function
       const options = {
         ...{
-          ...this.uploadOptions,
+          ...o,
           // Set the backend and interceptor factory functions to undefined
           interceptorFactory: undefined,
           backendFactory: undefined,
@@ -187,12 +186,13 @@ export class NgxSmartFileInputComponent {
         // in turn takes precedence over the globally configured upload path
         path,
         // We use the name provided in the input configuration or fallback to gloabbly configured name
-        name: uploadAs ?? this.uploadOptions.name ?? 'file',
+        name: uploadAs ?? name ?? 'file',
         // We use the default specified responseType else we fallback to 'json' response type
-        responseType: this.uploadOptions.responseType ?? 'text',
+        responseType: responseType ?? 'text',
         interceptor,
         backend,
       } as UploadOptions<HTTPRequest, HTTPResponse>;
+
       // Set the uploading state of the current component
       this.setState((state) => ({
         ...state,
@@ -216,13 +216,13 @@ export class NgxSmartFileInputComponent {
             try {
               // If parsing the string throws an error, then request may have
               // failed
-              _result = decorateFile(file.content, {
+              _result = decorateBlob(file.content, {
                 upload: {
                   result: JSON.parse(result),
                 },
               });
             } catch (error) {
-              _result = decorateFile(file.content, {
+              _result = decorateBlob(file.content, {
                 upload: {
                   result: result,
                   error: error,
@@ -230,7 +230,7 @@ export class NgxSmartFileInputComponent {
               });
             }
           } else {
-            _result = decorateFile(file.content, {
+            _result = decorateBlob(file.content, {
               upload: {
                 result: result,
               },
@@ -281,10 +281,6 @@ export class NgxSmartFileInputComponent {
    * each state changes
    */
   private setState(state: SetStateParam<StateType>) {
-    this._state =
-      typeof state === 'function'
-        ? state(this._state)
-        : { ...this._state, ...state };
-    this.changeRef.markForCheck();
+    this.state.update(state);
   }
 }

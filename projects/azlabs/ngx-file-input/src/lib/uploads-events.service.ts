@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-/**
- * upload event type definition
- */
+/** @description upload event type definition */
 export type UploadEvent = {
   id: string;
   processing: boolean;
@@ -11,35 +9,22 @@ export type UploadEvent = {
   file: File;
 };
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class NgxUploadsEventsService {
-  /**
-   * Cache of upload event entries to tracks uploads
-   *
-   * @property
-   */
+  /** @description Cache of upload event entries to tracks uploads */
   private _events$ = new BehaviorSubject<UploadEvent[]>([]);
 
-  //
+  /** @description Upload state event observables */
   public readonly events$ = this._events$.asObservable();
 
-  /**
-   * Signal an upload start event
-   *
-   * @method
-   *
-   * @param value
-   */
+  /** @description Signal an upload start event */
   public startUpload(value: UploadEvent) {
     this._events$.next([...this._events$.getValue(), value]);
   }
 
-  /**
-   * Signals an upload complete event
-   *
-   * @param uuid
-   * @param result
-   */
+  /** @description Signals an upload complete event */
   public completeUpload(uuid: string, result: unknown) {
     const state = [...this._events$.getValue()];
     const index = state.findIndex((event) => event.id === uuid);
@@ -50,11 +35,7 @@ export class NgxUploadsEventsService {
     this._events$.next([...state]);
   }
 
-  /**
-   * Removes an upload event from the cache
-   *
-   * @param uuid
-   */
+  /** @description Removes an upload event from the cache */
   public removeUploadState(uuid: string) {
     this._events$.next(
       [...this._events$.getValue()].filter((event) => event.id === uuid)

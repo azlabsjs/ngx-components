@@ -7,7 +7,7 @@ import {
   Inject,
   Input,
   OnDestroy,
-  Output
+  Output,
 } from '@angular/core';
 
 // @internal
@@ -19,7 +19,8 @@ type EventType<T = EventTarget> = Omit<Event, 'target'> & {
 };
 
 @Directive({
-  selector: '[fileInput]'
+  standalone: true,
+  selector: '[fileInput]',
 })
 export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
   //#region Directive inputs
@@ -34,12 +35,12 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
       ? value
       : '';
   }
-  @Input() acceptCallback!: (value: File) => boolean;
   get accept() {
     return this._accept;
   }
+  @Input() acceptCallback!: (value: File) => boolean;
   private _class!: string[];
-  @Input('class') set elementClass(value: string | string[]) {
+  @Input('class') set setClass(value: string | string[]) {
     this._class =
       typeof value === 'string'
         ? value.split(' ')
@@ -79,21 +80,15 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
       _element = this.createHTMLInputElement(element);
       this._elements.push(...[_element]);
     } else {
-      _element = this.setRequiredHTMLElementAttributes(
-        element as HTMLInputElement
-      );
+      _element = this.appendDirectiveAttributes(element);
       this._elements.push(...[_element]);
     }
     _element?.addEventListener('click', this.onClickedListener.bind(this));
     _element?.addEventListener('change', this.onChangeListener.bind(this));
   }
 
-  /**
-   * Add required files for the HTML input element
-   * 
-   * @param element 
-   */
-  private setRequiredHTMLElementAttributes(element: HTMLInputElement) {
+  /**  @description Add required files for the HTML input element */
+  private appendDirectiveAttributes(element: any) {
     //#region Bind HTML attributes to file input
     element.accept = this._accept;
     element.multiple = this.multiple;
@@ -102,11 +97,7 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
     return element;
   }
 
-  /**
-   * File input click listener
-   * 
-   * @param event 
-   */
+  /** @description File input click listener */
   private onClickedListener(event: Event) {
     const _event = event as unknown as EventType<HTMLInputElement>;
     if (_event.target) {
@@ -117,8 +108,8 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
 
   /**
    * File change listener
-   * 
-   * @param event 
+   *
+   * @param event
    */
   private onChangeListener(event: Event) {
     const _event = event as unknown as EventType<HTMLInputElement>;
@@ -131,27 +122,20 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
     this.onInputChange(_event.target);
   }
 
-  /**
-   * Creates an HTML file input
-   * 
-   * @param parent
-   */
+  /** @description Creates an HTML file input */
   private createHTMLInputElement(parent: HTMLElement) {
     if (this.document) {
-      let element = this.document.createElement('input');
-      element.type = 'file';
-      element = this.setRequiredHTMLElementAttributes(element);
-      parent.appendChild(element);
-      return element;
+      let el = this.document.createElement('input');
+      el.classList.add('ngx-file-input');
+      el.type = 'file';
+      el = this.appendDirectiveAttributes(el);
+      parent.appendChild(el);
+      return el;
     }
     throw new Error('platform document is not defined');
   }
 
-  /**
-   * Handles input change event
-   * 
-   * @param target 
-   */
+  /** @description Handles input change event */
   private onInputChange(target: HTMLInputElement) {
     if (target.files) {
       const {
@@ -188,12 +172,7 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
     }
   }
 
-  /**
-   * Returns the list of dropped files
-   * 
-   * @param files 
-   * @returns 
-   */
+  /** @description Returns the list of dropped files */
   private getDroppedFiles(files: FileList) {
     return this.maxFiles === 1
       ? [files[0]]
@@ -209,12 +188,7 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
         );
   }
 
-  /**
-   * Returns the list of accepted files
-   * 
-   * @param file 
-   * @returns 
-   */
+  /** @description Returns the list of accepted files */
   private isAccepted(file: File) {
     const types = this._accept ? this._accept.split(',') : [];
     if (types.length === 0) {
@@ -228,16 +202,11 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
     return false;
   }
 
-  /**
-   * Checks if the size is in the valid size range for dropped files
-   * 
-   * @param file 
-   */
+  /** @description Checks if the size is in the valid size range for dropped files */
   private inSizeRange(file: File) {
     return Number((file.size / 1024 / 1024).toFixed(4)) <= this.maxFileSize;
   }
 
-  //
   ngOnDestroy(): void {
     // Handle directive destruction
     for (const element of this._elements) {
