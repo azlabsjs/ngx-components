@@ -1,4 +1,4 @@
-import { NgxSlidesComponent } from '@azlabsjs/ngx-slides';
+import { NgxSlidesComponent } from './ngx-slides.component';
 
 //#region Exports
 export {

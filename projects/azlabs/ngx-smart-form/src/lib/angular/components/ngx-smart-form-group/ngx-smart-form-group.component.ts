@@ -1,109 +1,140 @@
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   Output,
+  SimpleChanges,
   TemplateRef,
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import {
-  controlAttributesDataBindings,
-  setControlsAttributes,
-  useHiddenAttributeSetter,
-} from '../../helpers';
-import { BindingInterface } from '../../types';
+import { bindingsFactory, setInputsProperties } from '../../helpers';
+import { CommonModule } from '@angular/common';
+import { PIPES } from '../../pipes';
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, ...PIPES],
   selector: 'ngx-smart-form-group',
   templateUrl: './ngx-smart-form-group.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFormGroupComponent
-  implements OnInit, AfterViewInit, OnDestroy
+  implements OnInit, AfterViewInit, OnChanges, OnDestroy
 {
   //#region Component inputs definitions
-  @Input() formGroup!: FormGroup;
-  @Input() controls!: InputConfigInterface[];
+  private _formGroup!: FormGroup;
+  @Input({ alias: 'formGroup' }) set setFormGroup(value: FormGroup) {
+    this._formGroup = value;
+  }
+  get formGroup() {
+    return this._formGroup;
+  }
+  private _inputs!: InputConfigInterface[];
+  @Input({ alias: 'controls' }) set setinput(value: InputConfigInterface[]) {
+    this._inputs = value;
+  }
+  get inputs() {
+    return this._inputs;
+  }
   @Input() template!: TemplateRef<any>;
   @Input() autoupload: boolean = false;
-  @Input('no-grid-layout') noGridLayout = false;
+  @Input({ alias: 'no-grid-layout' }) noGridLayout = false;
   //#endregion Component inputs definitions
 
   //#region Component internal properties
   // @internal
   private _destroy$ = new Subject<void>();
-
   //#endregion Component internal properties
 
   //#region Component output
   @Output() formGroupChange = new EventEmitter<FormGroup>();
   //#endregion Component outputs
 
+  /** @description smart form group component constructor */
+  constructor(private cdRef: ChangeDetectorRef) {}
+
   //
   ngOnInit(): void {
     // Simulate formgroup changes
     this.formGroup.valueChanges
-      .pipe(tap(() => this.formGroupChange.emit(this.formGroup)))
+      .pipe(
+        tap(() => this.formGroupChange.emit(this.formGroup)),
+        takeUntil(this._destroy$)
+      )
       .subscribe();
   }
 
   ngAfterViewInit(): void {
-    this.setBindings();
+    this.registerControlChanges();
   }
 
-  setBindings() {
-    if (this.controls && this.formGroup) {
-      const [bindings, formgroup, controls] = controlAttributesDataBindings(
-        this.controls
-      )(this.formGroup);
-      this.controls = controls as InputConfigInterface[];
-      this.formGroup = formgroup as FormGroup;
-      // Get control entries from the formgroup
-      const entries = Object.entries(this.formGroup.controls);
+  ngOnChanges(changes: SimpleChanges): void {
+    if ('controls' in changes || 'formGroup' in changes) {
+      this.registerControlChanges();
+    }
+  }
+
+  registerControlChanges() {
+    // Unsubscribe from any previous subscription
+    this._destroy$.next();
+
+    // Each type we listen for form controls changes, we query for
+    // input binding and set input properties based on their binding value
+    if (this._inputs && this.formGroup) {
+      const b = bindingsFactory(this._inputs)(this._formGroup);
+      const [g, _inputs] = setInputsProperties(
+        this._inputs,
+        b,
+        this._formGroup
+      );
+      // We update formgroup and inputs properties value and mark the component as dirty
+      this.setFormState(_inputs, g);
+
       // Handle form control value changes
-      for (const [name, element] of entries) {
-        element.valueChanges
-          .pipe(
-            tap((state) =>
-              this.handleControlChanges(
+      for (const n in this.formGroup.controls) {
+        this.formGroup
+          .get(n)
+          ?.valueChanges.pipe(
+            takeUntil(this._destroy$),
+            tap((state) => {
+              const [g, _inputs] = setInputsProperties(
+                this._inputs,
+                b,
+                this.formGroup,
                 state,
-                name,
-                bindings as Map<string, BindingInterface>
-              )
-            ),
-            takeUntil(this._destroy$)
+                n
+              );
+
+              // When we listen for changes on form group controls
+              // each changes that update the form group should trigger the change detector
+              this.setFormState(_inputs, g, true);
+            })
           )
           .subscribe();
       }
     }
   }
 
-  // tslint:disable-next-line: typedef
-  handleControlChanges(
-    event: any,
-    name: string,
-    bindings: Map<string, BindingInterface>
+  /** @description set inputs and formgroup properties value and trigger change detection */
+  private setFormState(
+    inputs: InputConfigInterface[],
+    g: FormGroup,
+    detect: boolean = false
   ) {
-    for (const current of bindings.values()) {
-      if (current.binding?.name.toString() === name.toString()) {
-        const [control, controls] = setControlsAttributes(
-          this.controls,
-          current,
-          event,
-          useHiddenAttributeSetter
-        )(this.formGroup);
-        this.formGroup = control as FormGroup;
-        this.controls = controls;
-      }
-    }
+    this._inputs = inputs;
+    this._formGroup = g;
+    detect === false ? this.cdRef?.markForCheck() : this.cdRef?.detectChanges();
   }
+
   //#region Destructor
   ngOnDestroy(): void {
     this._destroy$.next();

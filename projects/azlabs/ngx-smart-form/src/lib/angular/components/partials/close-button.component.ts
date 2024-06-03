@@ -1,11 +1,19 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Output,
+} from '@angular/core';
 
 @Component({
-  selector: 'ngx-smart-array-close-button',
+  standalone: true,
+  imports: [CommonModule],
+  selector: 'ngx-close-button',
   template: `
     <a
       href="#"
-      class="ngx__form_array__card__close_btn"
+      class="ngx__close_btn"
       (click)="onClickHandler($event)"
     >
       <svg
@@ -27,16 +35,17 @@ import { Component, EventEmitter, Output } from '@angular/core';
   `,
   styles: [
     `
-      .ngx__form_array__card__close_btn svg path {
+      .ngx__close_btn svg path {
         fill: #707070;
       }
       :host {
         display: 'inline';
       }
-    `
-  ]
+    `,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxSmartArrayCloseButtonComponent {
+export class CloseButtonComponent {
   @Output() click = new EventEmitter<Event>();
 
   onClickHandler(event: Event) {

@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -8,14 +9,16 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
+import { CloseButtonComponent } from '../partials';
+import { NgxSmartFormGroupComponent } from '../ngx-smart-form-group';
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, CloseButtonComponent, NgxSmartFormGroupComponent],
   selector: 'ngx-smart-form-array-child',
   template: `
     <div class="ngx__form_array__card">
-      <ngx-smart-array-close-button
-        (click)="onCloseButtonClicked($event)"
-      ></ngx-smart-array-close-button>
+      <ngx-close-button (click)="onButtonClick($event)"></ngx-close-button>
       <div class="ngx__form_array__card__card_block">
         <ng-container *ngIf="formGroup">
           <ngx-smart-form-group
@@ -46,7 +49,7 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
       }
 
       .ngx__form_array__card__card_block {
-        padding: var(--ngx-form-array-card-padding, 0.6rem .9rem);
+        padding: var(--ngx-form-array-card-padding, 0.6rem 0.9rem);
         border-bottom-width: var(--ngx-form-array-card-width, 0.05rem);
         border-bottom-style: solid;
       }
@@ -74,7 +77,7 @@ export class NgxSmartFormArrayChildComponent {
   @Output() componentDestroyer = new EventEmitter();
   // #endregion Component outputs
 
-  onCloseButtonClicked(event: Event) {
+  onButtonClick(event: Event) {
     this.componentDestroyer.emit();
     event.preventDefault();
   }

@@ -41,4 +41,3 @@ export type RequestOptionsType<T = unknown> =
       interceptors?: Interceptor<HTTPRequest>[];
     }
   | string;
-// TODO: Add a REST CLIENT interface with methods like get(), post(), put(), delete(), path(), options(), head(), etc...

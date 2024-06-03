@@ -1,2 +1,2 @@
-export { NgxSmartArrayCloseButtonComponent } from './ngx-close-button.component';
-export { NgxSmartArrayAddButtonComponent } from './ngx-smart-array-add-button.component';
+export { CloseButtonComponent } from './close-button.component';
+export { AddButtonComponent } from './add-button.component';

@@ -18,13 +18,18 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { cloneAbstractControl } from '../../helpers';
-import {
-  AngularReactiveFormBuilderBridge,
-  ANGULAR_REACTIVE_FORM_BRIDGE,
-} from '../../types';
+import { AngularReactiveFormBuilderBridge } from '../../types';
 import { NgxSmartFormControlArrayChildComponent } from './ngx-smart-form-control-array-child.component';
+import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
+import { CommonModule } from '@angular/common';
+import { AddButtonComponent } from '../partials';
+
+/** @internal */
+type ComponentRefType = ComponentRef<NgxSmartFormControlArrayChildComponent>;
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, AddButtonComponent],
   selector: 'ngx-smart-form-control-array',
   template: `
     <div #container></div>
@@ -36,9 +41,7 @@ import { NgxSmartFormControlArrayChildComponent } from './ngx-smart-form-control
     ></ng-container>
 
     <ng-template #addTemplate let-handler>
-      <ngx-smart-array-add-button
-        (click)="handler($event)"
-      ></ngx-smart-array-add-button>
+      <ngx-add-button (click)="handler($event)"></ngx-add-button>
     </ng-template>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,11 +56,10 @@ export class NgxSmartFormControlArrayComponent
   @Input() addButtonRef!: TemplateRef<any>;
   @Input() name!: string;
   private _autoupload: boolean = false;
-  @Input() set autoupload(value: boolean) {
+  @Input({ alias: 'autoupload' }) set setAutoUpload(value: boolean) {
     this._autoupload = !!value;
-
     // update child component instance autoupload values
-    this.componentRefs.forEach(
+    this.componentRefs?.forEach(
       (ref) => (ref.instance.autoupload = this._autoupload)
     );
   }
@@ -68,8 +70,7 @@ export class NgxSmartFormControlArrayComponent
 
   private _destroy$ = new Subject<void>();
   private componentRefCount = 0;
-  private componentRefs: ComponentRef<NgxSmartFormControlArrayChildComponent>[] =
-    [];
+  private componentRefs: ComponentRefType[] = [];
 
   //#region Component outputs
   @Output() listChange = new EventEmitter<number>();
@@ -110,9 +111,8 @@ export class NgxSmartFormControlArrayComponent
 
   // tslint:disable-next-line: typedef
   addNewComponent(index: number) {
-    const control = cloneAbstractControl(
-      this.builder.control(this.inputConfig)
-    ) as AbstractControl;
+    const c = this.builder.control(this.inputConfig);
+    const control = cloneAbstractControl(c);
     this.addComponent(control, index);
     this.formArray.push(control);
   }

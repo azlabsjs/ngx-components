@@ -1,5 +1,34 @@
-import { FormConfigInterface, FormInterface } from '@azlabsjs/smart-form-core';
 import { Observable } from 'rxjs';
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormGroup,
+} from '@angular/forms';
+import {
+  FormConfigInterface,
+  InputConfigInterface,
+  FormInterface,
+} from '@azlabsjs/smart-form-core';
+
+/** @internal */
+export type Builder = FormBuilder;
+
+export interface AngularReactiveFormBuilderBridge {
+  /**
+   * @var Builder
+   */
+  readonly builder: Builder;
+
+  /** @description Create an angular reactive form element from the configuration from dynamic form or list of dynamic inputs */
+  group(source: FormConfigInterface | InputConfigInterface[]): FormGroup;
+
+  /** @description Creates a form control instance from form configuration interface */
+  control(state: InputConfigInterface): AbstractControl;
+
+  /** @description It creates a form array instance */
+  array(state: InputConfigInterface): FormArray;
+}
 
 /**
  * @description Form client type definition. Implementation class must provide
@@ -68,7 +97,7 @@ export interface CacheProvider {
 
 /**
  * @internal
- * 
+ *
  * Internal type definition for load form request handler function
  */
 export type LoadFormsRequestHandler = (

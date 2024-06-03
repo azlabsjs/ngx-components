@@ -1,11 +1,7 @@
 import { Injector } from '@angular/core';
 import { HTTPRequest, HTTPResponse, NextFunction } from '@azlabsjs/requests';
 
-/**
- * Checks if a given value is a promise value
- *
- * @internal
- */
+/** @internal Checks if a given value is a promise value */
 function isPromise<T>(value: unknown): value is Promise<T> {
   return (
     typeof value === 'object' &&
@@ -14,10 +10,7 @@ function isPromise<T>(value: unknown): value is Promise<T> {
   );
 }
 
-/**
- * Provide a default interceptor function that intercepts request from form component/module
- * adding a bearer token to the authorization header
- */
+/** @description Provide a default interceptor function that intercepts request and add a bearer token to the authorization header */
 export function useBearerTokenInterceptor(
   bearerToken?: (injector: Injector) => string | Promise<string>
 ) {

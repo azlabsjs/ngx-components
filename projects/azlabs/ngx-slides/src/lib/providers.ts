@@ -1,8 +1,7 @@
 import { Provider, inject } from '@angular/core';
-import { SLIDES } from './types';
+import { SLIDES, SlideData } from './types';
 import { HttpClient } from '@angular/common/http';
 import { map, of } from 'rxjs';
-import { SlideData } from '@azlabsjs/ngx-slides';
 import { createSlide } from './helpers';
 
 /** @description Provides default slides used if no slides is provides to the slides component */

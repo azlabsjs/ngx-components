@@ -1,3 +1,11 @@
+import {
+  NgxSmartFormArrayChildComponent,
+  NgxSmartFormArrayComponent,
+  NgxSmartFormComponent,
+  NgxSmartFormGroupComponent,
+} from './components';
+import { SafeHTMLPipe } from './pipes';
+
 export {
   NgxSmartFormArrayChildComponent,
   NgxSmartFormArrayComponent,
@@ -12,26 +20,23 @@ export {
   createFormGroup,
   createFormControl,
   createFormArray,
-  useBearerTokenInterceptor
+  useBearerTokenInterceptor,
 } from './helpers';
 // Module & component & services exports
 export { NgxSmartFormModule } from './ngx-smart-form.module';
 // Pipes exports
 export { SafeHTMLPipe } from './pipes';
 // Ng Services
-export { DefaultFormsLoader } from './services';
+export { FormsLoader as NgxFormLoader } from './services';
+
 // Ng forms helpers classes & interfaces
 export {
-  ANGULAR_REACTIVE_FORM_BRIDGE,
-  API_HOST,
   AngularReactiveFormBuilderBridge,
   Builder,
   CacheProvider,
-  FORM_CLIENT,
   FormComponentInterface,
   FormsClient,
   FormsLoader,
-  HTTP_REQUEST_CLIENT,
   InputEventArgs,
   InputOptionsClient,
   ReactiveFormComponentInterface,
@@ -44,3 +49,19 @@ export {
   equalsValidator,
   patternValidator,
 } from './validators';
+
+export {
+  ANGULAR_REACTIVE_FORM_BRIDGE,
+  API_HOST,
+  FORM_CLIENT,
+  HTTP_REQUEST_CLIENT,
+} from './tokens';
+
+/** Exported library directives */
+export const FORM_DIRECTIVES = [
+  NgxSmartFormComponent,
+  NgxSmartFormGroupComponent,
+  NgxSmartFormArrayComponent,
+  NgxSmartFormArrayChildComponent,
+  SafeHTMLPipe,
+] as const;

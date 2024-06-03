@@ -1,29 +1,22 @@
-import { AbstractControl, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { isNumber } from '@azlabsjs/utilities';
 import { BindingInterface } from '../types';
 import { cloneAbstractControl } from './clone';
 
-type CreateControlAttributeSetterReturnType = (
-  formgroup: AbstractControl
-) => [AbstractControl, InputConfigInterface[]];
-
-type CreateControlAttributeSetterType = (
-  controls: InputConfigInterface[],
-  bindings: BindingInterface,
+/** @internal */
+type PropertySetterFactory = (
+  values: InputConfigInterface[],
+  b: BindingInterface,
   value: any
-) => CreateControlAttributeSetterReturnType;
+) => (g: FormGroup) => [FormGroup, InputConfigInterface[]];
 
-/**
- * @internal Returns the required if configured values
- */
+/** @internal Returns the required if configured values */
 function getRequiredIfValues(input: InputConfigInterface) {
   return input.requiredIf?.values ?? [];
 }
 
-/**
- * @internal check if the input should be hidden or not
- */
+/** @internal check if the input should be hidden or not */
 function shouldHideInput(values: unknown[], value: unknown, _name: string) {
   if (values.includes('*')) {
     return !(
@@ -52,89 +45,95 @@ function shouldHideInput(values: unknown[], value: unknown, _name: string) {
   return !_values.includes(value) ? true : false;
 }
 
-/**
- * Hidden attribute setter
- */
-export function useHiddenAttributeSetter(
-  controls: InputConfigInterface[],
-  bidings: BindingInterface,
-  value: string | number
-): CreateControlAttributeSetterReturnType {
-  return (formgroup) => {
-    const hasControls = Array.isArray(controls) && controls.length !== 0;
+/** @internal Hidden attribute setter */
+export function setHiddenPropertyFactory(
+  inputs: InputConfigInterface[],
+  b: BindingInterface,
+  v: any
+) {
+  return (g: FormGroup) => {
+    const hasControls = Array.isArray(inputs) && inputs.length !== 0;
     if (hasControls) {
-      controls = controls.map((_input) => {
-        if (_input.name === bidings.key) {
+      inputs = inputs.map((_input) => {
+        if (_input.name === b.key) {
           const values = getRequiredIfValues(_input);
-          _input.hidden = shouldHideInput(values, value, _input.name);
+          _input.hidden = shouldHideInput(values, v, _input.name);
           if (_input.hidden) {
-            (formgroup as FormGroup).removeControl(bidings.key);
+            g.removeControl(b.key);
           } else {
-            (formgroup as FormGroup).addControl(
-              bidings.key,
-              cloneAbstractControl(bidings.abstractControl)
-            );
+            g.addControl(b.key, cloneAbstractControl(b.abstractControl));
           }
         }
         return _input;
       });
     }
-    return [formgroup, controls];
+    return [g, inputs] as [FormGroup, InputConfigInterface[]];
   };
 }
 
 // tslint:disable-next-line: typedef
-export function controlAttributesDataBindings(
-  controls: InputConfigInterface[]
-) {
-  return (formgroup: AbstractControl) => {
-    const bindings: Map<string, BindingInterface> = new Map();
-    if (Array.isArray(controls) && controls.length !== 0 && formgroup) {
-      // First we retrieve input config having requiredIf property
-      // definition
-      const mathes = controls.filter(
-        (current) =>
-          current.requiredIf !== null &&
-          typeof current.requiredIf !== 'undefined'
+export function bindingsFactory(inputs: InputConfigInterface[]) {
+  return (g: FormGroup) => {
+    const b: Map<string, BindingInterface> = new Map();
+    if (Array.isArray(inputs) && inputs.length !== 0 && g) {
+      // First we retrieve input config having requiredIf property definition
+      const matches = inputs.filter(
+        (v) => v.requiredIf !== null && typeof v.requiredIf !== 'undefined'
       );
       // For each matches found, we build the binding map
-      for (const config of mathes) {
-        const { requiredIf, name } = config;
-        const abstractControl = formgroup.get(name);
-        if (abstractControl) {
-          bindings.set(name, {
+      for (const v of matches) {
+        const { requiredIf, name } = v;
+        const c = g.get(name);
+        if (c) {
+          b.set(name, {
             key: name,
             binding: requiredIf,
-            abstractControl: abstractControl,
-            validators: abstractControl?.validator ?? undefined,
-            asyncValidators: abstractControl?.asyncValidator ?? undefined,
+            abstractControl: c,
+            validators: c?.validator ?? undefined,
+            asyncValidators: c?.asyncValidator ?? undefined,
           });
         }
       }
-      for (const value of bindings.values()) {
-        if (value.binding) {
-          const [control, _controls] = setControlsAttributes(
-            controls,
-            value,
-            value.abstractControl.value,
-            useHiddenAttributeSetter
-          )(formgroup);
-          formgroup = control as FormGroup;
-          controls = _controls;
-        }
-      }
     }
-    return [bindings, formgroup, controls];
+    return b;
   };
 }
 
-// tslint:disable-next-line: typedef
-export function setControlsAttributes(
-  controls: InputConfigInterface[],
-  bindings: BindingInterface,
-  value: any,
-  callback: CreateControlAttributeSetterType
+/** @internal Set input properties */
+export function setInputsProperties(
+  inputs: InputConfigInterface[],
+  b: Map<string, BindingInterface>,
+  g: FormGroup,
+  v?: any,
+  name?: string
 ) {
-  return (formgroup: AbstractControl) =>
-    callback(controls, bindings, value)(formgroup);
+  for (const c of b.values()) {
+    if (!c.binding) {
+      continue;
+    }
+    if (name && c.binding.name.toString() !== name.toString()) {
+      continue;
+    }
+    const factory = createControlsPropertiesSetter(
+      inputs ?? [],
+      c,
+      v ?? c.abstractControl.value,
+      setHiddenPropertyFactory
+    );
+    [g, inputs] = factory(g);
+  }
+  return [g, inputs] as [FormGroup, InputConfigInterface[]];
+}
+
+/** @internal */
+// tslint:disable-next-line: typedef
+export function createControlsPropertiesSetter(
+  values: InputConfigInterface[],
+  b: BindingInterface,
+  v: any,
+  callback: PropertySetterFactory
+) {
+  return (formgroup: FormGroup) => {
+    return callback(values, b, v)(formgroup);
+  };
 }

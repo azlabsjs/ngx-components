@@ -1,6 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
+  standalone: true,
+  pure: true,
   name: 'ngxGroupHeader',
 })
 export class NgxSmartFormGroupHeaderPipe implements PipeTransform {

@@ -1,3 +1,3 @@
-export { DefaultFormsLoader } from './loader';
-export { ReactiveFormBuilderBrige } from './bridge';
+export { FormsLoader } from './loader';
+export { ReactiveFormBuilder } from './forms';
 export { FormsCacheProvider } from './cache';

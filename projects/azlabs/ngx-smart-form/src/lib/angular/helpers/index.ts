@@ -1,6 +1,5 @@
 export { cloneAbstractControl } from './clone';
 
-// Reactive forms helpers
 export {
   ComponentReactiveFormHelpers,
   createAngularAbstractControl,
@@ -9,12 +8,11 @@ export {
   createFormArray,
 } from './builders';
 
-// Attributes builder helper functions
 export {
-  controlAttributesDataBindings,
-  useHiddenAttributeSetter,
-  setControlsAttributes,
+  bindingsFactory,
+  setHiddenPropertyFactory,
+  createControlsPropertiesSetter,
+  setInputsProperties,
 } from './attributes';
 
-// Export interceptor helpers
 export { useBearerTokenInterceptor } from './interceptors';

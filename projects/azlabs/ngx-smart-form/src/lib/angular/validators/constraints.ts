@@ -1,4 +1,3 @@
-import { Injector } from '@angular/core';
 import {
   AbstractControl,
   AsyncValidatorFn,
@@ -10,9 +9,10 @@ import {
   createPatternConstraint,
   createUniqueConstraint,
 } from '@azlabsjs/smart-form-core';
-import { HTTP_REQUEST_CLIENT } from '../types';
 import { from, lastValueFrom } from 'rxjs';
+import { RequestClient } from '../../http';
 
+/** @description Async constraint type declaration */
 export type AsyncConstraint<T = boolean> = {
   query?: string;
   /**
@@ -30,28 +30,23 @@ function isDefined(value: unknown): value is AbstractControl {
   return !!value;
 }
 
+/** @internal */
 function restQueryFactory(
-  injector: Injector,
+  requestClient: RequestClient,
   url: string,
   value: unknown,
   query?: string
 ) {
   return async () => {
-    return query
-      ? await lastValueFrom(
-          from(
-            injector.get(HTTP_REQUEST_CLIENT).request(url, 'GET', null, {
+    return await lastValueFrom(
+      query
+        ? from(
+            requestClient.request(url, 'GET', null, {
               query: { [query]: value },
             })
           )
-        )
-      : lastValueFrom(
-          from(
-            injector
-              .get(HTTP_REQUEST_CLIENT)
-              .request(`${url}/${value}`, 'GET', null)
-          )
-        );
+        : from(requestClient.request(`${url}/${value}`, 'GET', null))
+    );
   };
 }
 
@@ -59,7 +54,7 @@ function restQueryFactory(
  * Creates an existance validation function
  */
 export function existsValidator(
-  injector: Injector,
+  requestClient: RequestClient,
   constraint: AsyncConstraint<boolean>
 ): AsyncValidatorFn {
   return async (control: AbstractControl) => {
@@ -68,7 +63,7 @@ export function existsValidator(
       const { fn, conditions, query } = constraint;
       const _fn =
         typeof fn === 'string'
-          ? restQueryFactory(injector, fn, _value, query)
+          ? restQueryFactory(requestClient, fn, _value, query)
           : fn;
       // Transform the function provided by the developper into one compatible with
       // exists async constraint required type
@@ -94,7 +89,7 @@ export function existsValidator(
  * Creates a unique validation function
  */
 export function uniqueValidator(
-  injector: Injector,
+  requestClient: RequestClient,
   constraint: AsyncConstraint<boolean>
 ): AsyncValidatorFn {
   return async (control: AbstractControl) => {
@@ -103,7 +98,7 @@ export function uniqueValidator(
       const { fn, conditions, query } = constraint;
       const _fn =
         typeof fn === 'string'
-          ? restQueryFactory(injector, fn, _value, query)
+          ? restQueryFactory(requestClient, fn, _value, query)
           : fn;
       // Transform the function provided by the developper into one compatible with
       // exists async constraint required type

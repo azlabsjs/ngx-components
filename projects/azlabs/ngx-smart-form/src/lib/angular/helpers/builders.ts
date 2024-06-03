@@ -21,20 +21,18 @@ import {
   FormConfigInterface,
   InputTypes,
   InputGroup,
-  InputOptionsInterface,
+  InputOptions,
   InputOption,
   InputConfigInterface,
 } from '@azlabsjs/smart-form-core';
 import { tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { JSDate } from '@azlabsjs/js-datetime';
-import { Injector } from '@angular/core';
+import { RequestClient } from '../../http';
 
 type InputConfigType = InputConfigInterface | InputGroup;
 
-/**
- * @description Helper class for generating angular reactive form controls with errors validation
- */
+/** @description Helper class for generating angular reactive form controls with errors validation */
 export class ComponentReactiveFormHelpers {
   /**
    * @description Generate an abstract form control using input configuration
@@ -43,11 +41,12 @@ export class ComponentReactiveFormHelpers {
    * @param inputs dynamic input configuration
    */
   static buildFormGroupFromInputConfig(
-    injector: Injector,
-    inputs: InputConfigType[]
+    builder: FormBuilder,
+    inputs: InputConfigType[],
+    requestClient?: RequestClient
   ) {
     // Build the outer form group
-    const group = injector.get(FormBuilder).group({});
+    const group = builder.group({});
     for (const input of inputs) {
       if (input.isRepeatable) {
         group.addControl(input.name, new FormArray<AbstractControl>([]));
@@ -60,8 +59,9 @@ export class ComponentReactiveFormHelpers {
       ) {
         const formgroup =
           ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(
-            injector,
-            config.children
+            builder,
+            config.children,
+            requestClient
           );
         if (input?.rules?.isRequired) {
           formgroup.addValidators(Validators.required);
@@ -71,31 +71,47 @@ export class ComponentReactiveFormHelpers {
       }
       group.addControl(
         config.name,
-        ComponentReactiveFormHelpers.buildControl(injector, config)
+        ComponentReactiveFormHelpers.buildControl(
+          builder,
+          config,
+          requestClient
+        )
       );
     }
     return group;
   }
 
-  public static buildGroup(injector: Injector, inputs: InputConfigInterface[]) {
-    const group = injector.get(FormBuilder).group({});
+  public static buildGroup(
+    builder: FormBuilder,
+    inputs: InputConfigInterface[],
+    requestClient?: RequestClient
+  ) {
+    const group = builder.group({});
     for (const config of inputs) {
       if (config.type !== InputTypes.CHECKBOX_INPUT) {
         group.addControl(
           config.name,
-          ComponentReactiveFormHelpers.buildControl(injector, config)
+          ComponentReactiveFormHelpers.buildControl(
+            builder,
+            config,
+            requestClient
+          )
         );
       } else {
         group.addControl(
           config.name,
-          ComponentReactiveFormHelpers.buildArray(injector, config)
+          ComponentReactiveFormHelpers.buildArray(builder, config)
         );
       }
     }
     return group;
   }
 
-  public static buildControl(injector: Injector, config: InputConfigInterface) {
+  public static buildControl(
+    builder: FormBuilder,
+    config: InputConfigInterface,
+    requestClient?: RequestClient
+  ) {
     const validators = [
       config.rules && config.rules.isRequired
         ? Validators.required
@@ -202,15 +218,16 @@ export class ComponentReactiveFormHelpers {
     }
 
     // #region Add constraint rule
-    if (config.constraints && config.constraints.unique) {
+    if (config.constraints && config.constraints.unique && requestClient) {
       asyncValidators.push(
-        uniqueValidator(injector, config.constraints.unique)
+        // TODO: Pass in the http
+        uniqueValidator(requestClient, config.constraints.unique)
       );
     }
 
-    if (config.constraints && config.constraints.exists) {
+    if (config.constraints && config.constraints.exists && requestClient) {
       asyncValidators.push(
-        existsValidator(injector, config.constraints.exists)
+        existsValidator(requestClient, config.constraints.exists)
       );
     }
 
@@ -221,7 +238,7 @@ export class ComponentReactiveFormHelpers {
     // #endregion Add constraint rule
 
     // Add formControl to the form group with the generated validation rules
-    const control = injector.get(FormBuilder).control(
+    const control = builder.control(
       {
         value: config.value,
         disabled: config.disabled,
@@ -229,8 +246,8 @@ export class ComponentReactiveFormHelpers {
       {
         validators: Validators.compose(validators),
         updateOn:
-        // Case the control is an email or the control is a date input or the control has equals constraint
-        // or the control has async validators, we update only on blur else, we update on submit
+          // Case the control is an email or the control is a date input or the control has equals constraint
+          // or the control has async validators, we update only on blur else, we update on submit
           asyncValidators.length > 0 ||
           config.type === InputTypes.DATE_INPUT ||
           hasEqualsConstraint ||
@@ -243,23 +260,23 @@ export class ComponentReactiveFormHelpers {
     return control;
   }
 
-  public static buildArray(injector: Injector, config: InputConfigInterface) {
+  public static buildArray(builder: FormBuilder, config: InputConfigInterface) {
     const array = new FormArray<AbstractControl>([]);
     of((config as OptionsInputConfigInterface).options)
       .pipe(
         tap((options) => {
-          (options as InputOptionsInterface).map(
+          (options as InputOptions).map(
             (current: InputOption, index: number) => {
               // Added validation rule to checkbox array
               (array as FormArray<AbstractControl>).push(
-                injector.get(FormBuilder).control(current.selected)
+                builder.control(current.selected)
               );
             }
           );
         })
       )
       .subscribe();
-    // Add FormArray control to the formGroup
+
     if (config.rules && config.rules.isRequired) {
       array.setValidators(Validators.required);
     }
@@ -281,6 +298,7 @@ export class ComponentReactiveFormHelpers {
 
   public static markControlAsTouched(
     control?: AbstractControl,
+    /** @deprecated */
     field?: string
   ): void {
     if (control) {
@@ -340,45 +358,54 @@ export class ComponentReactiveFormHelpers {
  * @deprecated
  */
 export function createAngularAbstractControl(
-  injector: Injector,
-  form?: FormConfigInterface
+  builder: FormBuilder,
+  form?: FormConfigInterface,
+  requestClient?: RequestClient
 ) {
   return form
-    ? ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(injector, [
-        ...form?.controlConfigs,
-      ])
+    ? ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(
+        builder,
+        [...form?.controlConfigs],
+        requestClient
+      )
     : undefined;
 }
 
-/**
- * Create angular form group instance from input configurations
- */
+/** @description Create angular form group instance from input configurations */
 export function createFormGroup(
-  injector: Injector,
-  inputConfigs?: InputConfigInterface[]
+  builder: FormBuilder,
+  inputConfigs?: InputConfigInterface[],
+  requestClient?: RequestClient
 ) {
   return ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(
-    injector,
-    inputConfigs ?? []
+    builder,
+    inputConfigs ?? [],
+    requestClient
+  );
+}
+
+/** @description Creates angular form control instance from input configuration */
+export function createFormControl(
+  builder: FormBuilder,
+  inputConfig: InputConfigInterface,
+  requestClient?: RequestClient
+) {
+  return ComponentReactiveFormHelpers.buildControl(
+    builder,
+    inputConfig,
+    requestClient
   );
 }
 
 /**
  * Creates angular form control instance from input configuration
  */
-export function createFormControl(
-  injector: Injector,
-  inputConfig: InputConfigInterface
-) {
-  return ComponentReactiveFormHelpers.buildControl(injector, inputConfig);
-}
-
-/**
- * Creates angular form control instance from input configuration
- */
 export function createFormArray(
-  injector: Injector,
+  builder: FormBuilder,
   inputConfig: InputConfigInterface
 ) {
-  return ComponentReactiveFormHelpers.buildArray(injector, inputConfig);
+  return ComponentReactiveFormHelpers.buildArray(
+    builder,
+    inputConfig
+  );
 }

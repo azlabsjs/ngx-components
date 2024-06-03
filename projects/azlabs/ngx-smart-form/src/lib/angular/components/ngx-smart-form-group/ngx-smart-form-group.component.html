@@ -1,7 +1,7 @@
 <ng-container *ngIf="formGroup">
   <ng-container *ngTemplateOutlet="
       recursiveTemplate;
-      context: { group: formGroup, controls }
+      context: { group: formGroup, controls: inputs }
     "></ng-container>
 </ng-container>
 

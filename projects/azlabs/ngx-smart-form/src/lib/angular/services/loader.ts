@@ -2,24 +2,18 @@ import { map } from 'rxjs/operators';
 import {
   ControlInterface,
   FormInterface,
-  FormsLoader,
+  FormsLoader as AbstractFormLoader,
 } from '@azlabsjs/smart-form-core';
 import { LoadFormsRequestHandler } from '../types';
 
-/**
- * @internal
- */
+/** @internal */
 type ControlsType = Record<string, unknown>;
 
-/**
- * @internal
- */
+/** @internal */
 type FormConfigType = Record<string, unknown> & {
   controls: Array<ControlsType>;
 };
-/**
- * @internal
- */
+/** @internal */
 type LegacyFormConfigType = Record<string, unknown> & {
   formControls?: Array<ControlsType>;
 };
@@ -134,7 +128,7 @@ function isValidURL(url: string) {
  * Internal implementation of forms loader that relies on a request handler implementation to query for
  * list of form from the resources
  */
-export class DefaultFormsLoader implements FormsLoader {
+export class FormsLoader implements AbstractFormLoader {
   // @constructor
   public constructor(
     private requestHandler: LoadFormsRequestHandler,

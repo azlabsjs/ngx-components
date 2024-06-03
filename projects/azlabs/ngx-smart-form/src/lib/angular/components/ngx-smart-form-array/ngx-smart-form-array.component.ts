@@ -12,23 +12,26 @@ import {
   TemplateRef,
   ViewChild,
   ViewContainerRef,
+  signal,
 } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { cloneAbstractControl } from '../../helpers';
-import {
-  AngularReactiveFormBuilderBridge,
-  ANGULAR_REACTIVE_FORM_BRIDGE,
-} from '../../types';
+import { AngularReactiveFormBuilderBridge } from '../../types';
 import { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array-child.component';
+import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
+import { CommonModule } from '@angular/common';
+import { AddButtonComponent } from '../partials';
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, AddButtonComponent],
   selector: 'ngx-smart-form-array',
   template: `
     <div #container></div>
-    <div *ngIf="refCount === 0" class="no-control-content">
+    <div *ngIf="refCount() === 0" class="no-control-content">
       <ng-container
         *ngTemplateOutlet="
           addGroupRef ? addGroupRef : addTemplate;
@@ -36,7 +39,7 @@ import { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array-child.co
         "
       ></ng-container>
     </div>
-    <ng-container *ngIf="refCount !== 0">
+    <ng-container *ngIf="refCount() !== 0">
       <ng-container
         *ngTemplateOutlet="
           addGroupRef ? addGroupRef : addTemplate;
@@ -46,9 +49,7 @@ import { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array-child.co
     </ng-container>
 
     <ng-template #addTemplate let-handler>
-      <ngx-smart-array-add-button
-        (click)="handler($event)"
-      ></ngx-smart-array-add-button>
+      <ngx-add-button (click)="handler($event)"></ngx-add-button>
     </ng-template>
   `,
   styles: [
@@ -73,33 +74,29 @@ import { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array-child.co
 export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
   //#region Component inputs definitions
   @Input() formArray!: FormArray<AbstractControl<any>>;
-  private _controls!: InputConfigInterface[];
-  @Input() set controls(value: InputConfigInterface | InputConfigInterface[]) {
-    this._controls = Array.isArray(value)
-      ? value
-      : [value].filter(
-          (current) => typeof current !== 'undefined' && current !== null
-        );
-  }
-  get controls() {
-    return this._controls;
-  }
+  @Input('no-grid-layout') noGridLayout = false;
   @Input() template!: TemplateRef<any>;
   @Input() addGroupRef!: TemplateRef<Node>;
   @Input() name!: string;
   private _autoupload: boolean = false;
-  @Input() set autoupload(value: boolean) {
+  @Input({ alias: 'autoupload' }) set setAutoload(value: boolean) {
     this._autoupload = !!value;
     // update child component instance autoupload values
-    this.componentRefs.forEach(
+    this.componentRefs?.forEach(
       (ref) => (ref.instance.autoupload = this._autoupload)
     );
   }
-  private _refCount = 0;
-  get refCount() {
-    return this._refCount;
-  }
-  @Input('no-grid-layout') noGridLayout = false;
+  @Input({
+    alias: 'controls',
+    transform: (value: InputConfigInterface | InputConfigInterface[]) => {
+      return Array.isArray(value)
+        ? value
+        : [value].filter(
+            (current) => typeof current !== 'undefined' && current !== null
+          );
+    },
+  })
+  controls!: InputConfigInterface[];
   //#endregion Component inputs definitions
 
   //#region Component outputs
@@ -112,10 +109,11 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
   viewContainerRef!: ViewContainerRef;
   // #endregion View children
 
-  // #region Internal properties
+  // #region Component properties
   private _destroy$ = new Subject<void>();
   private componentRefs: ComponentRef<NgxSmartFormArrayChildComponent>[] = [];
-  // #endregion Internal properties
+  refCount = signal(0);
+  // #endregion Component properties
 
   // Component instance initializer
   constructor(
@@ -133,13 +131,17 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
     this.addArrayControls();
     // Simulate form array
     this.formArray.valueChanges
-      .pipe(tap((state) => this.formArrayChange.emit(state)))
+      .pipe(
+        takeUntil(this._destroy$),
+        tap((state) => this.formArrayChange.emit(state))
+      )
       .subscribe();
   }
 
   onComponentDestroy(event: Event) {
-    this._refCount++;
-    this._addComponent(this._refCount);
+    this.refCount.update((v) => v++);
+    const refCount = this.refCount();
+    this._addComponent(refCount);
     event.preventDefault();
     event.stopPropagation();
   }
@@ -147,19 +149,19 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
   // tslint:disable-next-line: typedef
   private _addComponent(index: number) {
     const formGroup = cloneAbstractControl(
-      this.builder.group(this._controls)
+      this.builder.group(this.controls)
     ) as FormGroup;
     this.addComponent(formGroup, index);
     this.formArray.push(formGroup);
   }
 
   addComponent(formGroup: FormGroup, index: number) {
-    if (this._controls) {
+    if (this.controls) {
       const componentRef = this.viewContainerRef.createComponent(
         NgxSmartFormArrayChildComponent
       );
       // Initialize child component input properties
-      componentRef.instance.controls = [...this._controls];
+      componentRef.instance.controls = [...this.controls];
       componentRef.instance.formGroup = formGroup;
       componentRef.instance.template = this.template;
       componentRef.instance.autoupload = this._autoupload;
@@ -170,9 +172,10 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
       componentRef.instance.componentDestroyer
         .pipe(takeUntil(this._destroy$))
         .subscribe(() => {
-          if (this._refCount > 0) {
+          let refCount = this.refCount();
+          if (refCount > 0) {
             componentRef.destroy();
-            this._refCount -= 1;
+            refCount -= 1;
             // Remove the elment from the list of reference components
             this.componentRefs = this.componentRefs.filter(
               (component: ComponentRef<NgxSmartFormArrayChildComponent>) => {
@@ -182,7 +185,8 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
               }
             );
             this.formArray.removeAt(componentRef.instance.index);
-            this.listChange.emit(this._refCount);
+            this.refCount.set(refCount);
+            this.listChange.emit(refCount);
           } else {
             componentRef.instance.formGroup.reset();
             this.formArray.updateValueAndValidity();

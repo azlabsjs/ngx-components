@@ -7,19 +7,15 @@ import {
   FormConfigInterface,
   FormInterface,
 } from '@azlabsjs/smart-form-core';
-import { CACHE_PROVIDER, FormsClient } from '../types';
+import { FormsClient } from '../types';
+import { CACHE_PROVIDER } from '../tokens';
 
-@Injectable()
+@Injectable({
+  providedIn: 'any',
+})
 export class JSONFormsClient implements FormsClient {
-  /**
-   * @description Creates an instance of JSONFormsClient class
-   *
-   * @param provider
-   */
-  constructor(
-    @Inject(CACHE_PROVIDER)
-    private provider: CacheProvider
-  ) {}
+  /** @description Creates an instance of JSONFormsClient class */
+  constructor(@Inject(CACHE_PROVIDER) private provider: CacheProvider) {}
 
   get(id: string | number): Observable<FormConfigInterface> {
     return from(this.provider.get(id) as ObservableInput<FormInterface>).pipe(

@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -8,8 +9,11 @@ import {
 } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
+import { CloseButtonComponent } from '../partials';
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, CloseButtonComponent],
   selector: 'ngx-smart-form-array-child',
   template: `
     <div class="ngx__form_control_array">
@@ -27,9 +31,7 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
           ></ng-container>
         </ng-container>
       </div>
-      <ngx-smart-array-close-button
-        (click)="onCloseButtonClicked($event)"
-      ></ngx-smart-array-close-button>
+      <ngx-close-button (click)="onButtonClick($event)"></ngx-close-button>
     </div>
   `,
   styles: [
@@ -65,7 +67,7 @@ export class NgxSmartFormControlArrayChildComponent {
   @Output() componentDestroyer = new EventEmitter();
   // #endregion Component outputs
 
-  onCloseButtonClicked(event: Event) {
+  onButtonClick(event: Event) {
     this.componentDestroyer.emit();
     event.preventDefault();
   }

@@ -1,18 +1,14 @@
 import { map } from 'rxjs';
 import { isValidURL, rxRequest } from '../http';
 import { LoadFormsRequestHandler } from './types';
-import { DefaultFormsLoader } from './services';
+import { FormsLoader } from './services';
 import { LocationStrategy, PlatformLocation } from '@angular/common';
 
-/**
- * Factory function for creating default form loader instance
- * 
- * @internal
- */
-export function useDefaultFormLoader(
+/** @internal Factory function for creating default form loader instance */
+export function useHTTPFormLoader(
   _location: LocationStrategy,
   _platform: PlatformLocation,
-  handler: LoadFormsRequestHandler|undefined
+  handler: LoadFormsRequestHandler | undefined
 ) {
   const _loadFormsHandler =
     handler ??
@@ -28,7 +24,7 @@ export function useDefaultFormLoader(
         map((response) => response.body as unknown as Record<string, unknown>[])
       );
     });
-  return new DefaultFormsLoader(_loadFormsHandler, (path?: string) => {
+  return new FormsLoader(_loadFormsHandler, (path?: string) => {
     if (path && isValidURL(path)) {
       return path;
     }

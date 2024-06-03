@@ -1,7 +1,4 @@
-import {
-  InputOptionsInterface,
-  OptionsConfig,
-} from '@azlabsjs/smart-form-core';
+import { InputOptions, OptionsConfig } from '@azlabsjs/smart-form-core';
 import { Observable } from 'rxjs';
 
 export interface InputOptionsClient {
@@ -12,5 +9,5 @@ export interface InputOptionsClient {
    */
   request(
     optionsConfig: OptionsConfig & { name?: string }
-  ): Observable<InputOptionsInterface>;
+  ): Observable<InputOptions>;
 }

@@ -1,23 +1,10 @@
-import {
-  CommonModule,
-  LocationStrategy,
-  PlatformLocation,
-} from '@angular/common';
-import {
-  APP_INITIALIZER,
-  Injector,
-  ModuleWithProviders,
-  NgModule,
-  Provider,
-} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ModuleWithProviders, NgModule, Provider } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HTTPRequest } from '@azlabsjs/requests';
-import { CacheProvider } from '@azlabsjs/smart-form-core';
-import { from, lastValueFrom, map, ObservableInput } from 'rxjs';
-import { createRequestClient } from '../http';
 import {
-  NgxSmartArrayAddButtonComponent,
-  NgxSmartArrayCloseButtonComponent,
+  AddButtonComponent,
+  CloseButtonComponent,
   NgxSmartFormArrayChildComponent,
   NgxSmartFormArrayComponent,
   NgxSmartFormComponent,
@@ -32,23 +19,13 @@ import {
   IsRepeatablePipe,
   IsHiddenPipe,
 } from './pipes';
+import { InterceptorFactory, LoadFormsRequestHandler } from './types';
 import {
-  DefaultFormsLoader,
-  FormsCacheProvider,
-  ReactiveFormBuilderBrige,
-} from './services';
-import { JSONFormsClient } from './services/client';
-import {
-  ANGULAR_REACTIVE_FORM_BRIDGE,
-  API_HOST,
-  CACHE_PROVIDER,
-  FORMS_LOADER,
-  FORM_CLIENT,
-  HTTP_REQUEST_CLIENT,
-  InterceptorFactory,
-  LoadFormsRequestHandler,
-} from './types';
-import { useDefaultFormLoader } from './factories';
+  provideFormsHost,
+  provideFormsInitialization,
+  provideFormsLoader,
+  provideHttpClient,
+} from './providers';
 
 /**
  * @internal
@@ -89,36 +66,25 @@ type ConfigType = {
   loadFormsHandler?: LoadFormsRequestHandler;
 };
 
-/**
- * @internal
- *
- * @param service
- * @param assetsURL
- */
-export function preloadAppForms(service: CacheProvider, assetsURL: string) {
-  return async () => {
-    return await lastValueFrom(
-      from(service.cache(assetsURL) as ObservableInput<unknown>)
-    );
-  };
-}
-
+/** @deprecated Use `FORM_DIRECTIVES` in your module or component `imports` to register or use exported directives */
 @NgModule({
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
-  declarations: [
-    NgxSmartFormComponent,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
     NgxSmartFormGroupComponent,
-    NgxSmartFormArrayComponent,
-    NgxSmartFormArrayChildComponent,
     NgxSmartFormGroupHeaderPipe,
+    CloseButtonComponent,
+    AddButtonComponent,
     SafeHTMLPipe,
     HasChildrenPipe,
     IsRepeatablePipe,
     IsHiddenPipe,
-    NgxSmartArrayCloseButtonComponent,
-    NgxSmartArrayAddButtonComponent,
-    NgxSmartFormControlArrayChildComponent,
     NgxSmartFormControlArrayComponent,
+    NgxSmartFormControlArrayChildComponent,
+    NgxSmartFormArrayComponent,
+    NgxSmartFormArrayChildComponent,
+    NgxSmartFormComponent,
   ],
   exports: [
     NgxSmartFormComponent,
@@ -130,6 +96,7 @@ export function preloadAppForms(service: CacheProvider, assetsURL: string) {
   providers: [],
 })
 export class NgxSmartFormModule {
+  /** @deprecated Use `provideFormsLoader(...)`, provideFormsHost(...), `provideFormsInitialization(...)`, `provideHttpClient(...)` to register various required services */
   static forRoot(configs: ConfigType): ModuleWithProviders<NgxSmartFormModule> {
     let {
       formsAssets: assets,
@@ -139,53 +106,15 @@ export class NgxSmartFormModule {
       submitRequest,
     } = configs;
     const _assets = assets ?? '/assets/resources/app-forms.json';
-    
 
     const providers: Provider[] = [
-      FormsCacheProvider,
-      JSONFormsClient,
-      ReactiveFormBuilderBrige,
-      {
-        provide: FORMS_LOADER,
-        useFactory: (
-          location: LocationStrategy,
-          platformLocation: PlatformLocation
-        ) => useDefaultFormLoader(location, platformLocation, loadFormsHandler),
-        deps: [LocationStrategy, PlatformLocation],
-      },
-      {
-        provide: CACHE_PROVIDER,
-        useClass: FormsCacheProvider,
-      },
-      {
-        provide: FORM_CLIENT,
-        useClass: JSONFormsClient,
-      },
-      {
-        provide: API_HOST,
-        useValue: serverConfigs?.api.host || undefined,
-      },
-      {
-        provide: APP_INITIALIZER,
-        useFactory: (service: CacheProvider) =>
-          preloadAppForms(service, _assets),
-        multi: true,
-        deps: [CACHE_PROVIDER],
-      },
-      {
-        provide: ANGULAR_REACTIVE_FORM_BRIDGE,
-        useClass: ReactiveFormBuilderBrige,
-      },
-      {
-        provide: HTTP_REQUEST_CLIENT,
-        useFactory: (injector: Injector) =>
-          createRequestClient(
-            injector,
-            serverConfigs?.api.host,
-            requests?.interceptorFactory ?? submitRequest?.interceptorFactory
-          ),
-        deps: [Injector],
-      },
+      provideFormsLoader(loadFormsHandler),
+      provideFormsHost(serverConfigs?.api.host ?? undefined),
+      provideFormsInitialization(_assets),
+      provideHttpClient(
+        serverConfigs?.api.host,
+        requests?.interceptorFactory ?? submitRequest?.interceptorFactory
+      ),
     ];
     return {
       ngModule: NgxSmartFormModule,
