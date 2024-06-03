@@ -8,6 +8,8 @@ import { provideSupportedCountries } from './providers';
  *
  * In future (0.16.x) release, the component will be converted into a standalone component
  * therefore there will be no need to use the `NgxIntlTelInputModule` anymore
+ * 
+ * **Note** From >=0.17.x import tel input component via `import {INTL_TEL_INPUT_DIRECTIVES} from '@azlabsjs/ngx-intl-tel-input'`
  */
 @NgModule({
   imports: [NgxIntlTelInputComponent],

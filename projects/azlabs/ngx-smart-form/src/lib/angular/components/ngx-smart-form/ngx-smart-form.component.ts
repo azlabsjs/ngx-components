@@ -8,13 +8,10 @@ import {
   HostListener,
   Inject,
   Input,
-  OnChanges,
   OnDestroy,
   Optional,
   Output,
-  SimpleChanges,
   TemplateRef,
-  signal,
 } from '@angular/core';
 import {
   AbstractControl,
@@ -35,10 +32,12 @@ import { RequestClient } from '../../../http';
 import {
   ComponentReactiveFormHelpers,
   bindingsFactory,
+  setFormValue,
   setInputsProperties,
 } from '../../helpers';
 import {
   AngularReactiveFormBuilderBridge,
+  BindingInterface,
   ControlsStateMap,
   ReactiveFormComponentInterface,
 } from '../../types';
@@ -46,7 +45,6 @@ import {
   ANGULAR_REACTIVE_FORM_BRIDGE,
   HTTP_REQUEST_CLIENT,
 } from '../../tokens';
-import { setFormValue } from './helpers';
 import { CommonModule } from '@angular/common';
 import { NgxSmartFormArrayComponent } from '../ngx-smart-form-array';
 import { PIPES } from '../../pipes';
@@ -119,6 +117,8 @@ export class NgxSmartFormComponent
   get form() {
     return this._form;
   }
+  // @internal
+  private _destroy$ = new Subject<void>();
   //#endregion Local properties
 
   //#region Component inputs
@@ -148,9 +148,6 @@ export class NgxSmartFormComponent
   @Output() performingRequest = new EventEmitter<boolean>();
   //#endregion Component outputs
 
-  // @internal
-  private _destroy$ = new Subject<void>();
-
   @HostListener('keyup.enter', ['$event'])
   onEnterButtonCliked(event: KeyboardEvent) {
     if (!this.performingAction) {
@@ -172,6 +169,7 @@ export class NgxSmartFormComponent
   //
 
   setValue(state: { [k: string]: unknown }): void {
+    console.log('Setting form value: ', state);
     // Set or update the form state of the current component
     const { controlConfigs } = this._form;
     setFormValue(this.builder, this._formGroup, state, controlConfigs ?? []);
@@ -179,9 +177,11 @@ export class NgxSmartFormComponent
   }
 
   ngAfterViewInit(): void {
-    this.setComponentForm(this.form);
     // Timeout and notify parent component of ready state
-    this.ready.emit();
+    const t = setTimeout(() => {
+      this.ready.emit();
+      clearTimeout(t);
+    }, 700);
   }
 
   //#region FormComponent interface Methods definitions
@@ -338,13 +338,7 @@ export class NgxSmartFormComponent
     }
   }
 
-  private registerControlValueChanges() {
-    const { setFormState } = this;
-    const { controlConfigs: values } = this._form;
-    const factory = bindingsFactory(values ?? []);
-    const b = factory(this._formGroup);
-    const [g, _inputs] = setInputsProperties(values, b, this._formGroup);
-    setFormState({ ...this._form, controlConfigs: _inputs }, g);
+  private registerControlValueChanges(b: Map<string, BindingInterface>) {
     for (const n in this._formGroup.controls) {
       this._formGroup
         .get(n)
@@ -353,7 +347,14 @@ export class NgxSmartFormComponent
           tap((state) => {
             const { controlConfigs: values } = this._form;
             const { _formGroup: fg } = this;
-            const [g, _inputs] = setInputsProperties(values, b, fg, state, n);
+            const [g, _inputs] = setInputsProperties(
+              this.builder,
+              values,
+              b,
+              fg,
+              state,
+              n
+            );
             this.setFormState({ ...this._form, controlConfigs: _inputs }, g);
           })
         )
@@ -380,34 +381,32 @@ export class NgxSmartFormComponent
     }
   }
 
-  private onFormConfigChanges(f: FormConfigInterface, g?: FormGroup) {
-    // We unregister from previous event each time we set the
-    // form value
-    this._destroy$.next();
-    const {
-      state,
-      builder,
-      setValue,
-      setFormState,
-      registerControlValueChanges,
-      changes,
-    } = this;
+  private onFormConfigChanges(f: FormConfigInterface, formgroup?: FormGroup) {
     // We create an instance of angular Reactive Formgroup instance from input configurations
     // if formgroup parameter is null or undefined
-    if (!g) {
-      g = builder.group(f);
+    if (!formgroup) {
+      const { builder, state } = this;
+      formgroup = builder.group(f);
       // In case state property of the current component is defined, we set the value of the
       if (state) {
-        setValue(state);
+        this.setValue(state);
       }
+      // We only initialy set the form state to initialize component when we create
+      // a new form group instance because, the next time this function is called
+      // `form` and `formGroup` will have initial values
+      this.setFormState(f, formgroup);
     }
 
-    // set component form state value
-    setFormState(f, g);
-
+    // We unregister from previous event each time we set the form value
+    this._destroy$.next();
+    const { controlConfigs: values } = this._form;
+    const factory = bindingsFactory(values ?? []);
+    const b = factory(this._formGroup);
+    const [g, _inputs] = setInputsProperties(this.builder, values, b, this._formGroup);
+    this.setFormState({ ...this._form, controlConfigs: _inputs }, g);
     // register controls value changes and update ui based on requiredIf configuration
     // on form inputs
-    registerControlValueChanges();
+    this.registerControlValueChanges(b);
 
     // Subscribe to formgroup changes
     this._formGroup?.valueChanges
@@ -418,18 +417,18 @@ export class NgxSmartFormComponent
       .subscribe();
 
     // We then emit a changes event when stack complete
-    changes.emit();
+    this.changes.emit();
   }
 
-  private setFormState(f: FormConfigInterface, formgroup?: FormGroup) {
+  private setFormState(f: FormConfigInterface, g?: FormGroup) {
     if (this._form) {
       this._form = { ...this._form, ...f };
     } else {
       this._form = f;
     }
 
-    if (formgroup) {
-      this._formGroup = formgroup;
+    if (g) {
+      this._formGroup = g;
     }
 
     this.changesRef?.detectChanges();

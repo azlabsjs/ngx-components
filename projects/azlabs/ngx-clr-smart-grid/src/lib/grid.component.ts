@@ -16,7 +16,6 @@ import {
   GridConfigType,
 } from './core';
 import { CommonModule } from '@angular/common';
-import { NgxCommonModule } from '@azlabsjs/ngx-common';
 import { NgxClrGridSelectDirective } from './directives';
 import { GridRowClassPipe } from './pipes';
 import {
@@ -29,6 +28,7 @@ import {
   SlicePipe,
   UpperCasePipe,
 } from '@angular/common';
+import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 
 const GRID_CONFIG: Required<GridConfigType> = {
   transformColumnTitle: 'default',
@@ -54,7 +54,7 @@ const GRID_CONFIG: Required<GridConfigType> = {
   imports: [
     CommonModule,
     ClarityModule,
-    NgxCommonModule,
+    ...COMMON_PIPES,
     NgxClrGridSelectDirective,
     GridRowClassPipe,
   ],

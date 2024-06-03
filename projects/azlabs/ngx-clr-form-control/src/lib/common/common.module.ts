@@ -16,8 +16,8 @@ import { IsObjectPipe } from './is-object.pipe';
 import { NoAutoCompleteDirective } from './auto-complete-off.directive';
 
 @NgModule({
-  imports: [CommonModule],
-  declarations: [
+  imports: [
+    CommonModule,
     DateInputPipe,
     FileInputPipe,
     NumberInputPipe,
@@ -48,6 +48,7 @@ import { NoAutoCompleteDirective } from './auto-complete-off.directive';
     JoinPipe,
     IsObjectPipe,
     NoAutoCompleteDirective,
+    CommonModule
   ],
 })
 export class NgxCommonModule {}

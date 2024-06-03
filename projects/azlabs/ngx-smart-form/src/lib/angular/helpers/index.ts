@@ -11,8 +11,9 @@ export {
 export {
   bindingsFactory,
   setHiddenPropertyFactory,
-  createControlsPropertiesSetter,
   setInputsProperties,
-} from './attributes';
+  setFormValue,
+  setPropertyFactory
+} from './core';
 
 export { useBearerTokenInterceptor } from './interceptors';

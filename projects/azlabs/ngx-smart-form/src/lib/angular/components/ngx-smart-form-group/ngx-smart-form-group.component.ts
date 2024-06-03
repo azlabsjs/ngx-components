@@ -4,6 +4,7 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
+  Inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -19,6 +20,8 @@ import { takeUntil, tap } from 'rxjs/operators';
 import { bindingsFactory, setInputsProperties } from '../../helpers';
 import { CommonModule } from '@angular/common';
 import { PIPES } from '../../pipes';
+import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
+import { AngularReactiveFormBuilderBridge } from '../../types';
 
 @Component({
   standalone: true,
@@ -60,7 +63,11 @@ export class NgxSmartFormGroupComponent
   //#endregion Component outputs
 
   /** @description smart form group component constructor */
-  constructor(private cdRef: ChangeDetectorRef) {}
+  constructor(
+    @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
+    private builder: AngularReactiveFormBuilderBridge,
+    private cdRef: ChangeDetectorRef
+  ) {}
 
   //
   ngOnInit(): void {
@@ -92,6 +99,7 @@ export class NgxSmartFormGroupComponent
     if (this._inputs && this.formGroup) {
       const b = bindingsFactory(this._inputs)(this._formGroup);
       const [g, _inputs] = setInputsProperties(
+        this.builder,
         this._inputs,
         b,
         this._formGroup
@@ -107,6 +115,7 @@ export class NgxSmartFormGroupComponent
             takeUntil(this._destroy$),
             tap((state) => {
               const [g, _inputs] = setInputsProperties(
+                this.builder,
                 this._inputs,
                 b,
                 this.formGroup,

@@ -1,5 +1,14 @@
-import { LowerCasePipe } from '@angular/common';
-import { Component, Inject, Injector, OnInit, ViewChild } from '@angular/core';
+import {
+  AsyncPipe,
+  CurrencyPipe,
+  DecimalPipe,
+  JsonPipe,
+  LowerCasePipe,
+  PercentPipe,
+  SlicePipe,
+  UpperCasePipe,
+} from '@angular/common';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { GridColumnType, GridConfigType } from '@azlabsjs/ngx-clr-smart-grid';
 import { createPipeTransform } from '@azlabsjs/ngx-common';
@@ -9,6 +18,8 @@ import {
   FORM_CLIENT,
   ReactiveFormComponentInterface,
   uniqueValidator,
+  HTTP_REQUEST_CLIENT,
+  RequestClient,
 } from '@azlabsjs/ngx-smart-form';
 import {
   FileInput,
@@ -64,7 +75,16 @@ type ValuesType = typeof _values;
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  providers: [LowerCasePipe],
+  providers: [
+    UpperCasePipe,
+    LowerCasePipe,
+    CurrencyPipe,
+    DecimalPipe,
+    JsonPipe,
+    PercentPipe,
+    SlicePipe,
+    AsyncPipe,
+  ],
 })
 export class AppComponent implements OnInit {
   formControl = new FormControl<string | undefined>(undefined);
@@ -175,7 +195,7 @@ export class AppComponent implements OnInit {
   public constructor(
     @Inject(FORM_CLIENT) private client: FormsClient,
     private lowercasePipe: LowerCasePipe,
-    private injector: Injector
+    @Inject(HTTP_REQUEST_CLIENT) private httpClient: RequestClient
   ) {
     this.client
       .get(220)
@@ -207,7 +227,7 @@ export class AppComponent implements OnInit {
   onFormReadyState(event: FormConfigInterface) {
     setTimeout(() => {
       this.smartForm?.addAsyncValidator(
-        uniqueValidator(this.injector, {
+        uniqueValidator(this.httpClient, {
           query: 'user_details__email',
           fn: `http://127.0.0.1:3000/professions`,
           conditions: (_: unknown) => {
@@ -221,7 +241,7 @@ export class AppComponent implements OnInit {
     const timeout = setTimeout(() => {
       this.smartForm.setValue(this.fromState);
       clearTimeout(timeout);
-    }, 5000);
+    }, 3000);
   }
 
   afterChanges() {

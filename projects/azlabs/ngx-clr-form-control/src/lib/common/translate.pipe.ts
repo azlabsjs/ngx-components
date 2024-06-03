@@ -81,8 +81,9 @@ function createString(
 }
 
 @Pipe({
-  name: 'translate',
+  standalone: true,
   pure: false,
+  name: 'translate',
 })
 export class TranslatePipe implements PipeTransform {
   //

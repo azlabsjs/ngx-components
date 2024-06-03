@@ -15,9 +15,10 @@ export class IsHiddenPipe implements PipeTransform {
   //
   transform(value: InputConfigInterface) {
     return (
-      typeof value !== 'undefined' &&
-      value !== null &&
-      (Boolean(value.hidden) === true ?? value.type === InputTypes.HIDDEN_INPUT)
+      (typeof value !== 'undefined' &&
+        value !== null &&
+        Boolean(value.hidden) === true) ||
+      value?.type === InputTypes.HIDDEN_INPUT
     );
   }
 }
@@ -28,7 +29,6 @@ export class IsHiddenPipe implements PipeTransform {
   standalone: true,
 })
 export class HasChildrenPipe implements PipeTransform {
-  // Execute pipe transform logic
   transform(value: InputGroup) {
     return (
       typeof value !== 'undefined' &&

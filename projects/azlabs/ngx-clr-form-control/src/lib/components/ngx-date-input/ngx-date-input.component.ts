@@ -1,17 +1,22 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   ContentChild,
   Inject,
   Input,
   LOCALE_ID,
-  TemplateRef
+  TemplateRef,
 } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { DateInput } from '@azlabsjs/smart-form-core';
+import { NgxCommonModule } from '../../common';
 
 @Component({
+  standalone: true,
+  imports: [NgxCommonModule],
   selector: 'ngx-date-input',
   templateUrl: './ngx-date-input.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxDateInputComponent {
   // #region Component inputs
@@ -21,11 +26,7 @@ export class NgxDateInputComponent {
   // #endregion Component inputs
   @ContentChild('input') inputRef!: TemplateRef<any>;
 
-  /**
-   * Creates an instance of Date Input Component
-   * 
-   * @param locale 
-   */
+  /** @description Creates an instance of Date Input Component */
   constructor(@Inject(LOCALE_ID) private locale: string) {}
 
   // tslint:disable-next-line: typedef

@@ -1,8 +1,11 @@
 import { Component, Input, ContentChild, TemplateRef } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { TextAreaInput } from '@azlabsjs/smart-form-core';
+import { NgxCommonModule } from '../../common';
 
 @Component({
+  standalone: true,
+  imports: [NgxCommonModule],
   selector: 'ngx-textarea-input',
   templateUrl: './ngx-textarea-input.component.html',
   styles: [],

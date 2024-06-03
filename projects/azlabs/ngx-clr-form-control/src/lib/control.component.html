@@ -1,15 +1,15 @@
-<div class="ngx-form-control" *ngIf="formcontrol">
+<div class="ngx-form-control" *ngIf="formControl">
   <ng-container [ngSwitch]="inputConfig.type">
     <ng-container *ngSwitchCase="inputTypes.FILE_INPUT">
       <ngx-file-input (addedEvent)="fileAdded.emit($event)" (removedEvent)="fileRemoved.emit($event)"
-        [read]="(inputConfig | fileInput).read"
-        [describe]="describe" [autoupload]="(inputConfig | fileInput).autoupload ?? false"
-        [upload-as]="(inputConfig | fileInput).uploadAs" [placeholder]="inputConfig.placeholder"
-        [class]="inputConfig.classes" [multiple]="(inputConfig | fileInput).multiple"
-        [description]="(inputConfig | fileInput).description" [max-file-size]="(inputConfig | fileInput).maxFileSize"
-        [max-files]="50" [url]="(inputConfig | fileInput).uploadUrl"
-        [has-error]="formcontrol.hasError('required') && formcontrol.touched" (reset)="formcontrol.reset()"
-        (value)="formcontrol.setValue($event)" [required-error]="'validation.required' | translate" [file-size-error]="
+        [read]="(inputConfig | fileInput).read" [describe]="describe"
+        [autoupload]="(inputConfig | fileInput).autoupload ?? false" [upload-as]="(inputConfig | fileInput).uploadAs"
+        [placeholder]="inputConfig.placeholder" [class]="inputConfig.classes"
+        [multiple]="(inputConfig | fileInput).multiple" [description]="(inputConfig | fileInput).description"
+        [max-file-size]="(inputConfig | fileInput).maxFileSize" [max-files]="50"
+        [url]="(inputConfig | fileInput).uploadUrl"
+        [has-error]="formControl.hasError('required') && formControl.touched" (reset)="formControl.reset()"
+        (value)="formControl.setValue($event)" [required-error]="'validation.required' | translate" [file-size-error]="
           'fileSizeError'
             | translate
               : { maxFilesize: (inputConfig | fileInput).maxFileSize }
@@ -22,13 +22,13 @@
         </label>
       </ngx-file-input>
       <!-- Input errors -->
-      <ngx-input-error *ngIf="formcontrol.touched" [errors]="formcontrol.errors"></ngx-input-error>
+      <ngx-input-error *ngIf="formControl.touched" [errors]="formControl.errors"></ngx-input-error>
     </ng-container>
     <ng-container *ngSwitchCase="inputTypes.HTML_INPUT">
       <div [innerHTML]="inputConfig.value | trustHtml"></div>
     </ng-container>
     <ng-container *ngSwitchCase="inputTypes.SELECT_INPUT">
-      <ngx-select-input [control]="formcontrol" [inputConfig]="inputConfig | selectInput" [describe]="describe"
+      <ngx-select-input [control]="formControl" [inputConfig]="inputConfig | selectInput" [describe]="describe"
         (remove)="remove.emit($event)" (selected)="selected.emit($event)">
         <label class="clr-control-label" *ngIf="describe" [for]="inputConfig.name">
           {{ inputConfig.label }}
@@ -38,7 +38,7 @@
         </label>
       </ngx-select-input>
       <!-- Input errors -->
-      <ngx-input-error *ngIf="formcontrol.touched" [errors]="formcontrol.errors"></ngx-input-error>
+      <ngx-input-error *ngIf="formControl.touched" [errors]="formControl.errors"></ngx-input-error>
     </ng-container>
     <ng-container *ngSwitchCase="inputTypes.PHONE_INPUT">
       <div class="clr-control-container">
@@ -50,7 +50,7 @@
             </span>
           </label>
 
-          <ngx-phone-input [control]="formcontrol" [inputConfig]="inputConfig" [describe]="describe"
+          <ngx-phone-input [control]="formControl" [inputConfig]="inputConfig" [describe]="describe"
             [class]="'clr-input'" [countries]="preferredCountries">
             <ng-template #input let-config="config" let-onBlur="onBlur" let-onFocus="onFocus" let-keypress="keypress"
               let-selected="selected" let-change="change" let-required="required" let-disabled="disabled"
@@ -64,11 +64,11 @@
         </div>
       </div>
       <!-- Input errors -->
-      <ngx-input-error *ngIf="formcontrol.touched" [errors]="formcontrol.errors"></ngx-input-error>
+      <ngx-input-error *ngIf="formControl.touched" [errors]="formControl.errors"></ngx-input-error>
     </ng-container>
     <!-- Smart date Input -->
     <ng-container *ngSwitchCase="inputTypes.DATE_INPUT">
-      <ngx-date-input [control]="formcontrol" [inputConfig]="inputConfig | dateInput" [describe]="describe">
+      <ngx-date-input [control]="formControl" [inputConfig]="inputConfig | dateInput" [describe]="describe">
         <ng-template #input let-control="control" let-onBlur="onBlur" let-config="config">
           <clr-date-container>
             <label class="clr-control-label" *ngIf="describe" [for]="config.name">
@@ -88,7 +88,7 @@
     <!--\ Smart date Input -->
     <!-- Smart time input -->
     <ng-container *ngSwitchCase="inputTypes.TIME_INPUT">
-      <ngx-time-input [control]="formcontrol" [inputConfig]="inputConfig | timeInput" [describe]="describe">
+      <ngx-time-input [control]="formControl" [inputConfig]="inputConfig | timeInput" [describe]="describe">
         <ng-template #input let-max="max" let-config="config" let-control="control">
           <div class="clr-control-container">
             <div class="clr-input-wrapper">
@@ -113,7 +113,7 @@
     <!--\ Smart time Input -->
     <ng-container *ngSwitchCase="inputTypes.TEXTAREA_INPUT">
       <ng-container *ngIf="!inline; else textInput">
-        <ngx-textarea-input [control]="formcontrol" [inputConfig]="inputConfig | textAreaInput" [describe]="describe">
+        <ngx-textarea-input [control]="formControl" [inputConfig]="inputConfig | textAreaInput" [describe]="describe">
           <ng-template #input let-config="config" let-control="control">
             <div class="clr-form-control">
               <label class="clr-control-label" *ngIf="describe" [for]="config!.name">
@@ -139,7 +139,7 @@
       </ng-container>
     </ng-container>
     <ng-container *ngSwitchCase="inputTypes.NUMBER_INPUT">
-      <ngx-number-input [control]="formcontrol" [describe]="describe" [inputConfig]="inputConfig | numberInput">
+      <ngx-number-input [control]="formControl" [describe]="describe" [inputConfig]="inputConfig | numberInput">
         <ng-template #input let-max="max" let-config="config" let-control="control">
           <div class="clr-control-container">
             <div class="clr-input-wrapper">
@@ -162,7 +162,7 @@
       </ngx-number-input>
     </ng-container>
     <ng-container *ngSwitchCase="inputTypes.RADIO_INPUT">
-      <ngx-radio-input [control]="formcontrol" [inputConfig]="inputConfig | selectInput" [describe]="describe">
+      <ngx-radio-input [control]="formControl" [inputConfig]="inputConfig | selectInput" [describe]="describe">
         <ng-template #input let-options="options" let-config="config" let-control="control">
           <clr-radio-container clrInline>
             <label>
@@ -173,7 +173,7 @@
             </label>
             <clr-radio-wrapper *ngFor="let option of options">
               <input noAutoComplete placeholder="radio" [tabIndex]="config!.index" clrRadio type="radio" required
-                [checked]="control.value == option.value" [value]="radiovalue(config!.name, option?.value)"
+                [checked]="control.value == option.value" [value]="config!.name+ '_' + option?.value"
                 (change)="control!.setValue(option.value)" />
               <label>{{ option.description }}</label>
             </clr-radio-wrapper>
@@ -184,7 +184,7 @@
       </ngx-radio-input>
     </ng-container>
     <ng-container *ngSwitchCase="inputTypes.CHECKBOX_INPUT">
-      <ngx-checkbox-input [control]="formcontrol" [inputConfig]="inputConfig | selectInput" [describe]="describe">
+      <ngx-checkbox-input [control]="formControl" [inputConfig]="inputConfig | selectInput" [describe]="describe">
         <ng-template #input let-formgroup="formgroup" let-config="config" let-control="control">
           <clr-checkbox-container clrInline [formGroup]="formgroup">
             <label *ngIf="describe" [for]="config!.name">
@@ -194,7 +194,7 @@
               </span>
             </label>
             <clr-checkbox-wrapper *ngFor="
-                let item of formgroup.controls['options']!.controls;
+                let item of (formgroup.get('options')?.controls ?? []);
                 let index = index
               ">
               <input noAutoComplete placeholder="checkbox" [tabIndex]="config!.index" [id]="config!.name + '_' + index"
@@ -210,7 +210,7 @@
       </ngx-checkbox-input>
     </ng-container>
     <ng-container *ngSwitchCase="inputTypes.PASSWORD_INPUT">
-      <ngx-password-input [control]="formcontrol" [inputConfig]="inputConfig | textInput" [describe]="describe">
+      <ngx-password-input [control]="formControl" [inputConfig]="inputConfig | textInput" [describe]="describe">
         <ng-template #input let-state="state" let-control="control" let-config="config" let-toggle="toggle"
           let-defaultMaxLength="defaultMaxLength">
           <div class="clr-control-container">
@@ -246,7 +246,7 @@
           textInput;
           context: {
             config: inputConfig,
-            control: formcontrol
+            control: formControl
           }
         "></ng-container>
     </ng-container>

@@ -1,5 +1,5 @@
-<ng-container *ngIf="errors">
-    <ng-container *ngFor="let error of defaultErrors">
+<ng-container *ngIf="errors() as errors">
+    <ng-container *ngFor="let error of defaultErrors()">
         <ng-container *ngIf="errors[error] | defined">
             <ng-container
                 *ngTemplateOutlet="(errors[error] | isObject) ? objectRef : defaultRef; context: {$implicit: errors[error], error} ">
@@ -8,11 +8,13 @@
     </ng-container>
 </ng-container>
 
-<ng-container *ngIf="customErrors && customErrors.length > 0">
-    <!-- Custom Error -->
-    <ng-container *ngFor="let error of customErrors">
-        <ng-container *ngIf="error | defined">
-            <span>{{ error }}</span>
+<ng-container *ngIf="customErrors() as customErrors">
+    <ng-container *ngIf="customErrors && customErrors.length > 0">
+        <!-- Custom Error -->
+        <ng-container *ngFor="let error of customErrors">
+            <ng-container *ngIf="error | defined">
+                <span>{{ error }}</span>
+            </ng-container>
         </ng-container>
     </ng-container>
 </ng-container>

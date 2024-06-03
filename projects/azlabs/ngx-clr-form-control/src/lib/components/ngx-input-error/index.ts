@@ -1,1 +1,1 @@
-export { NgxInputErrorModule } from './ngx-input-error.module';
+export { NgxInputErrorComponent } from './ngx-input-error.component';

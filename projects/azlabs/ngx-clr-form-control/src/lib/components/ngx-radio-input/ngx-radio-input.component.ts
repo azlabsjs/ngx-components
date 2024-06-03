@@ -1,61 +1,61 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   ContentChild,
+  EventEmitter,
   Input,
-  OnDestroy,
-  OnInit,
-  TemplateRef
+  Output,
+  TemplateRef,
+  signal,
 } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import {
-  InputOptionsInterface,
-  OptionsInputConfigInterface
+  InputOptions,
+  OptionsInputConfigInterface,
 } from '@azlabsjs/smart-form-core';
-import { Subject } from 'rxjs';
+import { NgxCommonModule } from '../../common';
+import { OPTIONS_DIRECTIVES } from '@azlabsjs/ngx-options-input';
 
 @Component({
+  standalone: true,
+  imports: [NgxCommonModule, ...OPTIONS_DIRECTIVES],
   selector: 'ngx-radio-input',
   templateUrl: './ngx-radio-input.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxRadioInputComponent implements OnInit, OnDestroy {
+export class NgxRadioInputComponent {
   // #region Component input properties
   // tslint:disable-next-line: variable-name
   @Input() control!: AbstractControl;
   // tslint:disable-next-line: variable-name
-  @Input() inputConfig!: OptionsInputConfigInterface;
+  @Input({ alias: 'inputConfig' }) set setInputConfig(
+    value: OptionsInputConfigInterface
+  ) {
+    this.inputConfig.set(value);
+    this.loaded.set((value?.options ?? []).length !== 0);
+  }
   @Input() describe = true;
   // #endregion Component input properties
   @ContentChild('input') inputRef!: TemplateRef<any>;
 
+  //#region Component outputs
+  @Output() inputConfigChange = new EventEmitter<OptionsInputConfigInterface>();
+  //#endregion Component outputs
+
   // #region Component states
-  loaded: boolean = false;
-  private _destroy$ = new Subject<void>();
+  inputConfig = signal<OptionsInputConfigInterface | null>(null);
+  loaded = signal<boolean>(false);
   // #endregion Component states
 
-  /**
-   * Creates a Radio input
-   * 
-   * @param changes
-   */
-  constructor(private changes: ChangeDetectorRef) {}
-
-  //
-  ngOnInit(): void {
-    if (this.inputConfig && this.inputConfig.options) {
-      this.loaded = this.inputConfig.options.length !== 0;
+  onOptionsChange(options: InputOptions) {
+    this.inputConfig.update((v) => ({
+      ...(v ?? ({} as OptionsInputConfigInterface)),
+      options,
+    }));
+    this.loaded.set(true);
+    const inputConfig = this.inputConfig();
+    if (inputConfig) {
+      this.inputConfigChange.emit(inputConfig);
     }
-  }
-
-  onOptionsChange(state: InputOptionsInterface) {
-    this.inputConfig = { ...this.inputConfig, options: state };
-    this.loaded = true;
-    this.changes.detectChanges();
-  }
-
-  ngOnDestroy(): void {
-    this._destroy$.next();
   }
 }

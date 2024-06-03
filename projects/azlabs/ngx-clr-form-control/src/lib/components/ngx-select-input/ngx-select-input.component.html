@@ -1,12 +1,13 @@
-<ng-container *ngIf="state$ | async as vm">
+<ng-container *ngIf="state() as vm">
   <ng-content select="label"></ng-content>
-  <div #optionsRef fetchOptions [config]="inputConfig.optionsConfig" [loaded]="vm.loaded"
-    (optionsChange)="onOptionsChange($event)" (loadingChange)="onLoadingChange($event)" [name]="inputConfig.name">
-    <ng-select [class]="inputConfig.multiple ? '' : 'not-multiple'" [virtualScroll]="true" [items]="vm?.state ?? []"
-      [bindLabel]="'name'" [bindValue]="'value'" (focus)="onFocus()" [loading]="vm?.performingAction ?? false"
-      [loadingText]="'loadingText' | translate" [multiple]="inputConfig.multiple ?? false"
-      [placeholder]="inputConfig.placeholder ?? ''" [formControl]="control" [groupBy]="'type'" [clearable]="true"
-      (remove)="
+  <div *ngIf="vm.inputConfig as inputConfig" #optionsRef fetchOptions [config]="inputConfig.optionsConfig"
+    [loaded]="vm.loaded" (optionsChange)="onOptionsChange($event)" (loadingChange)="onLoadingChange($event)"
+    [name]="inputConfig.name">
+    <ng-select [class]="inputConfig.multiple ? '' : 'not-multiple'" [virtualScroll]="true"
+      [items]="inputConfig.options || []" [bindLabel]="'name'" [bindValue]="'value'" (focus)="onFocus()"
+      [loading]="vm?.performingAction ?? false" [loadingText]="'loadingText' | translate"
+      [multiple]="inputConfig.multiple ?? false" [placeholder]="inputConfig.placeholder ?? ''" [groupBy]="'type'"
+      [ngModel]="control.value" (ngModelChange)="onModelChange($event)" [clearable]="true" (remove)="
         remove.emit({
           name: inputConfig.name,
           event: $event
@@ -25,8 +26,7 @@
         </div>
       </ng-template>
     </ng-select>
+    <!-- Control description -->
+    <span *ngIf="describe" class="input__subtext" [innerHTML]="inputConfig.description || '' | trustHtml"></span>
   </div>
 </ng-container>
-
-<!-- Control description -->
-<span *ngIf="describe" class="input__subtext" [innerHTML]="inputConfig.description || '' | trustHtml"></span>

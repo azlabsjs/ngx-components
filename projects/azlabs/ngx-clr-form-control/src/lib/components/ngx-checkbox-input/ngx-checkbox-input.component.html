@@ -1,16 +1,17 @@
-<div fetchOptions (optionsChange)="onOptionsChange($event)" [loaded]="loaded" [config]="inputConfig.optionsConfig"
-  [name]="inputConfig.name">
-  <ng-container *ngIf="inputConfig.options!.length > 0">
-    <ng-container *ngTemplateOutlet="
+<ng-container *ngIf="inputConfig() as state">
+  <div fetchOptions (optionsChange)="onOptionsChange($event)" [loaded]="loaded()" [config]="state.optionsConfig"
+    [name]="state.name">
+    <ng-container *ngIf="state.options!.length > 0">
+      <ng-container *ngTemplateOutlet="
         inputRef;
         context: {
-          config: inputConfig,
-          formgroup,
-          options: inputConfig.options,
+          config: state,
+          formgroup: formGroup,
           control
         }
       "></ng-container>
-    <!-- Control description -->
-    <span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="inputConfig.description || '' | trustHtml"></span>
-  </ng-container>
-</div>
+      <!-- Control description -->
+      <span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="state.description || '' | trustHtml"></span>
+    </ng-container>
+  </div>
+</ng-container>

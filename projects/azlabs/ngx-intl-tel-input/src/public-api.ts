@@ -1,3 +1,5 @@
+import { NgxIntlTelInputComponent } from './lib/intl-tel-input.component';
+
 /*
  * Public API Surface of ngx-intl-tel-input
  */
@@ -13,3 +15,7 @@ export {
   providePreferredCountries,
   provideSupportedCountries,
 } from './lib/providers';
+
+
+/** Exported library directives */
+export const INTL_TEL_INPUT_DIRECTIVES = [NgxIntlTelInputComponent] as const;

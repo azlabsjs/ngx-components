@@ -7,6 +7,7 @@ import {
   Inject,
   Input,
   OnDestroy,
+  Optional,
   Output,
 } from '@angular/core';
 import {
@@ -30,11 +31,7 @@ type ObservationOptions = {
   threshold: number;
 };
 
-/** @description Creates a browser intersection observer instance
- *
- * @param callback
- * @param options
- */
+/** @description Creates a browser intersection observer instance */
 export function createIntersectionObserver(
   callback: IntersectionObserverCallback,
   options?: ObservationOptions | undefined
@@ -72,6 +69,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     @Inject(INPUT_OPTIONS_CLIENT) private client: InputOptionsClient,
     @Inject(DOCUMENT) private document: Document,
     @Inject(OPTIONS_CACHE)
+    @Optional()
     private cache: CacheType<Record<string, unknown>, InputOptions>
   ) {
     this._subscriptions.push(
@@ -192,7 +190,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     // Disconnect from the observer
-    this.observer.disconnect();
+    this.observer?.disconnect();
 
     for (const subscripton of this._subscriptions) {
       subscripton.unsubscribe();

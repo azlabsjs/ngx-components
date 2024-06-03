@@ -5,6 +5,8 @@ import {
 } from '@azlabsjs/smart-form-core';
 
 @Pipe({
+  standalone: true,
+  pure: true,
   name: 'timeInput',
 })
 export class TimeInputPipe implements PipeTransform {

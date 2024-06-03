@@ -1,11 +1,13 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
+  standalone: true,
+  pure: true,
   name: 'join',
 })
 export class JoinPipe implements PipeTransform {
   /**
-   * Join the list of using the provided character.
+   * @description Join the list of using the provided character.
    *
    * **Note** By default it uses the `,` to join the elements
    */

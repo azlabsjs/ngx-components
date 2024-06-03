@@ -57,6 +57,14 @@ export {
   HTTP_REQUEST_CLIENT,
 } from './tokens';
 
+/* Exported library providers */
+export {
+  provideFormsLoader,
+  provideFormsHost,
+  provideFormsInitialization,
+  provideHttpClient,
+} from './providers';
+
 /** Exported library directives */
 export const FORM_DIRECTIVES = [
   NgxSmartFormComponent,

@@ -1,4 +1,4 @@
-<!-- <div class="container">
+<div class="container">
   <h4>Ngx Common</h4>
   <p *ngIf="230|transform:['httpValue:http://localhost:3000/professions;label']|pipeResult as result">
     <ng-container *ngIf="result.value | isAsync; else defaultRef">
@@ -9,9 +9,9 @@
     </ng-template>
   </p>
 </div>
-<div class="container">
+<!-- <div class="container">
   <app-form-control></app-form-control>
-</div>
+</div> -->
 <div class="container">
   <h3>Form Group</h3>
   <ng-container *ngIf="state$ | async as form">
@@ -30,7 +30,7 @@
       </ng-template>
     </ngx-smart-form>
   </ng-container>
-</div> -->
+</div>
 <div class="container">
   <h3>Data Grid</h3>
   <ngx-clr-smart-grid (dgItemClick)="ondgItemClick($event)" [columns]="columns" [placeholder]="placeholder"

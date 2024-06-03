@@ -1,6 +1,4 @@
-/**
- * Default template text to use when tranlating
- */
+/** @description Default template text to use when tranlating */
 export const defaultStrings = {
   loadingText: 'Loading...',
   uploadFileLabel: 'to upload',

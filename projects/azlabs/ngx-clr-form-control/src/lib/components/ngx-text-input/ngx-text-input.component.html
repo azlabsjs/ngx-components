@@ -1,6 +1,6 @@
 <ng-container *ngTemplateOutlet="
     inputRef;
-    context: { maxLength: maxNumberSize(), config: inputConfig, control }
+    context: { maxLength: (Mt.pow(2, 31) - 1), config: inputConfig, control }
   "></ng-container>
 
 <!-- Control description -->

@@ -1,12 +1,20 @@
-import { Component, Input, ContentChild, TemplateRef } from '@angular/core';
+import {
+  Component,
+  Input,
+  ContentChild,
+  TemplateRef,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { AbstractControl } from '@angular/forms';
-import { getObjectProperty } from '@azlabsjs/js-object';
 import { NumberInput } from '@azlabsjs/smart-form-core';
+import { NgxCommonModule } from '../../common';
 
 @Component({
+  standalone: true,
+  imports: [NgxCommonModule],
   selector: 'ngx-number-input',
   templateUrl: './ngx-number-input.component.html',
-  styles: [],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxNumberInputComponent {
   //#region Component inputs
@@ -14,15 +22,6 @@ export class NgxNumberInputComponent {
   @Input() describe = true;
   @Input() inputConfig!: NumberInput;
   @ContentChild('input') inputRef!: TemplateRef<any>;
+  Mt = Math;
   //#endregion Component inputs
-
-  maxNumberSize(): number {
-    return Math.pow(2, 31) - 1;
-  }
-
-  getErrorAsNumber(value?: object | number, key?: string): number | string {
-    return typeof value === 'number'
-      ? value
-      : getObjectProperty(value, key || '');
-  }
 }

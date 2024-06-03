@@ -5,6 +5,8 @@ import {
 } from '@azlabsjs/smart-form-core';
 
 @Pipe({
+  standalone: true,
+  pure: true,
   name: 'textInput',
 })
 export class TextInputPipe implements PipeTransform {

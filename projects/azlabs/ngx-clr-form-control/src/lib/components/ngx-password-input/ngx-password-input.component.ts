@@ -1,13 +1,18 @@
 import {
-  ChangeDetectionStrategy, Component, ContentChild, Input, TemplateRef
+  ChangeDetectionStrategy,
+  Component,
+  ContentChild,
+  Input,
+  TemplateRef,
+  signal,
 } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
-import { getObjectProperty } from '@azlabsjs/js-object';
 import { TextInput } from '@azlabsjs/smart-form-core';
-import { BehaviorSubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { NgxCommonModule } from '../../common';
 
 @Component({
+  standalone: true,
+  imports: [NgxCommonModule],
   selector: 'ngx-password-input',
   templateUrl: './ngx-password-input.component.html',
   styles: [],
@@ -21,24 +26,12 @@ export class NgxPasswordInputComponent {
   @ContentChild('input') inputRef!: TemplateRef<any>;
 
   // tslint:disable-next-line: variable-name
-  private _showPassword = new BehaviorSubject(false);
-  get state$() {
-    return this._showPassword
-      .asObservable()
-      .pipe(map((state) => ({ showPassword: state })));
-  }
+  Mt = Math;
+  showPassword = signal({ showPassword: false });
 
   public toggle() {
-    this._showPassword.next(!this._showPassword.getValue());
-  }
-
-  maxNumberSize() {
-    return Math.pow(2, 31) - 1;
-  }
-
-  getErrorAsNumber(value: object | number, key?: string) {
-    return typeof value === 'number'
-      ? value
-      : getObjectProperty(value, key || '');
+    this.showPassword.update(({ showPassword }) => ({
+      showPassword: !showPassword,
+    }));
   }
 }

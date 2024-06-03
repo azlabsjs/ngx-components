@@ -3,34 +3,59 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
+  HostListener,
   Input,
   OnDestroy,
   OnInit,
   Output,
 } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  FormControl,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
 import { Subscription } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { InputEventArgs } from './types';
+import { FILE_INPUT_DIRECTIVES } from '@azlabsjs/ngx-file-input';
+import { NgxCommonModule } from './common';
+import { DIRECTIVES } from './components';
+import { ClarityModule } from '@clr/angular';
+import { ClarityIcons, eyeHideIcon, eyeIcon } from '@cds/core/icon';
+
+// Register clarity eye icons
+ClarityIcons.addIcons(eyeHideIcon, eyeIcon);
 
 @Component({
+  standalone: true,
+  imports: [
+    NgxCommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    ...DIRECTIVES,
+    ...FILE_INPUT_DIRECTIVES,
+    ClarityModule,
+  ],
   selector: 'ngx-clr-form-control',
-  templateUrl: './ngx-form-control.component.html',
-  styleUrls: ['./ngx-form-control.component.css'],
+  templateUrl: './control.component.html',
+  styleUrls: ['./control.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxFormControlComponent implements OnDestroy, OnInit {
+export class NgxFormControlComponent
+  implements OnDestroy, OnInit, ControlValueAccessor
+{
   // Component properties
   inputTypes = InputTypes;
 
   //#region Component inputs
-  @Input() class: string = 'clr-form-control';
-  @Input() inline: boolean = false;
+  @Input() inline = false;
   @Input() describe = true;
+  @Input() class = 'clr-form-control';
   @Input() inputConfig!: InputConfigInterface;
-  @Input('control') formcontrol!: FormControl<any>;
-  @Input('countries') preferredCountries!: string[];
+  @Input({ alias: 'control' }) formControl!: FormControl<any>;
+  @Input({ alias: 'countries' }) preferredCountries!: string[];
   //#endregion Component inputs
 
   //#region Component outputs
@@ -49,50 +74,65 @@ export class NgxFormControlComponent implements OnDestroy, OnInit {
 
   //#region Class properties
   private subscriptions: Subscription[] = [];
+  private _onTouched!: (...args: unknown[]) => void;
+  private _onChanged!: (value: unknown) => void;
   //#endregion Class properties
 
-  /**
-   * Creates an instance of Form Control Component
-   *
-   * @param changes
-   */
+  @HostListener('blur', ['$event']) hosBlured(event: Event) {
+    if (this._onTouched) {
+      this._onTouched(event);
+    }
+  }
+
+  /** @description Creates an instance of Form Control Component */
   constructor(private changes: ChangeDetectorRef) {}
+
+  writeValue(value: any): void {
+    this.formControl?.setValue(value);
+  }
+
+  registerOnChange(fn: (value: unknown) => void): void {
+    this._onChanged = fn.bind(this);
+  }
+
+  registerOnTouched(fn: () => void): void {
+    this._onTouched = fn.bind(this);
+  }
+
+  setDisabledState?(isDisabled: boolean): void {
+    isDisabled
+      ? this.formControl?.disable({ onlySelf: true })
+      : this.formControl?.enable({ onlySelf: true });
+  }
 
   ngOnInit() {
     this.subscriptions.push(
-      this.formcontrol.valueChanges
+      // Trigger change detection whenever control value changes
+      this.formControl.valueChanges
         .pipe(
           map((source) => ({ name: this.inputConfig.name, value: source })),
           tap((event) => {
             this.valueChange.emit(event);
-            // Trigger a change detection to insure update the UI component
+            if (this._onChanged) {
+              this._onChanged(event);
+            }
             this.changes.markForCheck();
           })
         )
         .subscribe(),
-      this.formcontrol.statusChanges.subscribe(() =>
+
+      // Mark the component as dirty whenever control status changes
+      this.formControl.statusChanges.subscribe(() =>
         this.changes.markForCheck()
       )
     );
   }
 
-  updateinlineclass(inputConfig: InputConfigInterface) {
-    return {
-      ...inputConfig,
-      classes: this.inline
-        ? inputConfig.classes?.includes('clr-textarea')
-          ? inputConfig.classes?.replace('textarea', 'input')
-          : `${inputConfig?.classes}`
-        : inputConfig?.classes,
-    };
-  }
-
-  radiovalue(name: string, value: string) {
-    return `${name}_${value}`;
-  }
-
   onBlur(event: Event, name: string) {
     this.blur.emit({ name, value: event });
+    if (this._onTouched) {
+      this._onTouched();
+    }
   }
 
   onKeyPress(event: Event, name: string) {

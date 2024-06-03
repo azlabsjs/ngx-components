@@ -1,4 +1,5 @@
 <!-- Main Template -->
+<pre>{{ formGroup?.getRawValue()| json }}</pre>
 <ng-container *ngIf="formGroup">
   <!-- before controls-->
   <ng-content select="[before]"></ng-content>
@@ -41,7 +42,7 @@
           <div [innerHTML]="value.label | ngxGroupHeader | safeHtml"></div>
           <!-- REPEATABLE INPUTS GROUP -->
           <ng-container *ngIf="value | repeatable">
-            <ngx-smart-form-array [no-grid-layout]="noGridLayout" *ngIf="group?.get(value.name)"
+            <ngx-smart-form-array [header]="value.label | ngxGroupHeader | safeHtml" [no-grid-layout]="noGridLayout" *ngIf="group?.get(value.name)"
               [formArray]="group?.get(value.name)" [controls]="value.children || []" [template]="template"
               [addGroupRef]="addTemplate" [name]="value.name" [autoupload]="autoupload">
             </ngx-smart-form-array>
