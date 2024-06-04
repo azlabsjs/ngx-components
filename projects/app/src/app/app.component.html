@@ -1,4 +1,3 @@
-<input type="file" />
 <div class="container">
   <h4>Ngx Common</h4>
   <p *ngIf="230|transform:['httpValue:http://localhost:3000/professions;label']|pipeResult as result">
@@ -13,7 +12,7 @@
 <div class="container">
   <app-form-control></app-form-control>
 </div>
-<!-- <div class="container">
+<div class="container">
   <h3>Form Group</h3>
   <ng-container *ngIf="state$ | async as form">
     <ngx-smart-form #smartform [no-grid-layout]="false" (ready)="onFormReadyState(form)" (changes)="afterChanges()"
@@ -38,4 +37,4 @@
   <ngx-clr-smart-grid (dgItemClick)="ondgItemClick($event)" [columns]="columns" [placeholder]="placeholder"
     [pageResult]="(pageResult$ | async)" (dgRefresh)="onDgRefresh($event)" (selectedChange)="onSelectedChanges($event)"
     [config]="gridConfig"></ngx-clr-smart-grid>
-</div> -->
+</div>
