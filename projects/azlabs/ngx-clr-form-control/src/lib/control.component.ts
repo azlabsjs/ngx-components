@@ -3,14 +3,12 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
-  HostListener,
   Input,
   OnDestroy,
   OnInit,
   Output,
 } from '@angular/core';
 import {
-  ControlValueAccessor,
   FormControl,
   FormsModule,
   ReactiveFormsModule,
@@ -43,9 +41,8 @@ ClarityIcons.addIcons(eyeHideIcon, eyeIcon);
   styleUrls: ['./control.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxFormControlComponent
-  implements OnDestroy, OnInit, ControlValueAccessor
-{
+// ControlValueAccessor
+export class NgxFormControlComponent implements OnDestroy, OnInit {
   // Component properties
   inputTypes = InputTypes;
 
@@ -74,36 +71,10 @@ export class NgxFormControlComponent
 
   //#region Class properties
   private subscriptions: Subscription[] = [];
-  private _onTouched!: (...args: unknown[]) => void;
-  private _onChanged!: (value: unknown) => void;
   //#endregion Class properties
 
-  @HostListener('blur', ['$event']) hosBlured(event: Event) {
-    if (this._onTouched) {
-      this._onTouched(event);
-    }
-  }
-
   /** @description Creates an instance of Form Control Component */
-  constructor(private changes: ChangeDetectorRef) {}
-
-  writeValue(value: any): void {
-    this.formControl?.setValue(value);
-  }
-
-  registerOnChange(fn: (value: unknown) => void): void {
-    this._onChanged = fn.bind(this);
-  }
-
-  registerOnTouched(fn: () => void): void {
-    this._onTouched = fn.bind(this);
-  }
-
-  setDisabledState?(isDisabled: boolean): void {
-    isDisabled
-      ? this.formControl?.disable({ onlySelf: true })
-      : this.formControl?.enable({ onlySelf: true });
-  }
+  constructor(private cdRef: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.subscriptions.push(
@@ -113,26 +84,18 @@ export class NgxFormControlComponent
           map((source) => ({ name: this.inputConfig.name, value: source })),
           tap((event) => {
             this.valueChange.emit(event);
-            if (this._onChanged) {
-              this._onChanged(event);
-            }
-            this.changes.markForCheck();
+            this.cdRef?.markForCheck();
           })
         )
         .subscribe(),
 
       // Mark the component as dirty whenever control status changes
-      this.formControl.statusChanges.subscribe(() =>
-        this.changes.markForCheck()
-      )
+      this.formControl.statusChanges.subscribe(() => this.cdRef?.markForCheck())
     );
   }
 
   onBlur(event: Event, name: string) {
     this.blur.emit({ name, value: event });
-    if (this._onTouched) {
-      this._onTouched();
-    }
   }
 
   onKeyPress(event: Event, name: string) {

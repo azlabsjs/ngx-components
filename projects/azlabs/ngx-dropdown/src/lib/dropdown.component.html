@@ -4,7 +4,7 @@
       class="ngx-azl-dropdown-header" #dropdownHeader>
       <ng-container *ngTemplateOutlet="dropdownToggleRef ?? defaultDdHeader"></ng-container>
     </a>
-    <div class="ngx-azl-dropdown-menu" [ngClass]="state.menuClass">
+    <div class="ngx-azl-dropdown-menu" [ngClass]="state.menuClass" #dropdownMenu>
       <ng-content></ng-content>
     </div>
   </div>

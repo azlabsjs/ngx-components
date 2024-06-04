@@ -169,7 +169,6 @@ export class NgxSmartFormComponent
   //
 
   setValue(state: { [k: string]: unknown }): void {
-    console.log('Setting form value: ', state);
     // Set or update the form state of the current component
     const { controlConfigs } = this._form;
     setFormValue(this.builder, this._formGroup, state, controlConfigs ?? []);

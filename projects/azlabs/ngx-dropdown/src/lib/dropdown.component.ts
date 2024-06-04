@@ -1,6 +1,6 @@
 import { CommonModule, DOCUMENT } from '@angular/common';
 import {
-  AfterViewInit,
+  AfterContentInit,
   ChangeDetectorRef,
   Component,
   ContentChild,
@@ -9,6 +9,7 @@ import {
   Input,
   OnChanges,
   OnDestroy,
+  OnInit,
   Optional,
   SimpleChanges,
   TemplateRef,
@@ -31,7 +32,9 @@ type StateType = {
   templateUrl: './dropdown.component.html',
   styleUrls: ['./dropdown.component.scss'],
 })
-export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
+export class DropdownComponent
+  implements OnDestroy, OnChanges, AfterContentInit
+{
   @Input() orientation: Orientation = 'right';
   @Input() animation: Animation = 'scaleY';
   @Input() text!: string;
@@ -41,7 +44,9 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
 
   // #region component view children
   @ViewChild('dropdownHeader', { static: false })
-  dropdownHeaderRef!: ElementRef<HTMLElement>;
+  headerRef!: ElementRef<HTMLElement>;
+  @ViewChild('dropdownMenu', { static: false })
+  dropdownMenuRef!: ElementRef<HTMLElement>;
   @ContentChild('dropdownToggle') dropdownToggleRef!: TemplateRef<any>;
   // #endregion component view children
 
@@ -53,7 +58,7 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
   get state() {
     return this._state;
   }
-  private defaultView!: Window;
+  private defaultView!: Window | null;
 
   /** @description Creates component instances */
   constructor(
@@ -61,10 +66,15 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
     @Inject(DOCUMENT) @Optional() document?: Document
   ) {
     const { defaultView } = document ?? ({} as Document);
-    if (defaultView) {
-      this.defaultView = defaultView;
-    }
+    this.defaultView = defaultView;
   }
+  ngAfterContentInit(): void {
+    this.defaultView?.addEventListener(
+      'click',
+      this.handleClickEvent.bind(this)
+    );
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (
       'orientation' in changes ||
@@ -84,13 +94,6 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
         ),
       }));
     }
-  }
-
-  ngAfterViewInit(): void {
-    this.defaultView?.addEventListener(
-      'click',
-      this.onDefaultViewClick.bind(this)
-    );
   }
 
   onToggleDropdown(e: Event) {
@@ -114,28 +117,23 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
   ngOnDestroy(): void {
     this.defaultView?.removeEventListener(
       'click',
-      this.onDefaultViewClick.bind(this)
+      this.handleClickEvent.bind(this)
     );
   }
 
-  private onDefaultViewClick(e: MouseEvent) {
+  private handleClickEvent(e: MouseEvent) {
     const { active } = this._state;
-    if (this.dropdownHeaderRef?.nativeElement) {
-      const {
-        left: x,
-        top: y,
-        width,
-        height,
-      } = this.dropdownHeaderRef?.nativeElement.getBoundingClientRect();
+    const { dropdownMenuRef } = this;
+    if (dropdownMenuRef.nativeElement) {
+      const { nativeElement } = dropdownMenuRef;
+      const { x, y, width, height } = nativeElement.getBoundingClientRect();
       const { clientX, clientY } = e;
       if (
-        !(
-          clientX >= x &&
-          clientX <= x + width &&
-          clientY >= y &&
-          clientY <= y + height
-        ) &&
-        active === true
+        clientX >= x &&
+        clientX <= x + width &&
+        clientY >= y &&
+        clientY <= y + height &&
+        active
       ) {
         this.setState((state) => ({
           ...state,
@@ -150,8 +148,6 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
         }));
       }
     }
-    e.preventDefault();
-    e.stopPropagation();
   }
 
   /** @description update component state and notify ui of state changes */

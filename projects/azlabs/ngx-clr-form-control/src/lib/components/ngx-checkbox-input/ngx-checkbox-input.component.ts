@@ -93,7 +93,6 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
       .pipe(
         distinctUntilChanged(),
         tap((v) => {
-          console.log('Setting state...', v);
           this.setState((state) => ({
             ...state,
             selection: v.map((i: unknown) => ({ value: i, checked: true })),
@@ -146,7 +145,6 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
 
   private setState(state: (s: StateType) => StateType) {
     this._state = state(this._state);
-    console.log('Checkbox state', this._state);
     this.changes.markForCheck();
   }
 }

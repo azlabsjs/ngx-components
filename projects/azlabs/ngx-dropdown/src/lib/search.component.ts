@@ -53,7 +53,8 @@ export class DropdownSearchComponent {
     }
     this.setState((state) => ({ ...state, value }));
     this.dispatchValueChange();
-    event?.stopPropagation();
+    event?.preventDefault();
+    event?.stopPropagation()
   }
 
   onSearchClick(event?: Event) {

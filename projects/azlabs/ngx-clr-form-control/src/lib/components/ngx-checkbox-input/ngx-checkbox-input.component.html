@@ -11,7 +11,7 @@
         </ng-container>
       </div>
     </div>
-    <!-- Control description -->
     <span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="state.config.description || '' | trustHtml"></span>
+    <ng-content></ng-content>
   </ng-container>
 </div>

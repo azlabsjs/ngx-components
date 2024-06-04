@@ -119,8 +119,6 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
   setState(state: SetStateParam<StateType>) {
     this._state = state(this._state);
     this.cdRef?.markForCheck();
-    // TODO: Uncomment the code below to use latest API instead
-    // this.state.update(state);
   }
 
   ngOnDestroy(): void {

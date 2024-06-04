@@ -166,11 +166,13 @@ export function setHiddenPropertyFactory(
     inputs = Array.isArray(inputs) ? [...inputs] : [];
     function setProperty(_inputs: InputConfigInterface[], n: string) {
       for (const i of _inputs) {
-        // In case the input has children and `b.key` contains `.` character
-        // we whish to update the child property of the child
         if (
           (i as InputGroup).children?.length > 0 &&
+          // we perform recursive call only if `n` contains `.`
           n.indexOf('.') !== -1 &&
+          // we perform recusive call only if n starts with input property name
+          n.substring(0, i.name.length) === i.name &&
+          // and we perform recursive call only of `n` is not equals to input property name
           n !== i.name
         ) {
           // Continue trimming the binding key until we read the last property name
@@ -211,7 +213,6 @@ export function setHiddenPropertyFactory(
     setProperty(inputs, b.key);
 
     // Return the updated g and input properties
-    console.log('updated inputs: ', inputs);
     return [g, inputs] as [FormGroup, InputConfigInterface[]];
   };
 }

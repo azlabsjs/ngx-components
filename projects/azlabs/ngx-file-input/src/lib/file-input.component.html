@@ -21,13 +21,9 @@
       <span class="tooltip-content error"> {{ fileUploadError }} </span>
     </a>
   </div>
+  <span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="description ?? '' | safeHtml"></span>
   <!-- Large files errors -->
   <span [class]="'input__subtext input__error_text'" *ngIf="state.tooLargeFiles.length > 0">
     {{ fileSizeError }}
   </span>
-  <!--\ Large files errors -->
-  <span [class]="'input__subtext input__error_text'" *ngIf="hasError">
-    {{ requiredError }}
-  </span>
-  <span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="description ?? '' | safeHtml"></span>
 </ng-container>

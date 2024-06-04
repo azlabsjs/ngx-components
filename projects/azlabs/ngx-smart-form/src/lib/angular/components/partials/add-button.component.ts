@@ -35,7 +35,7 @@ import {
         height: 32px;
         background: #0072a3;
         box-shadow: 1px 1px 1px rgb(114, 110, 110);
-        display: flex;
+        display: inline-flex;
         justify-content: center;
         align-items: center;
         border-radius: 50%;

@@ -139,10 +139,6 @@ export class NgxSmartFormArrayComponent
     @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
     private builder: AngularReactiveFormBuilderBridge
   ) {
-    // TODO: Remove the commented code after testing implementation
-    // effect(() => {
-    //   console.log(`Reference count value: ${this.refCount()}`);
-    // });
   }
 
   ngAfterViewInit(): void {

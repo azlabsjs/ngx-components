@@ -1,27 +1,24 @@
 <div class="ngx-form-control" *ngIf="formControl">
   <ng-container [ngSwitch]="inputConfig.type">
     <ng-container *ngSwitchCase="inputTypes.FILE_INPUT">
-      <ngx-file-input (addedEvent)="fileAdded.emit($event)" (removedEvent)="fileRemoved.emit($event)"
-        [read]="(inputConfig | fileInput).read" [describe]="describe"
-        [autoupload]="(inputConfig | fileInput).autoupload ?? false" [upload-as]="(inputConfig | fileInput).uploadAs"
-        [placeholder]="inputConfig.placeholder" [class]="inputConfig.classes"
-        [multiple]="(inputConfig | fileInput).multiple" [description]="(inputConfig | fileInput).description"
-        [max-file-size]="(inputConfig | fileInput).maxFileSize" [max-files]="50"
-        [url]="(inputConfig | fileInput).uploadUrl"
-        [has-error]="formControl.hasError('required') && formControl.touched" (reset)="formControl.reset()"
-        (value)="formControl.setValue($event)" [required-error]="'validation.required' | translate" [file-size-error]="
-          'fileSizeError'
-            | translate
-              : { maxFilesize: (inputConfig | fileInput).maxFileSize }
-        " [file-upload-error]="'fileUploadError' | translate">
-        <label class="clr-control-label" *ngIf="describe" [for]="inputConfig.name">
-          {{ inputConfig.label }}
-          <small class="required-text" *ngIf="inputConfig.rules?.isRequired">
-            (*)
-          </small>
-        </label>
-      </ngx-file-input>
-      <!-- Input errors -->
+      <ng-container *ngIf="inputConfig | fileInput  as config">
+        <ngx-file-input (addedEvent)="fileAdded.emit($event)" (removedEvent)="fileRemoved.emit($event)"
+          [read]="config.read" [describe]="describe" [autoupload]="config.autoupload ?? false"
+          [upload-as]="config.uploadAs" [placeholder]="config.placeholder" [class]="config.classes"
+          [multiple]="config.multiple" [description]="config.description" [max-file-size]="config.maxFileSize"
+          [max-files]="50" [url]="config.uploadUrl"
+          [has-error]="formControl.hasError('required') && formControl.touched" (reset)="formControl.reset()"
+          (value)="formControl.setValue($event)" [required-error]="'validation.required' | translate" [file-size-error]="
+          'fileSizeError'| translate: { maxFilesize: config.maxFileSize }"
+          [file-upload-error]="'fileUploadError' | translate">
+          <label class="clr-control-label" *ngIf="describe" [for]="config.name">
+            {{ config.label }}
+            <small class="required-text" *ngIf="config.rules?.isRequired">
+              (*)
+            </small>
+          </label>
+        </ngx-file-input>
+      </ng-container>
       <ngx-input-error *ngIf="formControl.touched" [errors]="formControl.errors"></ngx-input-error>
     </ng-container>
     <ng-container *ngSwitchCase="inputTypes.HTML_INPUT">
@@ -37,7 +34,6 @@
           </small>
         </label>
       </ngx-select-input>
-      <!-- Input errors -->
       <ngx-input-error *ngIf="formControl.touched" [errors]="formControl.errors"></ngx-input-error>
     </ng-container>
     <ng-container *ngSwitchCase="inputTypes.PHONE_INPUT">
@@ -63,7 +59,6 @@
           </ngx-phone-input>
         </div>
       </div>
-      <!-- Input errors -->
       <ngx-input-error *ngIf="formControl.touched" [errors]="formControl.errors"></ngx-input-error>
     </ng-container>
     <!-- Smart date Input -->
@@ -185,54 +180,7 @@
     </ng-container>
     <ng-container *ngSwitchCase="inputTypes.CHECKBOX_INPUT">
       <ngx-checkbox-input [control]="formControl" [inputConfig]="inputConfig | selectInput" [describe]="describe">
-        <ng-template #input let-formgroup="formgroup" let-config="config" let-control="control">
-          <!-- <div class="clr-form-control">
-            <label class="clr-control-label">
-              {{ config!.label }}
-              <span class="required-text" *ngIf="config?.rules?.isRequired">
-                (*)</span>
-            </label>
-            <div class="clr-control-container clr-control-inline"
-              [class.clr-error]="control.touched && control.hasError('required')">
-              <div class="clr-checkbox-wrapper" *ngFor="
-              let item of (formgroup.get('options')?.controls ?? []);
-              let index = index
-            ">
-                <input [id]="config.name + '-' + index" placeholder="checkbox" [tabIndex]="config!.index"
-                  type="checkbox" class="clr-checkbox" [formControl]="item"/>
-                <label [for]="config.name + '-' + index" class="clr-control-label">
-                  {{ config!.options[index]!.description }}
-                </label>
-              </div>
-            </div>
-          </div> -->
-          <input [style]="'display: block;'" *ngFor="
-          let item of (formgroup.get('options')?.controls ?? []);
-          let index = index
-        " noAutoComplete [name]="index" [attr.id]="config.name + '-' + index" placeholder="checkbox"
-            [tabIndex]="config.index" type="checkbox" [value]="config.options[index]!.value" [formControl]="item" />
-          <!-- <clr-checkbox-container clrInline [formGroup]="formgroup">
-            <label *ngIf="describe" [for]="config!.name">
-              {{ config!.label }}
-              <span class="required-text" *ngIf="config?.rules?.isRequired">
-                (*)
-              </span>
-            </label>
-            <clr-checkbox-wrapper *ngFor="
-                let item of (formgroup.get('options')?.controls ?? []);
-                let index = index
-              ">
-              <input noAutoComplete [name]="index" [id]="config.name + '-' + index" placeholder="checkbox"
-                [tabIndex]="config!.index" type="checkbox" [value]="config!.options[index]!.value" clrCheckbox
-                [formControl]="item" />
-              <labe [for]="config.name + '-' + index" l>
-                {{ config!.options[index]!.description }}
-                </label>
-            </clr-checkbox-wrapper>
-          </clr-checkbox-container> -->
-          <!-- Input errors -->
-          <ngx-input-error *ngIf="control.touched" [errors]="control.errors"></ngx-input-error>
-        </ng-template>
+        <ngx-input-error *ngIf="formControl.touched" [errors]="formControl.errors"></ngx-input-error>
       </ngx-checkbox-input>
     </ng-container>
     <ng-container *ngSwitchCase="inputTypes.PASSWORD_INPUT">

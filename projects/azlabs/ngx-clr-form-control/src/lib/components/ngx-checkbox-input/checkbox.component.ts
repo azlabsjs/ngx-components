@@ -6,9 +6,7 @@ import {
   HostListener,
   Input,
   Output,
-  forwardRef,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ClarityModule } from '@clr/angular';
 
 @Component({
@@ -29,16 +27,9 @@ import { ClarityModule } from '@clr/angular';
     </div>
   `,
   //   styleUrls: ['./checkbox.component.scss'],
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => CheckboxComponent),
-      multi: true,
-    },
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CheckboxComponent implements ControlValueAccessor {
+export class CheckboxComponent {
   //#region Component inputs
   @Input() text!: string | undefined;
   @Input() disabled = false;
@@ -58,25 +49,7 @@ export class CheckboxComponent implements ControlValueAccessor {
     e?.preventDefault();
   }
 
-  writeValue(obj: boolean): void {
-    console.log('Writing value....', obj);
-    this.isChecked = obj;
-  }
-
-  registerOnChange(fn: (...args: any) => void): void {
-    this._onChange = fn;
-  }
-
-  registerOnTouched(fn: (...args: any) => void): void {
-    this.onBlur = fn;
-  }
-
-  setDisabledState?(disabled: boolean): void {
-    this.disabled = disabled;
-  }
-
   onChanged(e: Event) {
     this.isChecked = e && e.target && (e.target as any).checked;
-    this._onChange(this.isChecked);
   }
 }

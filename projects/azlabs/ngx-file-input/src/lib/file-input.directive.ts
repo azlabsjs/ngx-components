@@ -106,11 +106,7 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
     }
   }
 
-  /**
-   * File change listener
-   *
-   * @param event
-   */
+  /** @description File change listener */
   private onChangeListener(event: Event) {
     const _event = event as unknown as EventType<HTMLInputElement>;
     if (_event.target && _event.target.value === '') {
