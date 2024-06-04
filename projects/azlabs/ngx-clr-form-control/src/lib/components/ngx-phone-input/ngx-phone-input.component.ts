@@ -9,7 +9,6 @@ import {
   OnDestroy,
   Output,
   TemplateRef,
-  signal,
 } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
@@ -49,15 +48,22 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
   //#endregion Component event emitter
 
   // #region Component state
-  state = signal<StateType>({
+  _state: StateType = {
     disabled: false,
     value: undefined as string | undefined,
-  });
+  };
+  get state() {
+    return this._state;
+  }
   // #endregion Component state
 
   //#region Class properties
   private subscriptions: Subscription[] = [];
   //#endregion Class properties
+
+
+  /** @description Phone input component class constructor */
+  constructor(private cdRef: ChangeDetectorRef) {}
 
 
   onBlur(event: FocusEvent) {
@@ -111,7 +117,10 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
   }
 
   setState(state: SetStateParam<StateType>) {
-    this.state.update(state);
+    this._state = state(this._state);
+    this.cdRef?.markForCheck();
+    // TODO: Uncomment the code below to use latest API instead
+    // this.state.update(state);
   }
 
   ngOnDestroy(): void {

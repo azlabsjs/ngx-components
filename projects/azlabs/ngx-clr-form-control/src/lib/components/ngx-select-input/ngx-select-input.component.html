@@ -1,20 +1,19 @@
-<ng-container *ngIf="state() as vm">
+<ng-container *ngIf="state">
   <ng-content select="label"></ng-content>
-  <div *ngIf="vm.inputConfig as inputConfig" #optionsRef fetchOptions [config]="inputConfig.optionsConfig"
-    [loaded]="vm.loaded" (optionsChange)="onOptionsChange($event)" (loadingChange)="onLoadingChange($event)"
-    [name]="inputConfig.name">
-    <ng-select [class]="inputConfig.multiple ? '' : 'not-multiple'" [virtualScroll]="true"
-      [items]="inputConfig.options || []" [bindLabel]="'name'" [bindValue]="'value'" (focus)="onFocus()"
-      [loading]="vm?.performingAction ?? false" [loadingText]="'loadingText' | translate"
-      [multiple]="inputConfig.multiple ?? false" [placeholder]="inputConfig.placeholder ?? ''" [groupBy]="'type'"
-      [ngModel]="control.value" (ngModelChange)="onModelChange($event)" [clearable]="true" (remove)="
+  <div *ngIf="state.config as config" #optionsRef fetchOptions [config]="config.optionsConfig" [loaded]="state.loaded"
+    (optionsChange)="onOptionsChange($event)" (loadingChange)="onLoadingChange($event)" [name]="config.name">
+    <ng-select [class]="config.multiple ? '' : 'not-multiple'" [virtualScroll]="true" [items]="config.options || []"
+      [bindLabel]="'name'" [bindValue]="'value'" (focus)="onFocus()" [loading]="state.performingAction || false"
+      [loadingText]="'loadingText' | translate" [multiple]="config.multiple ?? false"
+      [placeholder]="config.placeholder ?? ''" [groupBy]="'type'" [ngModel]="control.value"
+      (ngModelChange)="onModelChange($event)" [clearable]="true" (remove)="
         remove.emit({
-          name: inputConfig.name,
+          name: config.name,
           event: $event
         })
       " (change)="
         selected.emit({
-          name: inputConfig.name,
+          name: config.name,
           value: $event
         })
       ">
@@ -27,6 +26,6 @@
       </ng-template>
     </ng-select>
     <!-- Control description -->
-    <span *ngIf="describe" class="input__subtext" [innerHTML]="inputConfig.description || '' | trustHtml"></span>
+    <span *ngIf="describe" class="input__subtext" [innerHTML]="config.description || '' | trustHtml"></span>
   </div>
 </ng-container>

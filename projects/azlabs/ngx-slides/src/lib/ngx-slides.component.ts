@@ -7,23 +7,31 @@ import {
   ContentChild,
   TemplateRef,
   ChangeDetectionStrategy,
-  signal,
   inject,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { interval, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { SLIDES, Slide } from './types';
 import { CommonModule } from '@angular/common';
 
+/** @internal */
+type StateType = {
+  timer: number;
+  slides: Slide[];
+  direction: 'left' | 'right';
+  current: number;
+};
+
 @Component({
   standalone: true,
   imports: [CommonModule],
   selector: 'ngx-slides',
   template: `
-    <div class="carousel">
-      <ng-container *ngFor="let slide of slides(); let i = index">
-        <ng-container *ngIf="i === current()">
-          <div class="slide" [@slideIn]="slideLeft() ? 'left' : 'right'">
+    <div class="carousel" *ngIf="state">
+      <ng-container *ngFor="let slide of state.slides; let i = index">
+        <ng-container *ngIf="i === state.current">
+          <div class="slide" [@slideIn]="state.direction">
             <ng-container
               *ngTemplateOutlet="templateRef; context: { $implicit: slide }"
             ></ng-container>
@@ -93,22 +101,25 @@ import { CommonModule } from '@angular/common';
 export class NgxSlidesComponent implements OnInit, OnDestroy {
   //#region Component properties
   private _destroy$ = new Subject<void>();
-  readonly slideLeft = signal(false);
-  readonly current = signal(0);
-  readonly slides = signal<Slide[]>([]);
-  readonly state = signal<{ timer: number; slides: Slide[] }>({
+  _state: StateType = {
     timer: 0,
     slides: [],
-  });
+    current: 0,
+    direction: 'right',
+  };
+
+  get state() {
+    return this._state;
+  }
   //#endregion Component properties
 
   //#region Component inputs
   @Input({ alias: 'timer' }) timer: number = 1000;
   @Input({ alias: 'slides' }) setSlides(values: Slide[]) {
-    this.slides.set(values);
+    this.setState((state) => ({ ...state, slides: values }));
   }
   @Input({ alias: 'current' }) setCurrent(value: number) {
-    this.current.set(value);
+    this.setState((state) => ({ ...state, current: value }));
   }
   @Input() autostart = false;
   @ContentChild('ngxSlide') templateRef!: TemplateRef<any>;
@@ -116,15 +127,15 @@ export class NgxSlidesComponent implements OnInit, OnDestroy {
   @ContentChild('previous') previousRef!: TemplateRef<any>;
   //#endregion Component inputs
 
-  /** @description Class constructor */
-  constructor() {
+  /** @description slides component class constructor */
+  constructor(private cdRef: ChangeDetectorRef) {
     inject(SLIDES)?.pipe(
       takeUntil(this._destroy$),
-      tap(({ timer, slides }) => {
-        this.timer = timer;
-        const s = this.slides();
-        if (s.length <= 0) {
-          this.slides.set(slides);
+      tap(({ timer, slides: _slides }) => {
+        const { slides } = this._state;
+        if (slides.length <= 0) {
+          this.timer = timer;
+          this.setState((state) => ({ ...state, slides: _slides }));
         }
       })
     );
@@ -146,18 +157,24 @@ export class NgxSlidesComponent implements OnInit, OnDestroy {
   }
 
   previous() {
-    const [slides, current] = [this.slides(), this.current()];
+    const { slides, current } = this._state;
     const previous = current - 1;
-    this.slideLeft.set(true);
-    this.current.set(previous < 0 ? slides.length - 1 : previous);
+    this.setState((state) => ({
+      ...state,
+      direction: 'left',
+      current: previous < 0 ? slides.length - 1 : previous,
+    }));
     this.restartLoop();
   }
 
   next() {
-    const [slides, current] = [this.slides(), this.current()];
+    const { slides, current } = this._state;
     const next = current + 1;
-    this.slideLeft.set(false);
-    this.current.set(next === slides.length ? 0 : next);
+    this.setState((state) => ({
+      ...state,
+      direction: 'right',
+      current: next === slides.length ? 0 : next,
+    }));
     this.restartLoop();
   }
 
@@ -168,5 +185,11 @@ export class NgxSlidesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this._destroy$.next();
+  }
+
+  /** @description change component local state and request ui update */
+  setState(state: (s: StateType) => StateType) {
+    this._state = state(this._state);
+    this.cdRef?.markForCheck();
   }
 }

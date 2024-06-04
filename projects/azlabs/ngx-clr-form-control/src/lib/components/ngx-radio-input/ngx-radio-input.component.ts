@@ -1,12 +1,12 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ContentChild,
   EventEmitter,
   Input,
   Output,
   TemplateRef,
-  signal,
 } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import {
@@ -15,6 +15,12 @@ import {
 } from '@azlabsjs/smart-form-core';
 import { NgxCommonModule } from '../../common';
 import { OPTIONS_DIRECTIVES } from '@azlabsjs/ngx-options-input';
+
+/** @interal */
+type StateType = {
+  config: OptionsInputConfigInterface | null;
+  loaded: boolean;
+};
 
 @Component({
   standalone: true,
@@ -29,10 +35,13 @@ export class NgxRadioInputComponent {
   @Input() control!: AbstractControl;
   // tslint:disable-next-line: variable-name
   @Input({ alias: 'inputConfig' }) set setInputConfig(
-    value: OptionsInputConfigInterface
+    config: OptionsInputConfigInterface
   ) {
-    this.inputConfig.set(value);
-    this.loaded.set((value?.options ?? []).length !== 0);
+    this.setState((state) => ({
+      ...state,
+      config,
+      loaded: (config?.options ?? []).length !== 0,
+    }));
   }
   @Input() describe = true;
   // #endregion Component input properties
@@ -43,19 +52,35 @@ export class NgxRadioInputComponent {
   //#endregion Component outputs
 
   // #region Component states
-  inputConfig = signal<OptionsInputConfigInterface | null>(null);
-  loaded = signal<boolean>(false);
+  private _state: StateType = {
+    config: null,
+    loaded: false,
+  };
+
+  get state() {
+    return this._state;
+  }
   // #endregion Component states
 
+  /** @description radion input component class constructor */
+  constructor(private cdRef: ChangeDetectorRef) {}
+
   onOptionsChange(options: InputOptions) {
-    this.inputConfig.update((v) => ({
-      ...(v ?? ({} as OptionsInputConfigInterface)),
-      options,
+    const { config } = this._state;
+    let _config = config ?? ({} as OptionsInputConfigInterface);
+    _config = { ..._config, options };
+    this.setState((state) => ({
+      ...state,
+      config: _config,
+      loaded: true,
     }));
-    this.loaded.set(true);
-    const inputConfig = this.inputConfig();
-    if (inputConfig) {
-      this.inputConfigChange.emit(inputConfig);
-    }
+    this.inputConfigChange.emit(_config);
+  }
+
+  setState(state: (state: StateType) => StateType) {
+    this._state = state(this._state);
+    this.cdRef?.markForCheck();
+    // TODO: Uncomment the code below to use latest API instead
+    // this.state.update(state);
   }
 }

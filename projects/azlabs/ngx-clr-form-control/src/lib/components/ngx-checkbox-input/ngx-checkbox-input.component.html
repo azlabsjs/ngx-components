@@ -1,17 +1,17 @@
-<ng-container *ngIf="inputConfig() as state">
-  <div fetchOptions (optionsChange)="onOptionsChange($event)" [loaded]="loaded()" [config]="state.optionsConfig"
-    [name]="state.name">
-    <ng-container *ngIf="state.options!.length > 0">
-      <ng-container *ngTemplateOutlet="
-        inputRef;
-        context: {
-          config: state,
-          formgroup: formGroup,
-          control
-        }
-      "></ng-container>
-      <!-- Control description -->
-      <span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="state.description || '' | trustHtml"></span>
-    </ng-container>
-  </div>
-</ng-container>
+<div fetchOptions (optionsChange)="onOptionsChange($event)" [loaded]="state.loaded"
+  [config]="state.config.optionsConfig" [name]="state.config.name">
+  <ng-container *ngIf="(state.config.options ?? []).length > 0">
+    <div class="clr-form-control">
+      <label class="clr-control-label">Inline checkbox example</label>
+      <div class="clr-control-container clr-control-inline">
+        <ng-container *ngFor="let item of state.config.options">
+          <ngx-checkbox [checked]="item.value|isChecked:state.selection" [text]="item.description"
+            (onChange)="onSelectionChange({value: item.value, checked: $event})" [disabled]="disabled">
+          </ngx-checkbox>
+        </ng-container>
+      </div>
+    </div>
+    <!-- Control description -->
+    <span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="state.config.description || '' | trustHtml"></span>
+  </ng-container>
+</div>

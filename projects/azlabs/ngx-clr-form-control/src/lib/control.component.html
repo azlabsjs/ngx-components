@@ -186,7 +186,7 @@
     <ng-container *ngSwitchCase="inputTypes.CHECKBOX_INPUT">
       <ngx-checkbox-input [control]="formControl" [inputConfig]="inputConfig | selectInput" [describe]="describe">
         <ng-template #input let-formgroup="formgroup" let-config="config" let-control="control">
-          <div class="clr-form-control">
+          <!-- <div class="clr-form-control">
             <label class="clr-control-label">
               {{ config!.label }}
               <span class="required-text" *ngIf="config?.rules?.isRequired">
@@ -199,13 +199,18 @@
               let index = index
             ">
                 <input [id]="config.name + '-' + index" placeholder="checkbox" [tabIndex]="config!.index"
-                  type="checkbox" class="clr-checkbox" [formControl]="item" [checked]="false" />
+                  type="checkbox" class="clr-checkbox" [formControl]="item"/>
                 <label [for]="config.name + '-' + index" class="clr-control-label">
                   {{ config!.options[index]!.description }}
                 </label>
               </div>
             </div>
-          </div>
+          </div> -->
+          <input [style]="'display: block;'" *ngFor="
+          let item of (formgroup.get('options')?.controls ?? []);
+          let index = index
+        " noAutoComplete [name]="index" [attr.id]="config.name + '-' + index" placeholder="checkbox"
+            [tabIndex]="config.index" type="checkbox" [value]="config.options[index]!.value" [formControl]="item" />
           <!-- <clr-checkbox-container clrInline [formGroup]="formgroup">
             <label *ngIf="describe" [for]="config!.name">
               {{ config!.label }}
@@ -217,11 +222,12 @@
                 let item of (formgroup.get('options')?.controls ?? []);
                 let index = index
               ">
-              <input noAutoComplete placeholder="checkbox" [tabIndex]="config!.index" type="checkbox"
-                [value]="config!.options[index]!.value" clrCheckbox />
-              <label>
+              <input noAutoComplete [name]="index" [id]="config.name + '-' + index" placeholder="checkbox"
+                [tabIndex]="config!.index" type="checkbox" [value]="config!.options[index]!.value" clrCheckbox
+                [formControl]="item" />
+              <labe [for]="config.name + '-' + index" l>
                 {{ config!.options[index]!.description }}
-              </label>
+                </label>
             </clr-checkbox-wrapper>
           </clr-checkbox-container> -->
           <!-- Input errors -->

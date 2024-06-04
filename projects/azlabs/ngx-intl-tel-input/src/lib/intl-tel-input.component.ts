@@ -9,7 +9,6 @@ import {
   Output,
   SimpleChanges,
   TemplateRef,
-  signal,
 } from '@angular/core';
 import { IntlTelInput, Country } from './core';
 import { CommonModule } from '@angular/common';
@@ -62,16 +61,24 @@ export class NgxIntlTelInputComponent implements OnChanges {
   // #endregion Component outputs
 
   private _countries = this.service.fetchCountries() ?? [];
-  state = signal<StateType>({
+  _state: StateType = {
     disabled: false,
     required: false,
     value: undefined as string | undefined,
     countries: [...this._countries],
     preferredCountries: this.getPreferredCountries(),
     selected: undefined as Country | undefined,
-  });
+  };
 
-  constructor(private service: IntlTelInput) {}
+  get state() {
+    return this._state;
+  }
+
+  /** @description Intl tel input component class constructor */
+  constructor(
+    private service: IntlTelInput,
+    private cdRef: ChangeDetectorRef
+  ) {}
 
   ngOnChanges(changes: SimpleChanges) {
     let stateChanges = false;
@@ -88,7 +95,7 @@ export class NgxIntlTelInputComponent implements OnChanges {
       preferredCountries,
       countries,
       value,
-    } = this.state();
+    } = this._state;
     if (stateChanges) {
       let selected = this.value
         ? this.getValueSelectedCountry(this.value)
@@ -156,8 +163,9 @@ export class NgxIntlTelInputComponent implements OnChanges {
   }
 
   setState(state: SetStateParam<StateType>) {
-    this.state.update(state);
-    const { selected, value } = this.state();
+    this._state = state(this._state);
+    this.cdRef?.markForCheck();
+    const { selected, value } = this._state;
 
     if (selected?.iso2) {
       this.error.emit(
@@ -196,7 +204,7 @@ export class NgxIntlTelInputComponent implements OnChanges {
   }
 
   private dispatchValueChange() {
-    const { selected, value: _value } = this.state();
+    const { selected, value: _value } = this._state;
     if (!!!selected || !!!_value) {
       this.valueChange.emit(undefined);
       return;
@@ -208,7 +216,7 @@ export class NgxIntlTelInputComponent implements OnChanges {
   }
 
   private getValueSelectedCountry(value: string) {
-    const { countries } = this.state();
+    const { countries } = this._state;
     const tmpCode = this.getCountryCode(value);
     return tmpCode
       ? countries.find((c: Country) => c.dialCode === tmpCode.toString())

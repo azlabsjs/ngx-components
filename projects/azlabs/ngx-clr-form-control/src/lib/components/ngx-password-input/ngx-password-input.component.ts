@@ -1,14 +1,19 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ContentChild,
   Input,
   TemplateRef,
-  signal,
 } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { TextInput } from '@azlabsjs/smart-form-core';
 import { NgxCommonModule } from '../../common';
+
+/** @internal */
+type StateType = {
+  showPassword: boolean;
+};
 
 @Component({
   standalone: true,
@@ -27,11 +32,25 @@ export class NgxPasswordInputComponent {
 
   // tslint:disable-next-line: variable-name
   Mt = Math;
-  showPassword = signal({ showPassword: false });
+  _state: StateType = {
+    showPassword: false,
+  };
+  get state() {
+    return this._state;
+  }
 
   public toggle() {
-    this.showPassword.update(({ showPassword }) => ({
+    this.setState(({ showPassword }) => ({
       showPassword: !showPassword,
     }));
+  }
+
+  /** @description Creates new class instances */
+  constructor(private cdRef: ChangeDetectorRef) {}
+
+  /** @description update component state and notify ui of state changes */
+  private setState(state: (s: StateType) => StateType) {
+    this._state = state(this._state);
+    this.cdRef?.markForCheck();
   }
 }

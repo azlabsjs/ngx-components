@@ -19,12 +19,12 @@ export class NgxUploadsEventsService {
   /** @description Upload state event observables */
   public readonly events$ = this._events$.asObservable();
 
-  /** @description Signal an upload start event */
+  /** @description notify an upload start event */
   public startUpload(value: UploadEvent) {
     this._events$.next([...this._events$.getValue(), value]);
   }
 
-  /** @description Signals an upload complete event */
+  /** @description notify an upload complete event */
   public completeUpload(uuid: string, result: unknown) {
     const state = [...this._events$.getValue()];
     const index = state.findIndex((event) => event.id === uuid);

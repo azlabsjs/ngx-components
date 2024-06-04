@@ -1,12 +1,12 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ContentChild,
   EventEmitter,
   Input,
   Output,
   TemplateRef,
-  signal,
 } from '@angular/core';
 import { ClarityModule, ClrDatagridSortOrder } from '@clr/angular';
 import {
@@ -30,6 +30,7 @@ import {
 } from '@angular/common';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 
+/** @internal */
 const GRID_CONFIG: Required<GridConfigType> = {
   transformColumnTitle: 'default',
   selectable: false,
@@ -47,6 +48,12 @@ const GRID_CONFIG: Required<GridConfigType> = {
   totalItemLabel: 'Total',
   projectRowClass: '',
   columnHeadersClass: '',
+};
+
+/** @internal */
+type StateType = {
+  data: { [index: string]: any }[];
+  total: number;
 };
 
 @Component({
@@ -82,16 +89,20 @@ const GRID_CONFIG: Required<GridConfigType> = {
 export class NgxClrSmartGridComponent {
   //#region Component properties
   public readonly defaultSort = ClrDatagridSortOrder.DESC;
-  state = signal({
+  _state: StateType = {
     data: [] as { [index: string]: any }[],
     total: 0 as number,
-  });
+  };
+
+  get state() {
+    return this._state;
+  }
   //#endregion Component properties
 
   // #region Component inputs
   @Input() set pageResult(result: PaginateResult<any> | undefined | null) {
     if (result) {
-      this.state.update((state) => ({
+      this.setState((state) => ({
         ...state,
         data: result.data ?? [],
         total: result.total ?? result.data.length,
@@ -99,10 +110,10 @@ export class NgxClrSmartGridComponent {
     }
   }
   @Input() set data(values: { [index: string]: any }[]) {
-    this.state.update((state) => ({ ...state, data: values }));
+    this.setState((state) => ({ ...state, data: values }));
   }
   @Input() set total(total: number) {
-    this.state.update((state) => ({ ...state, total }));
+    this.setState((state) => ({ ...state, total }));
   }
   @Input() selected!: unknown[] | any;
   @Input() loading: boolean = false;
@@ -169,6 +180,10 @@ export class NgxClrSmartGridComponent {
   @Output() dgItemClick = new EventEmitter<unknown>();
   // #endregion Component outputs
 
+
+  /** @description smart grid class constructor */
+  constructor(private cdRef: ChangeDetectorRef) {}
+
   // Listen to internal grid component select changes and notify parent component
   onSelectedStateChanges(state: unknown[] | unknown) {
     this.selectedChange.emit(state);
@@ -190,5 +205,11 @@ export class NgxClrSmartGridComponent {
   /** @deprecated */
   onClrItemClick(e: Event, item: unknown) {
     this.onItemClick(e, item);
+  }
+
+  /** @description update component state and notify ui of state changes */
+  private setState(state: (s: StateType) => StateType) {
+    this._state = state(this._state);
+    this.cdRef?.markForCheck();
   }
 }

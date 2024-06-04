@@ -1,5 +1,5 @@
 <ng-content select="label"></ng-content>
-<ng-container *ngIf="state() as state">
+<ng-container *ngIf="state">
   <div [class]="state.hasError ? '' : ''" class="flex-files-input">
     <input type="file" [placeholder]="placeholder" fileInput [class]="cssClass ?? ''" [maxFileSize]="maxFilesize || 10"
       [maxFiles]="multiple ? maxFiles : 1" [multiple]="multiple" (sizeError)="onTooLargeFilesEvent($event)"

@@ -2,6 +2,7 @@ import {
   AfterContentInit,
   AfterViewInit,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ComponentRef,
   EventEmitter,
@@ -12,7 +13,6 @@ import {
   TemplateRef,
   ViewChild,
   ViewContainerRef,
-  signal,
 } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
@@ -32,7 +32,7 @@ import { SafeValue } from '@angular/platform-browser';
   selector: 'ngx-smart-form-array',
   template: `
     <div #container></div>
-    <div *ngIf="refCount() === 0" class="no-control-content">
+    <div *ngIf="refCount === 0" class="no-control-content">
       <ng-container
         *ngTemplateOutlet="
           addGroupRef ? addGroupRef : addTemplate;
@@ -40,7 +40,7 @@ import { SafeValue } from '@angular/platform-browser';
         "
       ></ng-container>
     </div>
-    <ng-container *ngIf="refCount() !== 0">
+    <ng-container *ngIf="refCount !== 0">
       <ng-container
         *ngTemplateOutlet="
           addGroupRef ? addGroupRef : addTemplate;
@@ -123,7 +123,10 @@ export class NgxSmartFormArrayComponent
   // #endregion View children
 
   // #region Component properties
-  refCount = signal(0);
+  _refCount = 0;
+  get refCount() {
+    return this._refCount;
+  }
   private _destroy$ = new Subject<void>();
   private componentRefs: ComponentRef<NgxSmartFormArrayChildComponent>[] = [];
   /** Helps in calling appendControls in both ngAfterViewInit and `@Input() set setArray()` closure  */
@@ -132,6 +135,7 @@ export class NgxSmartFormArrayComponent
 
   // Component instance initializer
   constructor(
+    private cdRef: ChangeDetectorRef | null,
     @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
     private builder: AngularReactiveFormBuilderBridge
   ) {
@@ -157,9 +161,9 @@ export class NgxSmartFormArrayComponent
   }
 
   onAddButtonClick(event: Event) {
-    let count = this.refCount();
+    let count = this._refCount;
     count++;
-    this.refCount.set(count);
+    this.setRefCount(count);
     const g = this.builder.group(this.inputs);
     const _clone = cloneAbstractControl(g) as FormGroup;
     this.addComponent(_clone, count);
@@ -184,7 +188,7 @@ export class NgxSmartFormArrayComponent
       componentRef.instance.componentDestroyer
         .pipe(takeUntil(this._destroy$))
         .subscribe(() => {
-          let count = this.refCount();
+          let count = this._refCount;
           if (count > 1) {
             componentRef.destroy();
             count -= 1;
@@ -197,7 +201,7 @@ export class NgxSmartFormArrayComponent
               }
             );
             this._array.removeAt(componentRef.instance.index);
-            this.refCount.set(count);
+            this.setRefCount(count);
             this.listChange.emit(count);
           } else {
             componentRef.instance.formGroup.reset();
@@ -222,7 +226,12 @@ export class NgxSmartFormArrayComponent
         this.addComponent(control as FormGroup, index);
         index++;
       }
-      this.refCount.set(index);
+      this.setRefCount(index);
     }
+  }
+
+  private setRefCount(value: number) {
+    this._refCount = value;
+    this.cdRef?.markForCheck();
   }
 }

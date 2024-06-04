@@ -1,5 +1,5 @@
 <div [class]="'intl-tel-input allow-dropdown input-effect'">
-  <ng-container *ngIf="state() as state">
+  <ng-container *ngIf="state">
     <div class="intl-tel-input__layout">
       <ngx-azl-dropdown [disabled]="state.disabled || false" class="intl-tel-input__dropdown" orientation="left"
         [text]="'+' + state.selected?.dialCode + '  '" [no-hover]="true" [animation]="'scaleY'">

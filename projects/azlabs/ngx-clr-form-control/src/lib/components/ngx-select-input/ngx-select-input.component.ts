@@ -7,7 +7,6 @@ import {
   Input,
   Output,
   ViewChild,
-  signal,
 } from '@angular/core';
 import { FormControl, FormsModule } from '@angular/forms';
 import {
@@ -21,6 +20,13 @@ import {
 } from '@azlabsjs/ngx-options-input';
 import { NgxCommonModule } from '../../common';
 import { NgSelectModule } from '@ng-select/ng-select';
+
+/** @internal */
+type StateType = {
+  performingAction: boolean;
+  config: OptionsInputConfigInterface | null;
+  loaded: boolean;
+};
 
 @Component({
   standalone: true,
@@ -58,15 +64,14 @@ import { NgSelectModule } from '@ng-select/ng-select';
 })
 export class NgxSelectInputComponent {
   //#region Component properties
-  state = signal<{
-    performingAction: boolean;
-    inputConfig: OptionsInputConfigInterface | null;
-    loaded: boolean;
-  }>({
+  _state: StateType = {
     performingAction: false,
-    inputConfig: null,
+    config: null,
     loaded: false,
-  });
+  };
+  get state() {
+    return this._state;
+  }
   private _handleFetchOnFocus: boolean = false;
   //#endregion Component properties
 
@@ -75,9 +80,9 @@ export class NgxSelectInputComponent {
   @Input({ alias: 'inputConfig' }) set setInputConfig(
     inputConfig: OptionsInputConfigInterface
   ) {
-    this.state.update((v) => ({
-      ...v,
-      inputConfig,
+    this.setState((state) => ({
+      ...state,
+      config: inputConfig,
       loaded: (inputConfig.options ?? [])?.length !== 0,
     }));
   }
@@ -110,14 +115,14 @@ export class NgxSelectInputComponent {
   }
 
   onLoadedChange(loaded: boolean) {
-    this.state.update((v) => ({ ...v, loaded }));
+    this.setState((v) => ({ ...v, loaded }));
   }
 
   onOptionsChange(options: InputOptions) {
-    const { inputConfig } = this.state();
-    let _inputConfig = inputConfig ?? ({} as OptionsInputConfigInterface);
-    _inputConfig = {
-      ..._inputConfig,
+    const { config } = this._state;
+    let _c = config ?? ({} as OptionsInputConfigInterface);
+    _c = {
+      ..._c,
       options: options.map((state) => ({
         ...state,
         // We convert the select values to uppercase
@@ -128,10 +133,10 @@ export class NgxSelectInputComponent {
     };
     // const value = this._state$.getValue();
     // this._state$.next({ ...value, state: this._inputConfig.options ?? [] });
-    this.state.update((v) => ({
-      ...v,
+    this.setState((state) => ({
+      ...state,
       performingAction: false,
-      inputConfig: _inputConfig,
+      config: _c,
     }));
   }
 
@@ -141,6 +146,13 @@ export class NgxSelectInputComponent {
   }
 
   onLoadingChange(value: boolean) {
-    this.state.update((v) => ({ ...v, performingAction: value }));
+    this.setState((v) => ({ ...v, performingAction: value }));
+  }
+
+  setState(state: (state: StateType) => StateType) {
+    this._state = state(this._state);
+    this.cdRef?.markForCheck();
+    // TODO: Uncomment the code below to use latest API instead
+    // this.setState(state);
   }
 }

@@ -9,13 +9,11 @@ import {
   OnInit,
   Output,
   TemplateRef,
-  signal,
 } from '@angular/core';
 import {
   AbstractControl,
-  FormArray,
-  FormBuilder,
-  FormControl,
+  FormsModule,
+  ReactiveFormsModule,
 } from '@angular/forms';
 import { OPTIONS_DIRECTIVES } from '@azlabsjs/ngx-options-input';
 import {
@@ -23,120 +21,83 @@ import {
   OptionsInputConfigInterface,
 } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
-import {
-  distinctUntilChanged,
-  filter,
-  map,
-  takeUntil,
-  tap,
-} from 'rxjs/operators';
+import { distinctUntilChanged, tap } from 'rxjs/operators';
 import { NgxCommonModule } from '../../common';
+import { CheckboxComponent } from './checkbox.component';
+import { IsCheckedPipe } from './is-checked.pipe';
 
-function project(options: InputOptions, state: boolean[]) {
-  options = options ?? [];
-  if (options.length === 0) {
-    return undefined;
-  }
-  if (options.length === 1) {
-    return state[0];
-  }
-  return state
-    .map((current, index) =>
-      current === false
-        ? undefined
-        : options[index]
-        ? options[index].value
-        : undefined
-    )
-    .filter((current) => typeof current !== 'undefined' && current !== null);
-}
+/** @internal */
+type SelectionState = { value: unknown; checked: boolean };
 
-/**
- * Wrap a value to an array and filter remove null or undefined entrries
- *
- * @param value
- */
-function arraywrap_filter(value: unknown) {
-  return (Array.isArray(value) ? value : [value]).filter(
-    (current) => typeof current !== 'undefined' && current !== null
-  );
-}
-
-function arrayequals(array_1: any[], array_2: any[]): boolean {
-  if (array_1.length !== array_2.length) {
-    return false;
-  }
-  let equals: boolean = true;
-  for (let index = 0; index < array_1.length; index++) {
-    equals =
-      Array.isArray(array_1[index]) && Array.isArray(array_2[index])
-        ? arrayequals(array_1[index], array_2[index])
-        : array_1[index] === array_2[index];
-    if (equals === false) {
-      break;
-    }
-  }
-  return equals;
-}
-
-function compilevalue(options: InputOptions, state: unknown[]) {
-  return options.map((option) => {
-    return state.find((current) => current == option.value) ? true : false;
-  });
-}
+/** @internal */
+type StateType = {
+  loaded: boolean;
+  config: OptionsInputConfigInterface;
+  selection: SelectionState[];
+};
 
 @Component({
   standalone: true,
-  imports: [NgxCommonModule, ...OPTIONS_DIRECTIVES],
+  imports: [
+    NgxCommonModule,
+    ...OPTIONS_DIRECTIVES,
+    ReactiveFormsModule,
+    FormsModule,
+    CheckboxComponent,
+    IsCheckedPipe,
+  ],
   selector: 'ngx-checkbox-input',
   templateUrl: './ngx-checkbox-input.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
   //#region Component inputs
+  @Input() disabled = false;
+  @Input() describe = true;
   @Input() control!: AbstractControl;
   @Input({ alias: 'inputConfig' }) set setInputConfig(
     value: OptionsInputConfigInterface
   ) {
-    this.inputConfig.set(value);
-    this.loaded.set((value?.options ?? []).length !== 0);
+    this.setState((state) => ({
+      ...state,
+      config: value,
+      loaded: (value?.options ?? []).length !== 0,
+    }));
   }
-  @Input() describe = true;
   @ContentChild('input') inputRef!: TemplateRef<any>;
   //#endregion Component inputs
 
   //#region Component outputs
   @Output() inputConfigChange = new EventEmitter<OptionsInputConfigInterface>();
+  @Output() onChange = new EventEmitter<unknown[]>();
   //#endregion Component outputs
 
   // #region Component properties
-  formGroup = this.builder.group<{ [key: string]: AbstractControl<any> }>({});
-  inputConfig = signal<OptionsInputConfigInterface | null>(null);
-  loaded = signal<boolean>(false);
+  // formGroup = this.builder.group<{ options?: FormArray<FormControl> }>({});
+  private _state: StateType = {
+    config: {} as OptionsInputConfigInterface,
+    loaded: false,
+    selection: [],
+  };
+  get state() {
+    return this._state;
+  }
   private _destroy$ = new Subject<void>();
   // #endregion Component properties
 
   /** @description Creates a Checkbox input component  */
-  constructor(
-    private builder: FormBuilder,
-    private changes: ChangeDetectorRef
-  ) {}
+  constructor(private changes: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    const { options } = this.inputConfig() ?? { options: [] as InputOptions };
-    if (options.length !== 0) {
-      this.addFormArray();
-    }
     this.control.valueChanges
       .pipe(
         distinctUntilChanged(),
-        tap((state) => {
-          const value = arraywrap_filter(state);
-          if (options.length !== 0 && this.formGroup.get('options')) {
-            (
-              this.formGroup.get('options') as FormArray<AbstractControl<any>>
-            ).setValue(compilevalue(options, value));
-          }
+        tap((v) => {
+          console.log('Setting state...', v);
+          this.setState((state) => ({
+            ...state,
+            selection: v.map((i: unknown) => ({ value: i, checked: true })),
+          }));
         })
       )
       .subscribe();
@@ -148,64 +109,44 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
 
   /** @description Options change event listener */
   onOptionsChange(options: InputOptions) {
-    this.inputConfig.update((v) => ({
-      ...(v ?? ({} as OptionsInputConfigInterface)),
-      options,
+    const { config } = this._state;
+    let _config = config ?? ({} as OptionsInputConfigInterface);
+    _config = { ..._config, options };
+    this.setState((state) => ({
+      ...state,
+      config: _config,
+      loaded: true,
     }));
-    this.loaded.set(true);
-    const inputConfig = this.inputConfig();
-    if (inputConfig) {
-      this.inputConfigChange.emit(inputConfig);
-    }
-    this.addFormArray();
+    this.inputConfigChange.emit(_config);
   }
 
-  /** @description Append a form array to the form group instance */
-  private addFormArray() {
-    const { options } = this.inputConfig() ?? { options: [] as InputOptions };
-    const array = this.builder.array<AbstractControl>([]);
-    // We get the value of the injected control
-    // if the value is not an array we wrap it as array
-    const value = arraywrap_filter(this.control.value);
-    // We add controls to the form array element
-    if (options.length !== 0) {
-      for (const option of options) {
-        array.push(new FormControl());
-      }
-      // Set the value of the form array
-      array.setValue(compilevalue(options, value));
+  /** @description Handle checkbox click of selection change event */
+  onSelectionChange(e: SelectionState) {
+    const { selection } = this._state;
+    const _index = selection.findIndex((el) => el.value === e.value);
+    const _selection = [...selection];
+    if (_index !== -1) {
+      _selection.splice(_index, 1);
     }
-    // Subscribe to changes on the form array
-    array.valueChanges
-      .pipe(
-        distinctUntilChanged(),
-        takeUntil(this._destroy$),
-        map((state) => arraywrap_filter(project(options, state) ?? [])),
-        filter(
-          // Unless the value of the form array changes and is not equals
-          // the value of the form control, we do not upte the form control value
-          (state) => !arrayequals(state, arraywrap_filter(this.control.value))
-        ),
-        tap((state) => this.control.setValue(state))
-      )
-      .subscribe();
+    _selection.push(e);
 
-    // Replace the control with name `options`
-    this.replaceOptionsControl(array);
+    // TODO: Update the control state with the selected values
+    const values = _selection
+      .filter((v) => v.checked === true)
+      .map((v) => v.value);
 
-    // Detect changes after adding the form array to the form group
+    this.setState((state) => ({ ...state, selection: _selection }));
+
+    // Notify top level component of an update
+    this.onChange.emit(values);
+
+    // TODO: Move setting control value to the top level component
+    this.control.setValue(values);
+  }
+
+  private setState(state: (s: StateType) => StateType) {
+    this._state = state(this._state);
+    console.log('Checkbox state', this._state);
     this.changes.markForCheck();
-  }
-
-  /**  @description replace the control with the options key index */
-  private replaceOptionsControl(array: FormArray) {
-    let c = this.formGroup.get('options');
-    if (c) {
-      this.formGroup.removeControl('options');
-      c = null;
-    }
-
-    // Add options input after removing the previous if it exists
-    this.formGroup.addControl('options', array);
   }
 }

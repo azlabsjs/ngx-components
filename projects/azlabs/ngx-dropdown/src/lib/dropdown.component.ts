@@ -1,6 +1,7 @@
 import { CommonModule, DOCUMENT } from '@angular/common';
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ContentChild,
   ElementRef,
@@ -12,7 +13,6 @@ import {
   SimpleChanges,
   TemplateRef,
   ViewChild,
-  signal,
 } from '@angular/core';
 import { computeCssClass, computeMenuClass } from './helpers';
 import { Animation, Orientation } from './types';
@@ -45,15 +45,21 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
   @ContentChild('dropdownToggle') dropdownToggleRef!: TemplateRef<any>;
   // #endregion component view children
 
-  state = signal<StateType>({
+  _state: StateType = {
     active: false,
     cssClass: {} as Record<string, boolean>,
     menuClass: {} as Record<string, boolean>,
-  });
+  };
+  get state() {
+    return this._state;
+  }
   private defaultView!: Window;
 
   /** @description Creates component instances */
-  constructor(@Inject(DOCUMENT) @Optional() document?: Document) {
+  constructor(
+    private cdRef: ChangeDetectorRef | null,
+    @Inject(DOCUMENT) @Optional() document?: Document
+  ) {
     const { defaultView } = document ?? ({} as Document);
     if (defaultView) {
       this.defaultView = defaultView;
@@ -67,7 +73,7 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
       'active' in changes ||
       'disabled' in changes
     ) {
-      this.state.update((state) => ({
+      this.setState((state) => ({
         ...state,
         menuClass: computeMenuClass(this.orientation, this.animation),
         cssClass: computeCssClass(
@@ -89,7 +95,7 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
 
   onToggleDropdown(e: Event) {
     if (this.noHover && !this.disabled) {
-      this.state.update((state) => ({
+      this.setState((state) => ({
         ...state,
         active: !state.active,
         menuClass: computeMenuClass(this.orientation, this.animation),
@@ -113,7 +119,7 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
   }
 
   private onDefaultViewClick(e: MouseEvent) {
-    const { active } = this.state();
+    const { active } = this._state;
     if (this.dropdownHeaderRef?.nativeElement) {
       const {
         left: x,
@@ -131,7 +137,7 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
         ) &&
         active === true
       ) {
-        this.state.update((state) => ({
+        this.setState((state) => ({
           ...state,
           active: !state.active,
           menuClass: computeMenuClass(this.orientation, this.animation),
@@ -146,5 +152,11 @@ export class DropdownComponent implements OnDestroy, OnChanges, AfterViewInit {
     }
     e.preventDefault();
     e.stopPropagation();
+  }
+
+  /** @description update component state and notify ui of state changes */
+  private setState(state: (s: StateType) => StateType) {
+    this._state = state(this._state);
+    this.cdRef?.markForCheck();
   }
 }

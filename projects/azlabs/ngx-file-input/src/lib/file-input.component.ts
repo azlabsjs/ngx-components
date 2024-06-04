@@ -1,12 +1,12 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Inject,
   Injector,
   Input,
   Output,
-  signal,
 } from '@angular/core';
 import {
   HTTPRequest,
@@ -100,11 +100,14 @@ export class NgxSmartFileInputComponent {
 
   // #region Component properties
   // Property for handling File Input types
-  state = signal<StateType>({
+  _state: StateType = {
     uploading: false,
     hasError: false,
     tooLargeFiles: [] as File[],
-  });
+  };
+  get state() {
+    return this._state;
+  }
   // #endregion Component properties
 
   // #region component outputs
@@ -116,6 +119,7 @@ export class NgxSmartFileInputComponent {
 
   // Class constructor
   constructor(
+    private cdRef: ChangeDetectorRef | null,
     @Inject(UPLOADER_OPTIONS)
     public readonly uploadOptions: UploadOptionsType<HTTPRequest, HTTPResponse>,
     private uploadEvents: NgxUploadsEventsService,
@@ -281,6 +285,7 @@ export class NgxSmartFileInputComponent {
    * each state changes
    */
   private setState(state: SetStateParam<StateType>) {
-    this.state.update(state);
+    this._state = state(this._state);
+    this.cdRef?.markForCheck();
   }
 }
