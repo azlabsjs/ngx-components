@@ -199,7 +199,7 @@
               let index = index
             ">
                 <input [id]="config.name + '-' + index" placeholder="checkbox" [tabIndex]="config!.index"
-                  type="checkbox" class="clr-checkbox" [formControl]="control" [checked]="false" />
+                  type="checkbox" class="clr-checkbox" [formControl]="item" [checked]="false" />
                 <label [for]="config.name + '-' + index" class="clr-control-label">
                   {{ config!.options[index]!.description }}
                 </label>
