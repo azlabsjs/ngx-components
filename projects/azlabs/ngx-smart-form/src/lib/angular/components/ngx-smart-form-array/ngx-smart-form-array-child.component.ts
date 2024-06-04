@@ -56,8 +56,8 @@ import { NgxSmartFormGroupComponent } from '../ngx-smart-form-group';
 
       :host ::ng-deep .ngx__form_array__card__close_btn {
         position: absolute;
-        top: 4px;
-        right: 4px;
+        top: 12px;
+        right: 12px;
       }
     `,
   ],

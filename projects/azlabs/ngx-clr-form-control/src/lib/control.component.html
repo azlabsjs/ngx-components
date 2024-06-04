@@ -186,7 +186,27 @@
     <ng-container *ngSwitchCase="inputTypes.CHECKBOX_INPUT">
       <ngx-checkbox-input [control]="formControl" [inputConfig]="inputConfig | selectInput" [describe]="describe">
         <ng-template #input let-formgroup="formgroup" let-config="config" let-control="control">
-          <clr-checkbox-container clrInline [formGroup]="formgroup">
+          <div class="clr-form-control">
+            <label class="clr-control-label">
+              {{ config!.label }}
+              <span class="required-text" *ngIf="config?.rules?.isRequired">
+                (*)</span>
+            </label>
+            <div class="clr-control-container clr-control-inline"
+              [class.clr-error]="control.touched && control.hasError('required')">
+              <div class="clr-checkbox-wrapper" *ngFor="
+              let item of (formgroup.get('options')?.controls ?? []);
+              let index = index
+            ">
+                <input [id]="config.name + '-' + index" placeholder="checkbox" [tabIndex]="config!.index"
+                  type="checkbox" class="clr-checkbox" [formControl]="control" [checked]="false" />
+                <label [for]="config.name + '-' + index" class="clr-control-label">
+                  {{ config!.options[index]!.description }}
+                </label>
+              </div>
+            </div>
+          </div>
+          <!-- <clr-checkbox-container clrInline [formGroup]="formgroup">
             <label *ngIf="describe" [for]="config!.name">
               {{ config!.label }}
               <span class="required-text" *ngIf="config?.rules?.isRequired">
@@ -197,13 +217,13 @@
                 let item of (formgroup.get('options')?.controls ?? []);
                 let index = index
               ">
-              <input noAutoComplete placeholder="checkbox" [tabIndex]="config!.index" [id]="config!.name + '_' + index"
-                type="checkbox" clrCheckbox [value]="config!.options[index]!.value" [formControl]="item" />
+              <input noAutoComplete placeholder="checkbox" [tabIndex]="config!.index" type="checkbox"
+                [value]="config!.options[index]!.value" clrCheckbox />
               <label>
                 {{ config!.options[index]!.description }}
               </label>
             </clr-checkbox-wrapper>
-          </clr-checkbox-container>
+          </clr-checkbox-container> -->
           <!-- Input errors -->
           <ngx-input-error *ngIf="control.touched" [errors]="control.errors"></ngx-input-error>
         </ng-template>
