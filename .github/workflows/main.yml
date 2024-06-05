@@ -37,8 +37,9 @@ jobs:
       - name: Publish ngx-common
         run: cd dist/azlabs/ngx-common && npm publish --access public
 
-      - name: Publish ngx-dropzone
-        run: cd dist/azlabs/ngx-dropzone && npm publish --access public
+      # Enable dropzone version deployment when ready
+      # - name: Publish ngx-dropzone
+      #   run: cd dist/azlabs/ngx-dropzone && npm publish --access public
 
       - name: Publish ngx-dropdown
         run: cd dist/azlabs/ngx-dropdown && npm publish --access public
