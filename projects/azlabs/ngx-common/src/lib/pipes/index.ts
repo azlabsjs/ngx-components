@@ -11,7 +11,7 @@ import { PipeResultPipe } from './common/pipe-result.pipe';
 import { PropertyValuePipe } from './common/property.pipe';
 import { NgxTransformPipe } from './transform';
 import { DefinedPipe, IncludesPipe } from './common/utils.pipe';
-import { CommonStringsPipe } from './strings';
+import { CommonStringsPipe, CommonTextPipe } from './strings';
 
 /** Exports */
 export { DefinedPipe, IncludesPipe } from './common/utils.pipe';
@@ -38,6 +38,7 @@ export {
   provideCommonStrings,
   provideCommonStringsFactory,
   COMMON_STRINGS,
+  CommonTextPipe,
 } from './strings';
 
 /** @description Exported pipes transforms */
@@ -53,6 +54,7 @@ export const COMMON_PIPES = [
   StrLengthPipe,
   NgxTransformPipe,
   CommonStringsPipe,
+  CommonTextPipe,
   JoinPipe,
   DefinedPipe,
   IncludesPipe,

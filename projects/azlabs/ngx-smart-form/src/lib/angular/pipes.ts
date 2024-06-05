@@ -6,6 +6,13 @@ import {
 } from '@azlabsjs/smart-form-core';
 import { DomSanitizer } from '@angular/platform-browser';
 
+/**
+ * @description Checks if input has `hidden` property set to true or is of type `hidden`
+ * 
+ * **Note** We mark the pipe as pure, because it depends on an object which hidden property
+ *          might change, while the reference does not change, therefore, for now we wish to
+ *          run the change dectector of the current pipe on each cycle
+ */
 @Pipe({
   name: 'isHidden',
   pure: false,

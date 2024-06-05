@@ -12,6 +12,7 @@ The module also makes use of angular services injector to provide mechanism for 
 | ^0.13.x                  | ^0.1.x                    | ^0.1.x             | ^13.0   |
 | ^0.14.x                  | ^0.1.x                    | ^0.2.x             | ^14.0   |
 | ^0.15.x                  | ^0.2.x                    | ^0.2.x             | ^15.0   |
+| ^0.17.x                  | ^0.2.x                    | ^0.2.x             | ^17.0   |
 
 ## Installation
 

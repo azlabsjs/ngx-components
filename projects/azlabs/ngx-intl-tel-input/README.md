@@ -127,7 +127,3 @@ export class MyComponent {
 
 }
 ```
-
-## APIs
-
-API documentation is under development. Please consult the current page for any changes.

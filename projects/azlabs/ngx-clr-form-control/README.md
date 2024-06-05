@@ -7,6 +7,7 @@ The `ngx-clr-form-control` library provide angular UI component for rendering in
 | @azlabsjs/ngx-clr-form-control | @azlabsjs/smart-form-core | @azlabsjs/ngx-intl-tel-input | @azlabsjs/ngx-options-input | @azlabsjs/ngx-file-input | Angular |
 | ------------------------------ | ------------------------- | ---------------------------- | --------------------------- | ------------------------ | ------- |
 | ^0.15.x                        | ^0.2.0                    | ^0.15.x                      | ^0.15.x                     | ^0.15.x                  | ^15.0   |
+| ^0.17.x                        | ^0.2.0                    | ^0.17.x                      | ^0.17.x                     | ^0.17.x                  | ^17.0   |
 
 ## Installation
 
@@ -119,5 +120,18 @@ list of preferred countries of the phone input component:
 ```html
 <ngx-clr-form-control [countries]="['tg', 'gh']" [control]="control" [inputConfig]="phoneInput"></ngx-clr-form-control>
 ```
+
+## version >= 0.17.x changes
+
+Use `provideTranslations(...) from @azlabsjs/ngx-smart-form` to register translations provider
+
+- `provideQueryClient(...) from @azlabsjs/ngx-options-input` to register options request client providers and
+- `provideUploadOptions(...) from @azlabsjs/ngx-file-input` to register upload options providers
+
+From version 0.17.x, `NgxClrFormControlModule` and `NgxClrFormControlModule.forRoot()` are marked as deprecated and will be remove in version `0.18.x`.
+
+It's recommended to use `CLR_FORM_CONTROL_DIRECTIVES from '@azlabsjs/ngx-clr-form-control'` to use `<ngx-clr-form-control>` component in your angular component.
+
+Also it's recommended to also to register providers at the root component level using `provideTranslations(...)` to register translation dictionnary for input errors, `provideQueryClient(...)` to register options requests http client and `provideUploadOptions(...)` to register file input upload configurations, if using standalone component or at `AppModule` level if running on angular >=15.x.
 
 **Note** Library is still under development and API might change. Please consult the current page for any version update.

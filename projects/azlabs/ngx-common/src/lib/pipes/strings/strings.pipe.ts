@@ -57,12 +57,12 @@ const _subscribableStrategy = new SubscribableStrategy();
  * @publicApi
  */
 @Pipe({
-  name: 'commonString',
+  name: 'text',
   pure: false,
   standalone: true,
 })
 @Injectable({ providedIn: 'any' })
-export class CommonStringsPipe implements OnDestroy, PipeTransform {
+export class CommonTextPipe implements OnDestroy, PipeTransform {
   private _ref: ChangeDetectorRef | null;
   private _latestValue: any = null;
   private markForCheckOnValueUpdate = true;
@@ -156,4 +156,27 @@ export class CommonStringsPipe implements OnDestroy, PipeTransform {
       }
     }
   }
+}
+
+
+/** @deprecated Use `text` pipe instead */
+@Pipe({
+  name: 'commonString',
+  pure: false,
+  standalone: true
+})
+
+@Injectable({ providedIn: 'any' })
+export class CommonStringsPipe implements PipeTransform {
+
+  /** @description strings pipe class constructor */
+  constructor(private textPipe: CommonTextPipe) {}
+
+
+  /** @description Redirect calls to text pipe transform method */
+  transform(q: string, module?: string, def: string = '') {
+    return this.textPipe.transform(q, module, def);
+  }
+
+  
 }

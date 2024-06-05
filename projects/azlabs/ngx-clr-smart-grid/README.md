@@ -9,6 +9,7 @@ Smart grid component is an angular component, using clarity datagrid component u
 | ^0.13.x                      |                      | ^13.x        | ^0.1.x              | ^0.1.x                | ^13.0   |
 | ^0.14.x                      |                      | ^13.x        | ^0.1.x              | ^0.1.x                | ^14.0   |
 | ^0.15.x                      | ^0.15.x              | ^15.x        | ^0.1.x              | ^0.1.x                | ^15.0   |
+| ^0.17.x                      | ^0.17.x              | ^17.x        | ^0.2.x              | ^0.2.x                | ^17.0   |
 
 ## Installation
 
@@ -588,5 +589,44 @@ export class MyComponent {
   onDgItemClick(value: unknown) {
     // TODO: Add click handler
   }
+}
+```
+
+## version 0.17.x changes
+
+From version `0.17.x`, `NgxClrSmartGridModule` has been marked as deprecated, and we recommend developper to import standalone datagrid component via exported `DIRECTIVES`, which contains a list of grid components.
+
+- In standalone components
+
+```ts
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { DIRECTIVES as GRID_DIRECTIVES } from '@azlabsjs/ngx-clr-smart-grid';
+
+
+@Component({
+  standalone: true,
+  selector: 'app-root',
+  imports: [CommonModule, ...GRID_DIRECTIVES]
+})
+export class AppComponent {
+  // Application source code
+}
+```
+
+- In angular module
+
+```ts
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/common';
+import { DIRECTIVES as GRID_DIRECTIVES } from '@azlabsjs/ngx-clr-smart-grid';
+
+
+@NgModule({
+  // ...
+  imports: [BrowserModule, ...GRID_DIRECTIVES]
+})
+export class AppModule {
+  // Application source code
 }
 ```
