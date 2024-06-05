@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
-import { CloseButtonComponent } from '../partials';
+import { CloseButtonComponent } from '../close-button';
 
 @Component({
   standalone: true,

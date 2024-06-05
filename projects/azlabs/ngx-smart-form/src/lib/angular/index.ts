@@ -3,7 +3,7 @@ import {
   NgxSmartFormArrayComponent,
   NgxSmartFormComponent,
   NgxSmartFormGroupComponent,
-} from './components';
+} from './directives';
 import { SafeHTMLPipe } from './pipes';
 
 export {
@@ -11,7 +11,7 @@ export {
   NgxSmartFormArrayComponent,
   NgxSmartFormComponent,
   NgxSmartFormGroupComponent,
-} from './components';
+} from './directives';
 // Fetch and HTML File directive exports
 export {
   ComponentReactiveFormHelpers,
@@ -23,7 +23,7 @@ export {
   useBearerTokenInterceptor,
 } from './helpers';
 // Module & component & services exports
-export { NgxSmartFormModule } from './ngx-smart-form.module';
+export { NgxSmartFormModule } from './smart-form.module';
 // Pipes exports
 export { SafeHTMLPipe } from './pipes';
 // Ng Services
@@ -65,7 +65,7 @@ export {
   provideHttpClient,
 } from './providers';
 
-/** Exported library directives */
+/** @description Exported library directives */
 export const FORM_DIRECTIVES = [
   NgxSmartFormComponent,
   NgxSmartFormGroupComponent,

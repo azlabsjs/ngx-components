@@ -9,8 +9,8 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
-import { CloseButtonComponent } from '../partials';
-import { NgxSmartFormGroupComponent } from '../ngx-smart-form-group';
+import { NgxSmartFormGroupComponent } from '../smart-form-group';
+import { CloseButtonComponent } from '../close-button';
 
 @Component({
   standalone: true,

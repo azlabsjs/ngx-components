@@ -46,10 +46,10 @@ import {
   HTTP_REQUEST_CLIENT,
 } from '../../tokens';
 import { CommonModule } from '@angular/common';
-import { NgxSmartFormArrayComponent } from '../ngx-smart-form-array';
+import { NgxSmartFormArrayComponent } from '../smart-form-array';
 import { PIPES } from '../../pipes';
-import { NgxSmartFormControlArrayComponent } from '../ngx-smart-form-control-array';
-import { NgxSmartFormGroupHeaderPipe } from '../ngx-smart-form-group';
+import { NgxSmartFormControlArrayComponent } from '../smart-form-control-array';
+import { NgxSmartFormGroupHeaderPipe } from '../smart-form-group';
 
 /**
  * Recursively get errors from an angular reactive control
@@ -99,8 +99,8 @@ type StateType = { form: FormConfigInterface; formGroup: FormGroup };
     ...PIPES,
   ],
   selector: 'ngx-smart-form',
-  templateUrl: './ngx-smart-form.component.html',
-  styleUrls: ['./ngx-form-grid.scss', './ngx-smart-form.component.scss'],
+  templateUrl: './smart-form.component.html',
+  styleUrls: ['./form-grid.scss', './smart-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 // , OnChanges

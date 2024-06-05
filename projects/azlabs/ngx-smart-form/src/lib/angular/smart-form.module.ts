@@ -12,7 +12,7 @@ import {
   NgxSmartFormControlArrayComponent,
   NgxSmartFormGroupComponent,
   NgxSmartFormGroupHeaderPipe,
-} from './components';
+} from './directives';
 import {
   SafeHTMLPipe,
   HasChildrenPipe,

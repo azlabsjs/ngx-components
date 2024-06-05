@@ -19,10 +19,10 @@ import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { cloneAbstractControl } from '../../helpers';
 import { AngularReactiveFormBuilderBridge } from '../../types';
-import { NgxSmartFormControlArrayChildComponent } from './ngx-smart-form-control-array-child.component';
+import { NgxSmartFormControlArrayChildComponent } from './smart-form-control-array-child.component';
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
 import { CommonModule } from '@angular/common';
-import { AddButtonComponent } from '../partials';
+import { AddButtonComponent } from '../add-button';
 
 /** @internal */
 type ComponentRefType = ComponentRef<NgxSmartFormControlArrayChildComponent>;

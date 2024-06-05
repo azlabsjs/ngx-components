@@ -20,11 +20,11 @@ import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { cloneAbstractControl } from '../../helpers';
 import { AngularReactiveFormBuilderBridge } from '../../types';
-import { NgxSmartFormArrayChildComponent } from './ngx-smart-form-array-child.component';
+import { NgxSmartFormArrayChildComponent } from './smart-form-array-child.component';
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
 import { CommonModule } from '@angular/common';
-import { AddButtonComponent } from '../partials';
 import { SafeValue } from '@angular/platform-browser';
+import { AddButtonComponent } from '../add-button';
 
 @Component({
   standalone: true,
@@ -138,8 +138,7 @@ export class NgxSmartFormArrayComponent
     private cdRef: ChangeDetectorRef | null,
     @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
     private builder: AngularReactiveFormBuilderBridge
-  ) {
-  }
+  ) {}
 
   ngAfterViewInit(): void {
     if (!this._initialized) {
