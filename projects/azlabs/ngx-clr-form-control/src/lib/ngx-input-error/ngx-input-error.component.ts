@@ -4,8 +4,8 @@ import {
   HostBinding,
   Input,
 } from '@angular/core';
-import { defaultStrings } from '../../constants';
-import { NgxCommonModule } from '../../common';
+import { defaultStrings } from '../constants';
+import { NgxCommonModule } from '../common';
 import { CustomErrorsPipe, ErrorsPipe } from './pipes';
 
 /** @internal */

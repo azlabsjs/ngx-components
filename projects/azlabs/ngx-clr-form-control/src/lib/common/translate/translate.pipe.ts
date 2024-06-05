@@ -1,16 +1,20 @@
 import {
   ChangeDetectorRef,
   Inject,
-  Injectable,
   OnDestroy,
   Optional,
   Pipe,
   PipeTransform,
   untracked,
 } from '@angular/core';
-import { Observable, Subscribable, Unsubscribable, map, of } from 'rxjs';
-import { COMMON_STRINGS } from './tokens';
-import { getObjectProperty } from '@azlabsjs/js-object';
+import { Subscribable, Unsubscribable, map, of } from 'rxjs';
+import { compile, equals } from './internal';
+import { Translations } from '../../types';
+import { TRANSLATIONS_DICTIONARY } from '../../tokens';
+import { defaultStrings } from '../../constants';
+
+/** @internal */
+type ObjType = { [index: string]: unknown };
 
 interface SubscriptionStrategy {
   createSubscription(
@@ -51,37 +55,41 @@ class SubscribableStrategy implements SubscriptionStrategy {
 /** @internal */
 const _subscribableStrategy = new SubscribableStrategy();
 
+/** @internal */
+const INVALID_PARAMETER_MESSAGE = `Wrong parameter in TranslatePipe. Expected a valid Object, received`;
+
 /**
- * @ngModule NgxCommonModule
+ * @ngModule CommonModule
+ * @description
  *
  * @publicApi
  */
 @Pipe({
-  name: 'commonString',
+  name: 'translate',
   pure: false,
   standalone: true,
 })
-@Injectable({ providedIn: 'any' })
-export class CommonStringsPipe implements OnDestroy, PipeTransform {
+export class TranslatePipe implements OnDestroy, PipeTransform {
   private _ref: ChangeDetectorRef | null;
   private _latestValue: any = null;
   private markForCheckOnValueUpdate = true;
 
   private _subscription: Unsubscribable | Promise<any> | null = null;
   private _lastQuery: string | null = null;
+  private _lastArgs: any[] | null = null;
   private _strategy: SubscriptionStrategy | null = null;
-  private _c: Observable<Record<string, any>>;
+  private translations: Translations;
 
   constructor(
     ref: ChangeDetectorRef,
-    @Inject(COMMON_STRINGS)
+    @Inject(TRANSLATIONS_DICTIONARY)
     @Optional()
-    _commonStrings: Observable<Record<string, any>>
+    _translations?: Translations
   ) {
     // Assign `ref` into `this._ref` manually instead of declaring `_ref` in the constructor
     // parameter list, as the type of `this._ref` includes `null` unlike the type of `ref`.
     this._ref = ref;
-    this._c = _commonStrings ?? of({});
+    this.translations = _translations ?? of(defaultStrings);
   }
 
   ngOnDestroy(): void {
@@ -98,12 +106,11 @@ export class CommonStringsPipe implements OnDestroy, PipeTransform {
   // NOTE(@benlesh): Because Observable has deprecated a few call patterns for `subscribe`,
   // TypeScript has a hard time matching Observable to Subscribable, for more information
   // see https://github.com/microsoft/TypeScript/issues/43643
-  transform(query: string, module?: string, def: string = ''): string {
+  transform(query: string, ...args: any[]): string {
     if (!query || !query.length) {
-      return def;
+      return query;
     }
 
-    const _query = module ? `${module}.${query}` : `${query}`;
     if (!this._lastQuery) {
       if (query) {
         try {
@@ -111,28 +118,61 @@ export class CommonStringsPipe implements OnDestroy, PipeTransform {
           // Synchronous updates _during_ subscription should not wastefully mark for check -
           // this value is already going to be returned from the transform function.
           this.markForCheckOnValueUpdate = false;
-          this._subscribe(_query);
+          let interpolate: { [index: string]: unknown } | null = null;
+          if (
+            !(typeof args[0] === 'undefined' || args[0] === null) &&
+            args.length
+          ) {
+            if (typeof args[0] === 'string' && args[0].length) {
+              // we accept objects written in the template such as {n:1}, {'n':1}, {n:'v'}
+              // which is why we might need to change it to real JSON objects such as {"n":1} or {"n":"v"}
+              let validArgs: string = args[0]
+                .replace(/(\')?([a-zA-Z0-9_]+)(\')?(\s)?:/g, '"$2":')
+                .replace(/:(\s)?(\')(.*?)(\')/g, ':"$3"');
+              try {
+                interpolate = JSON.parse(validArgs);
+              } catch (e) {
+                throw new SyntaxError(
+                  `${INVALID_PARAMETER_MESSAGE}: ${args[0]}`
+                );
+              }
+            } else if (typeof args[0] === 'object' && !Array.isArray(args[0])) {
+              interpolate = args[0];
+            }
+          }
+          this._subscribe(query, args, interpolate);
         } finally {
           this.markForCheckOnValueUpdate = true;
         }
       }
-      return this._latestValue ?? def;
+      return this._latestValue;
     }
 
-    if (_query !== this._lastQuery) {
+    if (!equals(query, this._lastQuery) || !equals(args, this._lastArgs)) {
       this._dispose();
-      return this.transform(query, module, def);
+      return this.transform(query, args);
     }
 
     return this._latestValue;
   }
 
-  private _subscribe(q: string): void {
+  private translate(q: string | string[], interpolateParams: ObjType) {
+    const keys = Array.isArray(q) ? q : [q];
+    const fn = (state: ObjType) => {
+      return (key: string) => compile(state, key, interpolateParams ?? {});
+    };
+    return this.translations.pipe(map((state) => keys.map(fn(state))[0]));
+  }
+
+  private _subscribe(
+    q: string,
+    args: any[],
+    interpolate: ObjType | null
+  ): void {
     this._lastQuery = q;
+    this._lastArgs = args;
     this._strategy = _subscribableStrategy;
-    const observable = this._c.pipe(
-      map((value) => getObjectProperty(value, q))
-    );
+    const observable = this.translate(q, interpolate ?? {});
     this._subscription = this._strategy.createSubscription(
       observable,
       (value: Object) => this._updateLatestValue(q, value)

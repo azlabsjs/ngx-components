@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { NumberInput } from '@azlabsjs/smart-form-core';
-import { NgxCommonModule } from '../../common';
+import { NgxCommonModule } from '../common';
 
 @Component({
   standalone: true,

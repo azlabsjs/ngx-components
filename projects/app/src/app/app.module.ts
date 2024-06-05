@@ -24,7 +24,11 @@ import {
   useOptionsInterceptor,
 } from '@azlabsjs/ngx-clr-form-control';
 import { FormControlComponent } from './form-control/form-control.component';
-import { COMMON_PIPES, providePipes } from '@azlabsjs/ngx-common';
+import {
+  COMMON_PIPES,
+  provideCommonStrings,
+  providePipes,
+} from '@azlabsjs/ngx-common';
 import { RouterModule } from '@angular/router';
 import { HTTPValuePipe } from './pipes';
 import {
@@ -33,6 +37,7 @@ import {
 } from '@azlabsjs/ngx-options-input';
 import { provideUploadOptions } from '@azlabsjs/ngx-file-input';
 import { ClarityModule } from '@clr/angular';
+import { map, timer } from 'rxjs';
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
@@ -111,6 +116,20 @@ ClarityIcons.addIcons(uploadCloudIcon);
         return next(request);
       };
     }),
+
+    provideCommonStrings(
+      timer(2000).pipe(
+        map(() => ({
+          app: {
+            modules: {
+              users: {
+                title: 'Users Administration',
+              },
+            },
+          },
+        }))
+      )
+    ),
   ],
   bootstrap: [AppComponent],
 })

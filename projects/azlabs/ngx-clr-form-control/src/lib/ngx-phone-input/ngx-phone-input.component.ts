@@ -13,7 +13,7 @@ import {
 import { AbstractControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { distinctUntilChanged, Subscription, tap } from 'rxjs';
-import { NgxCommonModule } from '../../common';
+import { NgxCommonModule } from '../common';
 import { INTL_TEL_INPUT_DIRECTIVES } from '@azlabsjs/ngx-intl-tel-input';
 
 /** @internal */

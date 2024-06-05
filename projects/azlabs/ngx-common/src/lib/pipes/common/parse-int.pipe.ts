@@ -1,10 +1,11 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Injectable, Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   pure: true,
   standalone: true,
   name: 'parseInt',
 })
+@Injectable({ providedIn: 'any' })
 export class ParseIntPipe implements PipeTransform {
   // Convert string value to integer
   transform(value: any, radix?: number | undefined) {

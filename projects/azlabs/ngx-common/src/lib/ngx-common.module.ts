@@ -9,7 +9,7 @@ import { COMMON_PIPES } from './pipes';
   exports: [CommonModule, ...COMMON_PIPES],
 })
 export class NgxCommonModule {
-  /** @deprecated Use `providePipes(...)` in your module or component to register custom pipes */
+  /** @deprecated Use `providePipes(...)`, `provideCommonStrings(...)` in your module or component to register custom pipes and application common text */
   static forRoot(config: {
     pipeTransformMap: PipeTransformTokenMapType;
   }): ModuleWithProviders<NgxCommonModule> {

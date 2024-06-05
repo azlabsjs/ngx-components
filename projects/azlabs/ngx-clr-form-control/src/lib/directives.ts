@@ -10,7 +10,7 @@ import { NgxTextInputComponent } from './ngx-text-input/ngx-text-input.component
 import { NgxTextAreaInputComponent } from './ngx-textarea-input/ngx-textarea-input.component';
 import { NgxTimeInputComponent } from './ngx-time-input/ngx-time-input.component';
 
-/** Exported directives */
+/** @internal Exported directives */
 export const DIRECTIVES = [
   NgxCheckBoxInputComponent,
   NgxDateInputComponent,

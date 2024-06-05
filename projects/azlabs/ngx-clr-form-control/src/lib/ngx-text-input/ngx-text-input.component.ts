@@ -1,7 +1,7 @@
 import { Component, Input, ContentChild, TemplateRef } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { InputTypes, TextInput } from '@azlabsjs/smart-form-core';
-import { NgxCommonModule } from '../../common';
+import { NgxCommonModule } from '../common';
 
 @Component({
   standalone: true,

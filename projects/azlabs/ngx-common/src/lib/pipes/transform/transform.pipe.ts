@@ -18,74 +18,7 @@ import {
 import { GetTimeAgo, JSDate, ParseMonth } from '@azlabsjs/js-datetime';
 import { PipeTransformTokenMapType, PipeTransformType } from './types';
 import { PIPE_TRANSFORMS } from './tokens';
-
-/**
- * Returns the strings after the first occurence the specified character
- *
- * @example
- * const substr = after('o', 'Hello World!'); // output " World!"
- *
- * @param char
- * @param haystack
- */
-export function after(char: string, haystack: string) {
-  const index = haystack.indexOf(char);
-  return haystack.slice(index + char.length);
-}
-
-/**
- * Returns the strings before the first occurence the specified character
- *
- * @example
- * const substr = before('W', 'Hello World!'); // outputs -> "Hello "
- *
- * @param char
- * @param haystack
- */
-export function before(char: string, haystack: string) {
-  return haystack.slice(0, haystack.indexOf(char));
-}
-
-/**
- * Creates pipe transform parameter from provided transform definition rules
- */
-export function createParams(transform: string) {
-  const hasParams = transform.indexOf(':') !== -1;
-  const pipe = hasParams ? before(':', transform) : transform;
-  let params = hasParams
-    ? after(':', transform)
-        .split(';')
-        .map((x) => x.trim()) ?? []
-    : [];
-  params = params.map((item) => {
-    if (item.indexOf('json:') !== -1) {
-      return JSON.parse(after('json:', item));
-    }
-    if (item.indexOf('js:') !== -1) {
-      return JSON.parse(after('js:', item));
-    }
-    return item;
-  });
-
-  return [pipe, ...params];
-}
-
-/**
- * Compute the substring of the `value` string
- */
-function substr(value: string, start: number, length?: number) {
-  if (typeof value !== 'string') {
-    return '';
-  }
-  if (start > value.length) {
-    return '';
-  }
-  start = start >= 0 ? start : value.length - Math.abs(start);
-  if (start < 0) {
-    return '';
-  }
-  return String(value).substring(start, length ? start + length : undefined);
-}
+import { createParams, substr } from './internal';
 
 @Pipe({
   pure: true,
@@ -95,9 +28,7 @@ function substr(value: string, start: number, length?: number) {
 export class NgxTransformPipe implements PipeTransform {
   private injector = inject(EnvironmentInjector);
 
-  /**
-   * Creates an instance {@see NgxGridDataPipe} pipe
-   */
+  /** @description Creates an instance {@see NgxTransformPipe} pipe */
   constructor(
     private uppercasePipe: UpperCasePipe,
     private lowerCasePipe: LowerCasePipe,
@@ -109,9 +40,7 @@ export class NgxTransformPipe implements PipeTransform {
     @Inject(PIPE_TRANSFORMS) private transforms?: PipeTransformTokenMapType
   ) {}
 
-  /**
-   * Transform template value to it corresponding converted value using the user pipe
-   */
+  /** @description Transform template value to it corresponding converted value using the user pipe */
   transform(value: any, transform: PipeTransformType | PipeTransformType[]) {
     if (Array.isArray(transform)) {
       return transform.reduce((carry, current) => {

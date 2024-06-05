@@ -8,10 +8,10 @@ import {
   SlicePipe,
   UpperCasePipe,
 } from '@angular/common';
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { GridColumnType, GridConfigType } from '@azlabsjs/ngx-clr-smart-grid';
-import { createPipeTransform } from '@azlabsjs/ngx-common';
+import { COMMON_PIPES, createPipeTransform } from '@azlabsjs/ngx-common';
 import { createSlide } from '@azlabsjs/ngx-slides';
 import {
   FormsClient,
@@ -84,7 +84,9 @@ type ValuesType = typeof _values;
     PercentPipe,
     SlicePipe,
     AsyncPipe,
+    ...COMMON_PIPES
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
   formControl = new FormControl<string | undefined>(undefined);

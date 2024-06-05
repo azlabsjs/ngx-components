@@ -13,7 +13,7 @@ import {
   InputOptions,
   OptionsInputConfigInterface,
 } from '@azlabsjs/smart-form-core';
-import { NgxCommonModule } from '../../common';
+import { NgxCommonModule } from '../common';
 import { OPTIONS_DIRECTIVES } from '@azlabsjs/ngx-options-input';
 
 /** @interal */

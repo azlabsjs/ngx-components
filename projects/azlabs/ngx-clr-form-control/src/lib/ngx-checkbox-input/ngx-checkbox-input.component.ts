@@ -22,7 +22,7 @@ import {
 } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { distinctUntilChanged, tap } from 'rxjs/operators';
-import { NgxCommonModule } from '../../common';
+import { NgxCommonModule } from '../common';
 import { CheckboxComponent } from './checkbox.component';
 import { IsCheckedPipe } from './is-checked.pipe';
 

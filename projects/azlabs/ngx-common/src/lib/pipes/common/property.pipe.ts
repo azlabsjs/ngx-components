@@ -1,16 +1,14 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Injectable, Pipe, PipeTransform } from '@angular/core';
 import { JSObject } from '@azlabsjs/js-object';
 
-/**
- * Resolve the value for a given property
- */
+/** @description Resolve the value for a given property */
 @Pipe({
   pure: true,
   standalone: true,
   name: 'propValue',
 })
+@Injectable({ providedIn: 'any' })
 export class PropertyValuePipe implements PipeTransform {
-  // Resolve property value for a given object
   transform(
     value: Record<string, unknown> | undefined | null,
     property: string,

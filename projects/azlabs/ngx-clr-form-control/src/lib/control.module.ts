@@ -14,7 +14,6 @@ import {
   provideQueryClient,
 } from '@azlabsjs/ngx-options-input';
 import '@cds/core/icon/register.js';
-import { deepEqual } from '@azlabsjs/utilities';
 
 type ConfigType = {
   translationsProvider?: Provider;

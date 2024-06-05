@@ -13,12 +13,12 @@ import {
   InputOptions,
   OptionsInputConfigInterface,
 } from '@azlabsjs/smart-form-core';
-import { InputEventArgs } from '../../types';
+import { InputEventArgs } from '../types';
 import {
   FetchOptionsDirective,
   OPTIONS_DIRECTIVES,
 } from '@azlabsjs/ngx-options-input';
-import { NgxCommonModule } from '../../common';
+import { NgxCommonModule } from '../common';
 import { NgSelectModule } from '@ng-select/ng-select';
 
 /** @internal */

@@ -8,20 +8,16 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {
-  FormControl,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
 import { Subscription } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { InputEventArgs } from './types';
 import { FILE_INPUT_DIRECTIVES } from '@azlabsjs/ngx-file-input';
 import { NgxCommonModule } from './common';
-import { DIRECTIVES } from './components';
 import { ClarityModule } from '@clr/angular';
 import { ClarityIcons, eyeHideIcon, eyeIcon } from '@cds/core/icon';
+import { DIRECTIVES } from './directives';
 
 // Register clarity eye icons
 ClarityIcons.addIcons(eyeHideIcon, eyeIcon);

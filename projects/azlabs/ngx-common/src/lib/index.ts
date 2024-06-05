@@ -19,6 +19,9 @@ export {
   NgxTransformPipe,
   createPipeTransform,
   PIPE_TRANSFORMS,
+  JoinPipe,
+  DefinedPipe,
+  IncludesPipe,
 } from './pipes';
 
 // Exported module

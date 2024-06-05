@@ -1,10 +1,11 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Injectable, Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   pure: true,
   standalone: true,
   name: 'parseStr',
 })
+@Injectable({ providedIn: 'any' })
 export class ParseStrPipe implements PipeTransform {
   // Parses a string replacing template variable `[name]`
   // with the corresponding value in the provided object
@@ -29,6 +30,7 @@ export class ParseStrPipe implements PipeTransform {
   standalone: true,
   name: 'strlen',
 })
+@Injectable({ providedIn: 'any' })
 export class StrLengthPipe implements PipeTransform {
   /** @description Returns the length of string object */
   transform(value: any): number {

@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { defaultStrings } from '../../constants';
+import { defaultStrings } from '../constants';
 
 /** @internal */
 type ErrorsType = { [prop: string]: any };
