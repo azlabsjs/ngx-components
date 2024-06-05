@@ -185,20 +185,22 @@ export function setHiddenPropertyFactory(
           // we can proceed to input update
         } else if (i.name === n) {
           const values = i.requiredIf?.values ?? [];
+          const _previous = i.hidden;
           i.hidden = isHidden(values, v);
+          const _current = i.hidden;
           // We find the parent node of the property to update
           // on which .get(), .removeControl() and .addControl() will be called
           const r = findAbstractControlParent(g, b.key);
           if (r === null) {
             return;
           }
-          if (i.hidden) {
-            const c = r.get(n);
+          const c = r.get(n);
+          if (i.hidden && c) {
             b.setValueFactory = () => (_g: FormGroup<any>, k: string) => {
               return setPropertyFactory(builder)(_g, k, c?.getRawValue(), i);
             };
             r.removeControl(n);
-          } else {
+          } else if (_previous !== _current && !c) {
             r.addControl(n, cloneAbstractControl(b.abstractControl));
             const { setValueFactory } = b;
             if (setValueFactory) {

@@ -8,7 +8,10 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class NgxSmartFormGroupHeaderPipe implements PipeTransform {
   // @internal
   // Transform value into an html content if it's not html
-  transform(value: string) {
+  transform(value: string, hidden?: boolean) {
+    if (hidden) {
+      return '';
+    }
     if (/<.+?>/g.test(value)) {
       return value;
     }

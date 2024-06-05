@@ -8,7 +8,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 
 @Pipe({
   name: 'isHidden',
-  pure: true,
+  pure: false,
   standalone: true,
 })
 export class IsHiddenPipe implements PipeTransform {

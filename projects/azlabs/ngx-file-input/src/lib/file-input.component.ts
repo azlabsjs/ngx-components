@@ -78,13 +78,12 @@ export class NgxSmartFileInputComponent {
   @Input({ alias: 'multiple' }) multiple: boolean = false;
   @Input({ alias: 'max-file-size' }) maxFilesize: number = 10;
   @Input({ alias: 'max-files' }) maxFiles: number = 50;
-  @Input({ alias: 'has-error' }) hasError: boolean = false;
   @Input() describe: boolean = true;
   /** @description Read the id property of the uploaded file result or the entire object */
   @Input() read: 'id' | 'url' | 'object' | undefined = 'id';
-  @Input({ alias: 'required-error' }) requiredError!: string;
   @Input({ alias: 'file-size-error' }) fileSizeError!: string;
   @Input({ alias: 'file-upload-error' }) fileUploadError!: string;
+  @Input() accept: string|string[] = [];
 
   /**
    * Ng Input attribute that defines whether files must

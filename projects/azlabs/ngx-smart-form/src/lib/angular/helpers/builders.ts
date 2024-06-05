@@ -305,7 +305,7 @@ export class ComponentReactiveFormHelpers {
       control.markAsTouched({ onlySelf: true });
       control.markAsDirty({ onlySelf: true });
       control.markAsPristine({ onlySelf: true });
-      control.updateValueAndValidity();
+      control.updateValueAndValidity({ onlySelf: true });
     }
   }
 
@@ -404,8 +404,5 @@ export function createFormArray(
   builder: FormBuilder,
   inputConfig: InputConfigInterface
 ) {
-  return ComponentReactiveFormHelpers.buildArray(
-    builder,
-    inputConfig
-  );
+  return ComponentReactiveFormHelpers.buildArray(builder, inputConfig);
 }

@@ -32,22 +32,14 @@ import { AddButtonComponent } from '../add-button';
   selector: 'ngx-smart-form-array',
   template: `
     <div #container></div>
-    <div *ngIf="refCount === 0" class="no-control-content">
-      <ng-container
-        *ngTemplateOutlet="
-          addGroupRef ? addGroupRef : addTemplate;
-          context: { $implicit: onAddButtonClick.bind(this) }
-        "
-      ></ng-container>
+    <div class="placeholder" *ngIf="refCount === 0">
     </div>
-    <ng-container *ngIf="refCount !== 0">
-      <ng-container
-        *ngTemplateOutlet="
-          addGroupRef ? addGroupRef : addTemplate;
-          context: { $implicit: onAddButtonClick.bind(this) }
-        "
-      ></ng-container>
-    </ng-container>
+    <ng-container
+      *ngTemplateOutlet="
+        addGroupRef ? addGroupRef : addTemplate;
+        context: { $implicit: onAddButtonClick.bind(this) }
+      "
+    ></ng-container>
 
     <ng-template #addTemplate let-handler>
       <ngx-add-button (click)="handler($event)"></ngx-add-button>
@@ -55,6 +47,26 @@ import { AddButtonComponent } from '../add-button';
   `,
   styles: [
     `
+      .placeholder {
+        border: 0;
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: var(
+            --ngx-array-placeholder-padding-top,
+            calc(24 * calc((1rem / 20) * 1))
+          )
+          0 var(--ngx-array-placeholder-padding-bottom, 4px) 0;
+        font-size: var(
+          --ngx-array-placeholder-font-size,
+          calc(20 * calc((1rem / 24) * 1))
+        );
+        font-weight: var(--ngx-array-placeholder-font-weight, 400);
+        line-height: var(--ngx-array-placeholder-line-height, 1.2rem);
+        letter-spacing: var(--ngx-array-placeholder-letter-spacing, -0.01rem);
+        color: var(--ngx-array-placeholder-color, inherit);
+      }
       .no-control-content {
         display: flex;
         align-items: center;
@@ -184,23 +196,29 @@ export class NgxSmartFormArrayComponent
         .pipe(takeUntil(this._destroy$))
         .subscribe(() => {
           let count = this._refCount;
-          if (count > 1) {
+          if (count >= 0) {
             componentRef.destroy();
             count -= 1;
             // Remove the elment from the list of reference components
-            this.componentRefs = this.componentRefs.filter(
-              (component: ComponentRef<NgxSmartFormArrayChildComponent>) => {
-                return component.instance === componentRef.instance
-                  ? false
-                  : true;
+            const i = this.componentRefs.findIndex((c) => {
+              return c.instance.index === componentRef.instance.index;
+            });
+            if (componentRef.instance.index !== this.componentRefs.length) {
+              for (let _i = i + 1; _i < this.componentRefs.length; _i++) {
+                const ref = this.componentRefs[_i];
+                if (!ref) {
+                  break;
+                }
+                ref.instance.index = ref.instance.index - 1;
               }
-            );
-            this._array.removeAt(componentRef.instance.index);
+            }
+            this.componentRefs.splice(i, 1);
+            this._array.removeAt(componentRef.instance.index - 1, {
+              emitEvent: true,
+            });
+            this._array.updateValueAndValidity();
             this.setRefCount(count);
             this.listChange.emit(count);
-          } else {
-            componentRef.instance.formGroup.reset();
-            this._array.updateValueAndValidity();
           }
         });
       this.componentRefs.push(componentRef);
@@ -218,8 +236,8 @@ export class NgxSmartFormArrayComponent
       // Then for each element in the form array we add a new component to the view container reference
       let index = 0;
       for (const control of a.controls) {
-        this.addComponent(control as FormGroup, index);
         index++;
+        this.addComponent(control as FormGroup, index);
       }
       this.setRefCount(index);
     }

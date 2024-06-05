@@ -38,10 +38,10 @@
       <!-- INPUT GROUP CONTAINER PART -->
       <ng-container *ngIf="value | hasChildren">
         <div [class]="noGridLayout ? 'ngx-form-no-grid' : value.containerClass" [hidden]="value | isHidden">
-          <div [innerHTML]="value.label | ngxGroupHeader | safeHtml"></div>
+          <div [innerHTML]="value.label | ngxGroupHeader | safeHtml" [hidden]="value | isHidden"></div>
           <!-- REPEATABLE INPUTS GROUP -->
           <ng-container *ngIf="value | repeatable">
-            <ngx-smart-form-array [header]="value.label | ngxGroupHeader | safeHtml" [no-grid-layout]="noGridLayout" *ngIf="group?.get(value.name)"
+            <ngx-smart-form-array [no-grid-layout]="noGridLayout" *ngIf="group?.get(value.name)"
               [formArray]="group?.get(value.name)" [controls]="value.children || []" [template]="template"
               [addGroupRef]="addTemplate" [name]="value.name" [autoupload]="autoupload">
             </ngx-smart-form-array>

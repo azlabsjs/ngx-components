@@ -6,10 +6,9 @@
           [read]="config.read" [describe]="describe" [autoupload]="config.autoupload ?? false"
           [upload-as]="config.uploadAs" [placeholder]="config.placeholder" [class]="config.classes"
           [multiple]="config.multiple" [description]="config.description" [max-file-size]="config.maxFileSize"
-          [max-files]="50" [url]="config.uploadUrl"
-          [has-error]="formControl.hasError('required') && formControl.touched" (reset)="formControl.reset()"
-          (value)="formControl.setValue($event)" [required-error]="'validation.required' | translate" [file-size-error]="
-          'fileSizeError'| translate: { maxFilesize: config.maxFileSize }"
+          [max-files]="50" [url]="config.uploadUrl" (reset)="formControl.reset()" (value)="formControl.setValue($event)"
+          [file-size-error]="'fileSizeError'| translate: { maxFilesize: config.maxFileSize }"
+          [accept]="config.pattern ?? []"
           [file-upload-error]="'fileUploadError' | translate">
           <label class="clr-control-label" *ngIf="describe" [for]="config.name">
             {{ config.label }}
@@ -17,9 +16,9 @@
               (*)
             </small>
           </label>
+          <ngx-input-error error *ngIf="formControl.touched" [errors]="formControl.errors"></ngx-input-error>
         </ngx-file-input>
       </ng-container>
-      <ngx-input-error *ngIf="formControl.touched" [errors]="formControl.errors"></ngx-input-error>
     </ng-container>
     <ng-container *ngSwitchCase="inputTypes.HTML_INPUT">
       <div [innerHTML]="inputConfig.value | trustHtml"></div>

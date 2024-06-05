@@ -51,10 +51,7 @@ import { PIPES } from '../../pipes';
 import { NgxSmartFormControlArrayComponent } from '../smart-form-control-array';
 import { NgxSmartFormGroupHeaderPipe } from '../smart-form-group';
 
-/**
- * Recursively get errors from an angular reactive control
- * (eg: FormGroup, FormControl, FormArray)
- */
+/** @description Recursively get errors from an angular reactive control (eg: FormGroup, FormControl, FormArray) */
 function getFormErrors(control: AbstractControl) {
   const errors: ValidationErrors[] = [];
   const getErrors = (c: AbstractControl, _name?: string) => {
@@ -85,9 +82,6 @@ function getFormErrors(control: AbstractControl) {
 /** @internal */
 const AUTO_SUBMIT_ERROR_MESSAGE =
   'autoSubmit input property must only be true if the form endpointURL is configured or an Http Client has been registered!';
-
-/** @internal */
-type StateType = { form: FormConfigInterface; formGroup: FormGroup };
 
 @Component({
   standalone: true,
@@ -162,7 +156,7 @@ export class NgxSmartFormComponent
   public constructor(
     @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
     private builder: AngularReactiveFormBuilderBridge,
-    private changesRef: ChangeDetectorRef,
+    private cdRef: ChangeDetectorRef | null,
     @Inject(HTTP_REQUEST_CLIENT) @Optional() private client?: RequestClient
   ) {}
 
@@ -172,7 +166,7 @@ export class NgxSmartFormComponent
     // Set or update the form state of the current component
     const { controlConfigs } = this._form;
     setFormValue(this.builder, this._formGroup, state, controlConfigs ?? []);
-    this.changesRef?.markForCheck();
+    this.cdRef?.markForCheck();
   }
 
   ngAfterViewInit(): void {
@@ -260,7 +254,10 @@ export class NgxSmartFormComponent
         filter((status) => status !== 'PENDING'),
         takeUntil(this._destroy$)
       )
-      .subscribe(() => this.changesRef?.detectChanges());
+      .subscribe(() => {
+        this.cdRef?.detectChanges();
+        console.log(this.formGroup.getRawValue());
+      });
     // We simply return without performing any further action if the validation fails
     // Due to some issue with form group being invalid while all controls does not
     // have error, we are adding a check that verifies if all controls has error before
@@ -381,6 +378,7 @@ export class NgxSmartFormComponent
   }
 
   private onFormConfigChanges(f: FormConfigInterface, formgroup?: FormGroup) {
+    console.log('Called onFormConfigChanges...');
     // We create an instance of angular Reactive Formgroup instance from input configurations
     // if formgroup parameter is null or undefined
     if (!formgroup) {
@@ -401,7 +399,12 @@ export class NgxSmartFormComponent
     const { controlConfigs: values } = this._form;
     const factory = bindingsFactory(values ?? []);
     const b = factory(this._formGroup);
-    const [g, _inputs] = setInputsProperties(this.builder, values, b, this._formGroup);
+    const [g, _inputs] = setInputsProperties(
+      this.builder,
+      values,
+      b,
+      this._formGroup
+    );
     this.setFormState({ ...this._form, controlConfigs: _inputs }, g);
     // register controls value changes and update ui based on requiredIf configuration
     // on form inputs
@@ -430,7 +433,7 @@ export class NgxSmartFormComponent
       this._formGroup = g;
     }
 
-    this.changesRef?.detectChanges();
+    this.cdRef?.detectChanges();
   }
 
   ngOnDestroy(): void {
