@@ -12,7 +12,7 @@
         "disabled": false,
         "readonly": false,
         "unique": false,
-        "pattern": "image/*",
+        "pattern": "image/*,application/pdf",
         "label": "Fichier",
         "isRepeatable": false,
         "dynamicControlContainerClass": "clr-col-12 pb-1",
