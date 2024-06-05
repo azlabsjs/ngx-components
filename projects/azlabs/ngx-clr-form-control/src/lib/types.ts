@@ -7,4 +7,5 @@ export type InputEventArgs = {
 };
 
 /** @description Translated text to preview on form control elements */
-export type Translations = Observable<Record<string, any>>;
+export type Translations<T extends Record<string, any> = Record<string, any>> =
+  Observable<T>;

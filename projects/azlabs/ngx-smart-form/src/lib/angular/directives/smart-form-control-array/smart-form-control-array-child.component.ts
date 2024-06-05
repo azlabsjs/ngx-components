@@ -42,7 +42,7 @@ import { CloseButtonComponent } from '../close-button';
       }
 
       .ngx__form_array__card__card_block {
-        padding: var(--ngx-form-array-card-padding, 0.6rem 0rem);
+        padding: var(--ngx-form-array-card-padding, 0rem);
         flex-grow: 1;
       }
       :host ::ng-deep .ngx__form_array__card__close_btn {

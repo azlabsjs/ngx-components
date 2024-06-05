@@ -2,7 +2,7 @@
   [config]="state.config.optionsConfig" [name]="state.config.name">
   <ng-container *ngIf="(state.config.options ?? []).length > 0">
     <div class="clr-form-control">
-      <label class="clr-control-label">Inline checkbox example</label>
+      <label class="clr-control-label">{{ state.config!.label }}</label>
       <div class="clr-control-container clr-control-inline">
         <ng-container *ngFor="let item of state.config.options">
           <ngx-checkbox [checked]="item.value|isChecked:state.selection" [text]="item.description"

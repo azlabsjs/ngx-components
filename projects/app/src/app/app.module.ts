@@ -22,6 +22,7 @@ import { TestPipe } from './pipes/test.pipe';
 import {
   CLR_FORM_CONTROL_DIRECTIVES,
   useOptionsInterceptor,
+  provideTranslations
 } from '@azlabsjs/ngx-clr-form-control';
 import { FormControlComponent } from './form-control/form-control.component';
 import {
@@ -130,6 +131,29 @@ ClarityIcons.addIcons(uploadCloudIcon);
         }))
       )
     ),
+    provideTranslations({
+      loadingText: 'Chargement en cours...',
+      validation: {
+        minlength:
+          'La longueur minimal du champ est de {{requiredLength}}',
+        maxlength:
+          'La longueur maximale du champ est de {{requiredLength}}',
+        maxLength: 'La longueur maximale du champ est de {{value}}',
+        minLength: 'La longueur minimal du champ est de {{value}}',
+        invalid: 'La valeur du champ est invalide',
+        required: 'Le champ est requis',
+        unique: 'La valeur de ce champ est déja existante',
+        email: 'La valeur de ce champ doit être un adresse mail valid [example@email.com]',
+        pattern: 'La valeur du champ est invalide',
+        min: 'La valeur minimal du champ est de {{value}}',
+        max: 'La valeur maximal du champ est de {{value}}',
+        phone: 'Veuillez saisir un numéro de téléphone valid',
+        minDate: 'Veuillez saisir une date ultérieure à la date du {{date}}',
+        maxDate: 'Veuillez saisir une date antérieure à la date du {{date}}',
+        exists: 'La valeur du champ n\'existe pas dans la dans la base de données',
+        equals: 'La valeur du champ {{value}} ne correspond pas à la valeur saisie',
+      },
+    })
   ],
   bootstrap: [AppComponent],
 })
