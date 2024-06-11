@@ -22,6 +22,20 @@ export class DefinedPipe implements PipeTransform {
 export class IncludesPipe implements PipeTransform {
   /** @description Checks if the indexOf the provided search exists in the `value` parameter */
   transform(value: string | unknown[], search: unknown) {
-    return value.indexOf(search as any) !== 1;
+    return value.indexOf(search as any) !== -1;
+  }
+}
+
+
+@Pipe({
+  standalone: true,
+  pure: true,
+  name: 'indexOf',
+})
+@Injectable({ providedIn: 'any' })
+export class IndexOfPipe implements PipeTransform {
+  /** @description returns the index of the search parameter in the collection data type */
+  transform(value: string | unknown[], search: unknown) {
+    return value.indexOf(search as any);
   }
 }

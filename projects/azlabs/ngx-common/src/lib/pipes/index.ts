@@ -10,11 +10,11 @@ import { ParseStrPipe, StrLengthPipe } from './common/str.pipe';
 import { PipeResultPipe } from './common/pipe-result.pipe';
 import { PropertyValuePipe } from './common/property.pipe';
 import { NgxTransformPipe } from './transform';
-import { DefinedPipe, IncludesPipe } from './common/utils.pipe';
+import { DefinedPipe, IncludesPipe, IndexOfPipe } from './common/utils.pipe';
 import { CommonStringsPipe, CommonTextPipe } from './strings';
 
 /** Exports */
-export { DefinedPipe, IncludesPipe } from './common/utils.pipe';
+export { DefinedPipe, IncludesPipe, IndexOfPipe } from './common/utils.pipe';
 export { IsAsyncPipe } from './common/is-async.pipe';
 export { PipeResultPipe } from './common/pipe-result.pipe';
 export { ParseIntPipe } from './common/parse-int.pipe';
@@ -58,4 +58,5 @@ export const COMMON_PIPES = [
   JoinPipe,
   DefinedPipe,
   IncludesPipe,
+  IndexOfPipe
 ] as const;

@@ -9,9 +9,7 @@ import { Injectable, Pipe, PipeTransform } from '@angular/core';
 export class ArrayPipe implements PipeTransform {
   /** Returns an empty array if the provided value is null or undefined or the value else */
   transform<T>(value: undefined | T[]) {
-    return typeof value === 'undefined' || value === null
-      ? ([] as T[])
-      : (value as T);
+    return typeof value === 'undefined' || value === null ? ([] as T[]) : value;
   }
 }
 
