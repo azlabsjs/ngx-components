@@ -22,7 +22,8 @@ export {
   JoinPipe,
   DefinedPipe,
   IncludesPipe,
-  CommonTextPipe
+  CommonTextPipe,
+  IndexOfPipe,
 } from './pipes';
 
 // Exported module
