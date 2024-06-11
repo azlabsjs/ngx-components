@@ -1,5 +1,16 @@
 import { Injectable, Pipe, PipeTransform } from '@angular/core';
 
+// TODO: Uncomment the code below to use custom implementation instead of implementation from angular
+// /** @description Checks if a provided value is a promise or not */
+// function isPromise<T>(a: unknown): a is Promise<T> {
+//   return (
+//     typeof a === 'object' &&
+//     a !== null &&
+//     typeof (a as Promise<T>).then === 'function' &&
+//     typeof (a as Promise<T>).catch === 'function'
+//   );
+// }
+
 @Pipe({
   standalone: true,
   pure: true,
@@ -26,7 +37,6 @@ export class IncludesPipe implements PipeTransform {
   }
 }
 
-
 @Pipe({
   standalone: true,
   pure: true,
@@ -37,5 +47,17 @@ export class IndexOfPipe implements PipeTransform {
   /** @description returns the index of the search parameter in the collection data type */
   transform(value: string | unknown[], search: unknown) {
     return value.indexOf(search as any);
+  }
+}
+
+@Pipe({
+  standalone: true,
+  name: 'asAny',
+  pure: true,
+})
+export class AsAnyPipe implements PipeTransform {
+  // Cast the provided value as any
+  transform(value: unknown) {
+    return value as any;
   }
 }

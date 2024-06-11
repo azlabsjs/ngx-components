@@ -4,18 +4,28 @@ import {
   IsArrayPipe,
   JoinPipe,
 } from './common/arrays.pipe';
-import { IsAsyncPipe } from './common/is-async.pipe';
+import { IsAsyncPipe, AsObservablePipe } from './common/async.pipe';
 import { ParseIntPipe } from './common/parse-int.pipe';
 import { ParseStrPipe, StrLengthPipe } from './common/str.pipe';
 import { PipeResultPipe } from './common/pipe-result.pipe';
 import { PropertyValuePipe } from './common/property.pipe';
 import { NgxTransformPipe } from './transform';
-import { DefinedPipe, IncludesPipe, IndexOfPipe } from './common/utils.pipe';
+import {
+  AsAnyPipe,
+  DefinedPipe,
+  IncludesPipe,
+  IndexOfPipe,
+} from './common/utils.pipe';
 import { CommonStringsPipe, CommonTextPipe } from './strings';
 
 /** Exports */
-export { DefinedPipe, IncludesPipe, IndexOfPipe } from './common/utils.pipe';
-export { IsAsyncPipe } from './common/is-async.pipe';
+export {
+  AsAnyPipe,
+  DefinedPipe,
+  IncludesPipe,
+  IndexOfPipe,
+} from './common/utils.pipe';
+export { IsAsyncPipe, AsObservablePipe } from './common/async.pipe';
 export { PipeResultPipe } from './common/pipe-result.pipe';
 export { ParseIntPipe } from './common/parse-int.pipe';
 export { ParseStrPipe, StrLengthPipe } from './common/str.pipe';
@@ -58,5 +68,7 @@ export const COMMON_PIPES = [
   JoinPipe,
   DefinedPipe,
   IncludesPipe,
-  IndexOfPipe
+  IndexOfPipe,
+  AsObservablePipe,
+  AsAnyPipe,
 ] as const;
