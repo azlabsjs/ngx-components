@@ -101,7 +101,7 @@ export type GridDetailColumnType = {
 };
 
 /** @description List of columns type declaration */
-export type DetailColumnTypes = GridDetailColumnType[];
+export type GridDetailColumnTypes = GridDetailColumnType[];
 
 // #region Pagination type declarations
 /** @description Paginate query result type definition */
