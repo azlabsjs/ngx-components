@@ -9,6 +9,7 @@ export {
   GridColumnType,
   GridConfigType,
   GriSelectDirectiveInputType,
+  GridDetailColumnType
 } from './core';
 export { NgxClrGridSelectDirective } from './directives';
 export { NgxClrSmartGridComponent } from './grid.component';

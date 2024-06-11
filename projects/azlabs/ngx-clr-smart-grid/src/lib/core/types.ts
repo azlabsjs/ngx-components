@@ -1,28 +1,18 @@
 import { ClrDatagridComparatorInterface } from '@clr/angular';
 
-/**
- * @internal
- *
- * Supported pipe transform type
- */
+/** @internal Supported pipe transform type */
 export type PipeTransformType = string | ((value: any) => any) | undefined;
 
-/**
- * Comparator function type declaration
- */
+/** @description Comparator function type declaration */
 export type Comparator<T> =
   | {
       compare: (a: T, b: T) => number;
     }
   | ClrDatagridComparatorInterface<unknown>;
 
-/**
- * Type definition of a smart grid column.
- * It represents each column of the smart grid
- */
-export type GridColumnType = {
+/** @internal */
+type BaseGridColumnType = {
   title: string;
-  label: string;
   transformTitle?: PipeTransformType | PipeTransformType[];
   transform?: PipeTransformType | PipeTransformType[];
   style?: {
@@ -31,23 +21,48 @@ export type GridColumnType = {
   };
   type?: 'string' | 'number';
   field?: string;
-  /**
-   * Comparator function when sorting datagrid items
-   */
+  /** @description Comparator function when sorting datagrid items */
   sort?: Comparator<unknown> | string | undefined;
-  /**
-   * The sortable property makes the column available for sorting
-   */
+  /** @description The sortable property makes the column available for sorting */
   sortable?: boolean;
-  /**
-   * Property name used during sort queries
-   */
+  /** @description Property name used during sort queries */
   sortPropertyName?: string;
 };
 
-/**
- * Type definition of Smart datagrid configuration value.
+/** @deprecated Legacy grid column configuration type declaration */
+export type LegacyGridColumnType = BaseGridColumnType & {
+  /** @deprecated Use `property` instead */
+  label: string;
+};
+
+/** 
+ * @description new datagrid API column type definition
+ * @internal
  */
+export type DatagridColumnType = BaseGridColumnType & { property: string };
+
+/** @description Type definition of a smart grid column. It represents each column of the smart grid */
+export type GridColumnType = LegacyGridColumnType | DatagridColumnType;
+
+/** @description Type declaration for a grid column type with added searchable property */
+export type SearchableGridColumnType = GridColumnType &
+  (
+    | {
+        searcheable?: true;
+        search?: {
+          type?: 'text' | 'date';
+          /**
+           * Flexible property is use allow grid to control the operator use when performing
+           * search. Case the search flexibility is true, an `or` query is send to the server
+           * else an `and` query is send to the server
+           */
+          flexible: boolean;
+        };
+      }
+    | { searcheable?: false }
+  );
+
+/** @description Type definition of Smart datagrid configuration value. */
 export type GridConfigType = {
   transformColumnTitle?: PipeTransformType | PipeTransformType[];
   selectable: boolean;
@@ -67,15 +82,29 @@ export type GridConfigType = {
   columnHeadersClass?: string | string[];
 };
 
+/** @description Grid select directive input type declaration */
 export type GriSelectDirectiveInputType = {
   selectable: boolean;
   singleSelection: boolean;
 };
 
+/** @description Datagrid Detail columns type declaration */
+export type GridDetailColumnType = {
+  title: string;
+  property: string;
+  titleTransform?: PipeTransformType | PipeTransformType[];
+  transform?: PipeTransformType | PipeTransformType[];
+  style?: {
+    cssClass?: string | string[];
+    styles?: string[] | Record<string, boolean>;
+  };
+};
+
+/** @description List of columns type declaration */
+export type DetailColumnTypes = GridDetailColumnType[];
+
 // #region Pagination type declarations
-/**
- * Paginate query result type definition
- */
+/** @description Paginate query result type definition */
 export type PaginateResult<T> = {
   total?: number;
   data: T[];
@@ -85,20 +114,13 @@ export type PaginateResult<T> = {
   page?: number;
 };
 
-/**
- * paginate result single item type definition. To make it easy for developpers
- * for identify paginate result items
- */
+/** @description paginate result single item type definition. To make it easy for developpers for identify paginate result items */
 export type PaginateItem = { id: string | number } & Record<string, unknown>;
 
-/**
- * Project query function query filters type
- */
+/** @description Project query function query filters type */
 export type QueryFiltersType = { [index: string]: any }[];
 
-/**
- * Parameter type for projectPaginateQuery() query function
- */
+/** @description Parameter type for projectPaginateQuery() query function */
 export type ProjectPaginateQueryParamType<T = any> = {
   page?: {
     from?: number;
@@ -113,9 +135,7 @@ export type ProjectPaginateQueryParamType<T = any> = {
   filters?: any[];
 };
 
-/**
- * projectPaginateQuery() query function output type
- */
+/** @description projectPaginateQuery() query function output type */
 export type ProjectPaginateQueryOutputType = {
   page: number;
   per_page: number | undefined;

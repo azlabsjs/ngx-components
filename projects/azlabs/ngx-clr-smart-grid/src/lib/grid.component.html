@@ -52,7 +52,8 @@
       <ng-container *ngFor="let column of columns">
         <clr-dg-cell (click)="onItemClick($event, current)">
           <span class="cell-value" [ngClass]="column.style.class ?? ''" [style]="column.style.styles">
-            <ng-container *ngIf="current|propValue:column.label | transform: column.transform | pipeResult as result">
+            <ng-container
+              *ngIf="current|propValue:column.property | transform: column.transform | pipeResult as result">
               <ng-container *ngIf="result.value | isAsync; else noAsyncRef">{{result.value | async}}</ng-container>
               <ng-template #noAsyncRef>{{ result.value }}</ng-template>
             </ng-container>

@@ -115,11 +115,11 @@ export class AppComponent implements OnInit {
   public columns: GridColumnType[] = [
     {
       title: 'Nom',
-      label: 'lastname',
+      property: 'lastname',
     },
     {
       title: 'Prénoms',
-      label: 'firstname',
+      property: 'firstname',
       transform: [
         'uppercase',
         (value: string) =>
@@ -128,24 +128,24 @@ export class AppComponent implements OnInit {
     },
     {
       title: 'Type',
-      label: 'type',
+      property: 'type',
     },
     {
       title: 'Téléphone',
-      label: 'address.phone',
+      property: 'address.phone',
     },
     {
       title: 'Genre',
-      label: 'sex',
+      property: 'sex',
     },
     {
       title: 'Nationalité',
-      label: 'address.nationality',
+      property: 'address.nationality',
       transform: createPipeTransform(this.lowercasePipe),
     },
     {
       title: 'Test',
-      label: 'test',
+      property: 'test',
       transform: 'testPipe',
       style: {
         class: 'label label-success p-top-bottom-12',

@@ -14,6 +14,9 @@ import {
   ProjectPaginateQueryParamType,
   GridColumnType,
   GridConfigType,
+  DatagridColumnType,
+  LegacyGridColumnType,
+  remove,
 } from './core';
 import { CommonModule } from '@angular/common';
 import { NgxClrGridSelectDirective } from './directives';
@@ -127,33 +130,43 @@ export class NgxClrSmartGridComponent {
     }),
   })
   config: Required<GridConfigType> = GRID_CONFIG;
-  @Input({
-    required: true,
-    transform: (values: GridColumnType[]) =>
-      values.map((column) => ({
-        ...column,
-        field: column.field ?? '',
-        style: column.style
-          ? {
-              class: Array.isArray(column.style.class)
-                ? column.style.class.join(' ')
-                : column.style.class || '',
-              styles: Array.isArray(column.style.styles)
-                ? column.style.styles.join(' ')
-                : column.style.styles || '',
-            }
-          : {},
-        type: column.type || 'string',
-        transform: column.transform || 'default',
-        sort: column.sort || {
-          compare: (a: unknown, b: unknown) => {
-            return Number(ClrDatagridSortOrder.DESC);
+  private _columns: Required<DatagridColumnType>[] = [];
+  @Input({ alias: 'columns', required: true }) set setColumns(values: GridColumnType[]) {
+    this._columns = values.map((column) =>
+      remove(
+        {
+          ...column,
+          label: (column as LegacyGridColumnType).label,
+          property:
+            (column as DatagridColumnType).property ??
+            (column as LegacyGridColumnType).label,
+          field: column.field ?? '',
+          style: column.style
+            ? {
+                class: Array.isArray(column.style.class)
+                  ? column.style.class.join(' ')
+                  : column.style.class || '',
+                styles: Array.isArray(column.style.styles)
+                  ? column.style.styles.join(' ')
+                  : column.style.styles || '',
+              }
+            : {},
+          type: column.type ?? 'string',
+          transform: column.transform || 'default',
+          sort: column.sort ?? {
+            compare: (a: unknown, b: unknown) => {
+              return Number(ClrDatagridSortOrder.DESC);
+            },
           },
+          sortable: column.sortable ?? true,
         },
-        sortable: column.sortable ?? true,
-      })),
-  })
-  columns: Required<GridColumnType>[] = [];
+        'label'
+      )
+    ) as Required<DatagridColumnType>[];
+  }
+  get columns() {
+    return this._columns;
+  }
   //#endregion Component inputs
 
   // Projected Templates
@@ -179,7 +192,6 @@ export class NgxClrSmartGridComponent {
   @Output() detailChange = new EventEmitter<unknown>();
   @Output() dgItemClick = new EventEmitter<unknown>();
   // #endregion Component outputs
-
 
   /** @description smart grid class constructor */
   constructor(private cdRef: ChangeDetectorRef) {}
