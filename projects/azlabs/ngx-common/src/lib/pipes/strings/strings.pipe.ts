@@ -11,6 +11,7 @@ import {
 import { Observable, Subscribable, Unsubscribable, map, of } from 'rxjs';
 import { COMMON_STRINGS } from './tokens';
 import { getObjectProperty } from '@azlabsjs/js-object';
+import { CommonStringsType } from './types';
 
 interface SubscriptionStrategy {
   createSubscription(
@@ -70,13 +71,13 @@ export class CommonTextPipe implements OnDestroy, PipeTransform {
   private _subscription: Unsubscribable | Promise<any> | null = null;
   private _lastQuery: string | null = null;
   private _strategy: SubscriptionStrategy | null = null;
-  private _c: Observable<Record<string, any>>;
+  private _c: Observable<CommonStringsType>;
 
   constructor(
     ref: ChangeDetectorRef,
     @Inject(COMMON_STRINGS)
     @Optional()
-    _commonStrings: Observable<Record<string, any>>
+    _commonStrings: Observable<CommonStringsType>
   ) {
     // Assign `ref` into `this._ref` manually instead of declaring `_ref` in the constructor
     // parameter list, as the type of `this._ref` includes `null` unlike the type of `ref`.
@@ -158,25 +159,19 @@ export class CommonTextPipe implements OnDestroy, PipeTransform {
   }
 }
 
-
 /** @deprecated Use `text` pipe instead */
 @Pipe({
   name: 'commonString',
   pure: false,
-  standalone: true
+  standalone: true,
 })
-
 @Injectable({ providedIn: 'any' })
 export class CommonStringsPipe implements PipeTransform {
-
   /** @description strings pipe class constructor */
   constructor(private textPipe: CommonTextPipe) {}
-
 
   /** @description Redirect calls to text pipe transform method */
   transform(q: string, module?: string, def: string = '') {
     return this.textPipe.transform(q, module, def);
   }
-
-  
 }

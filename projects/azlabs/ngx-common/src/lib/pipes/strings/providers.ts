@@ -1,10 +1,17 @@
-import { Injector, Provider } from '@angular/core';
+import { Injector, Provider, inject } from '@angular/core';
 import { CommonStringsType, ProvideCommonStringsType } from './types';
 import { Observable, isObservable, of } from 'rxjs';
 import { COMMON_STRINGS } from './tokens';
 
-/** @description Provide a common strings token */
+/** @deprecated use `provideTranslations(...)` API instead */
 export function provideCommonStrings(values: ProvideCommonStringsType) {
+  return typeof values === 'function'
+    ? provideCommonStringsFactory(values)
+    : provideCommonStringsValue(values);
+}
+
+/** @description provides application translated strings */
+export function provideTranslations(values: ProvideCommonStringsType) {
   return typeof values === 'function'
     ? provideCommonStringsFactory(values)
     : provideCommonStringsValue(values);
@@ -28,9 +35,8 @@ export function provideCommonStringsFactory(
 ) {
   return {
     provide: COMMON_STRINGS,
-    useFactory: (injector: Injector) => {
-      return factory(injector);
+    useFactory: () => {
+      return factory(inject(Injector));
     },
-    deps: [Injector],
   } as Provider;
 }

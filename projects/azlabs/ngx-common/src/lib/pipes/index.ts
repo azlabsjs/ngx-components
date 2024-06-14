@@ -51,7 +51,7 @@ export {
   CommonTextPipe,
 } from './strings';
 
-/** @description Exported pipes transforms */
+/** @description Exported standalone pipes */
 export const COMMON_PIPES = [
   IsAsyncPipe,
   PipeResultPipe,
