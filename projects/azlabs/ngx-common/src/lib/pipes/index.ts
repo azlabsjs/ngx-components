@@ -36,20 +36,12 @@ export {
   ArrayPipe,
   JoinPipe,
 } from './common/arrays.pipe';
-export {
-  PipeTransformTokenMapType,
-  NgxTransformPipe,
-  createPipeTransform,
-  PIPE_TRANSFORMS,
-} from './transform';
-export {
-  CommonStringsPipe,
-  ProvideCommonStringsType,
-  provideCommonStrings,
-  provideCommonStringsFactory,
-  COMMON_STRINGS,
-  CommonTextPipe,
-} from './strings';
+
+/** Exported types & declarations from transform namespace */
+export * from './transform';
+
+/** Exported types & declarations from strings namespace */
+export * from './strings';
 
 /** @description Exported standalone pipes */
 export const COMMON_PIPES = [
