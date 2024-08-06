@@ -256,7 +256,6 @@ export class NgxSmartFormComponent
       )
       .subscribe(() => {
         this.cdRef?.detectChanges();
-        console.log(this.formGroup.getRawValue());
       });
     // We simply return without performing any further action if the validation fails
     // Due to some issue with form group being invalid while all controls does not
@@ -378,7 +377,6 @@ export class NgxSmartFormComponent
   }
 
   private onFormConfigChanges(f: FormConfigInterface, formgroup?: FormGroup) {
-    console.log('Called onFormConfigChanges...');
     // We create an instance of angular Reactive Formgroup instance from input configurations
     // if formgroup parameter is null or undefined
     if (!formgroup) {

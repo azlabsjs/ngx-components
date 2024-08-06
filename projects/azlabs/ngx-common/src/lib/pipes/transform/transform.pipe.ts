@@ -124,7 +124,6 @@ export class NgxTransformPipe implements PipeTransform {
     }
     const pipe = this.injector.get(pipeToken);
     const result = pipe?.transform(value, ...params) ?? value;
-    console.log('Injection token result: ', value, result);
     return result;
   }
 }
