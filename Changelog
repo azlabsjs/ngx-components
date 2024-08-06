@@ -13,3 +13,10 @@
 - Reviewed smart-grid, ngx-dropdown, ngx-common, and ngx-options, ngx-intl-tel-input library integration in angular 17
 - Cleanup ngx-slides migration implementations
 - Review ngx-file-input library migration
+
+
+## [0.17.10] [2024-08-06]
+
+- Added support for async datagrid column name
+- Added support for asyncText pipe
+- Fixed issues in existing implementations
