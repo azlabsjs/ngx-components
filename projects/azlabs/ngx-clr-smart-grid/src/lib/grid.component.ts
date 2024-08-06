@@ -31,11 +31,12 @@ import {
   SlicePipe,
   UpperCasePipe,
 } from '@angular/common';
-import { COMMON_PIPES } from '@azlabsjs/ngx-common';
+import { COMMON_PIPES, CommonTextPipe } from '@azlabsjs/ngx-common';
 
 /** @internal */
 const GRID_CONFIG: Required<GridConfigType> = {
   transformColumnTitle: 'default',
+  capitalizeColumnTitle: false,
   selectable: false,
   class: '',
   sizeOptions: [20, 50, 100, 150],
@@ -77,16 +78,11 @@ type StateType = {
     PercentPipe,
     SlicePipe,
     AsyncPipe,
+    ...COMMON_PIPES
   ],
   selector: 'ngx-clr-smart-grid',
   templateUrl: './grid.component.html',
-  styles: [
-    `
-      .cell-value {
-        display: inline-block;
-      }
-    `,
-  ],
+  styleUrls: ['./grid.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxClrSmartGridComponent {
@@ -120,7 +116,6 @@ export class NgxClrSmartGridComponent {
   }
   @Input() selected!: unknown[] | any;
   @Input() loading: boolean = false;
-  @Input() currentDetail!: unknown;
   @Input() placeholder!: string | undefined | null;
   @Input({
     required: true,
@@ -131,7 +126,9 @@ export class NgxClrSmartGridComponent {
   })
   config: Required<GridConfigType> = GRID_CONFIG;
   private _columns: Required<DatagridColumnType>[] = [];
-  @Input({ alias: 'columns', required: true }) set setColumns(values: GridColumnType[]) {
+  @Input({ alias: 'columns', required: true }) set setColumns(
+    values: GridColumnType[]
+  ) {
     this._columns = values.map((column) =>
       remove(
         {

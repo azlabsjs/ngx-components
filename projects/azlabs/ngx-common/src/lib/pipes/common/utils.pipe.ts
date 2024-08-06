@@ -55,6 +55,7 @@ export class IndexOfPipe implements PipeTransform {
   name: 'asAny',
   pure: true,
 })
+@Injectable({ providedIn: 'any' })
 export class AsAnyPipe implements PipeTransform {
   // Cast the provided value as any
   transform(value: unknown) {

@@ -65,6 +65,7 @@ export type SearchableGridColumnType = GridColumnType &
 /** @description Type definition of Smart datagrid configuration value. */
 export type GridConfigType = {
   transformColumnTitle?: PipeTransformType | PipeTransformType[];
+  capitalizeColumnTitle?: boolean;
   selectable: boolean;
   class: string;
   sizeOptions: number[];

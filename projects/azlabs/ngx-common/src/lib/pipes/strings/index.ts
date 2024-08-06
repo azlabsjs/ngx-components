@@ -1,8 +1,8 @@
-export { CommonStringsPipe, CommonTextPipe } from './strings.pipe';
+export { CommonStringsPipe, CommonTextPipe, AsyncTextPipe } from './pipes';
 export {
   provideCommonStrings,
   provideCommonStringsFactory,
   provideTranslations,
 } from './providers';
-export { ProvideCommonStringsType } from './types';
+export { ProvideCommonStringsType, ProvideTranslationsType } from './types';
 export { COMMON_STRINGS } from './tokens';

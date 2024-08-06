@@ -8,7 +8,13 @@ import {
   SlicePipe,
   UpperCasePipe,
 } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { GridColumnType, GridConfigType } from '@azlabsjs/ngx-clr-smart-grid';
 import { COMMON_PIPES, createPipeTransform } from '@azlabsjs/ngx-common';
@@ -84,9 +90,9 @@ type ValuesType = typeof _values;
     PercentPipe,
     SlicePipe,
     AsyncPipe,
-    ...COMMON_PIPES
+    ...COMMON_PIPES,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
   formControl = new FormControl<string | undefined>(undefined);
@@ -114,11 +120,11 @@ export class AppComponent implements OnInit {
   // Columns configuration
   public columns: GridColumnType[] = [
     {
-      title: 'Nom',
+      title: 'app.modules.persons.firstname',
       property: 'lastname',
     },
     {
-      title: 'Prénoms',
+      title: 'app.modules.persons.lastname',
       property: 'firstname',
       transform: [
         'uppercase',
@@ -127,24 +133,24 @@ export class AppComponent implements OnInit {
       ],
     },
     {
-      title: 'Type',
+      title: 'app.modules.persons.type',
       property: 'type',
     },
     {
-      title: 'Téléphone',
+      title: 'app.modules.persons.phone_number',
       property: 'address.phone',
     },
     {
-      title: 'Genre',
+      title: 'app.modules.persons.gender',
       property: 'sex',
     },
     {
-      title: 'Nationalité',
+      title: 'app.modules.persons.nationality',
       property: 'address.nationality',
       transform: createPipeTransform(this.lowercasePipe),
     },
     {
-      title: 'Test',
+      title: 'app.modules.persons.test',
       property: 'test',
       transform: 'testPipe',
       style: {
@@ -160,7 +166,8 @@ export class AppComponent implements OnInit {
   gridConfig: Partial<GridConfigType> = {
     selectable: true,
     singleSelection: false,
-    transformColumnTitle: 'uppercase',
+    transformColumnTitle: ['asyncText'],
+    capitalizeColumnTitle: true,
     useServerPagination: true,
     projectRowClass: (current: { id: number }) => {
       return current.id === 3 ? 'my-row' : '';

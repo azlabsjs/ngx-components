@@ -1,7 +1,7 @@
-import { Injector, NgModule } from '@angular/core';
+import { inject, Injector, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DIRECTIVES } from '@azlabsjs/ngx-clr-smart-grid';
@@ -22,25 +22,37 @@ import { TestPipe } from './pipes/test.pipe';
 import {
   CLR_FORM_CONTROL_DIRECTIVES,
   useOptionsInterceptor,
-  provideTranslations
+  provideTranslations as provideInputTranslations,
 } from '@azlabsjs/ngx-clr-form-control';
 import { FormControlComponent } from './form-control/form-control.component';
 import {
   COMMON_PIPES,
-  provideCommonStrings,
+  CommonTextPipe,
+  provideTranslations,
   providePipes,
+  AsyncTextPipe,
 } from '@azlabsjs/ngx-common';
 import { RouterModule } from '@angular/router';
-import { HTTPValuePipe } from './pipes';
+import { HTTPValuePipe, TRANSLATE_PIPES } from './pipes';
 import {
   provideCacheConfig,
   provideQueryClient,
 } from '@azlabsjs/ngx-options-input';
 import { provideUploadOptions } from '@azlabsjs/ngx-file-input';
 import { ClarityModule } from '@clr/angular';
-import { map, timer } from 'rxjs';
+import {
+  TranslateLoader,
+  TranslateModule,
+  TranslatePipe,
+} from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { useTranslationsFactory } from './translations';
 
 ClarityIcons.addIcons(uploadCloudIcon);
+
+export function createTranslateLoader() {
+  return new TranslateHttpLoader(inject(HttpClient), './assets/i18n/', '.json');
+}
 
 @NgModule({
   declarations: [AppComponent, FormControlComponent],
@@ -51,11 +63,19 @@ ClarityIcons.addIcons(uploadCloudIcon);
     ReactiveFormsModule,
     HttpClientModule,
     RouterModule.forRoot([], { useHash: true }),
+    TranslateModule.forRoot({
+      defaultLanguage: 'fr',
+      loader: {
+        provide: TranslateLoader,
+        useFactory: createTranslateLoader,
+      },
+    }),
     HTTPValuePipe,
     ClarityModule,
     // CdsModule,
     ...DIRECTIVES,
     ...COMMON_PIPES,
+    ...TRANSLATE_PIPES,
     ...CLR_FORM_CONTROL_DIRECTIVES,
     ...FORM_DIRECTIVES,
     NgxDropzoneModule.forRoot(),
@@ -66,7 +86,10 @@ ClarityIcons.addIcons(uploadCloudIcon);
     providePipes({
       pipes: {
         testPipe: TestPipe,
+        text: CommonTextPipe,
         httpValue: HTTPValuePipe,
+        translate: TranslatePipe,
+        asyncText: AsyncTextPipe
       },
     }),
     provideFormsLoader(),
@@ -117,43 +140,32 @@ ClarityIcons.addIcons(uploadCloudIcon);
         return next(request);
       };
     }),
-
-    provideCommonStrings(
-      timer(2000).pipe(
-        map(() => ({
-          app: {
-            modules: {
-              users: {
-                title: 'Users Administration',
-              },
-            },
-          },
-        }))
-      )
-    ),
-    provideTranslations({
+    provideTranslations(useTranslationsFactory()),
+    provideInputTranslations({
       loadingText: 'Chargement en cours...',
       validation: {
-        minlength:
-          'La longueur minimal du champ est de {{requiredLength}}',
-        maxlength:
-          'La longueur maximale du champ est de {{requiredLength}}',
+        minlength: 'La longueur minimal du champ est de {{requiredLength}}',
+        maxlength: 'La longueur maximale du champ est de {{requiredLength}}',
         maxLength: 'La longueur maximale du champ est de {{value}}',
         minLength: 'La longueur minimal du champ est de {{value}}',
         invalid: 'La valeur du champ est invalide',
         required: 'Le champ est requis',
         unique: 'La valeur de ce champ est déja existante',
-        email: 'La valeur de ce champ doit être un adresse mail valid [example@email.com]',
+        email:
+          'La valeur de ce champ doit être un adresse mail valid [example@email.com]',
         pattern: 'La valeur du champ est invalide',
         min: 'La valeur minimal du champ est de {{value}}',
         max: 'La valeur maximal du champ est de {{value}}',
         phone: 'Veuillez saisir un numéro de téléphone valid',
         minDate: 'Veuillez saisir une date ultérieure à la date du {{date}}',
         maxDate: 'Veuillez saisir une date antérieure à la date du {{date}}',
-        exists: 'La valeur du champ n\'existe pas dans la dans la base de données',
-        equals: 'La valeur du champ {{value}} ne correspond pas à la valeur saisie',
+        exists:
+          "La valeur du champ n'existe pas dans la dans la base de données",
+        equals:
+          'La valeur du champ {{value}} ne correspond pas à la valeur saisie',
       },
-    })
+    }),
+    TranslatePipe
   ],
   bootstrap: [AppComponent],
 })

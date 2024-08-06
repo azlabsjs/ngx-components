@@ -7,14 +7,7 @@ import {
   SlicePipe,
   UpperCasePipe,
 } from '@angular/common';
-import {
-  EnvironmentInjector,
-  Inject,
-  Pipe,
-  PipeTransform,
-  inject,
-  runInInjectionContext,
-} from '@angular/core';
+import { Inject, Injectable, Injector, Pipe, PipeTransform } from '@angular/core';
 import { GetTimeAgo, JSDate, ParseMonth } from '@azlabsjs/js-datetime';
 import { PipeTransformTokenMapType, PipeTransformType } from './types';
 import { PIPE_TRANSFORMS } from './tokens';
@@ -25,9 +18,8 @@ import { createParams, substr } from './internal';
   standalone: true,
   name: 'transform',
 })
+@Injectable({providedIn: 'any'})
 export class NgxTransformPipe implements PipeTransform {
-  private injector = inject(EnvironmentInjector);
-
   /** @description Creates an instance {@see NgxTransformPipe} pipe */
   constructor(
     private uppercasePipe: UpperCasePipe,
@@ -37,6 +29,7 @@ export class NgxTransformPipe implements PipeTransform {
     private jsonPipe: JsonPipe,
     private percentPipe: PercentPipe,
     private slicePipe: SlicePipe,
+    private injector: Injector,
     @Inject(PIPE_TRANSFORMS) private transforms?: PipeTransformTokenMapType
   ) {}
 
@@ -122,15 +115,16 @@ export class NgxTransformPipe implements PipeTransform {
   }
 
   private getDefault(pipename: string, value: unknown, ...params: any[]) {
-    return runInInjectionContext(this.injector, () => {
-      if (!this.transforms) {
-        return value;
-      }
-      const pipeToken = this.transforms[pipename];
-      if (pipeToken) {
-        return inject(pipeToken)?.transform(value, ...params) ?? value;
-      }
+    if (!this.transforms) {
       return value;
-    });
+    }
+    const pipeToken = this.transforms[pipename];
+    if (!!!pipeToken) {
+      return value;
+    }
+    const pipe = this.injector.get(pipeToken);
+    const result = pipe?.transform(value, ...params) ?? value;
+    console.log('Injection token result: ', value, result);
+    return result;
   }
 }

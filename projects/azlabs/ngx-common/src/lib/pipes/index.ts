@@ -3,6 +3,7 @@ import {
   ArrayPipe,
   IsArrayPipe,
   JoinPipe,
+  LengthPipe
 } from './common/arrays.pipe';
 import { IsAsyncPipe, AsObservablePipe } from './common/async.pipe';
 import { ParseIntPipe } from './common/parse-int.pipe';
@@ -16,9 +17,9 @@ import {
   IncludesPipe,
   IndexOfPipe,
 } from './common/utils.pipe';
-import { CommonStringsPipe, CommonTextPipe } from './strings';
+import { AsyncTextPipe, CommonStringsPipe, CommonTextPipe } from './strings';
 
-/** Exports */
+
 export {
   AsAnyPipe,
   DefinedPipe,
@@ -35,6 +36,7 @@ export {
   IsArrayPipe,
   ArrayPipe,
   JoinPipe,
+  LengthPipe
 } from './common/arrays.pipe';
 
 /** Exported types & declarations from transform namespace */
@@ -51,12 +53,14 @@ export const COMMON_PIPES = [
   ParseStrPipe,
   PropertyValuePipe,
   ArrayLengthPipe,
+  LengthPipe,
   IsArrayPipe,
   ArrayPipe,
   StrLengthPipe,
   NgxTransformPipe,
   CommonStringsPipe,
   CommonTextPipe,
+  AsyncTextPipe,
   JoinPipe,
   DefinedPipe,
   IncludesPipe,

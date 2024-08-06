@@ -33,6 +33,7 @@ export function isAsync<T = any>(value: unknown): value is T {
   name: 'asObservable',
   pure: true,
 })
+@Injectable({providedIn: 'any'})
 export class AsObservablePipe implements PipeTransform {
   constructor(@Optional() private injector?: Injector) {}
 

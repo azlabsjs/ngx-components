@@ -11,7 +11,7 @@ import {
 import { Observable, Subscribable, Unsubscribable, map, of } from 'rxjs';
 import { COMMON_STRINGS } from './tokens';
 import { getObjectProperty } from '@azlabsjs/js-object';
-import { CommonStringsType } from './types';
+import { TranslationsType } from './types';
 
 interface SubscriptionStrategy {
   createSubscription(
@@ -71,13 +71,13 @@ export class CommonTextPipe implements OnDestroy, PipeTransform {
   private _subscription: Unsubscribable | Promise<any> | null = null;
   private _lastQuery: string | null = null;
   private _strategy: SubscriptionStrategy | null = null;
-  private _c: Observable<CommonStringsType>;
+  private _c: Observable<TranslationsType>;
 
   constructor(
     ref: ChangeDetectorRef,
     @Inject(COMMON_STRINGS)
     @Optional()
-    _commonStrings: Observable<CommonStringsType>
+    _commonStrings: Observable<TranslationsType>
   ) {
     // Assign `ref` into `this._ref` manually instead of declaring `_ref` in the constructor
     // parameter list, as the type of `this._ref` includes `null` unlike the type of `ref`.
@@ -99,9 +99,9 @@ export class CommonTextPipe implements OnDestroy, PipeTransform {
   // NOTE(@benlesh): Because Observable has deprecated a few call patterns for `subscribe`,
   // TypeScript has a hard time matching Observable to Subscribable, for more information
   // see https://github.com/microsoft/TypeScript/issues/43643
-  transform(query: string, module?: string, def: string = ''): string {
+  transform(query: string, module?: string, def?: string): string {
     if (!query || !query.length) {
-      return def;
+      return def ?? '';
     }
 
     const _query = module ? `${module}.${query}` : `${query}`;
@@ -117,7 +117,7 @@ export class CommonTextPipe implements OnDestroy, PipeTransform {
           this.markForCheckOnValueUpdate = true;
         }
       }
-      return this._latestValue ?? def;
+      return this._latestValue ?? def ?? query;
     }
 
     if (_query !== this._lastQuery) {
@@ -173,5 +173,32 @@ export class CommonStringsPipe implements PipeTransform {
   /** @description Redirect calls to text pipe transform method */
   transform(q: string, module?: string, def: string = '') {
     return this.textPipe.transform(q, module, def);
+  }
+}
+
+@Pipe({
+  name: 'asyncText',
+  pure: true,
+  standalone: true,
+})
+@Injectable({ providedIn: 'any' })
+export class AsyncTextPipe implements PipeTransform {
+  private _c: Observable<TranslationsType>;
+
+  constructor(
+    @Inject(COMMON_STRINGS)
+    @Optional()
+    _commonStrings: Observable<TranslationsType>
+  ) {
+    this._c = _commonStrings ?? of({});
+  }
+
+  //
+  transform(query: string, module?: string, def?: string): Observable<string> {
+    if (!query || !query.length) {
+      return of(def ?? '');
+    }
+    const q = module ? `${module}.${query}` : `${query}`;
+    return this._c.pipe(map((value) => getObjectProperty(value, q)));
   }
 }

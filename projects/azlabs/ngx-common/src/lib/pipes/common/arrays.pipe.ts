@@ -26,6 +26,7 @@ export class IsArrayPipe implements PipeTransform {
   }
 }
 
+/** @deprecated Use `length` pipe instead */
 @Pipe({
   standalone: true,
   pure: true,
@@ -33,6 +34,19 @@ export class IsArrayPipe implements PipeTransform {
 })
 @Injectable({ providedIn: 'any' })
 export class ArrayLengthPipe implements PipeTransform {
+  /** Returns an empty array if the provided value is null or undefined or the value else */
+  transform<T>(value: undefined | T[]): number {
+    return (value ?? []).length;
+  }
+}
+
+@Pipe({
+  standalone: true,
+  pure: true,
+  name: 'length',
+})
+@Injectable({ providedIn: 'any' })
+export class LengthPipe implements PipeTransform {
   /** Returns an empty array if the provided value is null or undefined or the value else */
   transform<T>(value: undefined | T[]): number {
     return (value ?? []).length;

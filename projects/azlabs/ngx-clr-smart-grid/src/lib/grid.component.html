@@ -13,8 +13,10 @@
       [clrDgSortBy]="column.sort || ''">
       <ng-container
         *ngIf="column.title | transform : (column.transformTitle ?? config.transformColumnTitle) | pipeResult as result">
-        <ng-container *ngIf="result.value | isAsync; else noAsyncRef">{{ result.value | async }} </ng-container>
-        <ng-template #noAsyncRef>{{ result.value }} </ng-template>
+        <ng-container *ngIf="result.value | isAsync; else noAsyncRef">{{ config.capitalizeColumnTitle ? (result.value |
+          async|uppercase) : (result.value | async) }} </ng-container>
+        <ng-template #noAsyncRef>{{ config.capitalizeColumnTitle ? (result.value|uppercase) : result.value }}
+        </ng-template>
       </ng-container>
       <clr-dg-filter *ngIf="config.useCustomFilters">
         <ng-content select=".dg-filter"></ng-content>
