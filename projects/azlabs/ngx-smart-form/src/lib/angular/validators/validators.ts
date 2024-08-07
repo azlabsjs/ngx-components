@@ -50,10 +50,8 @@ export class CustomValidators {
 
   static maxDate(maxDate: string | Date): ValidatorFn {
     return (control: AbstractControl) => {
-      if (control.validator) {
-        if (control.value && JSDate.isBefore(maxDate, control.value)) {
-          return { maxDate };
-        }
+      if (control.value && JSDate.isBefore(maxDate, control.value)) {
+        return { maxDate };
       }
       return null;
     };

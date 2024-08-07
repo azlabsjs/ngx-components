@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
+import { createFormControl } from '@azlabsjs/ngx-smart-form';
 import {
   DateInput,
   FileInput,
@@ -28,15 +29,14 @@ export class FormControlComponent implements OnInit, OnDestroy {
     type: 'file',
     name: 'file_id',
     classes: 'clr-input',
-    disabled: false,
-    readOnly: false,
     description: 'Upload file to server',
     hidden: false,
     isRepeatable: false,
     containerClass: 'clr-col-4',
     read: 'url',
-    rules: {
-      isRequired: false,
+    constraints: {
+      required: false,
+      disabled: false,
     },
   };
 
@@ -52,14 +52,14 @@ export class FormControlComponent implements OnInit, OnDestroy {
     type: 'file',
     name: 'file2_id',
     classes: 'clr-input',
-    disabled: false,
-    readOnly: false,
     hidden: false,
     isRepeatable: false,
     containerClass: 'clr-col-4',
+    constraints: {
+      required: true,
+    },
   };
 
-  dateInputControl = new FormControl();
   dateInput: DateInput = {
     minDate: '',
     maxDate: '',
@@ -70,9 +70,13 @@ export class FormControlComponent implements OnInit, OnDestroy {
     classes: 'clr-date',
     isRepeatable: false,
     containerClass: 'clr-col-6',
+    constraints: {
+      required: true,
+      max: new Date(),
+    },
   };
+  dateInputControl = createFormControl(this.fb, this.dateInput);
 
-  numberInputControl = new FormControl();
   numberInput: NumberInput = {
     min: 0,
     label: 'Taxes',
@@ -81,9 +85,13 @@ export class FormControlComponent implements OnInit, OnDestroy {
     classes: 'clr-input',
     isRepeatable: false,
     containerClass: 'clr-col-6',
+    constraints: {
+      required: true,
+      max: 10,
+    },
   };
+  numberInputControl = createFormControl(this.fb, this.numberInput);
 
-  textInputControl = new FormControl();
   textInput: TextInput = {
     label: 'Firstname',
     type: 'text',
@@ -91,7 +99,12 @@ export class FormControlComponent implements OnInit, OnDestroy {
     classes: 'clr-input',
     isRepeatable: false,
     containerClass: 'clr-col-6',
+    constraints: {
+      required: true,
+      max: 50,
+    },
   };
+  textInputControl = createFormControl(this.fb, this.textInput);
 
   textAreaInputControl = new FormControl();
   textAreaInput: TextAreaInput = {
@@ -117,7 +130,6 @@ export class FormControlComponent implements OnInit, OnDestroy {
     containerClass: 'clr-col-12',
   };
 
-  phoneInputControl = new FormControl();
   phoneInput: TextInput = {
     label: 'Phone number',
     type: 'phone',
@@ -125,9 +137,16 @@ export class FormControlComponent implements OnInit, OnDestroy {
     classes: 'clr-input',
     isRepeatable: false,
     containerClass: 'clr-col-6',
+    constraints: {
+      required: true,
+      max: 20,
+    },
   };
+  phoneInputControl = createFormControl(this.fb, this.phoneInput);
 
   private subscriptions: Subscription[] = [];
+
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
     this.subscriptions = [
@@ -150,6 +169,14 @@ export class FormControlComponent implements OnInit, OnDestroy {
         .pipe(
           tap((state) => {
             console.log('Auto upload control value changes...', state);
+          })
+        )
+        .subscribe(),
+
+      this.dateInputControl.valueChanges
+        .pipe(
+          tap(() => {
+            console.log(this.dateInputControl);
           })
         )
         .subscribe(),

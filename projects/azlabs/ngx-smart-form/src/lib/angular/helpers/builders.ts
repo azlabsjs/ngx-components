@@ -32,6 +32,17 @@ import { RequestClient } from '../../http';
 
 type InputConfigType = InputConfigInterface | InputGroup;
 
+function nullIfEmpty<T>(value: T) {
+  if (typeof value === 'undefined' || value === null) {
+    return value;
+  }
+  if (String(value).trim() === '') {
+    return undefined;
+  }
+
+  return value as T;
+}
+
 /** @description Helper class for generating angular reactive form controls with errors validation */
 export class ComponentReactiveFormHelpers {
   /**
@@ -63,7 +74,7 @@ export class ComponentReactiveFormHelpers {
             config.children,
             requestClient
           );
-        if (input?.rules?.isRequired) {
+        if (!!input?.rules?.isRequired || !!input?.constraints?.required) {
           formgroup.addValidators(Validators.required);
         }
         group.addControl(input.name, formgroup);
@@ -113,7 +124,7 @@ export class ComponentReactiveFormHelpers {
     requestClient?: RequestClient
   ) {
     const validators = [
-      config.rules && config.rules.isRequired
+      !!config.rules?.isRequired || !!config?.constraints?.required
         ? Validators.required
         : Validators.nullValidator,
     ];
@@ -126,34 +137,38 @@ export class ComponentReactiveFormHelpers {
       config.type === InputTypes.PASSWORD_INPUT
     ) {
       // Checks if maxlength rule is set to true and apply the rule to the input
-      config.rules && config.rules.maxLength
+      !!config.rules?.maxLength || (config as TextInput).constraints?.max
         ? validators.push(
             Validators.maxLength(
-              (config as TextInput)?.maxLength
-                ? (config as TextInput).maxLength || Math.pow(2, 31) - 1
-                : 255
+              nullIfEmpty((config as TextInput).maxLength) ??
+                nullIfEmpty((config as TextInput).constraints?.max) ??
+                Math.pow(2, 31) - 1
             )
           )
         : // tslint:disable-next-line:no-unused-expression
-          null,
-        // Checks if maxlength rule is set to true and apply the rule to the input
-        config.rules && config.rules.minLength
-          ? validators.push(
-              Validators.minLength(
-                (config as TextInput)?.minLength
-                  ? (config as TextInput).minLength || 1
-                  : 255
-              )
+          null;
+      // Checks if maxlength rule is set to true and apply the rule to the input
+      !!config.rules?.minLength || (config as TextInput).constraints?.min
+        ? validators.push(
+            Validators.minLength(
+              nullIfEmpty((config as TextInput).minLength) ??
+                nullIfEmpty((config as TextInput).constraints?.min) ??
+                1
             )
-          : // tslint:disable-next-line:no-unused-expression
-            null;
-      config.rules && config.rules.email
+          )
+        : // tslint:disable-next-line:no-unused-expression
+          null;
+      !!config.rules?.email || !!(config as TextInput).constraints?.email
         ? validators.push(Validators.email)
         : // tslint:disable-next-line:no-unused-expression
           null;
-      config.rules && config.rules.pattern
+      !!config.rules?.pattern || !!(config as TextInput).constraints?.pattern
         ? validators.push(
-            Validators.pattern((config as TextInput).pattern || '')
+            Validators.pattern(
+              nullIfEmpty((config as TextInput).pattern) ??
+                nullIfEmpty((config as TextInput).constraints?.pattern?.fn) ??
+                ''
+            )
           )
         : // tslint:disable-next-line:no-unused-expression
           null;
@@ -166,55 +181,55 @@ export class ComponentReactiveFormHelpers {
     }
     // Check for min an max rules on number inputs and apply validation to the input
     if (config.type === InputTypes.NUMBER_INPUT) {
-      config.rules && config.rules.min
+      config.rules?.min || (config as NumberInput).constraints?.min
         ? validators.push(
             Validators.min(
-              (config as NumberInput)?.min ? (config as NumberInput).min : -1
+              nullIfEmpty((config as NumberInput).min) ??
+                nullIfEmpty((config as NumberInput).constraints?.min) ??
+                -1
             )
           )
         : // tslint:disable-next-line:no-unused-expression
-          null,
-        // Checks if maxlength rule is set to true and apply the rule to the input
-        config.rules && config.rules.max
-          ? validators.push(
-              Validators.max(
-                (config as NumberInput)?.max
-                  ? (config as NumberInput).max || Math.pow(2, 31) - 1
-                  : Math.pow(2, 31) - 1
-              )
+          null;
+      // Checks if maxlength rule is set to true and apply the rule to the input
+      config.rules?.max || !!(config as NumberInput).constraints?.max
+        ? validators.push(
+            Validators.max(
+              nullIfEmpty((config as NumberInput).max) ??
+                nullIfEmpty((config as NumberInput).constraints?.max) ??
+                Math.pow(2, 31) - 1
             )
-          : // tslint:disable-next-line:no-unused-expression
-            null;
+          )
+        : // tslint:disable-next-line:no-unused-expression
+          null;
     }
     // Validation rules form date input
     if (config.type === InputTypes.DATE_INPUT) {
-      config.rules && config.rules.minDate
+      config.rules?.minDate || !!(config as DateInput).constraints?.min
         ? validators.push(
             CustomValidators.minDate(
-              (config as DateInput)?.minDate
-                ? JSDate.format(
-                    (config as DateInput).minDate as string,
-                    'YYYY-MM-DD'
-                  )
-                : JSDate.format(undefined, 'YYYY-MM-DD')
+              JSDate.format(
+                nullIfEmpty((config as DateInput).minDate) ??
+                  nullIfEmpty((config as DateInput).constraints?.min),
+                'YYYY-MM-DD'
+              )
             )
           )
         : // tslint:disable-next-line:no-unused-expression
-          null,
-        // Checks if maxlength rule is set to true and apply the rule to the input
-        config.rules && config.rules.maxDate
-          ? validators.push(
-              CustomValidators.maxDate(
-                (config as DateInput)?.maxDate
-                  ? JSDate.format(
-                      (config as DateInput).maxDate as string,
-                      'YYYY-MM-DD'
-                    )
-                  : JSDate.format(undefined, 'YYYY-MM-DD')
+          null;
+      // Checks if maxlength rule is set to true and apply the rule to the input
+      config.rules?.maxDate || !!(config as DateInput).constraints?.max
+        ? validators.push(
+            CustomValidators.maxDate(
+              JSDate.format(
+                nullIfEmpty((config as DateInput).maxDate) ??
+                  nullIfEmpty((config as DateInput).constraints?.max),
+                'YYYY-MM-DD'
               )
             )
-          : // tslint:disable-next-line:no-unused-expression
-            null;
+          )
+        : // tslint:disable-next-line:no-unused-expression
+          null;
     }
 
     // #region Add constraint rule
@@ -277,7 +292,7 @@ export class ComponentReactiveFormHelpers {
       )
       .subscribe();
 
-    if (config.rules && config.rules.isRequired) {
+    if (!!config.rules?.isRequired || !!config.constraints?.required) {
       array.setValidators(Validators.required);
     }
     return array;

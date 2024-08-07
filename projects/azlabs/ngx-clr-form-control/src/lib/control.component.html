@@ -8,11 +8,10 @@
           [multiple]="config.multiple" [description]="config.description" [max-file-size]="config.maxFileSize"
           [max-files]="50" [url]="config.uploadUrl" (reset)="formControl.reset()" (value)="formControl.setValue($event)"
           [file-size-error]="'fileSizeError'| translate: { maxFilesize: config.maxFileSize }"
-          [accept]="config.pattern ?? []"
-          [file-upload-error]="'fileUploadError' | translate">
+          [accept]="config.pattern ?? []" [file-upload-error]="'fileUploadError' | translate">
           <label class="clr-control-label" *ngIf="describe" [for]="config.name">
             {{ config.label }}
-            <small class="required-text" *ngIf="config.rules?.isRequired">
+            <small class="required-text" *ngIf="config.rules?.isRequired ?? !!config.constraints?.required">
               (*)
             </small>
           </label>
@@ -28,7 +27,7 @@
         (remove)="remove.emit($event)" (selected)="selected.emit($event)">
         <label class="clr-control-label" *ngIf="describe" [for]="inputConfig.name">
           {{ inputConfig.label }}
-          <small class="required-text" *ngIf="inputConfig.rules?.isRequired">
+          <small class="required-text" *ngIf="inputConfig.rules?.isRequired ?? !!inputConfig.constraints?.required">
             (*)
           </small>
         </label>
@@ -40,7 +39,7 @@
         <div class="clr-input-wrapper">
           <label class="clr-control-label" *ngIf="describe" [for]="inputConfig!.name">
             {{ inputConfig!.label }}
-            <span class="required-text" *ngIf="inputConfig?.rules?.isRequired">
+            <span class="required-text" *ngIf="inputConfig.rules?.isRequired ?? !!inputConfig.constraints?.required">
               (*)
             </span>
           </label>
@@ -67,7 +66,7 @@
           <clr-date-container>
             <label class="clr-control-label" *ngIf="describe" [for]="config.name">
               {{ config.label }}
-              <span class="required-text" *ngIf="config.rules?.isRequired">
+              <span class="required-text" *ngIf="config.rules?.isRequired ?? !!config.constraints?.required">
                 (*)
               </span>
             </label>
@@ -88,7 +87,7 @@
             <div class="clr-input-wrapper">
               <label class="clr-control-label" *ngIf="describe" [for]="config!.name">
                 {{ config!.label }}
-                <span class="required-text" *ngIf="config?.rules?.isRequired">
+                <span class="required-text" *ngIf="config.rules?.isRequired ?? !!config.constraints?.required">
                   (*)
                 </span>
               </label>
@@ -112,7 +111,7 @@
             <div class="clr-form-control">
               <label class="clr-control-label" *ngIf="describe" [for]="config!.name">
                 {{ config!.label }}
-                <span class="required-text" *ngIf="config?.rules?.isRequired">
+                <span class="required-text" *ngIf="config.rules?.isRequired ?? !!config.constraints?.required">
                   (*)
                 </span>
               </label>
@@ -139,7 +138,7 @@
             <div class="clr-input-wrapper">
               <label class="clr-control-label" *ngIf="describe" [for]="config!.name">
                 {{ config!.label }}
-                <span class="required-text" *ngIf="config?.rules?.isRequired">
+                <span class="required-text" *ngIf="config.rules?.isRequired ?? !!config.constraints?.required">
                   (*)
                 </span>
               </label>
@@ -161,7 +160,7 @@
           <clr-radio-container clrInline>
             <label>
               {{ config!.label }}
-              <span class="required-text" *ngIf="config?.rules?.isRequired">
+              <span class="required-text" *ngIf="config.rules?.isRequired ?? !!config.constraints?.required">
                 (*)
               </span>
             </label>
@@ -190,7 +189,7 @@
             <div class="clr-input-wrapper password-clr-input-wrapper password-wrapper">
               <label [for]="inputConfig!.name" class="clr-control-label" *ngIf="describe">
                 {{ inputConfig!.label }}
-                <small class="required-text" *ngIf="inputConfig?.rules?.isRequired">
+                <small class="required-text" *ngIf="inputConfig.rules?.isRequired ?? !!inputConfig.constraints?.required">
                   (*)
                 </small>
               </label>
@@ -233,7 +232,7 @@
         <div class="clr-input-wrapper">
           <label [for]="config!.name" class="clr-control-label" *ngIf="describe">
             {{ config!.label }}
-            <small class="required-text" *ngIf="config?.rules?.isRequired">
+            <small class="required-text" *ngIf="config.rules?.isRequired ?? !!config.constraints?.required">
               (*)
             </small>
           </label>
@@ -241,7 +240,7 @@
             (keydown)="onKeyDown($event, config!.name)" (keypress)="onKeyPress($event, config!.name)"
             (blur)="onBlur($event, config!.name)" [type]="config!.type === inputTypes.EMAIL_INPUT ? 'email' : 'text'"
             [maxLength]="config!.maxLength ? config!.maxLength : maxLength"
-            [minLength]="config!.minLength ? config!.minLength : 0" [class]="config!.classes" [formControl]="control"
+            [minLength]="config!.minLength ? config!.minLength : 0" class="clr-input" [class]="config!.classes" [formControl]="control"
             placeholder="{{ config!.placeholder ? config!.placeholder : '' }}" />
         </div>
       </div>

@@ -1,7 +1,7 @@
 <ng-container *ngIf="state">
   <ngx-intl-tel-input *ngIf="control" [disabled]="state.disabled" (error)="onError($event, control.value)"
     (valueChange)="control.setValue($event)" [value]="state.value ?? ''" (blur)="onBlur($event)"
-    (focus)="onFocus($event)" [class]="cssClass" [required]="config!.rules?.isRequired || false"
+    (focus)="onFocus($event)" [class]="cssClass" [required]="config.rules?.isRequired ?? !!config.constraints?.required"
     [preferredCountries]="preferredCountries" [country]="'tg'" [name]="config.name">
     <ng-template #input let-keypress="keypress" let-selected="selected" let-change="change" let-required="required"
       let-disabled="disabled" let-value="value">
