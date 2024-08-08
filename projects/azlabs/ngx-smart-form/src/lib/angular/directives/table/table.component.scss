@@ -1,0 +1,74 @@
+.table td.middle {
+  vertical-align: var(--array-table-td-vertical-align, middle) !important;
+}
+
+.table td.bottom {
+  vertical-align: var(--array-table-td-vertical-align, bottom) !important;
+}
+
+.table td,
+.table-compact td {
+  padding: var(--array-table-padding, 0) !important;
+}
+
+.table td,
+.table th {
+  border-left: var(--array-table-borderwidth, calc(1 * (1rem / 20))) solid
+    var(--array-table-border-color, hsl(198, 14%, 82%));
+  background: var(--array-table-background-color, none);
+}
+
+.table th {
+  font-weight: var(--array-table-header-font-weight, bold) !important;
+}
+
+.table td:has(input:focus) {
+  border-width: var(--array-table-borderwidth, calc(1 * (1rem / 12)));
+  border-style: solid;
+  border-color: var(
+    --array-table-border-focus-color,
+    hsl(198, 100%, 34%)
+  ) !important;
+}
+
+.table td.error,
+.table td:has(input.ng-touched.ng-invalid),
+.table td:has(input.ng-touched.error) {
+  border-width: var(--array-table-borderwidth, calc(1 * (1rem / 12)));
+  border-style: solid;
+  border-color: var(--array-table-border-error-color, #ff494f) !important;
+}
+
+.table {
+  border-collapse: separate;
+  border: var(--array-table-borderwidth, calc(1 * (1rem / 20))) solid
+    var(--array-table-border-color, hsl(198, 14%, 82%)) !important;
+  border-radius: var(--array-table-border-radius, 0) !important;
+  max-width: 100%;
+  width: 100%;
+  border-spacing: 0;
+}
+
+.table td .ngx-smart-form-control,
+:host ::ng-deep .table td .ngx-smart-form-control {
+  padding: var(--array-table-content-padding, 0) !important;
+}
+
+:host ::ng-deep .table td input,
+:host ::ng-deep .table td input:focus,
+:host ::ng-deep .table td input:not([readonly]) {
+  border: none !important;
+  background: none !important;
+}
+
+:host ::ng-deep .table td ngx-input-error {
+  display: none;
+}
+
+:host ::ng-deep .table td .ng-select .ng-select-container {
+  border: var(--array-table-select-border, none) !important;
+}
+
+.required {
+  color: var(--item-required-color, #f13232);
+}

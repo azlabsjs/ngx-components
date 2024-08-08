@@ -1,15 +1,15 @@
 export {
-  NgxSmartFormArrayChildComponent,
+  NgxSmartFormArrayItemComponent,
   NgxSmartFormArrayComponent,
-} from './smart-form-array';
+} from './array';
 export {
-  NgxSmartFormControlArrayChildComponent,
+  NgxSmartFormControlArrayItemComponent,
   NgxSmartFormControlArrayComponent,
-} from './smart-form-control-array';
+} from './control-array';
 export {
   NgxSmartFormGroupComponent,
   NgxSmartFormGroupHeaderPipe,
-} from './smart-form-group';
-export { NgxSmartFormComponent } from './smart-form';
-export { AddButtonComponent } from './add-button';
-export { CloseButtonComponent } from './close-button';
+} from './group';
+export { NgxSmartFormComponent } from './form';
+export { BUTTON_DIRECTIVES } from '../directives/buttons';
+export { NgxTableForm } from './table';

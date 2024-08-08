@@ -1,18 +1,14 @@
 import {
-  NgxSmartFormArrayChildComponent,
+  NgxSmartFormArrayItemComponent,
   NgxSmartFormArrayComponent,
   NgxSmartFormComponent,
   NgxSmartFormGroupComponent,
+  NgxTableForm,
 } from './directives';
 import { SafeHTMLPipe } from './pipes';
 
-export {
-  NgxSmartFormArrayChildComponent,
-  NgxSmartFormArrayComponent,
-  NgxSmartFormComponent,
-  NgxSmartFormGroupComponent,
-} from './directives';
-// Fetch and HTML File directive exports
+export * from './directives';
+
 export {
   ComponentReactiveFormHelpers,
   cloneAbstractControl,
@@ -70,6 +66,7 @@ export const FORM_DIRECTIVES = [
   NgxSmartFormComponent,
   NgxSmartFormGroupComponent,
   NgxSmartFormArrayComponent,
-  NgxSmartFormArrayChildComponent,
+  NgxSmartFormArrayItemComponent,
   SafeHTMLPipe,
+  NgxTableForm
 ] as const;

@@ -1,0 +1,9 @@
+<div class="ngx__form_array__card">
+    <ngx-close-button (click)="onButtonClick($event)"></ngx-close-button>
+    <div class="ngx__form_array__card__card_block">
+        <ng-container *ngIf="formGroup">
+            <ngx-smart-form-group [no-grid-layout]="noGridLayout" [formGroup]="formGroup" [controls]="controls"
+                [template]="template" [autoupload]="autoupload"></ngx-smart-form-group>
+        </ng-container>
+    </div>
+</div>

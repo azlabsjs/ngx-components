@@ -19,31 +19,19 @@ import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { cloneAbstractControl } from '../../helpers';
 import { AngularReactiveFormBuilderBridge } from '../../types';
-import { NgxSmartFormControlArrayChildComponent } from './smart-form-control-array-child.component';
+import { NgxSmartFormControlArrayItemComponent } from './control-array-item.component';
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
 import { CommonModule } from '@angular/common';
-import { AddButtonComponent } from '../add-button';
+import { BUTTON_DIRECTIVES } from '../buttons';
 
 /** @internal */
-type ComponentRefType = ComponentRef<NgxSmartFormControlArrayChildComponent>;
+type ComponentRefType = ComponentRef<NgxSmartFormControlArrayItemComponent>;
 
 @Component({
   standalone: true,
-  imports: [CommonModule, AddButtonComponent],
+  imports: [CommonModule, ...BUTTON_DIRECTIVES],
   selector: 'ngx-smart-form-control-array',
-  template: `
-    <div #container></div>
-    <ng-container
-      *ngTemplateOutlet="
-        addButtonRef ? addButtonRef : addTemplate;
-        context: { $implicit: onTemplateButtonClicked.bind(this) }
-      "
-    ></ng-container>
-
-    <ng-template #addTemplate let-handler>
-      <ngx-add-button (click)="handler($event)"></ngx-add-button>
-    </ng-template>
-  `,
+  templateUrl: './control-array.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFormControlArrayComponent
@@ -119,7 +107,7 @@ export class NgxSmartFormControlArrayComponent
 
   addComponent(control: AbstractControl, index: number) {
     const componentRef = this.viewContainerRef.createComponent(
-      NgxSmartFormControlArrayChildComponent
+      NgxSmartFormControlArrayItemComponent
     );
     // Initialize child component input properties
     componentRef.instance.inputConfig = { ...this.inputConfig };
@@ -138,7 +126,7 @@ export class NgxSmartFormControlArrayComponent
           // Remove the elment from the list of reference components
           this.componentRefs = this.componentRefs.filter(
             (
-              component: ComponentRef<NgxSmartFormControlArrayChildComponent>
+              component: ComponentRef<NgxSmartFormControlArrayItemComponent>
             ) => {
               return component.instance === componentRef.instance
                 ? false

@@ -34,16 +34,16 @@
     <ng-container *ngTemplateOutlet="previewTemplate; context: {controls, group, autoupload}"></ng-container>
   </ng-container>
   <ng-template #previewTemplate let-controls="controls" let-group="group" let-autoupload="autoupload">
-    <ng-container *ngFor="let value of controls">
+    <ng-container *ngFor="let value of controls|asInputs">
       <!-- INPUT GROUP CONTAINER PART -->
-      <ng-container *ngIf="value | hasChildren">
+      <ng-container *ngIf="value| asInputGroup | hasChildren">
         <div [class]="noGridLayout ? 'ngx-form-no-grid' : value.containerClass" [hidden]="value | isHidden">
           <div [innerHTML]="value.label | ngxGroupHeader | safeHtml" [hidden]="value | isHidden"></div>
           <!-- REPEATABLE INPUTS GROUP -->
           <ng-container *ngIf="value | repeatable">
-            <ngx-smart-form-array [no-grid-layout]="noGridLayout" *ngIf="group?.get(value.name)"
-              [formArray]="group?.get(value.name)" [controls]="value.children || []" [template]="template"
-              [addGroupRef]="addTemplate" [name]="value.name" [autoupload]="autoupload">
+            <ngx-smart-form-array [class]="value.classes" [no-grid-layout]="noGridLayout" *ngIf="group?.get(value.name)"
+              [formArray]="group?.get(value.name)" [controls]="((value|asInputGroup).children || [])|inputConfigArray"
+              [template]="template" [addGroupRef]="addTemplate" [name]="value.name" [autoupload]="autoupload">
             </ngx-smart-form-array>
           </ng-container>
           <!--\ REPEATABLE INPUTS GROUP -->
@@ -52,7 +52,7 @@
             <ng-container *ngTemplateOutlet="
                 recursiveTemplate;
                 context: {
-                  controls: value!.children || [],
+                  controls: (value|asInputGroup)!.children || [],
                   group: group?.get(value.name),
                   autoupload
                 }
@@ -63,7 +63,7 @@
       </ng-container>
       <!--\ INPUT GROUP CONTAINER PART -->
       <!-- SIMPLE INPUT CONTAINER PART -->
-      <ng-container *ngIf="!(value | hasChildren)">
+      <ng-container *ngIf="!(value|asInputGroup | hasChildren)">
         <div [class]="noGridLayout ? 'ngx-form-no-grid' : value.containerClass" [hidden]="value | isHidden">
           <ng-container *ngTemplateOutlet="
               formTemplate;

@@ -8,7 +8,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 
 /**
  * @description Checks if input has `hidden` property set to true or is of type `hidden`
- * 
+ *
  * **Note** We mark the pipe as pure, because it depends on an object which hidden property
  *          might change, while the reference does not change, therefore, for now we wish to
  *          run the change dectector of the current pipe on each cycle
@@ -74,10 +74,62 @@ export class SafeHTMLPipe implements PipeTransform {
   }
 }
 
+@Pipe({
+  name: 'asInputs',
+  pure: true,
+  standalone: true,
+})
+export class AsInputsPipe implements PipeTransform {
+  transform(value: unknown) {
+    return value as InputConfigInterface[];
+  }
+}
+
+@Pipe({
+  name: 'asInputGroup',
+  pure: true,
+  standalone: true,
+})
+export class AsInputGroupPipe implements PipeTransform {
+  transform(value: unknown) {
+    return value as InputGroup;
+  }
+}
+
+@Pipe({
+  name: 'keys',
+  pure: true,
+  standalone: true,
+})
+export class KeysPipe implements PipeTransform {
+  transform(value: { [prop: string]: unknown }) {
+    return Object.keys(value);
+  }
+}
+
+@Pipe({
+  name: 'inputConfigArray',
+  pure: true,
+  standalone: true,
+})
+export class AsInputConfigArray implements PipeTransform {
+  transform(value: InputConfigInterface | InputConfigInterface[]) {
+    return Array.isArray(value)
+      ? value
+      : [value].filter(
+          (current) => typeof current !== 'undefined' && current !== null
+        );
+  }
+}
+
 /** @description Exported pipes */
 export const PIPES = [
   SafeHTMLPipe,
   IsRepeatablePipe,
   HasChildrenPipe,
   IsHiddenPipe,
+  AsInputsPipe,
+  AsInputGroupPipe,
+  KeysPipe,
+  AsInputConfigArray
 ] as const;

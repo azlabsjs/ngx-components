@@ -27,7 +27,7 @@ import { AngularReactiveFormBuilderBridge } from '../../types';
   standalone: true,
   imports: [CommonModule, ...PIPES],
   selector: 'ngx-smart-form-group',
-  templateUrl: './smart-form-group.component.html',
+  templateUrl: './group.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFormGroupComponent

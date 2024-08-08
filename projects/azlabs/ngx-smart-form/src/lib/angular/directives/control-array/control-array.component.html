@@ -1,0 +1,9 @@
+<div #container></div>
+<ng-container *ngTemplateOutlet="
+    addButtonRef ? addButtonRef : addTemplate;
+    context: { $implicit: onTemplateButtonClicked.bind(this) }
+  "></ng-container>
+
+<ng-template #addTemplate let-handler>
+    <ngx-add-button (click)="handler($event)"></ngx-add-button>
+</ng-template>
