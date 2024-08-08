@@ -3,7 +3,7 @@ import {
   ArrayPipe,
   IsArrayPipe,
   JoinPipe,
-  LengthPipe
+  LengthPipe,
 } from './common/arrays.pipe';
 import { IsAsyncPipe, AsObservablePipe } from './common/async.pipe';
 import { ParseIntPipe } from './common/parse-int.pipe';
@@ -16,15 +16,16 @@ import {
   DefinedPipe,
   IncludesPipe,
   IndexOfPipe,
+  KeysPipe,
 } from './common/utils.pipe';
 import { AsyncTextPipe, CommonStringsPipe, CommonTextPipe } from './strings';
-
 
 export {
   AsAnyPipe,
   DefinedPipe,
   IncludesPipe,
   IndexOfPipe,
+  KeysPipe,
 } from './common/utils.pipe';
 export { IsAsyncPipe, AsObservablePipe } from './common/async.pipe';
 export { PipeResultPipe } from './common/pipe-result.pipe';
@@ -36,7 +37,7 @@ export {
   IsArrayPipe,
   ArrayPipe,
   JoinPipe,
-  LengthPipe
+  LengthPipe,
 } from './common/arrays.pipe';
 
 /** Exported types & declarations from transform namespace */
@@ -67,4 +68,5 @@ export const COMMON_PIPES = [
   IndexOfPipe,
   AsObservablePipe,
   AsAnyPipe,
+  KeysPipe,
 ] as const;

@@ -62,3 +62,14 @@ export class AsAnyPipe implements PipeTransform {
     return value as any;
   }
 }
+
+@Pipe({
+  name: 'keys',
+  pure: true,
+  standalone: true,
+})
+export class KeysPipe implements PipeTransform {
+  transform(value: { [prop: string]: unknown }) {
+    return Object.keys(value);
+  }
+}
