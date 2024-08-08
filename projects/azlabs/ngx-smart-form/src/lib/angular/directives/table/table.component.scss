@@ -2,6 +2,10 @@
   vertical-align: var(--array-table-td-vertical-align, middle) !important;
 }
 
+.table td.center {
+  text-align: center !important;
+}
+
 .table td.bottom {
   vertical-align: var(--array-table-td-vertical-align, bottom) !important;
 }
@@ -11,15 +15,18 @@
   padding: var(--array-table-padding, 0) !important;
 }
 
+
 .table td,
 .table th {
   border-left: var(--array-table-borderwidth, calc(1 * (1rem / 20))) solid
     var(--array-table-border-color, hsl(198, 14%, 82%));
   background: var(--array-table-background-color, none);
+  text-align: var(--array-table-text-align, inherit) !important;
 }
 
-.table th {
+.table th, .table-compact th {
   font-weight: var(--array-table-header-font-weight, bold) !important;
+  padding: var(--array-table-header-padding, calc(4 * calc(6 * calc((1rem / 20) * 1)) / 3) calc(4 * calc(6 * calc((1rem / 20) * 1)) / 3)) !important;
 }
 
 .table td:has(input:focus) {
