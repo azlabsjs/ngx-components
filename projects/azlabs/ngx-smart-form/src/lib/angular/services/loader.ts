@@ -90,7 +90,10 @@ export function createInputConfig(
         }
       : undefined,
     // Add support for read property
-    read: input['read']
+    read: input['read'],
+
+    // Add support for compute property
+    compute: input['compute']
   } as ControlInterface;
 }
 

@@ -7,6 +7,10 @@ import {
 import { isNumber } from '@azlabsjs/utilities';
 import { AngularReactiveFormBuilderBridge, BindingInterface } from '../types';
 import { cloneAbstractControl } from './clone';
+import { Subject } from 'rxjs';
+
+/** @internal */
+type ChangedInputStateType = { name: string; value: boolean }[];
 
 /** @internal */
 function findAbstractControlArray<
@@ -76,7 +80,7 @@ export function setPropertyFactory(builder: AngularReactiveFormBuilderBridge) {
     const ac = g.controls[key];
     if (ac && value) {
       if (ac instanceof FormGroup) {
-        setValue(g, key, value, i);
+        setFormGroupValue(ac, value);
       } else if (
         ac instanceof FormArray &&
         Boolean(i?.isRepeatable) === true &&
@@ -89,22 +93,22 @@ export function setPropertyFactory(builder: AngularReactiveFormBuilderBridge) {
               (current) => typeof current !== 'undefined' && current !== null
             );
         const items = Array.isArray(value) ? value : [];
-        const a = new FormArray<AbstractControl<any>>([]);
+        const a = (g.get(key) as FormArray<any>) ?? new FormArray<any>([]);
         for (const current of items) {
           const t = builder.group(leaf) as FormGroup;
           setFormGroupValue(t, current);
           a.push(t);
         }
-        g.controls[key] = a;
+        g.setControl(key, a);
       } else if (ac instanceof FormArray && Boolean(i?.isRepeatable)) {
         const items = Array.isArray(value) ? value : [];
-        const a = new FormArray<AbstractControl<any>>([]);
+        const a = (g.get(key) as FormArray<any>) ?? new FormArray<any>([]);
         for (const current of items) {
           const t = builder.control(i);
           t.setValue(current);
           a.push(t);
         }
-        g.controls[key] = a;
+        g.setControl(key, a);
       } else {
         g.controls[key]?.setValue(value);
       }
@@ -118,11 +122,7 @@ export function setFormGroupValue(
   values: { [index: string]: any }
 ) {
   for (const [key, value] of Object.entries(values)) {
-    try {
-      formgroup.controls[key].setValue(value);
-    } catch (error) {
-      //
-    }
+    formgroup.controls[key]?.setValue(value);
   }
 }
 
@@ -162,6 +162,7 @@ export function setHiddenPropertyFactory(
   v: any
 ) {
   return (builder: AngularReactiveFormBuilderBridge, g: FormGroup) => {
+    const changes: ChangedInputStateType = [];
     // TODO: Provide a way to update array input property as current implementation does not work on array
     inputs = Array.isArray(inputs) ? [...inputs] : [];
     function setProperty(_inputs: InputConfigInterface[], n: string) {
@@ -185,9 +186,12 @@ export function setHiddenPropertyFactory(
           // we can proceed to input update
         } else if (i.name === n) {
           const values = i.requiredIf?.values ?? [];
-          const _previous = i.hidden;
+          const _previous = i.hidden ?? false;
           i.hidden = isHidden(values, v);
           const _current = i.hidden;
+          if (_previous !== _current) {
+            changes.push({ name: b.key, value: _current });
+          }
           // We find the parent node of the property to update
           // on which .get(), .removeControl() and .addControl() will be called
           const r = findAbstractControlParent(g, b.key);
@@ -200,13 +204,17 @@ export function setHiddenPropertyFactory(
               return setPropertyFactory(builder)(_g, k, c?.getRawValue(), i);
             };
             r.removeControl(n);
+            // Case previous value does not equals current value but the control is not
+            // defined, we add the control to the list of form controls
           } else if (_previous !== _current && !c) {
-            r.addControl(n, cloneAbstractControl(b.abstractControl));
+            const result = cloneAbstractControl(b.abstractControl);
+            r.addControl(n, result);
             const { setValueFactory } = b;
             if (setValueFactory) {
               setValueFactory()(r, n);
             }
           }
+        } else {
         }
       }
     }
@@ -215,7 +223,11 @@ export function setHiddenPropertyFactory(
     setProperty(inputs, b.key);
 
     // Return the updated g and input properties
-    return [g, inputs] as [FormGroup, InputConfigInterface[]];
+    return [g, inputs, changes] as [
+      FormGroup,
+      InputConfigInterface[],
+      ChangedInputStateType
+    ];
   };
 }
 
@@ -266,6 +278,28 @@ export function bindingsFactory(inputs: InputConfigInterface[]) {
   };
 }
 
+/** @description Query for an input configuration from the list of input configurations */
+export function pickInputConfig(
+  inputs: InputConfigInterface[],
+  key: string,
+  character: string = '.'
+) {
+  let items = [...inputs];
+  const keys = key.split(character);
+  let result: InputConfigInterface | null = null;
+  for (const k of keys) {
+    const input = items.find((i) => i.name === k);
+    if (!input) {
+      result = null;
+      break;
+    }
+    items = [...((input as InputGroup).children ?? [])];
+    result = input;
+  }
+
+  return result;
+}
+
 /** @internal Set input properties */
 export function setInputsProperties(
   builder: AngularReactiveFormBuilderBridge,
@@ -275,11 +309,13 @@ export function setInputsProperties(
   v?: any,
   name?: string
 ) {
-  for (const c of b.values()) {
-    if (!c.binding) {
+  let changes: ChangedInputStateType = [];
+  for (const item of b.values()) {
+    let c: ChangedInputStateType = [];
+    if (!item.binding) {
       continue;
     }
-    if (name && c.binding.name.toString() !== name.toString()) {
+    if (name && item.binding.name.toString() !== name.toString()) {
       continue;
     }
     const factory = (
@@ -288,12 +324,267 @@ export function setInputsProperties(
     ) => {
       return setHiddenPropertyFactory(
         inputs ?? [],
-        c,
-        v ?? c.abstractControl.value
+        item,
+        v ?? item.abstractControl.value
       )(builder, formgroup);
     };
-    [g, inputs] = factory(builder, g);
+    [g, inputs, c] = factory(builder, g);
+    changes.push(...c);
   }
 
-  return [g, inputs] as [FormGroup, InputConfigInterface[]];
+  return [g, inputs, changes] as [
+    FormGroup,
+    InputConfigInterface[],
+    ChangedInputStateType
+  ];
+}
+
+/** @description Query for the value located at a given leaf of the tree of control in an abstract control */
+export function getPropertyValue<TReturn = any>(
+  model: AbstractControl | null,
+  key: string,
+  character: string = '.'
+): TReturn {
+  if (
+    key === '' ||
+    typeof key === 'undefined' ||
+    key === null ||
+    typeof model === 'undefined' ||
+    model === null
+  ) {
+    return model?.getRawValue() ?? null;
+  }
+  character = character ?? '.';
+  if (key.includes(character)) {
+    const properties = key.split(character);
+    let carry: AbstractControl | null = model;
+
+    for (let i = 0; i < properties.length; i++) {
+      const property = properties[i];
+
+      if (property === '*' && carry instanceof FormArray) {
+        const least = properties.slice(i + 1).join(character);
+        return carry.controls.map((c) =>
+          getPropertyValue(c, least, character)
+        ) as any as TReturn;
+      }
+      if (carry instanceof FormGroup) {
+        carry = carry.get(property);
+      }
+
+      if (carry === null) {
+        break;
+      }
+    }
+    return carry ? carry.getRawValue() : null;
+  }
+
+  return model.get(key)?.getRawValue();
+}
+
+/** @description Query for the value located at a given leaf of the tree of control in an abstract control */
+export function pickAbstractControl(
+  model: AbstractControl | null,
+  key: string,
+  character: string = '.'
+): AbstractControl | null {
+  if (
+    key === '' ||
+    typeof key === 'undefined' ||
+    key === null ||
+    typeof model === 'undefined' ||
+    model === null
+  ) {
+    return model ?? null;
+  }
+  character = character ?? '.';
+  if (key.includes(character)) {
+    const properties = key.split(character);
+    let carry: AbstractControl | null = cloneAbstractControl(model);
+
+    for (let i = 0; i < properties.length; i++) {
+      const property = properties[i];
+
+      if (property === '*' && carry instanceof FormArray) {
+        return carry;
+      }
+
+      if (carry instanceof FormGroup) {
+        carry = carry.get(property.trim());
+      }
+
+      if (carry === null) {
+        break;
+      }
+    }
+    return carry;
+  }
+
+  return model.get(key.trim());
+}
+
+/** @internal */
+export function useSupportedAggregations() {
+  //#region Supported aggregation function
+  function avg(...args: unknown[]) {
+    return sum(...args) / args.length;
+  }
+
+  function sum(...args: unknown[]) {
+    return args
+      .map((v) => Number(v))
+      .filter((v) => !isNaN(v))
+      .reduce((carry, curr) => {
+        carry += curr;
+        return carry;
+      }, 0);
+  }
+
+  function count(...args: unknown[]) {
+    return args.length;
+  }
+
+  function min(...args: unknown[]) {
+    return Math.min(...args.map((v) => Number(v)).filter((v) => !isNaN(v)));
+  }
+
+  function max(...args: unknown[]) {
+    return Math.max(...args.map((v) => Number(v)).filter((v) => !isNaN(v)));
+  }
+
+  function concat(character: string, ...args: unknown[]) {
+    return args.map((v) => String(v)).join(character);
+  }
+  //#region Supported aggregation function
+
+  const aggregations: Record<string, (...args: any) => unknown> = {
+    avg,
+    average: avg,
+    sum,
+    count,
+    min,
+    max,
+    join: concat,
+    concat,
+  };
+
+  return aggregations;
+}
+
+/**
+ * @description Computes a dependencies trees of input that has their value that needs to be computed
+ * based on other input value or provided raw values
+ */
+export function createComputableDepencies(
+  items: InputConfigInterface[],
+  aggregations: Record<string, (...args: any) => unknown>
+) {
+  const dependencies: {
+    [prop: string]: {
+      values: {
+        name: string;
+        fn: (model: AbstractControl) => unknown;
+      }[];
+      cancel: Subject<void>;
+    };
+  } = {};
+  const inputs = [...items];
+
+  const decorated = (values: InputConfigInterface[]) => {
+    for (const input of values) {
+      const hasLeaf = ((input as InputGroup)?.children ?? []).length > 0;
+      if (hasLeaf) {
+        decorated((input as InputGroup).children);
+        continue;
+      }
+      if (input.compute) {
+        if (typeof input.compute.fn === 'string') {
+          const method = aggregations[input.compute.fn];
+          const args = (input.compute as { fn: string; args: string[] }).args;
+          const argumentBuilders: ((
+            model: AbstractControl,
+            params: unknown[]
+          ) => void)[] = [];
+          const deps: string[] = [];
+          for (const arg of args) {
+            // Case the argument value starts with [ and ends with ], the argument is considered a dependency
+            if (arg.startsWith('[') && arg.endsWith(']')) {
+              const name = arg.slice(1, arg.length - 1);
+              // In case we are in presence of a form array value selection
+              // the dependency is the form array itself
+              const start_index = name.indexOf('*');
+
+              // Push the property on top of dependencies array
+              deps.push(
+                start_index !== -1 ? name.slice(0, start_index - 1) : name
+              );
+
+              // Create control property value resolver and push it on top of arguments builder
+              const builder =
+                start_index !== -1
+                  ? (model: AbstractControl, p: unknown[]) => {
+                      p.push(...getPropertyValue<unknown[]>(model, name));
+                    }
+                  : (model: AbstractControl, p: unknown[]) => {
+                      p.push(getPropertyValue<unknown>(model, name));
+                    };
+
+              argumentBuilders.push(builder);
+            } else {
+              argumentBuilders.push((_, p: unknown[]) => {
+                p.push(arg);
+              });
+            }
+          }
+          for (const dep of deps) {
+            const current = dependencies[dep] ?? {
+              values: [],
+              cancel: new Subject<void>(),
+            };
+            const values = current.values ?? [];
+            values.push({
+              name: input.name,
+              fn: (model: AbstractControl) => {
+                const stack: unknown[] = [];
+                for (const builder of argumentBuilders) {
+                  builder(model, stack);
+                }
+                return method(...stack);
+              },
+            });
+            dependencies[dep] = {
+              values,
+              cancel: current.cancel ?? new Subject<void>(),
+            };
+          }
+        } else {
+          const compute = input.compute as {
+            fn: (model: any) => unknown;
+            deps: string[];
+          };
+          for (const dep of compute.deps) {
+            const current = dependencies[dep] ?? {
+              values: [],
+              cancel: new Subject<void>(),
+            };
+            const values = current.values ?? [];
+            values.push({
+              name: input.name,
+              fn: compute.fn,
+            });
+            dependencies[dep] = {
+              values,
+              cancel: current.cancel ?? new Subject<void>(),
+            };
+          }
+        }
+      }
+    }
+  };
+
+  // Call the decorated function on the provided inputs
+  decorated(inputs);
+
+  // Return the builded dependencies
+  return dependencies;
 }

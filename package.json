@@ -27,7 +27,7 @@
     "@azlabsjs/js-object": "^0.2.0",
     "@azlabsjs/requests": "^0.2.4",
     "@azlabsjs/rx-query": "^0.2.13",
-    "@azlabsjs/smart-form-core": "^0.2.19",
+    "@azlabsjs/smart-form-core": "^0.2.21",
     "@azlabsjs/uploader": "^0.2.2",
     "@azlabsjs/utilities": "^0.2.0",
     "@cds/core": "^6.11.0",

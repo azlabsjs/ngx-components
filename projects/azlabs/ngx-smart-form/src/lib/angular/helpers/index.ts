@@ -13,7 +13,12 @@ export {
   setHiddenPropertyFactory,
   setInputsProperties,
   setFormValue,
-  setPropertyFactory
+  setPropertyFactory,
+  getPropertyValue,
+  createComputableDepencies,
+  useSupportedAggregations,
+  pickAbstractControl,
+  pickInputConfig
 } from './core';
 
 export { useBearerTokenInterceptor } from './interceptors';

@@ -69,7 +69,7 @@
       {
         "formId": 220,
         "controlName": "fruits",
-        "controlIndex": 1,
+        "controlIndex": 3,
         "required": true,
         "disabled": false,
         "readonly": false,
@@ -92,7 +92,7 @@
       {
         "formId": 220,
         "controlName": "category_id",
-        "controlIndex": 2,
+        "controlIndex": 4,
         "required": true,
         "disabled": false,
         "readonly": false,
@@ -115,7 +115,7 @@
       {
         "formId": 220,
         "controlName": "lastname",
-        "controlIndex": 3,
+        "controlIndex": 5,
         "required": true,
         "disabled": false,
         "readonly": false,
@@ -135,7 +135,7 @@
       {
         "formId": 220,
         "controlName": "firstname",
-        "controlIndex": 4,
+        "controlIndex": 6,
         "required": true,
         "disabled": false,
         "readonly": false,
@@ -156,7 +156,7 @@
       {
         "formId": 220,
         "controlName": "profession",
-        "controlIndex": 6,
+        "controlIndex": 7,
         "required": true,
         "disabled": false,
         "readonly": false,
@@ -181,7 +181,7 @@
       {
         "formId": 220,
         "controlName": "phonenumber",
-        "controlIndex": 4,
+        "controlIndex": 8,
         "required": true,
         "disabled": false,
         "readonly": false,
@@ -319,8 +319,76 @@
             "multiple": 0,
             "options": [],
             "children": []
+          },
+          {
+            "formId": 234,
+            "controlName": "gpg",
+            "controlIndex": 5,
+            "required": true,
+            "disabled": false,
+            "readonly": false,
+            "unique": false,
+            "isRepeatable": false,
+            "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-4",
+            "id": 1290,
+            "label": "GPG",
+            "placeholder": "...",
+            "type": "number",
+            "classes": "clr-input",
+            "max": 100,
+            "multiple": 0,
+            "options": [],
+            "children": []
           }
         ]
+      },
+      {
+        "formId": 220,
+        "controlName": "stakeholders_avg_gpg",
+        "controlIndex": 9,
+        "required": true,
+        "disabled": false,
+        "readonly": false,
+        "unique": false,
+        "isRepeatable": false,
+        "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-3",
+        "id": 1249,
+        "label": "Stakeholders Avg GPG",
+        "placeholder": "...",
+        "type": "number",
+        "classes": "clr-input",
+        "maxLength": 100,
+        "multiple": 0,
+        "options": [],
+        "children": [],
+        "compute": {
+          "fn": "avg",
+          "args": ["[stakeholders.*.gpg]"]
+        }
+      },
+      {
+        "formId": 220,
+        "controlName": "stakeholders_total_gpg",
+        "controlIndex": 10,
+        "required": true,
+        "disabled": false,
+        "readonly": false,
+        "unique": false,
+        "isRepeatable": false,
+        "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-3",
+        "id": 1249,
+        "label": "Stakeholders Total GPG",
+        "placeholder": "...",
+        "type": "number",
+        "classes": "clr-input",
+        "maxLength": 100,
+        "multiple": 0,
+        "options": [],
+        "children": [],
+        "compute": {
+          "fn": "sum",
+          "args": ["[stakeholders.*.gpg]"]
+        }
       },
       {
         "formId": 220,

@@ -15,30 +15,20 @@ export function cloneAbstractControl<T extends AbstractControl>(control: T): T {
   let newControl: T;
 
   if (control instanceof FormGroup) {
-    const formGroup = new FormGroup(
-      {} as { [key in keyof typeof control.controls]: AbstractControl<any> },
-      control.validator,
-      control.asyncValidator
-    );
+    const group = new FormGroup({}, control.validator, control.asyncValidator);
     const controls = control.controls;
-
     Object.keys(controls).forEach((key) => {
-      formGroup.addControl(key, cloneAbstractControl(controls[key]));
+      group.addControl(key, cloneAbstractControl(controls[key]));
     });
-
-    newControl = formGroup as any;
+    newControl = group as any;
   } else if (control instanceof FormArray) {
-    const formArray = new FormArray<AbstractControl<any>>(
+    const array = new FormArray<AbstractControl<any>>(
       [],
       control.validator,
       control.asyncValidator
     );
-
-    control.controls.forEach((formControl) =>
-      formArray.push(cloneAbstractControl(formControl))
-    );
-
-    newControl = formArray as any;
+    control.controls.forEach((f) => array.push(cloneAbstractControl(f)));
+    newControl = array as any;
   } else if (control instanceof FormControl) {
     newControl = new FormControl(
       control.value,
@@ -51,6 +41,18 @@ export function cloneAbstractControl<T extends AbstractControl>(control: T): T {
 
   if (control.disabled) {
     newControl.disable({ emitEvent: false });
+  }
+
+  if (control.enabled) {
+    newControl.enable({ emitEvent: false });
+  }
+
+  if (control.parent && typeof newControl?.setParent === 'function') {
+    newControl?.setParent(control.parent);
+  }
+
+  if (control.errors) {
+    newControl.setErrors(control.errors);
   }
 
   return newControl;

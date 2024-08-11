@@ -60,7 +60,8 @@ export class ComponentReactiveFormHelpers {
     const group = builder.group({});
     for (const input of inputs) {
       if (input.isRepeatable) {
-        group.addControl(input.name, new FormArray<AbstractControl>([]));
+        const array = new FormArray<AbstractControl>([]);
+        group.addControl(input.name, array);
         continue;
       }
       const config = input as InputGroup;

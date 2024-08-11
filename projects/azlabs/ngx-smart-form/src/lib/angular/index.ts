@@ -17,6 +17,9 @@ export {
   createFormControl,
   createFormArray,
   useBearerTokenInterceptor,
+  getPropertyValue,
+  pickAbstractControl,
+  pickInputConfig,
 } from './helpers';
 // Module & component & services exports
 export { NgxSmartFormModule } from './smart-form.module';
@@ -68,5 +71,5 @@ export const FORM_DIRECTIVES = [
   NgxSmartFormArrayComponent,
   NgxSmartFormArrayItemComponent,
   SafeHTMLPipe,
-  NgxTableForm
+  NgxTableForm,
 ] as const;

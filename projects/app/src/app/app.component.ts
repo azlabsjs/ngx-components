@@ -189,12 +189,23 @@ export class AppComponent implements OnInit {
     // profession: 'INFORMATIQUE',
     stakeholders: [
       {
-        lastname: 'AYI',
         firstname: 'EKUE',
+        lastname: 'AYI',
         profession: 'INFORMATIQUE',
+      },
+      {
+        firstname: 'RODRIGUE',
+        lastname: 'KOLANI',
+        profession: 'RESEARCH',
+        category_id: 2,
       },
     ],
     phonenumber: ['22891969456', '22892384958'],
+    persons: {
+      firstname: 'MADELEINE',
+      lastname: 'DE LA COURT',
+      email: 'madeleined@example.com',
+    },
   };
 
   required = false;
