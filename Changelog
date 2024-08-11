@@ -20,3 +20,8 @@
 - Added support for async datagrid column name
 - Added support for asyncText pipe
 - Fixed issues in existing implementations
+
+## [0.17.14] [2024-08-11]
+
+- Added support for compupte property in the form input configurations
+- Fixed issue with latest contraints.disabled not being applied to UI
