@@ -18,7 +18,9 @@ export {
   createComputableDepencies,
   useSupportedAggregations,
   pickAbstractControl,
-  pickInputConfig
+  pickInputConfig,
+  findAbstractControlParent,
+  collectErrors
 } from './core';
 
 export { useBearerTokenInterceptor } from './interceptors';

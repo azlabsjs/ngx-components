@@ -146,7 +146,6 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
 
   private setRefCount(value: number) {
     this._refCount = value;
-    console.log(`Ref count: [${value}]`);
     this.cdRef?.markForCheck();
   }
 }

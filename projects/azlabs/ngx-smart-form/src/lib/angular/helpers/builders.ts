@@ -257,7 +257,7 @@ export class ComponentReactiveFormHelpers {
     const control = builder.control(
       {
         value: config.value,
-        disabled: config.disabled,
+        disabled: config.constraints?.disabled ?? config.disabled,
       },
       {
         validators: Validators.compose(validators),

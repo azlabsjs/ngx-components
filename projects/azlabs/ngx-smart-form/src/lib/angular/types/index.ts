@@ -17,3 +17,4 @@ export {
 export { InputEventArgs } from './input';
 export { InterceptorFactory } from './interceptors';
 export { InputOptionsClient } from './options';
+export { ComputedInputValueConfigType } from './compute';

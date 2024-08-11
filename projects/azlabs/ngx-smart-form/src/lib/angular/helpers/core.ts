@@ -1,11 +1,20 @@
-import { AbstractControl, FormGroup, FormArray } from '@angular/forms';
+import {
+  AbstractControl,
+  FormGroup,
+  FormArray,
+  ValidationErrors,
+} from '@angular/forms';
 import {
   InputConfigInterface,
   InputGroup,
   InputRequireIfConfig,
 } from '@azlabsjs/smart-form-core';
 import { isNumber } from '@azlabsjs/utilities';
-import { AngularReactiveFormBuilderBridge, BindingInterface } from '../types';
+import {
+  AngularReactiveFormBuilderBridge,
+  BindingInterface,
+  ComputedInputValueConfigType,
+} from '../types';
 import { cloneAbstractControl } from './clone';
 import { Subject } from 'rxjs';
 
@@ -34,10 +43,9 @@ function findAbstractControlArray<
 }
 
 /** @internal helper function to find the parent of a given abstract control specialy if using . separated property names */
-function findAbstractControlParent<TReturn extends FormGroup = FormGroup>(
-  g: FormGroup,
-  key: string
-) {
+export function findAbstractControlParent<
+  TReturn extends FormGroup = FormGroup
+>(g: FormGroup, key: string) {
   const keys = key.split('.');
   // Remove the top element of the list of values
   keys.pop();
@@ -123,6 +131,7 @@ export function setFormGroupValue(
 ) {
   for (const [key, value] of Object.entries(values)) {
     formgroup.controls[key]?.setValue(value);
+    formgroup.updateValueAndValidity();
   }
 }
 
@@ -382,6 +391,45 @@ export function getPropertyValue<TReturn = any>(
   return model.get(key)?.getRawValue();
 }
 
+export function getInputValue<TReturn = any>(
+  v: any,
+  key: string,
+  character: string = '.'
+): TReturn {
+  if (
+    key === '' ||
+    typeof key === 'undefined' ||
+    key === null ||
+    typeof v !== 'object' ||
+    v === null
+  ) {
+    return v ?? null;
+  }
+  character = character ?? '.';
+
+  const properties = key.split(character);
+  let carry: any | null = v;
+
+  for (let i = 0; i < properties.length; i++) {
+    const property = properties[i];
+
+    if (property === '*' && Array.isArray(carry)) {
+      const least = properties.slice(i + 1).join(character);
+      return carry.map((c) =>
+        getInputValue(c, least, character)
+      ) as any as TReturn;
+    }
+    if (typeof carry === 'object') {
+      carry = carry[property];
+    }
+
+    if (carry === null) {
+      break;
+    }
+  }
+  return carry ?? null;
+}
+
 /** @description Query for the value located at a given leaf of the tree of control in an abstract control */
 export function pickAbstractControl(
   model: AbstractControl | null,
@@ -455,6 +503,47 @@ export function useSupportedAggregations() {
   function concat(character: string, ...args: unknown[]) {
     return args.map((v) => String(v)).join(character);
   }
+
+  function multiply(...args: unknown[]) {
+    if (args.length === 0) {
+      return 0;
+    }
+    return args
+      .map((v) => Number(v))
+      .map((v) => (!isNaN(v) ? v : 0))
+      .reduce((carry, curr) => {
+        carry *= curr;
+        return carry;
+      }, 1);
+  }
+
+  function divide(...args: unknown[]) {
+    if (args.length === 0) {
+      return 0;
+    }
+    return args
+      .slice(1)
+      .map((v) => Number(v))
+      .map((v) => (!isNaN(v) ? v : 1))
+      .reduce((carry, curr) => {
+        carry /= curr;
+        return carry;
+      }, Number(args[0]));
+  }
+
+  function substract(...args: unknown[]) {
+    if (args.length === 0) {
+      return 0;
+    }
+    return args
+      .slice(1)
+      .map((v) => Number(v))
+      .filter((v) => !isNaN(v))
+      .reduce((carry, curr) => {
+        carry -= curr;
+        return carry;
+      }, Number(args[0]));
+  }
   //#region Supported aggregation function
 
   const aggregations: Record<string, (...args: any) => unknown> = {
@@ -466,6 +555,9 @@ export function useSupportedAggregations() {
     max,
     join: concat,
     concat,
+    multiply,
+    divide,
+    substract,
   };
 
   return aggregations;
@@ -480,13 +572,7 @@ export function createComputableDepencies(
   aggregations: Record<string, (...args: any) => unknown>
 ) {
   const dependencies: {
-    [prop: string]: {
-      values: {
-        name: string;
-        fn: (model: AbstractControl) => unknown;
-      }[];
-      cancel: Subject<void>;
-    };
+    [prop: string]: ComputedInputValueConfigType<any>;
   } = {};
   const inputs = [...items];
 
@@ -501,32 +587,51 @@ export function createComputableDepencies(
         if (typeof input.compute.fn === 'string') {
           const method = aggregations[input.compute.fn];
           const args = (input.compute as { fn: string; args: string[] }).args;
-          const argumentBuilders: ((
-            model: AbstractControl,
-            params: unknown[]
-          ) => void)[] = [];
+          const argumentBuilders: ((model: any, params: unknown[]) => void)[] =
+            [];
           const deps: string[] = [];
           for (const arg of args) {
             // Case the argument value starts with [ and ends with ], the argument is considered a dependency
-            if (arg.startsWith('[') && arg.endsWith(']')) {
+            if (String(arg).startsWith('[') && arg.endsWith(']')) {
               const name = arg.slice(1, arg.length - 1);
               // In case we are in presence of a form array value selection
               // the dependency is the form array itself
               const start_index = name.indexOf('*');
 
+              // Due to issue not being able to listen for formgroup control valueChanges event
+              // current implementation will listen for entire inner formgroup changes
+              // if any is request, and we will use `getObjectProperty` to query for
+              // the value of the requested control
+              const dot_start_index = name.indexOf('.');
+              const after_dot_index = name.slice(dot_start_index + 1);
+              const depName =
+                start_index !== -1
+                  ? name.slice(0, start_index - 1)
+                  : dot_start_index !== -1
+                  ? name.slice(0, dot_start_index)
+                  : name;
+
               // Push the property on top of dependencies array
-              deps.push(
-                start_index !== -1 ? name.slice(0, start_index - 1) : name
-              );
+              deps.push(depName);
 
               // Create control property value resolver and push it on top of arguments builder
               const builder =
                 start_index !== -1
-                  ? (model: AbstractControl, p: unknown[]) => {
-                      p.push(...getPropertyValue<unknown[]>(model, name));
+                  ? (model: any, p: unknown[]) => {
+                      const result = getInputValue<unknown[]>(
+                        model,
+                        name.slice(start_index)
+                      );
+                      if (result) {
+                        p.push(...result);
+                      }
                     }
-                  : (model: AbstractControl, p: unknown[]) => {
-                      p.push(getPropertyValue<unknown>(model, name));
+                  : dot_start_index !== -1 && after_dot_index.trim() !== ''
+                  ? (model: any, p: unknown[]) => {
+                      p.push(getInputValue<unknown>(model, after_dot_index));
+                    }
+                  : (model: any, p: unknown[]) => {
+                      p.push(model);
                     };
 
               argumentBuilders.push(builder);
@@ -544,7 +649,7 @@ export function createComputableDepencies(
             const values = current.values ?? [];
             values.push({
               name: input.name,
-              fn: (model: AbstractControl) => {
+              fn: (model: any) => {
                 const stack: unknown[] = [];
                 for (const builder of argumentBuilders) {
                   builder(model, stack);
@@ -587,4 +692,32 @@ export function createComputableDepencies(
 
   // Return the builded dependencies
   return dependencies;
+}
+
+/** @internal Recursively get errors from an angular reactive control (eg: FormGroup, FormControl, FormArray) */
+export function collectErrors(control: AbstractControl) {
+  const errors: ValidationErrors[] = [];
+  const getErrors = (c: AbstractControl, _name?: string) => {
+    if (c instanceof FormGroup) {
+      for (const name of Object.keys(c.controls)) {
+        const current = c.get(name);
+        if (current) {
+          getErrors(current, name);
+        }
+      }
+    } else if (c instanceof FormArray) {
+      for (const _c of c.controls) {
+        getErrors(_c);
+      }
+    } else {
+      if (c.invalid && c.errors) {
+        errors.push(c.errors);
+      }
+    }
+  };
+
+  getErrors(control);
+
+  // Return the list of error from the control element
+  return errors;
 }

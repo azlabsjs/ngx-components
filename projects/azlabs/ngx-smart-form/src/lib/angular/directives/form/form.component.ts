@@ -35,6 +35,7 @@ import { RequestClient } from '../../../http';
 import {
   ComponentReactiveFormHelpers,
   bindingsFactory,
+  collectErrors,
   createComputableDepencies,
   pickAbstractControl,
   setFormValue,
@@ -44,6 +45,7 @@ import {
 import {
   AngularReactiveFormBuilderBridge,
   BindingInterface,
+  ComputedInputValueConfigType,
   ControlsStateMap,
   ReactiveFormComponentInterface,
 } from '../../types';
@@ -57,34 +59,7 @@ import { PIPES } from '../../pipes';
 import { NgxSmartFormControlArrayComponent } from '../control-array';
 import { NgxSmartFormGroupHeaderPipe } from '../group';
 import { memoize } from '@azlabsjs/functional';
-
-/** @description Recursively get errors from an angular reactive control (eg: FormGroup, FormControl, FormArray) */
-function getFormErrors(control: AbstractControl) {
-  const errors: ValidationErrors[] = [];
-  const getErrors = (c: AbstractControl, _name?: string) => {
-    if (c instanceof FormGroup) {
-      for (const name of Object.keys(c.controls)) {
-        const current = c.get(name);
-        if (current) {
-          getErrors(current, name);
-        }
-      }
-    } else if (c instanceof FormArray) {
-      for (const _c of c.controls) {
-        getErrors(_c);
-      }
-    } else {
-      if (c.invalid && c.errors) {
-        errors.push(c.errors);
-      }
-    }
-  };
-
-  getErrors(control);
-
-  // Return the list of error from the control element
-  return errors;
-}
+import { findAbstractControlParent } from '../../helpers';
 
 /** @internal */
 const AUTO_SUBMIT_ERROR_MESSAGE =
@@ -92,14 +67,8 @@ const AUTO_SUBMIT_ERROR_MESSAGE =
 
 /** @internal */
 const memoizedComputeProperties = memoize(createComputableDepencies);
+/** @internal */
 const aggregations = useSupportedAggregations();
-type ComputedInputValueConfigType = {
-  values: {
-    name: string;
-    fn: (model: AbstractControl) => unknown;
-  }[];
-  cancel: Subject<void>;
-};
 
 @Component({
   standalone: true,
@@ -135,10 +104,10 @@ export class NgxSmartFormComponent
   }
   // @internal
   private _destroy$ = new Subject<void>();
-  private computedInputs: {
-    [prop: string]: ComputedInputValueConfigType;
+  private computedInputsConfig: {
+    [prop: string]: ComputedInputValueConfigType<any>;
   } | null = null;
-  private changedInputs: {
+  private requiredIfInputState: {
     [prop: string]: { previous: boolean; current: boolean };
   } | null = null;
   private trackedDependencies: string[] | null = [];
@@ -301,7 +270,7 @@ export class NgxSmartFormComponent
     // Due to some issue with form group being invalid while all controls does not
     // have error, we are adding a check that verifies if all controls has error before
     // breaking out of the function
-    const errors = getFormErrors(this._formGroup);
+    const errors = collectErrors(this._formGroup);
     if (!this._formGroup.valid && errors.length > 0) {
       return;
     }
@@ -393,8 +362,8 @@ export class NgxSmartFormComponent
             this.setFormState({ ...this._form, controlConfigs: _inputs }, g);
             this.updateComputedInputsDepedencies(changes);
 
-            const inputs = this.changedInputs ?? {};
-            const computedInputs = this.computedInputs ?? {};
+            const inputs = this.requiredIfInputState ?? {};
+            const computedInputs = this.computedInputsConfig ?? {};
             const changedDependencies = Object.keys(inputs)
               .filter(
                 (k) =>
@@ -427,15 +396,9 @@ export class NgxSmartFormComponent
       // Case we are already tracking the dependency
       // we continue to the next iteration
       if (this.trackedDependencies?.includes(name)) {
-        console.log(`Tracking ${name} dependencies, returning...`);
         continue;
       }
       const control = pickAbstractControl(this._formGroup, name);
-      console.log(
-        'Dependency control: ',
-        dep,
-        Object.keys(this._formGroup.controls)
-      );
       if (!control) {
         // Case the control cannot be found, we unsuscribe from any previous
         // subscription on the control
@@ -449,27 +412,19 @@ export class NgxSmartFormComponent
             1
           );
         }
-
-        console.log(
-          `Unsubcribe from value changes for [${name}]`,
-          this.trackedDependencies
-        );
         continue;
       }
-      console.log(`Listening for [${name}] control changes`, control.getRawValue());
       this.trackedDependencies?.push(name);
+
       control.valueChanges
         .pipe(
-          tap(() => {
-            console.log('Updating inputs value: ', config.values);
+          tap((state) => {
             for (const value of config.values) {
-              console.log(`Picking and updating [${value.name}] input`);
               pickAbstractControl(this._formGroup, value.name)?.setValue(
-                value.fn(this._formGroup)
+                value.fn(state)
               );
             }
           }),
-          //
           takeUntil(config.cancel)
         )
         .subscribe();
@@ -498,7 +453,7 @@ export class NgxSmartFormComponent
   private onFormConfigChanges(f: FormConfigInterface, formgroup?: FormGroup) {
     // Each type form configuration changes, we set the list of computed properties
     const { controlConfigs: inputs } = f;
-    this.computedInputs = memoizedComputeProperties(inputs, aggregations);
+    this.computedInputsConfig = memoizedComputeProperties(inputs, aggregations);
 
     // We create an instance of angular Reactive Formgroup instance from input configurations
     // if formgroup parameter is null or undefined
@@ -532,7 +487,9 @@ export class NgxSmartFormComponent
     this.setFormState({ ...this._form, controlConfigs: _inputs }, g);
 
     // Register listeners for computing input values
-    this.registerDependenciesChanges(Object.entries(this.computedInputs ?? {}));
+    this.registerDependenciesChanges(
+      Object.entries(this.computedInputsConfig ?? {})
+    );
 
     // register controls value changes and update ui based on requiredIf configuration on form inputs
     this.registerControlValueChanges(b);
@@ -569,8 +526,7 @@ export class NgxSmartFormComponent
     if (changes.length === 0) {
       return;
     }
-    console.log('Changes: ', changes);
-    const changedInputs = this.changedInputs ?? {};
+    const changedInputs = this.requiredIfInputState ?? {};
     for (const change of changes) {
       const el = changedInputs[change.name] ?? {};
       changedInputs[change.name] = {
@@ -578,14 +534,13 @@ export class NgxSmartFormComponent
         current: change.value,
       };
     }
-    console.log('Changed inputs: ', changedInputs);
-    this.changedInputs = changedInputs;
+    this.requiredIfInputState = changedInputs;
   }
 
   ngOnDestroy(): void {
     this._destroy$.next();
-    this.computedInputs = null;
+    this.computedInputsConfig = null;
     this.trackedDependencies = null;
-    this.changedInputs = null;
+    this.requiredIfInputState = null;
   }
 }
