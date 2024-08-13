@@ -35,7 +35,7 @@ export type LegacyGridColumnType = BaseGridColumnType & {
   label: string;
 };
 
-/** 
+/**
  * @description new datagrid API column type definition
  * @internal
  */
@@ -91,14 +91,24 @@ export type GriSelectDirectiveInputType = {
 
 /** @description Datagrid Detail columns type declaration */
 export type GridDetailColumnType = {
+  /** Column description of name property value */
   title: string;
+
+  /** Object property to which the column is attached to */
   property: string;
+
+  /** Takes object property value and passes it through a pipeline of function which must return an output */
   titleTransform?: PipeTransformType | PipeTransformType[];
+
+  /** Takes `title` property and passes it through a pipeline of function which must return an output */
   transform?: PipeTransformType | PipeTransformType[];
   style?: {
     cssClass?: string | string[];
     styles?: string[] | Record<string, boolean>;
   };
+
+  /** Provides developper information about how column value should be treated or preview */
+  contentType?: 'text' | 'document' | 'link';
 };
 
 /** @description List of columns type declaration */
