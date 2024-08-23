@@ -10,4 +10,3 @@
 - Remove reactive forms depedency from intl-tel-input [x]
 - Fix issue with custom submit button on smart form component [x]
 - Review dropzone directive and component implementations []
-- Replace the swith statement with a call to pipe transform []

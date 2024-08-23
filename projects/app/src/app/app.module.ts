@@ -20,7 +20,7 @@ import { ClarityIcons, uploadCloudIcon } from '@cds/core/icon';
 import { AppComponent } from './app.component';
 import { TestPipe } from './pipes/test.pipe';
 import {
-  CLR_FORM_CONTROL_DIRECTIVES,
+  FORM_CONTROL_DIRECTIVES,
   useOptionsInterceptor,
   provideTranslations as provideInputTranslations,
 } from '@azlabsjs/ngx-clr-form-control';
@@ -76,7 +76,7 @@ export function createTranslateLoader() {
     ...DIRECTIVES,
     ...COMMON_PIPES,
     ...TRANSLATE_PIPES,
-    ...CLR_FORM_CONTROL_DIRECTIVES,
+    ...FORM_CONTROL_DIRECTIVES,
     ...FORM_DIRECTIVES,
     NgxDropzoneModule.forRoot(),
   ],

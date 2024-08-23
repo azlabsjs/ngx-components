@@ -20,7 +20,18 @@
       [autoSubmit]="true" [path]="'http://localhost:3000/customers'" [template]="controlTemplate">
       <ng-template #controlTemplate let-config="value" let-control="control" let-describe="describe">
         <ngx-clr-form-control class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control"
-          [inputConfig]="config" [describe]="describe ?? true"></ngx-clr-form-control>
+          [inputConfig]="config" [describe]="describe ?? true" [error]="error" [label]="label">
+          <ng-template #label let-label>
+            <span>My - {{ label }}</span>
+          </ng-template>
+          <ng-template #error let-touched="touched" let-errors>
+            <ngx-input-error *ngIf="touched" [errors]="errors" [template]="template">
+              <ng-template #template let-value>
+                <span>{{ value }}</span>
+              </ng-template>
+            </ngx-input-error>
+          </ng-template>
+        </ngx-clr-form-control>
       </ng-template>
       <ng-template #submitButton let-handler>
         <button class="btn btn-primary" (click)="handler($event)">

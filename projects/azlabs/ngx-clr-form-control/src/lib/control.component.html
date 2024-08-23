@@ -18,7 +18,7 @@
             </small>
           </label>
           <ng-container
-            *ngTemplateOutlet="errorRef ?? error; context: {touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors}"></ng-container>
+            *ngTemplateOutlet="error ?? errorRef; context: {touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors}"></ng-container>
         </ngx-file-input>
       </ng-container>
     </ng-container>
@@ -43,7 +43,7 @@
         </label>
       </ngx-select-input>
       <ng-container
-        *ngTemplateOutlet="errorRef ?? error; context: {touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors}"></ng-container>
+        *ngTemplateOutlet="error ?? errorRef; context: {touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors}"></ng-container>
     </ng-container>
     <!--\ Select Input -->
 
@@ -73,7 +73,7 @@
         </div>
       </div>
       <ng-container
-        *ngTemplateOutlet="errorRef ?? error; context: {touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors}"></ng-container>
+        *ngTemplateOutlet="error ?? errorRef; context: {touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors}"></ng-container>
     </ng-container>
     <!--\ Phone Input -->
 
@@ -94,7 +94,7 @@
           </clr-date-container>
           <!-- Input errors -->
           <ng-container
-            *ngTemplateOutlet="errorRef ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
+            *ngTemplateOutlet="error ?? errorRef; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
         </ng-template>
       </ngx-date-input>
     </ng-container>
@@ -121,7 +121,7 @@
           </div>
           <!-- Input errors -->
           <ng-container
-            *ngTemplateOutlet="errorRef ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
+            *ngTemplateOutlet="error ?? errorRef; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
         </ng-template>
       </ngx-time-input>
     </ng-container>
@@ -152,7 +152,7 @@
             </div>
             <!-- Input errors -->
             <ng-container
-              *ngTemplateOutlet="errorRef ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
+              *ngTemplateOutlet="error ?? errorRef; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
           </ng-template>
         </ngx-textarea-input>
       </ng-container>
@@ -180,7 +180,7 @@
           </div>
           <!-- Input errors -->
           <ng-container
-            *ngTemplateOutlet="errorRef ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
+            *ngTemplateOutlet="error ?? errorRef; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
         </ng-template>
       </ngx-number-input>
     </ng-container>
@@ -207,7 +207,7 @@
           </clr-radio-container>
           <!-- Input errors -->
           <ng-container
-            *ngTemplateOutlet="errorRef ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
+            *ngTemplateOutlet="error ?? errorRef; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
         </ng-template>
       </ngx-radio-input>
     </ng-container>
@@ -224,7 +224,7 @@
           </small>
         </label>
         <ng-container
-          *ngTemplateOutlet="errorRef ?? error; context: {touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors}"></ng-container>
+          *ngTemplateOutlet="error ?? errorRef; context: {touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors}"></ng-container>
       </ngx-checkbox-input>
     </ng-container>
     <!--\ Checkbox Input -->
@@ -261,7 +261,7 @@
           </div>
           <!-- Input errors -->
           <ng-container
-            *ngTemplateOutlet="errorRef ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
+            *ngTemplateOutlet="error ?? errorRef; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
         </ng-template>
       </ngx-password-input>
     </ng-container>
@@ -301,20 +301,20 @@
       </div>
       <!-- Input errors -->
       <ng-container
-        *ngTemplateOutlet="errorRef ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
+        *ngTemplateOutlet="error ?? errorRef; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
     </ng-template>
   </ngx-text-input>
 </ng-template>
 <!--\ Text Input -->
 
 <!-- Input label -->
-<ng-template #labelRef let-config>
-  {{ config?.label }}
+<ng-template #labelRef let-value>
+  {{ value }}
 </ng-template>
 <!--\ Input label -->
 
 <!-- Input errors -->
-<ng-template #errorRef let-input let-errors="errors">
-  <ngx-input-error error *ngIf="!!input?.touched" [errors]="errors"></ngx-input-error>
+<ng-template #errorRef let-touched="touched" let-errors>
+  <ngx-input-error error *ngIf="touched" [errors]="errors"></ngx-input-error>
 </ng-template>
 <!--\ Input errors -->
