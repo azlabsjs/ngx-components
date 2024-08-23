@@ -7,6 +7,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  TemplateRef,
 } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
@@ -37,21 +38,32 @@ ClarityIcons.addIcons(eyeHideIcon, eyeIcon);
   styleUrls: ['./control.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-// ControlValueAccessor
 export class NgxFormControlComponent implements OnDestroy, OnInit {
-  // Component properties
-  inputTypes = InputTypes;
 
   //#region Component inputs
   @Input() inline = false;
   @Input() describe = true;
-  @Input() class = 'clr-form-control';
-  @Input() inputConfig!: InputConfigInterface;
+  @Input() countries!: string[];
+  private _inputConfig!: InputConfigInterface;
+  @Input() set config(value: InputConfigInterface) {
+    this._inputConfig = value;
+  }
+  /** @deprecated */
+  @Input() set inputConfig(value: InputConfigInterface) {
+    this._inputConfig = value;
+  }
+  get inputConfig() {
+    return this._inputConfig;
+  }
+  /** @deprecated */
+  @Input({ alias: 'class' }) cssClass = 'clr-form-control';
   @Input({ alias: 'control' }) formControl!: FormControl<any>;
-  @Input({ alias: 'countries' }) preferredCountries!: string[];
+  @Input() label!: TemplateRef<any>;
+  @Input() error!: TemplateRef<any>;
   //#endregion Component inputs
 
   //#region Component outputs
+  @Output() valueChange = new EventEmitter<InputEventArgs>();
   @Output('item-removed') remove = new EventEmitter<any>();
   @Output('item-selected') selected = new EventEmitter<InputEventArgs>();
   @Output('file-added') fileAdded = new EventEmitter<any>();
@@ -61,12 +73,11 @@ export class NgxFormControlComponent implements OnDestroy, OnInit {
   @Output('keyup') keyup = new EventEmitter<InputEventArgs>();
   @Output('keypress') keypress = new EventEmitter<InputEventArgs>();
   @Output('blur') blur = new EventEmitter<InputEventArgs>();
-  // Value changes emitters
-  @Output() valueChange = new EventEmitter<InputEventArgs>();
   //#endregion Component outputs
 
   //#region Class properties
   private subscriptions: Subscription[] = [];
+  readonly inputTypes = InputTypes;
   //#endregion Class properties
 
   /** @description Creates an instance of Form Control Component */
@@ -74,7 +85,6 @@ export class NgxFormControlComponent implements OnDestroy, OnInit {
 
   ngOnInit() {
     this.subscriptions.push(
-      // Trigger change detection whenever control value changes
       this.formControl.valueChanges
         .pipe(
           map((source) => ({ name: this.inputConfig.name, value: source })),
@@ -84,8 +94,6 @@ export class NgxFormControlComponent implements OnDestroy, OnInit {
           })
         )
         .subscribe(),
-
-      // Mark the component as dirty whenever control status changes
       this.formControl.statusChanges.subscribe(() => this.cdRef?.markForCheck())
     );
   }

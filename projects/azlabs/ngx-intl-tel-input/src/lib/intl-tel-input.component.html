@@ -40,7 +40,7 @@
   </ng-container>
   <ng-template #defaultInputElement let-change="change" let-value="value" let-required="required"
     let-disabled="disabled" let-selected="selected">
-    <input [disabled]="" [required]="required" [tabIndex]="index" autocomplete="off" type="tel" [value]="value"
+    <input [disabled]="disabled" [required]="required" autocomplete="off" type="tel" [value]="value"
       [class]="'effect-24 ' + class" (keypress)="onKeyPress($event)" (blur)="onBlur($event)" (focus)="onFocus($event)"
       (change)="change($event)" (input)="change($event)" placeholder="{{ selected?.placeHolder }}" #focusable />
   </ng-template>

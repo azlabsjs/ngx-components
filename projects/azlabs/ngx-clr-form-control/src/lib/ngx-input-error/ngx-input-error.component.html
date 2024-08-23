@@ -2,7 +2,7 @@
     <ng-container *ngFor="let error of errors | supportedErrors">
         <ng-container *ngIf="errors[error] | defined">
             <ng-container
-                *ngTemplateOutlet="(errors[error] | isObject) ? objectRef : defaultRef; context: {$implicit: errors[error], error} ">
+                *ngTemplateOutlet="(errors[error] | isObject) ? oRef : ref; context: {$implicit: errors[error], error} ">
             </ng-container>
         </ng-container>
     </ng-container>
@@ -12,15 +12,27 @@
     <ng-container *ngIf="err && err.length > 0">
         <ng-container *ngFor="let error of err">
             <ng-container *ngIf="error | defined">
-                <span>{{ error }}</span>
+                <ng-container
+                    *ngTemplateOutlet="template ?? custom; context: {$implicit: error, error, params: {}}"></ng-container>
             </ng-container>
         </ng-container>
     </ng-container>
 </ng-container>
 
-<ng-template #objectRef let-value let-error="error">
-    <span>{{ ['validation', error] | join:'.' | translate:value }}</span>
+<ng-template #oRef let-value let-error="error">
+    <ng-container
+        *ngTemplateOutlet="template ?? text; context: {$implicit: error, error, params: value}"></ng-container>
 </ng-template>
-<ng-template #defaultRef let-value let-error="error">
-    <span>{{ ['validation', error] | join:'.' | translate:{value} }}</span>
+<ng-template #ref let-value let-error="error">
+    <ng-container
+        *ngTemplateOutlet="template ?? text; context: {$implicit: error, error, params: {value}}"></ng-container>
+</ng-template>
+
+<!-- Error text -->
+<ng-template #text let-error let-params="params">
+    <span>{{ ['validation', error] | join:'.' | translate:params }}</span>
+</ng-template>
+
+<ng-template #custom let-error>
+    <span>{{ error }}</span>
 </ng-template>
