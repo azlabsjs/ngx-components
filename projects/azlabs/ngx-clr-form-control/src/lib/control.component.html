@@ -1,5 +1,6 @@
 <div class="ngx-form-control" *ngIf="formControl">
   <ng-container [ngSwitch]="inputConfig.type">
+    <!-- File Input -->
     <ng-container *ngSwitchCase="inputTypes.FILE_INPUT">
       <ng-container *ngIf="inputConfig | fileInput  as config">
         <ngx-file-input (addedEvent)="fileAdded.emit($event)" (removedEvent)="fileRemoved.emit($event)"
@@ -17,13 +18,19 @@
             </small>
           </label>
           <ng-container
-            *ngTemplateOutlet="inputError ?? error; context: {touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors}"></ng-container>
+            *ngTemplateOutlet="errorRef ?? error; context: {touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors}"></ng-container>
         </ngx-file-input>
       </ng-container>
     </ng-container>
+    <!--\ File Input -->
+
+    <!-- HTML Input -->
     <ng-container *ngSwitchCase="inputTypes.HTML_INPUT">
       <div [innerHTML]="inputConfig.value | trustHtml"></div>
     </ng-container>
+    <!--\ HTML Input -->
+
+    <!-- Select Input -->
     <ng-container *ngSwitchCase="inputTypes.SELECT_INPUT">
       <ngx-select-input [control]="formControl" [inputConfig]="inputConfig | selectInput" [describe]="describe"
         (remove)="remove.emit($event)" (selected)="selected.emit($event)">
@@ -36,8 +43,11 @@
         </label>
       </ngx-select-input>
       <ng-container
-        *ngTemplateOutlet="inputError ?? error; context: {touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors}"></ng-container>
+        *ngTemplateOutlet="errorRef ?? error; context: {touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors}"></ng-container>
     </ng-container>
+    <!--\ Select Input -->
+
+    <!-- Phone Input -->
     <ng-container *ngSwitchCase="inputTypes.PHONE_INPUT">
       <div class="clr-control-container">
         <div class="clr-input-wrapper">
@@ -63,9 +73,11 @@
         </div>
       </div>
       <ng-container
-        *ngTemplateOutlet="inputError ?? error; context: {touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors}"></ng-container>
+        *ngTemplateOutlet="errorRef ?? error; context: {touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors}"></ng-container>
     </ng-container>
-    <!-- Smart date Input -->
+    <!--\ Phone Input -->
+
+    <!-- Date Input -->
     <ng-container *ngSwitchCase="inputTypes.DATE_INPUT">
       <ngx-date-input [control]="formControl" [inputConfig]="inputConfig | dateInput" [describe]="describe">
         <ng-template #input let-control="control" let-onBlur="onBlur" let-config="config">
@@ -82,12 +94,13 @@
           </clr-date-container>
           <!-- Input errors -->
           <ng-container
-            *ngTemplateOutlet="inputError ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
+            *ngTemplateOutlet="errorRef ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
         </ng-template>
       </ngx-date-input>
     </ng-container>
-    <!--\ Smart date Input -->
-    <!-- Smart time input -->
+    <!--\ Date Input -->
+
+    <!-- Time Input -->
     <ng-container *ngSwitchCase="inputTypes.TIME_INPUT">
       <ngx-time-input [control]="formControl" [inputConfig]="inputConfig | timeInput" [describe]="describe">
         <ng-template #input let-max="max" let-config="config" let-control="control">
@@ -108,11 +121,13 @@
           </div>
           <!-- Input errors -->
           <ng-container
-            *ngTemplateOutlet="inputError ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
+            *ngTemplateOutlet="errorRef ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
         </ng-template>
       </ngx-time-input>
     </ng-container>
-    <!--\ Smart time Input -->
+    <!--\ Time Input -->
+
+    <!-- Textarea Input -->
     <ng-container *ngSwitchCase="inputTypes.TEXTAREA_INPUT">
       <ng-container *ngIf="!inline; else textInput">
         <ngx-textarea-input [control]="formControl" [inputConfig]="inputConfig | textAreaInput" [describe]="describe">
@@ -137,11 +152,14 @@
             </div>
             <!-- Input errors -->
             <ng-container
-              *ngTemplateOutlet="inputError ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
+              *ngTemplateOutlet="errorRef ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
           </ng-template>
         </ngx-textarea-input>
       </ng-container>
     </ng-container>
+    <!--\ Textarea Input -->
+
+    <!-- Number Input -->
     <ng-container *ngSwitchCase="inputTypes.NUMBER_INPUT">
       <ngx-number-input [control]="formControl" [describe]="describe" [inputConfig]="inputConfig | numberInput">
         <ng-template #input let-max="max" let-config="config" let-control="control">
@@ -162,10 +180,13 @@
           </div>
           <!-- Input errors -->
           <ng-container
-            *ngTemplateOutlet="inputError ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
+            *ngTemplateOutlet="errorRef ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
         </ng-template>
       </ngx-number-input>
     </ng-container>
+    <!--\ Number Input -->
+
+    <!-- Radio Input -->
     <ng-container *ngSwitchCase="inputTypes.RADIO_INPUT">
       <ngx-radio-input [control]="formControl" [inputConfig]="inputConfig | selectInput" [describe]="describe">
         <ng-template #input let-options="options" let-config="config" let-control="control">
@@ -186,10 +207,13 @@
           </clr-radio-container>
           <!-- Input errors -->
           <ng-container
-            *ngTemplateOutlet="inputError ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
+            *ngTemplateOutlet="errorRef ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
         </ng-template>
       </ngx-radio-input>
     </ng-container>
+    <!--\ Radio Input -->
+
+    <!-- Checkbox Input -->
     <ng-container *ngSwitchCase="inputTypes.CHECKBOX_INPUT">
       <ngx-checkbox-input [control]="formControl" [inputConfig]="inputConfig | selectInput" [describe]="describe">
         <label label class="clr-control-label">
@@ -200,9 +224,12 @@
           </small>
         </label>
         <ng-container
-          *ngTemplateOutlet="inputError ?? error; context: {touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors}"></ng-container>
+          *ngTemplateOutlet="errorRef ?? error; context: {touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors}"></ng-container>
       </ngx-checkbox-input>
     </ng-container>
+    <!--\ Checkbox Input -->
+
+    <!-- Password Input -->
     <ng-container *ngSwitchCase="inputTypes.PASSWORD_INPUT">
       <ngx-password-input [control]="formControl" [inputConfig]="inputConfig | textInput" [describe]="describe">
         <ng-template #input let-state="state" let-control="control" let-config="config" let-toggle="toggle"
@@ -234,10 +261,12 @@
           </div>
           <!-- Input errors -->
           <ng-container
-            *ngTemplateOutlet="inputError ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
+            *ngTemplateOutlet="errorRef ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
         </ng-template>
       </ngx-password-input>
     </ng-container>
+    <!--\ Password Input -->
+
     <ng-container *ngSwitchDefault>
       <ng-container *ngTemplateOutlet="
           textInput;
@@ -249,7 +278,7 @@
     </ng-container>
   </ng-container>
 </div>
-<!-- Text input template -->
+<!-- Text Input -->
 <ng-template #textInput let-control="control" let-config="config">
   <ngx-text-input [control]="control" [inputConfig]="config" [describe]="describe">
     <ng-template #input let-config="config" let-maxLength="maxLength" let-control="control">
@@ -272,20 +301,20 @@
       </div>
       <!-- Input errors -->
       <ng-container
-        *ngTemplateOutlet="inputError ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
+        *ngTemplateOutlet="errorRef ?? error; context: {touched: control.touched, $implicit: control.errors, errors: control.errors}"></ng-container>
     </ng-template>
   </ngx-text-input>
 </ng-template>
-<!--\ Text input template -->
+<!--\ Text Input -->
 
-<!-- Input label template -->
+<!-- Input label -->
 <ng-template #labelRef let-config>
   {{ config?.label }}
 </ng-template>
-<!--\ Input label template -->
+<!--\ Input label -->
 
 <!-- Input errors -->
-<ng-template #inputError let-input let-errors="errors">
-  <ngx-input-error error *ngIf="input.touched" [errors]="errors"></ngx-input-error>
+<ng-template #errorRef let-input let-errors="errors">
+  <ngx-input-error error *ngIf="!!input?.touched" [errors]="errors"></ngx-input-error>
 </ng-template>
 <!--\ Input errors -->
