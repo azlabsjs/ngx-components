@@ -1,7 +1,7 @@
 <table class="table table-compact">
     <thead>
         <tr>
-            <th *ngFor="let i of configs" class="left"><span>{{ i.label }}</span>
+            <th *ngFor="let i of configs" class="left"><span>{{ i.label | text }}</span>
                 <small class="required" *ngIf="i.rules?.isRequired ?? !!i.constraints?.required">
                     (*)
                 </small>

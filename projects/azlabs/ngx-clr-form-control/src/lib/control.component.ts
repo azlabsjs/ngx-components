@@ -39,7 +39,6 @@ ClarityIcons.addIcons(eyeHideIcon, eyeIcon);
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
-
   //#region Component inputs
   @Input() inline = false;
   @Input() describe = true;
@@ -84,6 +83,10 @@ export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
   constructor(private cdRef: ChangeDetectorRef) {}
 
   ngAfterContentInit() {
+    if (!this.formControl) {
+      return;
+    }
+
     this.subscriptions.push(
       this.formControl.valueChanges
         .pipe(

@@ -22,7 +22,7 @@
         <ngx-clr-form-control class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control"
           [inputConfig]="config" [describe]="describe ?? true" [error]="error" [label]="label">
           <ng-template #label let-label>
-            <span>My - {{ label }}</span>
+            <span>My Label</span>
           </ng-template>
           <ng-template #error let-touched="touched" let-errors>
             <ngx-input-error *ngIf="touched" [errors]="errors" [template]="template">

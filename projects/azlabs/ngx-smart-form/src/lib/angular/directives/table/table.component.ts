@@ -17,6 +17,7 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { BUTTON_DIRECTIVES } from '../buttons';
 import { PIPES } from '../../pipes';
+import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 
 /** @internal */
 type ContextType = {
@@ -29,7 +30,7 @@ type ContextType = {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ...BUTTON_DIRECTIVES, ...PIPES],
+  imports: [CommonModule, ...COMMON_PIPES, ...BUTTON_DIRECTIVES, ...PIPES],
   selector: 'ngx-table-form',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
@@ -38,9 +39,9 @@ export class NgxTableForm
   implements AfterViewInit, ViewRefFactory<EmbeddedViewRef<any>>, OnDestroy
 {
   //#region Component inputs
-  @Input({alias: 'inputs'}) configs: InputConfigInterface[] = [];
+  @Input({ alias: 'inputs' }) configs: InputConfigInterface[] = [];
   @Input({ alias: 'auto-upload' }) autoupload: boolean = true;
-  @Input({alias: 'template'}) view!: TemplateRef<any>;
+  @Input({ alias: 'template' }) view!: TemplateRef<any>;
   //#endregion Component inputs
 
   //#region Component output
