@@ -7,7 +7,6 @@ import {
   EventEmitter,
   HostListener,
   Inject,
-  input,
   Input,
   OnChanges,
   OnDestroy,
@@ -19,9 +18,7 @@ import {
 import {
   AbstractControl,
   AsyncValidatorFn,
-  FormArray,
   FormGroup,
-  ValidationErrors,
   ValidatorFn,
 } from '@angular/forms';
 import { HTTPRequestMethods } from '@azlabsjs/requests';
@@ -59,7 +56,6 @@ import { PIPES } from '../../pipes';
 import { NgxSmartFormControlArrayComponent } from '../control-array';
 import { NgxSmartFormGroupHeaderPipe } from '../group';
 import { memoize } from '@azlabsjs/functional';
-import { findAbstractControlParent } from '../../helpers';
 
 /** @internal */
 const AUTO_SUBMIT_ERROR_MESSAGE =

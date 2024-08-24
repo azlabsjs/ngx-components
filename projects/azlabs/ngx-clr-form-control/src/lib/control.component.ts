@@ -1,11 +1,11 @@
 import {
+  AfterContentInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
   OnDestroy,
-  OnInit,
   Output,
   TemplateRef,
 } from '@angular/core';
@@ -38,7 +38,7 @@ ClarityIcons.addIcons(eyeHideIcon, eyeIcon);
   styleUrls: ['./control.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxFormControlComponent implements OnDestroy, OnInit {
+export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
 
   //#region Component inputs
   @Input() inline = false;
@@ -83,7 +83,7 @@ export class NgxFormControlComponent implements OnDestroy, OnInit {
   /** @description Creates an instance of Form Control Component */
   constructor(private cdRef: ChangeDetectorRef) {}
 
-  ngOnInit() {
+  ngAfterContentInit() {
     this.subscriptions.push(
       this.formControl.valueChanges
         .pipe(
