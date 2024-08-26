@@ -21,9 +21,21 @@ function is_not_empty(value: any) {
     return value.length !== 0;
   }
 
+  function object_is_not_empty(item: Record<string, unknown>) {
+    if (Object.keys(value).length === 0) {
+      return false;
+    }
+    for (const k in item) {
+      if (typeof item[k] !== 'undefined' && item[k] !== null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   switch (typeof value) {
     case 'object':
-      return Object.keys(value).length !== 0;
+      return object_is_not_empty(value);
     case 'string':
       return String(value).length !== 0;
     case 'undefined':
