@@ -26,7 +26,11 @@
 
     <!-- HTML Input -->
     <ng-container *ngSwitchCase="inputTypes.HTML_INPUT">
-      <div [innerHTML]="inputConfig.value | trustHtml"></div>
+      <ng-container
+        *ngTemplateOutlet="textView ?? textViewRef; context: {$implicit: inputConfig, value: inputConfig.value, config: inputConfig}"></ng-container>
+      <ng-template #textViewRef let-config let-value="value">
+        <div [ngClass]="config.classes" [innerHTML]="value | trustHtml"></div>
+      </ng-template>
     </ng-container>
     <!--\ HTML Input -->
 

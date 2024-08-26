@@ -59,6 +59,8 @@ export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
   @Input({ alias: 'control' }) formControl!: FormControl<any>;
   @Input() label!: TemplateRef<any>;
   @Input() error!: TemplateRef<any>;
+  /** HTML/Text View template input */
+  @Input() textView!: TemplateRef<any>;
   //#endregion Component inputs
 
   //#region Component outputs
