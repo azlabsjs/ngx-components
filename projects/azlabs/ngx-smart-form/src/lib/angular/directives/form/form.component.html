@@ -38,7 +38,10 @@
       <!-- INPUT GROUP CONTAINER PART -->
       <ng-container *ngIf="value| asInputGroup | hasChildren">
         <div [class]="noGridLayout ? 'ngx-form-no-grid' : value.containerClass" [hidden]="value | isHidden">
-          <div [innerHTML]="value.label | ngxGroupHeader | safeHtml" [hidden]="value | isHidden"></div>
+          <ng-container *ngTemplateOutlet="label ?? labelRef; context: {$implicit: value.label, config: value}"></ng-container>
+          <ng-template #labelRef let-label let-config="config">
+            <div [innerHTML]="config.label | ngxGroupHeader | safeHtml" [hidden]="config | isHidden"></div>
+          </ng-template>
           <!-- REPEATABLE INPUTS GROUP -->
           <ng-container *ngIf="value | repeatable">
             <ngx-smart-form-array [class]="value.classes" [no-grid-layout]="noGridLayout" *ngIf="group?.get(value.name)"
@@ -93,7 +96,7 @@
   <!-- NON REPEATABLE INPUTS -->
   <ng-container *ngIf="!(value | repeatable)">
     <ng-container *ngIf="group?.get(value.name) as control">
-      <ng-container *ngTemplateOutlet="template; context: { control, value, autoupload }">
+      <ng-container *ngTemplateOutlet="template; context: { control, value, autoupload, template: {label} }">
       </ng-container>
     </ng-container>
   </ng-container>

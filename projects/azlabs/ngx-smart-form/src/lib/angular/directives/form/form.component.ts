@@ -112,6 +112,8 @@ export class NgxSmartFormComponent
   //#region Component inputs
   @Input() template!: TemplateRef<any>;
   @Input() addTemplate!: TemplateRef<any>;
+  /** Projected content which will preview the label of composed input */
+  @Input() label!: TemplateRef<any>;
   @Input() performingAction = false;
   @Input() disabled = false;
   @Input() submitable = false;
