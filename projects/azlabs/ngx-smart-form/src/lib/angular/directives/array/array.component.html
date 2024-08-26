@@ -6,7 +6,7 @@
 <ngx-table-form (removed)="handleRemoved($event)" [inputs]="inputs" [auto-upload]="autoupload" [template]="template"
   *ngIf="cssClass.includes('table')" #container></ngx-table-form>
 
-<div class="placeholder" *ngIf="refCount === 0"></div>
+<div *ngIf="!cssClass.includes('table') && refCount === 0" class="placeholder"></div>
 <ng-container *ngTemplateOutlet="
     addGroupRef ? addGroupRef : addTemplate;
     context: { $implicit: handleAddView.bind(this) }
