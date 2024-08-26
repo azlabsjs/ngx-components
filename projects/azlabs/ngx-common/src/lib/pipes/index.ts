@@ -17,6 +17,8 @@ import {
   IncludesPipe,
   IndexOfPipe,
   KeysPipe,
+  NotEmptyPipe,
+  EmptyPipe,
 } from './common/utils.pipe';
 import { AsyncTextPipe, CommonStringsPipe, CommonTextPipe } from './strings';
 
@@ -26,6 +28,8 @@ export {
   IncludesPipe,
   IndexOfPipe,
   KeysPipe,
+  EmptyPipe,
+  NotEmptyPipe,
 } from './common/utils.pipe';
 export { IsAsyncPipe, AsObservablePipe } from './common/async.pipe';
 export { PipeResultPipe } from './common/pipe-result.pipe';
@@ -69,4 +73,6 @@ export const COMMON_PIPES = [
   AsObservablePipe,
   AsAnyPipe,
   KeysPipe,
+  EmptyPipe,
+  NotEmptyPipe,
 ] as const;

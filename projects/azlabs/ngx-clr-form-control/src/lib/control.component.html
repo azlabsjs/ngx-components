@@ -13,6 +13,7 @@
           <label class="clr-control-label" *ngIf="describe" [for]="config.name">
             <ng-container
               *ngTemplateOutlet="label ?? labelRef; context: {$implicit: config!.label, config}"></ng-container>
+
             <small class="required-text" *ngIf="config.rules?.isRequired ?? !!config.constraints?.required">
               (*)
             </small>
@@ -195,7 +196,7 @@
       <ngx-radio-input [control]="formControl" [inputConfig]="inputConfig | selectInput" [describe]="describe">
         <ng-template #input let-options="options" let-config="config" let-control="control">
           <clr-radio-container clrInline>
-            <label>
+            <label class="clr-control-label" *ngIf="describe">
               <ng-container
                 *ngTemplateOutlet="label ?? labelRef; context: {$implicit: config!.label, config }"></ng-container>
               <span class="required-text" *ngIf="config.rules?.isRequired ?? !!config.constraints?.required">
@@ -220,7 +221,7 @@
     <!-- Checkbox Input -->
     <ng-container *ngSwitchCase="inputTypes.CHECKBOX_INPUT">
       <ngx-checkbox-input [control]="formControl" [inputConfig]="inputConfig | selectInput" [describe]="describe">
-        <label label class="clr-control-label">
+        <label label class="clr-control-label" *ngIf="describe">
           <ng-container
             *ngTemplateOutlet="label ?? labelRef; context: {$implicit: inputConfig!.label, config: inputConfig }"></ng-container>
           <small class="required-text" *ngIf="inputConfig.rules?.isRequired ?? !!inputConfig.constraints?.required">

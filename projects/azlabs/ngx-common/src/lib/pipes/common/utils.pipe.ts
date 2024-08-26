@@ -11,6 +11,28 @@ import { Injectable, Pipe, PipeTransform } from '@angular/core';
 //   );
 // }
 
+/** @internal */
+function is_not_empty(value: any) {
+  if (value === null) {
+    return false;
+  }
+
+  if (Array.isArray(value)) {
+    return value.length !== 0;
+  }
+
+  switch (typeof value) {
+    case 'object':
+      return Object.keys(value).length !== 0;
+    case 'string':
+      return String(value).length !== 0;
+    case 'undefined':
+      return false;
+    default:
+      return true;
+  }
+}
+
 @Pipe({
   standalone: true,
   pure: true,
@@ -68,8 +90,33 @@ export class AsAnyPipe implements PipeTransform {
   pure: true,
   standalone: true,
 })
+@Injectable({ providedIn: 'any' })
 export class KeysPipe implements PipeTransform {
   transform(value: { [prop: string]: unknown }) {
     return Object.keys(value);
+  }
+}
+
+@Pipe({
+  name: 'notEmpty',
+  standalone: true,
+  pure: true,
+})
+@Injectable({ providedIn: 'any' })
+export class NotEmptyPipe implements PipeTransform {
+  transform(value: any) {
+    return is_not_empty(value);
+  }
+}
+
+@Pipe({
+  name: 'empty',
+  standalone: true,
+  pure: true,
+})
+@Injectable({ providedIn: 'any' })
+export class EmptyPipe implements PipeTransform {
+  transform(value: any) {
+    return !is_not_empty(value);
   }
 }
