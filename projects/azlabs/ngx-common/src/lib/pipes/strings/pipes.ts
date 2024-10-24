@@ -99,12 +99,12 @@ export class CommonTextPipe implements OnDestroy, PipeTransform {
   // NOTE(@benlesh): Because Observable has deprecated a few call patterns for `subscribe`,
   // TypeScript has a hard time matching Observable to Subscribable, for more information
   // see https://github.com/microsoft/TypeScript/issues/43643
-  transform(query: string, module?: string, def?: string): string {
+  transform(query: string, ns?: string, def?: string): string {
     if (!query || !query.length) {
       return def ?? '';
     }
 
-    const _query = module ? `${module}.${query}` : `${query}`;
+    const _query = ns ? `${ns}.${query}` : `${query}`;
     if (!this._lastQuery) {
       if (query) {
         try {
@@ -122,7 +122,7 @@ export class CommonTextPipe implements OnDestroy, PipeTransform {
 
     if (_query !== this._lastQuery) {
       this._dispose();
-      return this.transform(query, module, def);
+      return this.transform(query, ns, def);
     }
 
     return this._latestValue;
