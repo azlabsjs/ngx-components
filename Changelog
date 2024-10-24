@@ -6,3 +6,8 @@
 - Fixed bugs related to radio and checkbox input types
 - Add support for smart grid row class projection
 - Review change detection implementation for smart form control, smart form array, etc...
+
+
+## [v.15.36]
+
+- Bug fix release in commonString pipe implementation
