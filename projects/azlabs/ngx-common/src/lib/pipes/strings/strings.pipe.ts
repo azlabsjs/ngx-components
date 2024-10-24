@@ -58,9 +58,9 @@ export class CommonStringsPipe implements PipeTransform {
   }
 
   //
-  transform(query: string, module?: string, _default: string = '...'): any {
-    const _query = module
-      ? `${module.toString()}.${query.toString()}`
+  transform(query: string, ns?: string, _default: string = '...'): any {
+    const _query = ns
+      ? `${ns.toString()}.${query.toString()}`
       : `${query.toString()}`;
 
     if (!this._search) {
@@ -71,7 +71,9 @@ export class CommonStringsPipe implements PipeTransform {
 
     if (_query !== this._search) {
       this.dispose();
-      this.transform(query, _default);
+      // Fixed bug from previous versions which forget adding namespace
+      // on consequent ns calls
+      this.transform(query, ns, _default);
     }
 
     return this._latestValue ?? _default;

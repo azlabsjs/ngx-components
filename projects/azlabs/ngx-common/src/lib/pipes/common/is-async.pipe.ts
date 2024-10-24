@@ -1,9 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { Subscribable } from 'rxjs';
 
-/**
- * Determine if the argument is shaped like a Promise
- */
+/** @internal Determine if the argument is shaped like a Promise */
 export function isPromise<T = unknown>(obj: any): obj is Promise<T> {
   return !!obj && typeof obj.then === 'function';
 }
