@@ -11,7 +11,7 @@ import {
   providePreferredCountries,
   provideSupportedCountries,
 } from '@azlabsjs/ngx-intl-tel-input';
-import { NgxSlidesModule } from '@azlabsjs/ngx-slides';
+// import { NgxSlidesModule } from '@azlabsjs/ngx-slides';
 import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
 import { CdsModule } from '@cds/angular';
 import { ClarityIcons, uploadCloudIcon } from '@cds/core/icon';
@@ -25,6 +25,8 @@ import { FormControlComponent } from './form-control/form-control.component';
 import { NgxCommonModule } from '@azlabsjs/ngx-common';
 import { RouterModule } from '@angular/router';
 import { HTTPValuePipe } from './pipes';
+import { TranslateService } from '@ngx-translate/core';
+import { of, tap } from 'rxjs';
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
@@ -51,13 +53,6 @@ ClarityIcons.addIcons(uploadCloudIcon);
           bindings: 'api/v2/bindings',
         },
       },
-      // templateTextProvider: {
-      //   provide: TEMPLATE_DICTIONARY,
-      //   useFactory: (translate: TranslateService) => {
-      //     return translate.stream();
-      //   },
-      //   deps: [TranslateService],
-      // },
       submitRequest: {
         interceptorFactory: (injector: Injector) => {
           // Replace the interceptor function by using the injector
@@ -83,11 +78,11 @@ ClarityIcons.addIcons(uploadCloudIcon);
     NgxCommonModule.forRoot({
       pipeTransformMap: {
         testPipe: TestPipe,
-        httpValue: HTTPValuePipe
+        httpValue: HTTPValuePipe,
       },
     }),
     NgxClrSmartGridModule,
-    NgxSlidesModule.forRoot(),
+    // NgxSlidesModule.forRoot(),
 
     NgxDropzoneModule.forRoot(),
 
@@ -132,6 +127,40 @@ ClarityIcons.addIcons(uploadCloudIcon);
         },
         // Files upload url
         url: 'https://storagev2.lik.tg/api/storage/object/upload',
+      },
+      translationsProvider: (i: Injector | null) => {
+        return of({
+          loadingText: 'Loading...',
+          uploadFileLabel: 'to upload',
+          dragFileLabel: 'Drag file(s) here or',
+          clickUploadButtonLabel: 'Click',
+          fileUploadError: 'Error while uploading file to server',
+          fileSizeError:
+            'File size must be less than or equal to {{maxFilesize}}Mo.',
+          addButtonText: 'Click on the the button to add a new input element',
+          validation: {
+            minlength:
+              'input value must contain at least {{requiredLength}} characters',
+            maxlength:
+              'maximum number of characters for this input is {{requiredLength}}',
+            maxLength:
+              'maximum number of characters for this input is {{requiredLength}}',
+            minLength: 'input value must contain at least {{requiredLength}} characters',
+            invalid: 'input value this input is invalid',
+            required: 'Le champ est requis',
+            unique: 'input value is already taken',
+            email: 'input has invalid email format [example@email.com]',
+            pattern: 'input value does not match the input pattern',
+            min: 'La valeur minimale de ce champ est {{min}}',
+            max: 'La valeur maximale de ce champ est {{max}}',
+            phone: 'please enter a valid phone number',
+            minDate: 'Veuillez saisir une date postérieure à la date du {{min}}',
+            maxDate:
+              'Veuillez saisir une date antérieure à la date du {{max}}',
+            exists: 'input value does not exists',
+            equals: 'input and {{value}} input values does not match',
+          },
+        });
       },
     }),
   ],

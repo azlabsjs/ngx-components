@@ -1,4 +1,5 @@
 import {
+  inject,
   Injector,
   ModuleWithProviders,
   NgModule,
@@ -22,7 +23,7 @@ import {
 } from './components';
 import { TRANSLATIONS_DICTIONARY } from './tokens';
 import { defaultStrings } from './constants';
-import { of } from 'rxjs';
+import { isObservable, Observable, of } from 'rxjs';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxIntlTelInputModule } from '@azlabsjs/ngx-intl-tel-input';
 import {
@@ -44,12 +45,15 @@ import '@cds/core/icon/register.js';
 import { ClarityIcons, eyeHideIcon, eyeIcon } from '@cds/core/icon';
 import { deepEqual } from '@azlabsjs/utilities';
 import { NgxCommonModule } from './common';
+import { Translations } from './types';
 
 // Register clarity icons
 ClarityIcons.addIcons(eyeHideIcon, eyeIcon);
 
 type ConfigType = {
-  translationsProvider?: Provider;
+  translationsProvider?:
+    | Provider
+    | ((i: Injector | null) => Translations | Observable<Translations>);
   options?: {
     url?: string;
     requests: OptionsQueryConfigType;
@@ -100,12 +104,29 @@ export class NgxClrFormControlModule {
   static forRoot(
     config?: ConfigType
   ): ModuleWithProviders<NgxClrFormControlModule> {
-    const providers = [
-      NgxUploadsEventsService,
-      config?.translationsProvider ?? {
+    let provider: Provider;
+
+    if (typeof config?.translationsProvider === 'function') {
+      const fn = config.translationsProvider as (
+        i: Injector
+      ) => Translations | Observable<Translations>;
+      provider = {
+        provide: TRANSLATIONS_DICTIONARY,
+        useFactory: () => {
+          const i = inject(Injector);
+          const result = fn(i);
+          return isObservable(result) ? result : of(result);
+        },
+      };
+    } else {
+      provider = config?.translationsProvider ?? {
         provide: TRANSLATIONS_DICTIONARY,
         useValue: of(defaultStrings),
-      },
+      };
+    }
+    const providers = [
+      NgxUploadsEventsService,
+      provider,
       {
         provide: INPUT_OPTIONS_CLIENT,
         useFactory: (injector: Injector) => {
