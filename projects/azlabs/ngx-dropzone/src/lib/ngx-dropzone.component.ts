@@ -1,16 +1,32 @@
-import { isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
-  AfterViewInit, Component, ContentChild, EventEmitter, Inject, Input, OnDestroy, OnInit, Output, PLATFORM_ID, TemplateRef, ViewChild
+  AfterViewInit,
+  Component,
+  ContentChild,
+  EventEmitter,
+  Inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  PLATFORM_ID,
+  TemplateRef,
+  ViewChild,
 } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { createDefaultPreviewTemplate, mergeDzAcceptFiles } from './helpers';
 import { NgxDropzoneDirective } from './ngx-dropzone.directive';
 import {
-  DropzoneComponentInterface, DropzoneConfig, DropzoneEvent, DropzoneEvents, DROPZONE_CONFIG
+  DropzoneComponentInterface,
+  DropzoneConfig,
+  DropzoneEvent,
+  DropzoneEvents,
+  DROPZONE_CONFIG,
 } from './types';
 
 @Component({
   selector: 'ngx-dropzone',
+  imports: [CommonModule, NgxDropzoneDirective],
   template: `
     <ng-container *ngIf="defaults$ | async as defaults">
       <div
@@ -48,6 +64,7 @@ import {
     </ng-container>
   `,
   styleUrls: ['./ngx-dropzone.component.scss'],
+  standalone: true,
 })
 export class NgxDropzoneComponent
   implements OnInit, AfterViewInit, OnDestroy, DropzoneComponentInterface

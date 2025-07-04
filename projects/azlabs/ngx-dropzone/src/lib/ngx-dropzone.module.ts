@@ -7,12 +7,11 @@ import {
   DropzoneConfig,
   DropzoneDict,
   DROPZONE_CONFIG,
-  DROPZONE_DICT
+  DROPZONE_DICT,
 } from './types';
 
 @NgModule({
-  declarations: [NgxDropzoneComponent, NgxDropzoneDirective],
-  imports: [CommonModule],
+  imports: [CommonModule, NgxDropzoneComponent, NgxDropzoneDirective],
   exports: [NgxDropzoneComponent, NgxDropzoneDirective],
 })
 export class NgxDropzoneModule {

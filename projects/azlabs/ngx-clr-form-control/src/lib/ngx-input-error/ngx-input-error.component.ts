@@ -13,7 +13,7 @@ import { CustomErrorsPipe, ErrorsPipe } from './pipes';
 type ErrorsType = { [prop: string]: any };
 
 /** @internal */
-const DEFAULT_ERRORS = Object.keys(defaultStrings.validation);
+// const DEFAULT_ERRORS = Object.keys(defaultStrings.validation);
 
 @Component({
   standalone: true,
@@ -30,7 +30,6 @@ const DEFAULT_ERRORS = Object.keys(defaultStrings.validation);
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxInputErrorComponent {
-
   //#region Component class attributes
   @HostBinding('class.input__subtext') subText = true;
   @HostBinding('class.input__error_text') errorText = true;

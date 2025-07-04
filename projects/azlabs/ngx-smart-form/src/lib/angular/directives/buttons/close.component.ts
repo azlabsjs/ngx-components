@@ -11,11 +11,7 @@ import {
   imports: [CommonModule],
   selector: 'ngx-close-button',
   template: `
-    <a
-      href="#"
-      class="ngx__close_btn"
-      (click)="onClickHandler($event)"
-    >
+    <a href="#" class="ngx__close_btn" (click)="onClickHandler($event)">
       <svg
         version="1.1"
         width="24"

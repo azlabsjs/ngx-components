@@ -61,10 +61,8 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   //#endregion Class properties
 
-
   /** @description Phone input component class constructor */
   constructor(private cdRef: ChangeDetectorRef) {}
-
 
   onBlur(event: FocusEvent) {
     this.control?.markAsTouched();
@@ -78,7 +76,6 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.subscriptions.push(
-
       // Listen for control value changes to update component `value` state
       this.control.valueChanges
         .pipe(

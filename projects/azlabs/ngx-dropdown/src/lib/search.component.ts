@@ -42,7 +42,7 @@ export class DropdownSearchComponent {
   }
 
   /** @description Search component class constructor */
-  constructor(private cdRef: ChangeDetectorRef|null) {}
+  constructor(private cdRef: ChangeDetectorRef | null) {}
 
   onInputChange(event?: Event) {
     const { value: v } = this._state;
@@ -54,7 +54,7 @@ export class DropdownSearchComponent {
     this.setState((state) => ({ ...state, value }));
     this.dispatchValueChange();
     event?.preventDefault();
-    event?.stopPropagation()
+    event?.stopPropagation();
   }
 
   onSearchClick(event?: Event) {

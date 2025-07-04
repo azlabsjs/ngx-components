@@ -1,5 +1,6 @@
 import {
   AsyncPipe,
+  CommonModule,
   CurrencyPipe,
   DecimalPipe,
   JsonPipe,
@@ -26,6 +27,7 @@ import {
   uniqueValidator,
   HTTP_REQUEST_CLIENT,
   RequestClient,
+  FORM_DIRECTIVES,
 } from '@azlabsjs/ngx-smart-form';
 import {
   FileInput,
@@ -33,6 +35,11 @@ import {
   InputTypes,
 } from '@azlabsjs/smart-form-core';
 import { BehaviorSubject, filter, Subject, takeUntil, tap } from 'rxjs';
+import { TestPipe, TRANSLATE_PIPES } from './pipes';
+import { FORM_CONTROL_DIRECTIVES } from '@azlabsjs/ngx-clr-form-control';
+import { DIRECTIVES as GRID_DIRECTIVES } from '@azlabsjs/ngx-clr-smart-grid';
+import { FormControlComponent } from './form-control/form-control.component';
+import { ClarityModule } from '@clr/angular';
 
 const _values = {
   data: [
@@ -93,6 +100,7 @@ type ValuesType = typeof _values;
     ...COMMON_PIPES,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class AppComponent implements OnInit {
   formControl = new FormControl<string | undefined>(undefined);

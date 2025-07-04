@@ -83,7 +83,7 @@ export class NgxSmartFileInputComponent {
   @Input() read: 'id' | 'url' | 'object' | undefined = 'id';
   @Input({ alias: 'file-size-error' }) fileSizeError!: string;
   @Input({ alias: 'file-upload-error' }) fileUploadError!: string;
-  @Input() accept: string|string[] = [];
+  @Input() accept: string | string[] = [];
 
   /**
    * Ng Input attribute that defines whether files must

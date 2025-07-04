@@ -78,7 +78,7 @@ type StateType = {
     PercentPipe,
     SlicePipe,
     AsyncPipe,
-    ...COMMON_PIPES
+    ...COMMON_PIPES,
   ],
   selector: 'ngx-clr-smart-grid',
   templateUrl: './grid.component.html',

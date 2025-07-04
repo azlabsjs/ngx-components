@@ -59,8 +59,8 @@ export function createTranslateLoader() {
 }
 
 @NgModule({
-  declarations: [AppComponent, FormControlComponent],
   bootstrap: [AppComponent],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -82,6 +82,7 @@ export function createTranslateLoader() {
     ...TRANSLATE_PIPES,
     ...FORM_CONTROL_DIRECTIVES,
     ...FORM_DIRECTIVES,
+    FormControlComponent,
     NgxDropzoneModule.forRoot(),
   ],
   providers: [
