@@ -193,12 +193,11 @@ export class AsyncTextPipe implements PipeTransform {
     this._c = _commonStrings ?? of({});
   }
 
-  //
   transform(query: string, module?: string, def?: string): Observable<string> {
     if (!query || !query.length) {
       return of(def ?? '');
     }
     const q = module ? `${module}.${query}` : `${query}`;
-    return this._c.pipe(map((value) => getObjectProperty(value, q)));
+    return this._c.pipe(map((value) => getObjectProperty(value, q))) as Observable<string>;
   }
 }

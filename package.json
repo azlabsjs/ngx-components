@@ -33,7 +33,7 @@
     "@cds/core": "^6.11.0",
     "@clr/angular": "^17.10.0",
     "@clr/ui": "^17.2.0",
-    "@ng-select/ng-select": "^12.0.7",
+    "@ng-select/ng-select": ">=12.0.0 | <14.0.0",
     "@ngx-translate/core": "^15.0.0",
     "@ngx-translate/http-loader": "^8.0.0",
     "awesome-phonenumber": "^5.0",

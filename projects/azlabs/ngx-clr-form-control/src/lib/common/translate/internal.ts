@@ -59,7 +59,9 @@ export function compile(
   key: string,
   interpolateParams: { [index: string]: any }
 ) {
-  let value: string | undefined = getObjectProperty(state, key);
+  let value: string | undefined = getObjectProperty(state, key) as
+    | string
+    | undefined;
   if (value && interpolateParams) {
     for (const [prop, current] of Object.entries(interpolateParams)) {
       if (value.includes('{{' + prop + '}}')) {

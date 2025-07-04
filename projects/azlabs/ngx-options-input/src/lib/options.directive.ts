@@ -182,7 +182,12 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
       this.client.request({ ...options, name: this.name }, params).pipe(
         first(),
         map((state) => {
-          return state ? mapIntoInputOptions(options, state) : [];
+          return state
+            ? mapIntoInputOptions(
+                options,
+                state as unknown as Record<string, unknown>[]
+              )
+            : [];
         })
       )
     );
