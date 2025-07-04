@@ -1,7 +1,11 @@
 import { inject, Injector, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import {
+  HttpClient,
+  provideHttpClient as ngProvideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DIRECTIVES } from '@azlabsjs/ngx-clr-smart-grid';
@@ -56,12 +60,12 @@ export function createTranslateLoader() {
 
 @NgModule({
   declarations: [AppComponent, FormControlComponent],
+  bootstrap: [AppComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule,
     RouterModule.forRoot([], { useHash: true }),
     TranslateModule.forRoot({
       defaultLanguage: 'fr',
@@ -89,7 +93,7 @@ export function createTranslateLoader() {
         text: CommonTextPipe,
         httpValue: HTTPValuePipe,
         translate: TranslatePipe,
-        asyncText: AsyncTextPipe
+        asyncText: AsyncTextPipe,
       },
     }),
     provideFormsLoader(),
@@ -165,8 +169,8 @@ export function createTranslateLoader() {
           'La valeur du champ {{value}} ne correspond pas à la valeur saisie',
       },
     }),
-    TranslatePipe
+    TranslatePipe,
+    ngProvideHttpClient(withInterceptorsFromDi()),
   ],
-  bootstrap: [AppComponent],
 })
 export class AppModule {}
