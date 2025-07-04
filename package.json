@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.2.20",
-    "@angular-eslint/schematics": "^18.4.3",
+    "@angular-eslint/schematics": "^19.8.1",
     "@angular/cli": "^18.2.20",
     "@angular/compiler-cli": "^18.2.13",
     "@azlabsjs/built-type": "^0.2.21",
