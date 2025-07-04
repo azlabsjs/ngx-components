@@ -385,7 +385,7 @@ export function getPropertyValue<TReturn = any>(
         break;
       }
     }
-    return carry ? carry.getRawValue() : null;
+    return carry ? carry.getRawValue() : (null as TReturn);
   }
 
   return model.get(key)?.getRawValue();

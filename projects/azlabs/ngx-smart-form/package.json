@@ -6,7 +6,7 @@
     "@angular/core": ">=17.0.0 | <20.0.0",
     "@angular/forms": ">=17.0.0 | <20.0.0",
     "@azlabsjs/smart-form-core": "^0.2.0",
-    "@azlabsjs/requests": "^0.2.4 || ^0.3.0",
+    "@azlabsjs/requests": ">=0.2.0 | <0.4.0",
     "@azlabsjs/ngx-common": "^0.17.0"
   },
   "dependencies": {
