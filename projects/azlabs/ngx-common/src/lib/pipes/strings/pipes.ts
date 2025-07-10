@@ -99,12 +99,12 @@ export class CommonTextPipe implements OnDestroy, PipeTransform {
   // NOTE(@benlesh): Because Observable has deprecated a few call patterns for `subscribe`,
   // TypeScript has a hard time matching Observable to Subscribable, for more information
   // see https://github.com/microsoft/TypeScript/issues/43643
-  transform(query: string, ns?: string, def?: string): string {
+  transform(query: string, prefix?: string, def?: string): string {
     if (!query || !query.length) {
       return def ?? '';
     }
 
-    const _query = ns ? `${ns}.${query}` : `${query}`;
+    const _query = prefix ? `${prefix}.${query}` : `${query}`;
     if (!this._lastQuery) {
       if (query) {
         try {
@@ -122,10 +122,10 @@ export class CommonTextPipe implements OnDestroy, PipeTransform {
 
     if (_query !== this._lastQuery) {
       this._dispose();
-      return this.transform(query, ns, def);
+      return this.transform(query, prefix, def);
     }
 
-    return this._latestValue;
+    return this._latestValue ?? def ?? query;
   }
 
   private _subscribe(q: string): void {
@@ -171,8 +171,8 @@ export class CommonStringsPipe implements PipeTransform {
   constructor(private textPipe: CommonTextPipe) {}
 
   /** @description Redirect calls to text pipe transform method */
-  transform(q: string, module?: string, def: string = '') {
-    return this.textPipe.transform(q, module, def);
+  transform(q: string, prefix?: string, def: string = '') {
+    return this.textPipe.transform(q, prefix, def);
   }
 }
 
@@ -183,21 +183,23 @@ export class CommonStringsPipe implements PipeTransform {
 })
 @Injectable({ providedIn: 'any' })
 export class AsyncTextPipe implements PipeTransform {
-  private _c: Observable<TranslationsType>;
+  private translations: Observable<TranslationsType>;
 
   constructor(
     @Inject(COMMON_STRINGS)
     @Optional()
-    _commonStrings: Observable<TranslationsType>
+    translations: Observable<TranslationsType>
   ) {
-    this._c = _commonStrings ?? of({});
+    this.translations = translations ?? of({});
   }
 
-  transform(query: string, module?: string, def?: string): Observable<string> {
+  transform(query: string, prefix?: string, def?: string): Observable<string> {
     if (!query || !query.length) {
       return of(def ?? '');
     }
-    const q = module ? `${module}.${query}` : `${query}`;
-    return this._c.pipe(map((value) => getObjectProperty(value, q))) as Observable<string>;
+    const q = prefix ? `${prefix}.${query}` : `${query}`;
+    return this.translations.pipe(
+      map((value) => getObjectProperty(value, q) ?? def)
+    ) as Observable<string>;
   }
 }

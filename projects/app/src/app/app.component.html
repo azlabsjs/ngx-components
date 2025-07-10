@@ -13,7 +13,7 @@
   <app-form-control></app-form-control>
 </div>
 <div class="container">
-  <h3>{{'app.modules.users.title' | commonString }}</h3>
+  <h3>{{'app.modules.users.title' | text }}</h3>
   <ng-container *ngIf="state$ | async as form">
     <ngx-smart-form #smartform [no-grid-layout]="false" (ready)="onFormReadyState(form)" (changes)="afterChanges()"
       (error)="onError($event)" [submitable]="true" [autoupload]="true" (submit)="ngxFormSubmit($event)" [form]="form"
