@@ -309,7 +309,7 @@ export function pickInputConfig(
   return result;
 }
 
-/** @internal Set input properties */
+/** @internal set input properties */
 export function setInputsProperties(
   builder: AngularReactiveFormBuilderBridge,
   inputs: InputConfigInterface[],

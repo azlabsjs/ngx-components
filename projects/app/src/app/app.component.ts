@@ -40,6 +40,7 @@ import { FORM_CONTROL_DIRECTIVES } from '@azlabsjs/ngx-clr-form-control';
 import { DIRECTIVES as GRID_DIRECTIVES } from '@azlabsjs/ngx-clr-smart-grid';
 import { FormControlComponent } from './form-control/form-control.component';
 import { ClarityModule } from '@clr/angular';
+import { ReactiveFormDirectiveInterface } from 'projects/azlabs/ngx-smart-form/src/lib';
 
 const _values = {
   data: [
@@ -122,8 +123,8 @@ export class AppComponent implements OnInit {
   _state$ = new BehaviorSubject<FormConfigInterface | undefined>(undefined);
   state$ = this._state$.asObservable();
   private _destroy$ = new Subject<void>();
-  @ViewChild('smartform', { static: false })
-  smartForm!: ReactiveFormComponentInterface;
+  @ViewChild('formRef', { static: false })
+  smartForm!: ReactiveFormDirectiveInterface;
 
   // Columns configuration
   public columns: GridColumnType[] = [
@@ -273,13 +274,13 @@ export class AppComponent implements OnInit {
   }
 
   afterChanges() {
-    const timeout = setTimeout(() => {
-      this.smartForm
-        ?.controlValueChanges('profession')
-        .pipe(tap((state) => console.log('State changes:', state)))
-        .subscribe();
-      clearTimeout(timeout);
-    }, 300);
+    // const timeout = setTimeout(() => {
+    //   this.smartForm
+    //     ?.controlValueChanges('profession')
+    //     .pipe(tap((state) => console.log('State changes:', state)))
+    //     .subscribe();
+    //   clearTimeout(timeout);
+    // }, 300);
   }
 
   onBlur(event: FocusEvent) {

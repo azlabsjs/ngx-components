@@ -4,6 +4,7 @@ export {
   ControlsStateMap,
   FormComponentInterface,
   ReactiveFormComponentInterface,
+  ReactiveFormDirectiveInterface
 } from './directives';
 
 export {
