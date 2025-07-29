@@ -15,7 +15,7 @@
 <div class="container">
   <h3>{{'app.modules.users.title' | text }}</h3>
   <ng-container *ngIf="state$ | async as form">
-    <ngx-smart-form #smartform [no-grid-layout]="false" (ready)="onFormReadyState(form)" (changes)="afterChanges()"
+    <ngx-smart-form #formRef [no-grid-layout]="false" (ready)="onFormReadyState(form)" (changes)="afterChanges()"
       (error)="onError($event)" [submitable]="true" [autoupload]="true" (submit)="ngxFormSubmit($event)" [form]="form"
       [autoSubmit]="true" [path]="'http://localhost:3000/customers'" [template]="controlTemplate">
       <ng-template #controlTemplate let-config="value" let-control="control" let-describe="describe">
@@ -39,7 +39,7 @@
           SOUMETTRE
         </button>
       </ng-template>
-      <pre after>{{ smartform?.formGroup?.getRawValue()| json }}</pre>
+      <pre after>{{ formRef?.formGroup?.getRawValue()| json }}</pre>
     </ngx-smart-form>
   </ng-container>
 </div>

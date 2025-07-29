@@ -1,4 +1,11 @@
 <div>
+  <ngx-clr-form-control
+    [class]="'ngx-smart-form-control ' + radioInput.containerClass"
+    [hidden]="radioInput.hidden"
+    [control]="fileControl"
+    [inputConfig]="radioInput"
+  ></ngx-clr-form-control>
+
   <h3>File Controls</h3>
   <br />
   <ngx-clr-form-control

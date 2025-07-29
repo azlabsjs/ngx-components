@@ -5,8 +5,9 @@ import { CacheType, _Cache } from './cache';
 type KeyType = { [index: string]: unknown };
 
 export class OptionsCache implements CacheType<KeyType, InputOptions> {
-  // Properties
+  //#region properties
   private cache: CacheType<KeyType, InputOptions>;
+  //#endregion
 
   /** @description Options cache constructor */
   constructor(

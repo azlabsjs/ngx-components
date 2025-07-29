@@ -207,7 +207,7 @@
               <input noAutoComplete placeholder="radio" clrRadio type="radio" required
                 [checked]="control.value == option.value" [value]="config!.name+ '_' + option?.value"
                 (change)="control!.setValue(option.value)" />
-              <label>{{ option.description }}</label>
+              <label>{{ option.description ?? option.name }}</label>
             </clr-radio-wrapper>
           </clr-radio-container>
           <!-- Input errors -->

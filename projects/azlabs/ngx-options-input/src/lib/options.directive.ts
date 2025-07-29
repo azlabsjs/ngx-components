@@ -44,21 +44,21 @@ export function createIntersectionObserver(
   selector: '[fetchOptions]',
 })
 export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
-  //#region Directive inputs
+  //#region directive inputs
   @Input() loaded!: boolean;
   @Input({ alias: 'config' }) options!: OptionsConfig | undefined;
   @Input() name!: string;
   @Input() auto: boolean = true;
   @Input({ alias: 'query' }) search: string = 'label';
   @Input({ alias: 'limit' }) limit!: number;
-  //#endregion Directive inputs
+  //#endregion
 
-  //#region Directive outputs
+  //#region directive outputs
   @Output() optionsChange = new EventEmitter<InputOptions>();
   @Output() loadingChange = new EventEmitter<boolean>();
-  //#endregion Directive outputs
+  //#endregion
 
-  // Directive properties
+  // directive properties
   private observer!: IntersectionObserver;
   _search$ = new Subject<[Record<string, unknown>, OptionsConfig]>();
   private _subscriptions: Subscription[] = [];
@@ -116,7 +116,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   }
 
   /**
-   * @internal A private API method that might not be used externally
+   * @internal a private API method that might not be used externally
    */
   async query() {
     if (

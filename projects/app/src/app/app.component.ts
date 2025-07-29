@@ -124,7 +124,7 @@ export class AppComponent implements OnInit {
   state$ = this._state$.asObservable();
   private _destroy$ = new Subject<void>();
   @ViewChild('formRef', { static: false })
-  smartForm!: ReactiveFormDirectiveInterface;
+  private smartForm!: ReactiveFormDirectiveInterface;
 
   // Columns configuration
   public columns: GridColumnType[] = [

@@ -7,6 +7,7 @@ import {
   DateInput,
   FileInput,
   NumberInput,
+  OptionsInputConfigInterface,
   TextAreaInput,
   TextInput,
   TimeInput,
@@ -22,6 +23,30 @@ import { Subscription, tap } from 'rxjs';
 export class FormControlComponent implements OnInit, OnDestroy {
   //
   autoUploadFileControl = new FormControl();
+
+  radioInput = {
+    label: 'modules.kyc.policyholders.person.columns.sex',
+    name: 'pat_type_id',
+    type: 'radio',
+    classes: 'clr-input',
+    placeholder: '...',
+    value: null,
+    description: '', // TODO: Add input description
+    index: undefined,
+    isRepeatable: false,
+    containerClass: 'input-col-sm-12 input-col-md-6',
+    options: [
+      { name: 'FEMININ', value: 'F' },
+      { name: 'MASCULIN', value: 'M' },
+      { name: 'Autres', value: 'O' },
+    ],
+    constraints: {
+      required: true,
+      disabled: false,
+      min: 1,
+    },
+  } as OptionsInputConfigInterface;
+  
   autoUploadFile: FileInput = {
     uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
     pattern: 'image/*',
