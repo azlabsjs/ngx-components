@@ -23,17 +23,17 @@ type EventType<T = EventTarget> = Omit<Event, 'target'> & {
   selector: '[fileInput]',
 })
 export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
-  //#region Directive inputs
+  //#region directive inputs
   @Input() multiple: boolean = false;
   @Input() maxFiles = 1;
   @Input() maxFileSize = 10; // MB
-  private _accept!: string;
+  private _accept!: string[];
   @Input() set accept(value: string | string[]) {
     this._accept = Array.isArray(value)
-      ? (value as string[]).join(', ')
-      : typeof value === 'string'
       ? value
-      : '';
+      : typeof value === 'string'
+      ? value.split(',').map((x) => x.trim())
+      : [];
   }
   get accept() {
     return this._accept;
@@ -48,21 +48,21 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
         ? value
         : [];
   }
-  //#endregion Directive inputs
+  //#endregion
 
-  //#region Directive outputs
+  //#region directuve outputs
   @Output() sizeError = new EventEmitter<File[]>();
   @Output() unAcceptedFiles = new EventEmitter<File[]>();
   @Output() acceptedFiles = new EventEmitter<File[]>();
   @Output() removed = new EventEmitter();
   @Output() reset = new EventEmitter<void>();
-  //#endregion Directive outputs
+  //#endregion
 
-  //#region Directive local properties
+  //#region directive local properties
   private _elements: HTMLElement[] = [];
-  //#endregion Directive local properties
+  //#endregion
 
-  // Construct the directive class
+  // constructor the directive class
   public constructor(
     private elementRef: ElementRef,
     @Inject(DOCUMENT) private document: Document
@@ -87,7 +87,7 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
     _element?.addEventListener('change', this.onChangeListener.bind(this));
   }
 
-  /**  @description Add required files for the HTML input element */
+  /**  @description add required files for the HTML input element */
   private appendDirectiveAttributes(element: any) {
     //#region Bind HTML attributes to file input
     element.accept = this._accept;
@@ -97,7 +97,7 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
     return element;
   }
 
-  /** @description File input click listener */
+  /** @description file input click listener */
   private onClickedListener(event: Event) {
     const _event = event as unknown as EventType<HTMLInputElement>;
     if (_event.target) {
@@ -106,7 +106,7 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
     }
   }
 
-  /** @description File change listener */
+  /** @description file change listener */
   private onChangeListener(event: Event) {
     const _event = event as unknown as EventType<HTMLInputElement>;
     if (_event.target && _event.target.value === '') {
@@ -118,7 +118,7 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
     this.onInputChange(_event.target);
   }
 
-  /** @description Creates an HTML file input */
+  /** @description creates an HTML file input */
   private createHTMLInputElement(parent: HTMLElement) {
     if (this.document) {
       let el = this.document.createElement('input');
@@ -131,7 +131,7 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
     throw new Error('platform document is not defined');
   }
 
-  /** @description Handles input change event */
+  /** @description handles input change event */
   private onInputChange(target: HTMLInputElement) {
     if (target.files) {
       const {
@@ -168,7 +168,7 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
     }
   }
 
-  /** @description Returns the list of dropped files */
+  /** @description returns the list of dropped files */
   private getDroppedFiles(files: FileList) {
     return this.maxFiles === 1
       ? [files[0]]
@@ -186,25 +186,29 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
 
   /** @description Returns the list of accepted files */
   private isAccepted(file: File) {
-    const types = this._accept ? this._accept.split(',') : [];
+    const types = this._accept ?? [];
     if (types.length === 0) {
       return true;
     }
-    for (var i = 0; i < types.length; i++) {
-      if (file.type.match(types[i])) {
+
+    for (const item of types) {
+      if (item.trim() === '*') {
+        return true;
+      }
+
+      if (file.type.match(item)) {
         return true;
       }
     }
     return false;
   }
 
-  /** @description Checks if the size is in the valid size range for dropped files */
+  /** @description check if the size is in the valid size range for dropped files */
   private inSizeRange(file: File) {
     return Number((file.size / 1024 / 1024).toFixed(4)) <= this.maxFileSize;
   }
 
   ngOnDestroy(): void {
-    // Handle directive destruction
     for (const element of this._elements) {
       element?.removeEventListener('click', this.onClickedListener.bind(this));
       element?.removeEventListener('click', this.onClickedListener.bind(this));

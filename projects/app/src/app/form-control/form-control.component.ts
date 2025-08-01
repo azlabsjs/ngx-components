@@ -49,7 +49,7 @@ export class FormControlComponent implements OnInit, OnDestroy {
   
   autoUploadFile: FileInput = {
     uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
-    pattern: 'image/*',
+    pattern: 'image/*,application/pdf',
     multiple: false,
     maxFileSize: 12,
     autoupload: true,

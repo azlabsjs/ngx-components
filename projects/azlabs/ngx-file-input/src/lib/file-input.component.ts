@@ -79,7 +79,7 @@ export class NgxSmartFileInputComponent {
   @Input({ alias: 'max-file-size' }) maxFilesize: number = 10;
   @Input({ alias: 'max-files' }) maxFiles: number = 50;
   @Input() describe: boolean = true;
-  /** @description Read the id property of the uploaded file result or the entire object */
+  /** @description read the id property of the uploaded file result or the entire object */
   @Input() read: 'id' | 'url' | 'object' | undefined = 'id';
   @Input({ alias: 'file-size-error' }) fileSizeError!: string;
   @Input({ alias: 'file-upload-error' }) fileUploadError!: string;
@@ -93,12 +93,11 @@ export class NgxSmartFileInputComponent {
    */
   @Input({ alias: 'autoupload' }) autoupload: boolean = false;
 
-  /** @description Uploader submit url */
+  /** @description uploader submit url */
   @Input() url!: string | undefined;
-  //#endregion Component inputs
+  //#endregion
 
-  // #region Component properties
-  // Property for handling File Input types
+  // #region component properties
   _state: StateType = {
     uploading: false,
     hasError: false,
@@ -107,7 +106,7 @@ export class NgxSmartFileInputComponent {
   get state() {
     return this._state;
   }
-  // #endregion Component properties
+  // #endregion
 
   // #region component outputs
   @Output() reset = new EventEmitter<void>();

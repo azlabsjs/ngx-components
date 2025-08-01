@@ -9,4 +9,7 @@
 - Move HTTP loaders and Submit handlers to dedicated packages [x]
 - Remove reactive forms depedency from intl-tel-input [x]
 - Fix issue with custom submit button on smart form component [x]
+- Add event handlers to control config interface []
+- Mark clr-form-control component keyup, kewdown, etc... event as deprecated []
 - Review dropzone directive and component implementations []
+- Update smart-form library to support max attribute as constraint []
