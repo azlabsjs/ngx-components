@@ -45,6 +45,7 @@ import { PIPES } from './pipes';
     `
       .flex-files-input {
         display: flex;
+        position: relative;
       }
 
       .flex-files-input > input[type='file'] {
@@ -52,23 +53,22 @@ import { PIPES } from './pipes';
       }
 
       .flex-files-input.error > input[type='file'] {
-        border: var(--error-input-border, 1px solid #ff494f);
+        border: var(--error-file-input-border, 1px solid #ff494f);
       }
 
-      .tooltip .tooltip-content.error {
-        background-color: #ff494f !important;
+      .tooltip {
+        position: relative;
+        margin: 0;
+        padding: 0
       }
-      .tooltip > .tooltip-content::before {
-        border-left: 0.3rem solid #ff494f !important;
-        border-left-color: #ff494f !important;
-        border-top: 0.25rem solid #ff494f !important;
-        border-top-color: #ff494f !important;
-        border-right: 0.3rem solid transparent;
-        border-bottom: 0.25rem solid transparent;
+
+      .tooltip > svg {
+        width: var(--tooltip-width, 24px);
+        height: var(--tooltip-height, 24px);
       }
 
       .error-icon {
-        fill: red;
+        fill: #ff494f;
       }
     `,
   ],

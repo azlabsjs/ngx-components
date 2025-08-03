@@ -13,11 +13,14 @@
     [hidden]="fileInput.hidden"
     [control]="fileControl"
     [inputConfig]="fileInput"
-  ></ngx-clr-form-control>
+    [tooltip-error]="tooltipError"
+  >
+  </ngx-clr-form-control>
 
   <ngx-clr-form-control
     [class]="'ngx-smart-form-control ' + autoUploadFile.containerClass"
     [hidden]="autoUploadFile.hidden"
+    [tooltip-error]="tooltipError"
     [control]="autoUploadFileControl"
     [inputConfig]="autoUploadFile"
   ></ngx-clr-form-control>
@@ -72,4 +75,16 @@
     [control]="phoneInputControl"
     [inputConfig]="phoneInput"
   ></ngx-clr-form-control>
+
+  <ng-template #tooltipError let-error="error" let-data="data">
+    <span *ngIf="error === 'size'" class="tooltip-content error">
+      file(s) too large
+    </span>
+    <span *ngIf="error === 'accept'" class="tooltip-content error">
+      file(s) format not supported
+    </span>
+    <span *ngIf="error === 'upload'" class="tooltip-content error">
+      error uploading file(s)
+    </span>
+  </ng-template>
 </div>

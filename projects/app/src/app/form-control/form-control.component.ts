@@ -18,6 +18,21 @@ import { Subscription, tap } from 'rxjs';
   standalone: true,
   imports: [CommonModule, NgxFormControlComponent],
   selector: 'app-form-control',
+  styles: [
+    `
+      .tooltip-content.error {
+        background-color: #ff494f !important;
+      }
+      .tooltip-content.error::before {
+        border-left: 0.3rem solid #ff494f !important;
+        border-left-color: #ff494f !important;
+        border-top: 0.25rem solid #ff494f !important;
+        border-top-color: #ff494f !important;
+        border-right: 0.3rem solid transparent;
+        border-bottom: 0.25rem solid transparent;
+      }
+    `,
+  ],
   templateUrl: './form-control.component.html',
 })
 export class FormControlComponent implements OnInit, OnDestroy {
@@ -46,7 +61,7 @@ export class FormControlComponent implements OnInit, OnDestroy {
       min: 1,
     },
   } as OptionsInputConfigInterface;
-  
+
   autoUploadFile: FileInput = {
     // uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
     pattern: 'image/*,application/pdf',
