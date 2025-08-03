@@ -13,7 +13,6 @@ import { DefinedPipe } from './defined.pipe';
 import { JoinPipe } from './join.pipe';
 import { IsObjectPipe } from './is-object.pipe';
 import { NoAutoCompleteDirective } from './auto-complete-off.directive';
-import { TranslatePipe } from './translate';
 
 @NgModule({
   imports: [
@@ -25,7 +24,6 @@ import { TranslatePipe } from './translate';
     TextAreaInputPipe,
     TextInputPipe,
     TimeInputPipe,
-    TranslatePipe,
     TrustHTMLPipe,
     IncludesPipe,
     DefinedPipe,
@@ -41,14 +39,13 @@ import { TranslatePipe } from './translate';
     TextAreaInputPipe,
     TextInputPipe,
     TimeInputPipe,
-    TranslatePipe,
     TrustHTMLPipe,
     IncludesPipe,
     DefinedPipe,
     JoinPipe,
     IsObjectPipe,
     NoAutoCompleteDirective,
-    CommonModule
+    CommonModule,
   ],
 })
 export class NgxCommonModule {}

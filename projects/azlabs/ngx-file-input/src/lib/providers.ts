@@ -3,7 +3,7 @@ import { UPLOADER_OPTIONS } from './tokens';
 import { UploadOptionsType } from './types';
 import { HTTPRequest, HTTPResponse } from '@azlabsjs/requests';
 
-/** @description Provides uploads options for the library */
+/** @description provide uploads options for the library */
 export function provideUploadOptions(
   url: string,
   options?: UploadOptionsType<HTTPRequest, HTTPResponse>

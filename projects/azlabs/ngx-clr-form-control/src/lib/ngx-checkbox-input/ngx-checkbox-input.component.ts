@@ -24,7 +24,7 @@ import { Subject } from 'rxjs';
 import { distinctUntilChanged, tap } from 'rxjs/operators';
 import { NgxCommonModule } from '../common';
 import { CheckboxComponent } from './checkbox.component';
-import { IsCheckedPipe } from './is-checked.pipe';
+import { IsCheckedPipe, PIPES } from './pipes';
 
 /** @internal */
 type SelectionState = { value: unknown; checked: boolean };
@@ -44,14 +44,14 @@ type StateType = {
     ReactiveFormsModule,
     FormsModule,
     CheckboxComponent,
-    IsCheckedPipe,
+    ...PIPES,
   ],
   selector: 'ngx-checkbox-input',
   templateUrl: './ngx-checkbox-input.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
-  //#region Component inputs
+  //#region component inputs
   @Input() disabled = false;
   @Input() describe = true;
   @Input() control!: AbstractControl;
@@ -65,15 +65,14 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
     }));
   }
   @ContentChild('input') inputRef!: TemplateRef<any>;
-  //#endregion Component inputs
+  //#endregion
 
-  //#region Component outputs
+  //#region component outputs
   @Output() inputConfigChange = new EventEmitter<OptionsInputConfigInterface>();
-  @Output() onChange = new EventEmitter<unknown[]>();
-  //#endregion Component outputs
+  @Output() change = new EventEmitter<unknown[]>();
+  //#endregion
 
-  // #region Component properties
-  // formGroup = this.builder.group<{ options?: FormArray<FormControl> }>({});
+  // #region component properties
   private _state: StateType = {
     config: {} as OptionsInputConfigInterface,
     loaded: false,
@@ -83,9 +82,9 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
     return this._state;
   }
   private _destroy$ = new Subject<void>();
-  // #endregion Component properties
+  // #endregion
 
-  /** @description Creates a Checkbox input component  */
+  /** @description create an instance of ngx checkbox input component  */
   constructor(private changes: ChangeDetectorRef) {}
 
   ngOnInit(): void {
@@ -106,7 +105,9 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
     this._destroy$.next();
   }
 
-  /** @description Options change event listener */
+  /**
+   * options change event listener
+   */
   onOptionsChange(options: InputOptions) {
     const { config } = this._state;
     let _config = config ?? ({} as OptionsInputConfigInterface);
@@ -119,27 +120,21 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
     this.inputConfigChange.emit(_config);
   }
 
-  /** @description Handle checkbox click of selection change event */
-  onSelectionChange(e: SelectionState) {
+  /**
+   * handle checkbox click of selection change event
+   */
+  onChange(e: SelectionState) {
     const { selection } = this._state;
     const _index = selection.findIndex((el) => el.value === e.value);
-    const _selection = [...selection];
+    const items = [...selection];
     if (_index !== -1) {
-      _selection.splice(_index, 1);
+      items.splice(_index, 1);
     }
-    _selection.push(e);
 
-    // TODO: Update the control state with the selected values
-    const values = _selection
-      .filter((v) => v.checked === true)
-      .map((v) => v.value);
-
-    this.setState((state) => ({ ...state, selection: _selection }));
-
-    // Notify top level component of an update
-    this.onChange.emit(values);
-
-    // TODO: Move setting control value to the top level component
+    items.push(e);
+    const values = items.filter((v) => v.checked === true).map((v) => v.value);
+    this.setState((state) => ({ ...state, selection: items }));
+    this.change.emit(values);
     this.control.setValue(values);
   }
 

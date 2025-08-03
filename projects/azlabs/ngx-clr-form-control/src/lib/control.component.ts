@@ -33,7 +33,7 @@ ClarityIcons.addIcons(eyeHideIcon, eyeIcon);
     ...DIRECTIVES,
     ...FILE_INPUT_DIRECTIVES,
     ClarityModule,
-    ...PIPES
+    ...PIPES,
   ],
   selector: 'ngx-clr-form-control',
   templateUrl: './control.component.html',
@@ -59,9 +59,11 @@ export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
   /** @deprecated */
   @Input({ alias: 'class' }) cssClass = 'clr-form-control';
   @Input({ alias: 'control' }) formControl!: FormControl<any>;
+  @Input({ alias: 'tooltip-error' }) tooltipError!: TemplateRef<any>;
+  @Input({ alias: 'loading-text' }) loadingText!: string;
+
   @Input() label!: TemplateRef<any>;
   @Input() error!: TemplateRef<any>;
-  /** HTML/Text View template input */
   @Input() textView!: TemplateRef<any>;
   //#endregion
 

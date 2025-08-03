@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'isObject',
 })
 export class IsObjectPipe implements PipeTransform {
-  /** @description Returns true if the provided value is a javascript object and is not null*/
+  /** @description return true if the provided value is a javascript object and is not null*/
   transform(value: unknown) {
     return typeof value === 'object' && value !== null;
   }

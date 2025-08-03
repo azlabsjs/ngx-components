@@ -17,11 +17,8 @@
           [url]="config.uploadUrl"
           (reset)="formControl.reset()"
           (value)="formControl.setValue($event)"
-          [file-size-error]="
-            'fileSizeError' | translate : { maxFilesize: config.maxFileSize }
-          "
           [accept]="config | accept"
-          [file-upload-error]="'fileUploadError' | translate"
+          [tooltip-error]="tooltipError"
         >
           <label class="clr-control-label" *ngIf="describe" [for]="config.name">
             <ng-container
@@ -77,6 +74,7 @@
         [control]="formControl"
         [inputConfig]="inputConfig | selectInput"
         [describe]="describe"
+        [loading-text]="loadingText"
         (remove)="remove.emit($event)"
         (selected)="selected.emit($event)"
       >

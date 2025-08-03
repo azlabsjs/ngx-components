@@ -63,7 +63,7 @@ type StateType = {
   ],
 })
 export class NgxSelectInputComponent {
-  //#region Component properties
+  //#region component properties
   _state: StateType = {
     performingAction: false,
     config: null,
@@ -72,9 +72,10 @@ export class NgxSelectInputComponent {
   get state() {
     return this._state;
   }
-  private _handleFetchOnFocus: boolean = false;
-  //#endregion Component properties
+  private fetchOnFocus: boolean = false;
+  //#endregion
 
+  //#region component inputs
   @Input() control!: FormControl<any>;
   @Input() describe = true;
   @Input({ alias: 'inputConfig' }) set setInputConfig(
@@ -86,11 +87,13 @@ export class NgxSelectInputComponent {
       loaded: (inputConfig.options ?? [])?.length !== 0,
     }));
   }
+  @Input({ alias: 'loading-text' }) loadingText!: string;
+  //#endregion
 
-  //#region Component outputs
+  //#region component outputs
   @Output() remove = new EventEmitter<any>();
   @Output() selected = new EventEmitter<InputEventArgs>();
-  //#endregion Component outputs
+  //#endregion
 
   @ViewChild('optionsRef', { static: false })
   options!: FetchOptionsDirective;
@@ -100,7 +103,7 @@ export class NgxSelectInputComponent {
     private cdRef: ChangeDetectorRef
   ) {
     const { defaultView } = this.document;
-    this._handleFetchOnFocus = !(
+    this.fetchOnFocus = !(
       defaultView !== null &&
       'IntersectionObserver' in defaultView &&
       'IntersectionObserverEntry' in defaultView &&
@@ -109,30 +112,26 @@ export class NgxSelectInputComponent {
   }
 
   onFocus(): void {
-    if (this._handleFetchOnFocus) {
+    if (this.fetchOnFocus) {
       this.options?.query();
     }
   }
 
-  onLoadedChange(loaded: boolean) {
+  loadedChange(loaded: boolean) {
     this.setState((v) => ({ ...v, loaded }));
   }
 
-  onOptionsChange(options: InputOptions) {
+  optionsChange(options: InputOptions) {
     const { config } = this._state;
     let _c = config ?? ({} as OptionsInputConfigInterface);
     _c = {
       ..._c,
       options: options.map((state) => ({
         ...state,
-        // We convert the select values to uppercase
-        // for UI consistency
         name: state?.name?.toUpperCase(),
         description: state.description?.toUpperCase(),
       })),
     };
-    // const value = this._state$.getValue();
-    // this._state$.next({ ...value, state: this._inputConfig.options ?? [] });
     this.setState((state) => ({
       ...state,
       performingAction: false,
@@ -140,19 +139,25 @@ export class NgxSelectInputComponent {
     }));
   }
 
-  onModelChange(value: any) {
+  modelChange(value: any) {
     this.control.setValue(value);
     this.cdRef?.markForCheck();
   }
 
-  onLoadingChange(value: boolean) {
+  loadingChange(value: boolean) {
     this.setState((v) => ({ ...v, performingAction: value }));
   }
 
   setState(state: (state: StateType) => StateType) {
     this._state = state(this._state);
     this.cdRef?.markForCheck();
-    // TODO: Uncomment the code below to use latest API instead
-    // this.setState(state);
+  }
+
+  removed(e: unknown, config: OptionsInputConfigInterface) {
+    this.remove.emit({ name: config.name, event: e });
+  }
+
+  select(e: unknown, config: OptionsInputConfigInterface) {
+    this.selected.emit({ name: config.name, value: e });
   }
 }

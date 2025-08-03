@@ -1,37 +1,28 @@
 <ng-content select="label"></ng-content>
 <ng-container *ngIf="state">
-  <div [class]="state.hasError ? '' : ''" class="flex-files-input">
+  <div [ngClass]="{ error: state | haserror }" class="flex-files-input">
     <input
+      fileinput
       type="file"
       [placeholder]="placeholder"
-      fileInput
       [class]="cssClass ?? ''"
-      [maxFileSize]="maxFilesize || 10"
-      [maxFiles]="multiple ? maxFiles : 1"
+      [max-size]="maxFilesize || 10"
+      [max]="multiple ? maxFiles : 1"
       [multiple]="multiple"
-      (sizeError)="onTooLargeFilesEvent($event)"
+      (sizeError)="sizeError($event)"
       [accept]="accept"
-      (acceptedFiles)="
-        onAcceptedFiles(
-          $event,
-          url,
-          uploadOptions,
-          multiple,
-          autoupload,
-          uploadAs
-        )
-      "
+      (acceptedFiles)="accepted($event)"
+      (unAcceptedFiles)="notAccepted($event)"
       (reset)="onReset()"
     />
     <span *ngIf="state.uploading" class="spinner spinner-inline"></span>
     <a
-      *ngIf="state.hasError || state.tooLargeFiles.length > 0"
+      *ngIf="tooltip && (state | haserror)"
       href="#"
       role="tooltip"
       aria-haspopup="true"
       class="tooltip tooltip-sm input__error_text"
     >
-      <!-- Error SVG icon -->
       <svg
         class="error-icon"
         version="1.1"
@@ -42,7 +33,7 @@
         xmlns="http://www.w3.org/2000/svg"
         xmlns:xlink="http://www.w3.org/1999/xlink"
       >
-        <title>error-standard-line</title>
+        <title>error</title>
         <circle cx="18" cy="26.06" r="1.33" />
         <path
           d="M18,22.61a1,1,0,0,1-1-1v-12a1,1,0,1,1,2,0v12A1,1,0,0,1,18,22.61Z"
@@ -52,19 +43,19 @@
         />
         <rect x="0" y="0" width="36" height="36" fill-opacity="0" />
       </svg>
-      <!--\ Error SVG icon -->
-      <ng-container *ngIf="state.hasError">
-        <span class="tooltip-content error"> {{ fileSizeError }} </span>
-      </ng-container>
-      <ng-container *ngIf="state.tooLargeFiles.length > 0">
-        <span class="tooltip-content error"> {{ fileUploadError }} </span>
+      <ng-container
+        *ngTemplateOutlet="
+          tooltip;
+          context: { error: state.error?.type, data: state.error?.data }
+        "
+      >
       </ng-container>
     </a>
   </div>
   <span
     [class]="'input__subtext'"
     *ngIf="describe"
-    [innerHTML]="description ?? '' | safeHtml"
+    [innerHTML]="description ?? '' | safehtml"
   ></span>
   <ng-content select="[error]"></ng-content>
 </ng-container>

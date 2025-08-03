@@ -48,7 +48,7 @@ export class FormControlComponent implements OnInit, OnDestroy {
   } as OptionsInputConfigInterface;
   
   autoUploadFile: FileInput = {
-    uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
+    // uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
     pattern: 'image/*,application/pdf',
     multiple: false,
     maxFileSize: 12,

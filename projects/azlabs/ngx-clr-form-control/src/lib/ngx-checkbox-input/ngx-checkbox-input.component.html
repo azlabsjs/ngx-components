@@ -5,7 +5,7 @@
   [config]="state.config.optionsConfig"
   [name]="state.config.name"
 >
-  <ng-container *ngIf="(state.config.options ?? []).length > 0">
+  <ng-container *ngIf="state.config | hasoptions">
     <div class="clr-form-control">
       <ng-content select="[label]"></ng-content>
       <div class="clr-control-container clr-control-inline">
@@ -13,7 +13,7 @@
           *ngFor="let item of state.config.options"
           [checked]="item.value | isChecked : state.selection"
           [text]="item.description ?? item.name"
-          (onChange)="onSelectionChange({ value: item.value, checked: $event })"
+          (change)="onChange({ value: item.value, checked: $event })"
           [disabled]="disabled"
         >
         </ngx-checkbox>

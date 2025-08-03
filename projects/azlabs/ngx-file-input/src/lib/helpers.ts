@@ -1,7 +1,7 @@
 import { EventArgType } from './types';
 
 /**
- * @description UUID version 4 string generator
+ * @description uuid version 4 string generator
  *
  * @internal
  */
@@ -26,7 +26,7 @@ export function uuidv4() {
   )}`;
 }
 
-/** @description Try to parse an HTTP url to check wether the resource URI is valid or not */
+/** @description try to parse an HTTP url to check wether the resource URI is valid or not */
 export function isValidHttpUrl(uri: string) {
   try {
     const url = new URL(uri);
@@ -36,7 +36,7 @@ export function isValidHttpUrl(uri: string) {
   }
 }
 
-/** @description Get object id property value if read equals `id` and entire object, case the read property is object */
+/** @description get object id property value if read equals `id` and entire object, case the read property is object */
 export function readPropertyValue<T extends EventArgType>(
   value: T | undefined | null,
   read: 'id' | 'url' | 'object'
@@ -49,7 +49,7 @@ export function readPropertyValue<T extends EventArgType>(
     : undefined;
 }
 
-/** @description Provides a javascript file instance decorator */
+/** @description provides a javascript file instance decorator */
 export function decorateBlob<T extends Record<string, unknown>>(
   value: File,
   decorate: T

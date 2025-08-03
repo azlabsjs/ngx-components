@@ -6,6 +6,6 @@ export type InputEventArgs = {
   value: any;
 };
 
-/** @description Translated text to preview on form control elements */
+/** @deprecated translated text to preview on form control elements */
 export type Translations<T extends Record<string, any> = Record<string, any>> =
   Observable<T>;

@@ -10,7 +10,7 @@ const DEFAULT_ERRORS = Object.keys(defaultStrings.validation);
 @Pipe({
   pure: true,
   standalone: true,
-  name: 'customErrors',
+  name: 'customerrors',
 })
 export class CustomErrorsPipe implements PipeTransform {
   /** @description returns custom errors from the provided list of errors */
@@ -28,7 +28,7 @@ export class CustomErrorsPipe implements PipeTransform {
 @Pipe({
   pure: true,
   standalone: true,
-  name: 'supportedErrors',
+  name: 'supportederrors',
 })
 export class ErrorsPipe implements PipeTransform {
   /** @description resolve the list of errors that are predefined in  the library */
@@ -36,3 +36,6 @@ export class ErrorsPipe implements PipeTransform {
     return errors ? DEFAULT_ERRORS.filter((v) => !!errors[v]) : [];
   }
 }
+
+// exported standalone pipes
+export const PIPES = [ErrorsPipe, CustomErrorsPipe] as const;

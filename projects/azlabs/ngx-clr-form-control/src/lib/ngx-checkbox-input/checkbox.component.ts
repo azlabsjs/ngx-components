@@ -7,18 +7,17 @@ import {
   Input,
   Output,
 } from '@angular/core';
-import { ClarityModule } from '@clr/angular';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ClarityModule],
+  imports: [CommonModule],
   selector: 'ngx-checkbox',
   template: `
     <div class="clr-checkbox-wrapper">
       <input
         class="clr-checkbox"
         type="checkbox"
-        [checked]="isChecked"
+        [checked]="checked"
         (change)="onChanged($event)"
         (blur)="onBlur($event)"
         [disabled]="disabled"
@@ -26,30 +25,29 @@ import { ClarityModule } from '@clr/angular';
       <label class="clr-control-label">{{ text }}</label>
     </div>
   `,
-  //   styleUrls: ['./checkbox.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CheckboxComponent {
-  //#region Component inputs
+  //#region component inputs
   @Input() text!: string | undefined;
   @Input() disabled = false;
-  @Input({ alias: 'checked' }) isChecked = false;
-  //#endregion Component inputs
+  @Input({ alias: 'checked' }) checked = false;
+  //#endregion
 
-  //#region Component outputs
-  @Output() onChange = new EventEmitter<boolean>();
-  //#endregion Component outputs
+  //#region component outputs
+  @Output() change = new EventEmitter<boolean>();
+  //#endregion
 
   _onChange: (...args: any) => void = () => {};
   onBlur: (...args: any) => void = () => {};
 
   @HostListener('click', ['$event']) onClick(e: Event) {
-    this.isChecked = !this.isChecked;
-    this.onChange.emit(this.isChecked);
+    this.checked = !this.checked;
+    this.change.emit(this.checked);
     e?.preventDefault();
   }
 
   onChanged(e: Event) {
-    this.isChecked = e && e.target && (e.target as any).checked;
+    this.checked = e && e.target && (e.target as any).checked;
   }
 }

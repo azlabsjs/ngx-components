@@ -1,27 +1,41 @@
 <ng-container *ngIf="state">
   <ng-content select="label"></ng-content>
-  <div *ngIf="state.config as config" #optionsRef fetchOptions [config]="config.optionsConfig" [loaded]="state.loaded"
-    (optionsChange)="onOptionsChange($event)" (loadingChange)="onLoadingChange($event)" [name]="config.name">
-    <ng-select [class]="config.multiple ? '' : 'not-multiple'" [virtualScroll]="true" [items]="config.options || []"
-      [bindLabel]="'name'" [bindValue]="'value'" (focus)="onFocus()" [loading]="state.performingAction || false"
-      [loadingText]="'loadingText' | translate" [multiple]="config.multiple ?? false"
-      [placeholder]="config.placeholder ?? ''" [groupBy]="'type'" [ngModel]="control.value"
-      (ngModelChange)="onModelChange($event)" [clearable]="true" (remove)="
-        remove.emit({
-          name: config.name,
-          event: $event
-        })
-      " (change)="
-        selected.emit({
-          name: config.name,
-          value: $event
-        })
-      ">
+  <div
+    *ngIf="state.config as config"
+    #optionsRef
+    fetchOptions
+    [config]="config.optionsConfig"
+    [loaded]="state.loaded"
+    (optionsChange)="optionsChange($event)"
+    (loadingChange)="loadingChange($event)"
+    [name]="config.name"
+  >
+    <ng-select
+      [class]="config.multiple ? '' : 'not-multiple'"
+      [virtualScroll]="true"
+      [items]="config.options || []"
+      [bindLabel]="'name'"
+      [bindValue]="'value'"
+      (focus)="onFocus()"
+      [loading]="state.performingAction || false"
+      [loadingText]="loadingText"
+      [multiple]="config.multiple ?? false"
+      [placeholder]="config.placeholder ?? ''"
+      [groupBy]="'type'"
+      [ngModel]="control.value"
+      (ngModelChange)="modelChange($event)"
+      [clearable]="true"
+      (remove)="removed($event, state.config)"
+      (change)="select($event, state.config)"
+    >
       <ng-template ng-option-tmp let-item="item">
-          <label class="form-check-label ml-2"> {{ item?.name }} </label>
+        <label class="form-check-label ml-2"> {{ item?.name }} </label>
       </ng-template>
     </ng-select>
-    <!-- Control description -->
-    <span *ngIf="describe" class="input__subtext" [innerHTML]="config.description || '' | trustHtml"></span>
+    <span
+      *ngIf="describe"
+      class="input__subtext"
+      [innerHTML]="config.description || '' | trustHtml"
+    ></span>
   </div>
 </ng-container>

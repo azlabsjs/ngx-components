@@ -59,6 +59,8 @@ const _subscribableStrategy = new SubscribableStrategy();
 const INVALID_PARAMETER_MESSAGE = `Wrong parameter in TranslatePipe. Expected a valid Object, received`;
 
 /**
+ * @deprecated will be removed in future release
+ * 
  * @ngModule CommonModule
  * @description
  *

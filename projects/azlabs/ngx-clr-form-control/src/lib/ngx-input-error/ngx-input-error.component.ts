@@ -5,19 +5,15 @@ import {
   Input,
   TemplateRef,
 } from '@angular/core';
-import { defaultStrings } from '../constants';
 import { NgxCommonModule } from '../common';
-import { CustomErrorsPipe, ErrorsPipe } from './pipes';
+import { PIPES } from './pipes';
 
 /** @internal */
 type ErrorsType = { [prop: string]: any };
 
-/** @internal */
-// const DEFAULT_ERRORS = Object.keys(defaultStrings.validation);
-
 @Component({
   standalone: true,
-  imports: [NgxCommonModule, ErrorsPipe, CustomErrorsPipe],
+  imports: [NgxCommonModule, ...PIPES],
   selector: 'ngx-input-error',
   templateUrl: './ngx-input-error.component.html',
   styles: [
@@ -30,13 +26,13 @@ type ErrorsType = { [prop: string]: any };
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxInputErrorComponent {
-  //#region Component class attributes
+  //#region component class attributes
   @HostBinding('class.input__subtext') subText = true;
   @HostBinding('class.input__error_text') errorText = true;
-  //#endregion Component class attributes
+  //#endregion
 
-  //#region Component inputs
+  //#region component inputs
   @Input({ alias: 'errors' }) errors!: ErrorsType | null;
   @Input() template!: TemplateRef<any>;
-  //#endregion Component inputs
+  //#endregion
 }
