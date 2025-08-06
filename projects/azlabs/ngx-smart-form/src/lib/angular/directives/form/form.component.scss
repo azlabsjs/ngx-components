@@ -15,11 +15,11 @@ div.control__group__header,
 :host ::ng-deep .ngx-smart-form-control {
   margin: var(--ngx-form-control-margin, 0);
   padding: var(--ngx-form-control-padding, 0);
-  margin-top: var(--ngx-form-control-margin-top, .015rem);
+  margin-top: var(--ngx-form-control-margin-top, 0.015rem);
 }
 .ngx-smart-form-control,
 :host ::ng-deep .ngx-smart-form-control {
-  padding: var(--ngx-form-control-margin-top, .015rem);
+  padding: var(--ngx-form-control-margin-top, 0.015rem);
 }
 .inputs-row,
 :host ::ng-deep .input-row {
@@ -29,7 +29,45 @@ div.control__group__header,
   margin-left: var(--ngx-input-row-h-margin, -0.6rem);
 }
 
-.ngx-form-no-grid, :host ::ng-deep .ngx-form-no-grid {
+.ngx-form-no-grid,
+:host ::ng-deep .ngx-form-no-grid {
   padding: var(--ngx-form-no-grid-padding, 0);
   margin: var(--ngx-form-no-grid-margin, 0);
+}
+
+:host ::ng-deep ngx-table-form,
+:host ::ng-deep .ngx-table-form {
+  display: block;
+  width: 100%;
+  overflow-x: scroll;
+}
+
+:host ::ng-deep ngx-table-form .clr-input,
+:host ::ng-deep .ngx-table-form .clr-input,
+:host ::ng-deep ngx-table-form .clr-control-container,
+:host ::ng-deep .ngx-table-form .clr-control-container,
+:host ::ng-deep ngx-table-form .clr-input-wrapper,
+:host ::ng-deep .ngx-table-form .clr-input-wrapper,
+:host ::ng-deep ngx-table-form .ng-select-container,
+:host ::ng-deep .ngx-table-form .ng-select-container {
+  min-width: 100px;
+}
+
+:host ::ng-deep ngx-table-form .clr-input-group,
+:host ::ng-deep .ngx-table-form .clr-input-group,
+:host ::ng-deep ngx-table-form .clr-input-group:focus,
+:host ::ng-deep .ngx-table-form .clr-input-group:focus,
+:host ::ng-deep ngx-table-form .clr-error .clr-input-group:focus,
+:host ::ng-deep .ngx-table-form .clr-error .clr-input-group:focus,
+:host ::ng-deep ngx-table-form .clr-input-group.clr-focus,
+:host ::ng-deep .ngx-table-form .clr-input-group.clr-focus,
+:host ::ng-deep ngx-table-form .clr-error .clr-input-group.clr-focus,
+:host ::ng-deep .ngx-table-form .clr-error .clr-input-group.clr-focus,
+:host ::ng-deep ngx-table-form .clr-input-group:focus-within,
+:host ::ng-deep .ngx-table-form .clr-input-group:focus-within,
+:host ::ng-deep ngx-table-form .clr-error .clr-input-group:focus-within,
+:host ::ng-deep .ngx-table-form .clr-error .clr-input-group:focus-within {
+  border: none !important;
+  border-bottom-color: transparent !important;
+  background-size: 0;
 }

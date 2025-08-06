@@ -335,6 +335,7 @@
             "placeholder": "...",
             "type": "number",
             "classes": "clr-input",
+            "requiredIf": "stakeholders.*.category_id:1",
             "max": 100,
             "multiple": 0,
             "options": [],
