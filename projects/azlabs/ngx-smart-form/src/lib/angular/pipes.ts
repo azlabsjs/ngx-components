@@ -5,9 +5,10 @@ import {
   InputTypes,
 } from '@azlabsjs/smart-form-core';
 import { DomSanitizer } from '@angular/platform-browser';
+import { AbstractControl } from '@angular/forms';
 
 /**
- * @description Checks if input has `hidden` property set to true or is of type `hidden`
+ * @description checks if input has `hidden` property set to true or is of type `hidden`
  *
  * **Note** We mark the pipe as pure, because it depends on an object which hidden property
  *          might change, while the reference does not change, therefore, for now we wish to
@@ -19,7 +20,6 @@ import { DomSanitizer } from '@angular/platform-browser';
   standalone: true,
 })
 export class IsHiddenPipe implements PipeTransform {
-  //
   transform(value: InputConfigInterface) {
     return (
       (typeof value !== 'undefined' &&
@@ -122,7 +122,18 @@ export class AsInputConfigArray implements PipeTransform {
   }
 }
 
-/** @description Exported pipes */
+@Pipe({
+  name: 'inarray',
+  pure: true,
+  standalone: true,
+})
+export class InArrayPipe implements PipeTransform {
+  transform<T extends AbstractControl>(input: T, list: T[], name?: string) {
+    return list.indexOf(input) !== -1;
+  }
+}
+
+/** @description exported pipes */
 export const PIPES = [
   SafeHTMLPipe,
   IsRepeatablePipe,
@@ -131,5 +142,6 @@ export const PIPES = [
   AsInputsPipe,
   AsInputGroupPipe,
   KeysPipe,
-  AsInputConfigArray
+  AsInputConfigArray,
+  InArrayPipe,
 ] as const;

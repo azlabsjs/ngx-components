@@ -13,11 +13,10 @@ import {
   SimpleChanges,
   TemplateRef,
 } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { bindingsFactory, setInputsProperties } from '../../helpers';
 import { CommonModule } from '@angular/common';
 import { PIPES } from '../../pipes';
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
@@ -51,7 +50,8 @@ export class NgxSmartFormGroupComponent
   @Input() template!: TemplateRef<any>;
   @Input() autoupload: boolean = false;
   @Input({ alias: 'no-grid-layout' }) noGridLayout = false;
-  //#endregion Component inputs definitions
+  @Input({required: true}) detached!: AbstractControl[];
+  //#endregion
 
   //#region Component internal properties
   // @internal
@@ -91,45 +91,46 @@ export class NgxSmartFormGroupComponent
   }
 
   registerControlChanges() {
-    // Unsubscribe from any previous subscription
+    // unsubscribe from any previous subscription
     this._destroy$.next();
 
-    // Each type we listen for form controls changes, we query for
+    // each time we listen for form controls changes, we query for
     // input binding and set input properties based on their binding value
     if (this._inputs && this.formGroup) {
-      const b = bindingsFactory(this._inputs)(this._formGroup);
-      const [g, _inputs] = setInputsProperties(
-        this.builder,
-        this._inputs,
-        b,
-        this._formGroup
-      );
-      // We update formgroup and inputs properties value and mark the component as dirty
-      this.setFormState(_inputs, g);
+      // TODO: fix bug and uncomment code below
+      // const b = bindingsFactory(this._inputs)(this._formGroup);
+      // const [g, _inputs] = setInputsProperties(
+      //   this.builder,
+      //   this._inputs,
+      //   b,
+      //   this._formGroup
+      // );
+      // // We update formgroup and inputs properties value and mark the component as dirty
+      // this.setFormState(_inputs, g);
 
-      // Handle form control value changes
-      for (const n in this.formGroup.controls) {
-        this.formGroup
-          .get(n)
-          ?.valueChanges.pipe(
-            takeUntil(this._destroy$),
-            tap((state) => {
-              const [g, _inputs] = setInputsProperties(
-                this.builder,
-                this._inputs,
-                b,
-                this.formGroup,
-                state,
-                n
-              );
+      // // Handle form control value changes
+      // for (const n in this.formGroup.controls) {
+      //   this.formGroup
+      //     .get(n)
+      //     ?.valueChanges.pipe(
+      //       takeUntil(this._destroy$),
+      //       tap((state) => {
+      //         const [g, _inputs] = setInputsProperties(
+      //           this.builder,
+      //           this._inputs,
+      //           b,
+      //           this.formGroup,
+      //           state,
+      //           n
+      //         );
 
-              // When we listen for changes on form group controls
-              // each changes that update the form group should trigger the change detector
-              this.setFormState(_inputs, g, true);
-            })
-          )
-          .subscribe();
-      }
+      //         // When we listen for changes on form group controls
+      //         // each changes that update the form group should trigger the change detector
+      //         this.setFormState(_inputs, g, true);
+      //       })
+      //     )
+      //     .subscribe();
+      // }
     }
   }
 

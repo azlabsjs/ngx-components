@@ -1,31 +1,64 @@
 <div class="container">
   <h4>Ngx Common</h4>
-  <p *ngIf="230|transform:['httpValue:http://localhost:3000/professions;label']|pipeResult as result">
+  <p
+    *ngIf="
+      230
+        | transform : ['httpValue:http://localhost:3000/professions;label']
+        | pipeResult as result
+    "
+  >
     <ng-container *ngIf="result.value | isAsync; else defaultRef">
-      Async : {{result.value | async}}
+      Async : {{ result.value | async }}
     </ng-container>
-    <ng-template #defaultRef>
-      Not Async: {{ result.value }}
-    </ng-template>
+    <ng-template #defaultRef> Not Async: {{ result.value }} </ng-template>
   </p>
 </div>
 <div class="container">
   <app-form-control></app-form-control>
 </div>
 <div class="container">
-  <h3>{{'app.modules.users.title' | text }}</h3>
+  <h3>{{ "app.modules.users.title" | text }}</h3>
   <ng-container *ngIf="state$ | async as form">
-    <ngx-smart-form #formRef [no-grid-layout]="false" (ready)="onFormReadyState(form)" (changes)="afterChanges()"
-      (error)="onError($event)" [submitable]="true" [autoupload]="true" (submit)="ngxFormSubmit($event)" [form]="form"
-      [autoSubmit]="true" [path]="'http://localhost:3000/customers'" [template]="controlTemplate">
-      <ng-template #controlTemplate let-config="value" let-control="control" let-describe="describe">
-        <ngx-clr-form-control class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control"
-          [inputConfig]="config" [describe]="describe ?? true" [error]="error" [label]="label">
+    <ngx-smart-form
+      #formRef
+      [no-grid-layout]="false"
+      (ready)="onFormReadyState(form)"
+      (changes)="afterChanges()"
+      (error)="onError($event)"
+      [submitable]="true"
+      [autoupload]="true"
+      (submit)="ngxFormSubmit($event)"
+      [form]="form"
+      [autoSubmit]="true"
+      [path]="'http://localhost:3000/customers'"
+      [template]="controlTemplate"
+    >
+      <ng-template
+        #controlTemplate
+        let-config="value"
+        let-control="control"
+        let-describe="describe"
+        let-hidden="hidden"
+      >
+        <ngx-clr-form-control
+          class="ngx-smart-form-control"
+          [hidden]="config.hidden"
+          [control]="control"
+          [hidden]="hidden"
+          [inputConfig]="config"
+          [describe]="describe ?? true"
+          [error]="error"
+          [label]="label"
+        >
           <ng-template #label let-label>
-            <span>My Label</span>
+            <span>{{ label }}</span>
           </ng-template>
           <ng-template #error let-touched="touched" let-errors>
-            <ngx-input-error *ngIf="touched" [errors]="errors" [template]="template">
+            <ngx-input-error
+              *ngIf="touched"
+              [errors]="errors"
+              [template]="template"
+            >
               <ng-template #template let-value>
                 <span>{{ value }}</span>
               </ng-template>
@@ -39,13 +72,19 @@
           SOUMETTRE
         </button>
       </ng-template>
-      <pre after>{{ formRef?.formGroup?.getRawValue()| json }}</pre>
+      <pre after>{{ formRef?.formGroup?.getRawValue() | json }}</pre>
     </ngx-smart-form>
   </ng-container>
 </div>
 <div class="container">
   <h3>Data Grid</h3>
-  <ngx-clr-smart-grid (dgItemClick)="ondgItemClick($event)" [columns]="columns" [placeholder]="placeholder"
-    [pageResult]="(pageResult$ | async)" (dgRefresh)="onDgRefresh($event)" (selectedChange)="onSelectedChanges($event)"
-    [config]="gridConfig"></ngx-clr-smart-grid>
+  <ngx-clr-smart-grid
+    (dgItemClick)="ondgItemClick($event)"
+    [columns]="columns"
+    [placeholder]="placeholder"
+    [pageResult]="pageResult$ | async"
+    (dgRefresh)="onDgRefresh($event)"
+    (selectedChange)="onSelectedChanges($event)"
+    [config]="gridConfig"
+  ></ngx-clr-smart-grid>
 </div>

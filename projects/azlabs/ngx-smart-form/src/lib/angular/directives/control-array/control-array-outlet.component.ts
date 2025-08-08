@@ -16,7 +16,7 @@ import { AbstractControl } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { BUTTON_DIRECTIVES } from '../buttons';
-import { NgxSmartFormControlArrayItemComponent } from './control-array-item.component';
+import { NgxArrayItemComponent } from './control-array-item.component';
 
 @Component({
   standalone: true,
@@ -26,50 +26,47 @@ import { NgxSmartFormControlArrayItemComponent } from './control-array-item.comp
   styleUrls: ['./control-array-outlet.component.scss'],
 })
 export class NgxFormControlArrayOutletComponent
-  implements
-    OnDestroy,
-    ViewRefFactory<ComponentRef<NgxSmartFormControlArrayItemComponent>>
+  implements OnDestroy, ViewRefFactory<ComponentRef<NgxArrayItemComponent>>
 {
-  //#region Component inputs
-  @Input({ required: true }) inputConfig!: InputConfigInterface;
+  //#region component inputs
+  @Input({ required: true }) config!: InputConfigInterface;
   @Input({ alias: 'auto-upload' }) autoupload: boolean = true;
   @Input({ required: true }) template!: TemplateRef<any>;
-  //#endregion Component inputs
+  @Input({ required: true }) detached!: AbstractControl[];
+  //#endregion
 
-  //#region Component output
+  //#region component output
   @Output() removed = new EventEmitter<
-    RefType<ComponentRef<NgxSmartFormControlArrayItemComponent>>
+    RefType<ComponentRef<NgxArrayItemComponent>>
   >();
-  //#endregion Component output
+  //#endregion
 
-  //#region Component properties
+  //#region component properties
   @ViewChild('container', { read: ViewContainerRef, static: false })
-  containerRef!: ViewContainerRef;
+  container!: ViewContainerRef;
   private destroy$ = new Subject<void>();
-  //#endregion Component properties
+  //#endregion
 
   createView(index: number, input: AbstractControl) {
-    const element = this.containerRef?.createComponent(
-      NgxSmartFormControlArrayItemComponent
-    );
-    // Initialize child component input properties
-    element.instance.inputConfig = { ...this.inputConfig };
-    element.instance.control = input;
-    element.instance.template = this.template;
-    element.instance.autoupload = this.autoupload;
-    element.instance.index = index;
-    // Ends child component properties initialization
+    const e = this.container?.createComponent(NgxArrayItemComponent);
 
-    const ref: RefType<ComponentRef<NgxSmartFormControlArrayItemComponent>> = {
-      index: element.instance.index,
-      element,
-      destroy: () => element.destroy(),
+    e.instance.config = { ...this.config };
+    e.instance.control = input;
+    e.instance.template = this.template;
+    e.instance.autoupload = this.autoupload;
+    e.instance.index = index;
+    e.instance.detached = this.detached;
+
+    const ref: RefType<ComponentRef<NgxArrayItemComponent>> = {
+      index: e.instance.index,
+      element: e,
+      destroy: () => e.destroy(),
     };
 
-    element.instance.componentDestroyer
+    e.instance.componentDestroyer
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
-        element?.destroy();
+        e?.destroy();
         this.removed.emit(ref);
       });
 
@@ -77,7 +74,7 @@ export class NgxFormControlArrayOutletComponent
   }
 
   clear(): void {
-    this.containerRef?.clear();
+    this.container?.clear();
   }
 
   ngOnDestroy(): void {

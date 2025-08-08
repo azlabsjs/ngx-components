@@ -20,8 +20,8 @@ export {
   createFormArray,
   useBearerTokenInterceptor,
   getPropertyValue,
-  pickAbstractControl,
-  pickInputConfig,
+  pickcontrol,
+  pickconfig,
 } from './helpers';
 
 export { NgxSmartFormModule } from './smart-form.module';

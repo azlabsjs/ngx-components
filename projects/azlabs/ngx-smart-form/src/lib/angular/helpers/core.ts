@@ -18,18 +18,46 @@ import {
 import { cloneAbstractControl } from './clone';
 import { Subject } from 'rxjs';
 
+function isinputgroup(input: InputConfigInterface): input is InputGroup {
+  return (
+    typeof input === 'object' &&
+    input !== null &&
+    ((input as InputGroup).children ?? []).length > 0
+  );
+}
+
+function isrepeatablegroup(input: InputConfigInterface): input is InputGroup {
+  return isinputgroup(input) && Boolean(input.isRepeatable) === true;
+}
+
+function isrepeatableinput(input: InputConfigInterface) {
+  return (
+    typeof input === 'object' &&
+    input !== null &&
+    Boolean(input.isRepeatable) === true
+  );
+}
+
+function getinputgroupinputs(input: InputGroup) {
+  const { children } = input;
+  return Array.isArray(children)
+    ? children
+    : [children].filter(
+        (current) => typeof current !== 'undefined' && current !== null
+      );
+}
+
 /** @internal */
 type ChangedInputStateType = { name: string; value: boolean }[];
 
 /** @internal */
-function findAbstractControlArray<
-  TReturn extends AbstractControl = AbstractControl
->(g: AbstractControl, keys: string[]) {
+function findarray<T extends AbstractControl>(g: T, keys: string[]) {
   let c: AbstractControl | null = g;
   for (const k of keys) {
     if (c === null) {
       break;
     }
+
     if (c && (c instanceof FormGroup || c instanceof FormArray)) {
       c = c.get(k) as FormGroup;
     } else {
@@ -39,27 +67,28 @@ function findAbstractControlArray<
       c = null;
     }
   }
-  return c as TReturn | null;
+  return c as T | null;
 }
 
 /** @internal helper function to find the parent of a given abstract control specialy if using . separated property names */
-export function findAbstractControlParent<
-  TReturn extends FormGroup = FormGroup
->(g: FormGroup, key: string) {
+export function findparent<T extends FormGroup | null>(
+  g: FormGroup,
+  key: string
+) {
   const keys = key.split('.');
-  // Remove the top element of the list of values
   keys.pop();
-  return findAbstractControlArray<TReturn>(g, keys);
+  return findarray(g, keys) as T;
 }
 
-/** @description Search for an abstract control using dot seperated property names  */
-export function findAbstractControl<
-  TReturn extends AbstractControl = AbstractControl
->(g: FormGroup, key: string) {
-  return findAbstractControlArray<TReturn>(g, key.split('.'));
+/** @description search for an abstract control using dot seperated property names  */
+export function findcontrol<T extends AbstractControl | null>(
+  g: FormGroup,
+  key: string
+) {
+  return findarray(g, key.split('.')) as T;
 }
 
-/** @internal Set value for formgroup form controls */
+/** @internal set value for formgroup form controls */
 export function setFormValue(
   builder: AngularReactiveFormBuilderBridge,
   formgroup: FormGroup,
@@ -73,12 +102,12 @@ export function setFormValue(
     if (typeof i === 'undefined' || i === null) {
       continue;
     }
-    setPropertyFactory(builder)(formgroup, key, value, i);
+    createSetValue(builder)(formgroup, key, value, i);
   }
 }
 
-/** @description Creates a factory function that set the  */
-export function setPropertyFactory(builder: AngularReactiveFormBuilderBridge) {
+/** @description creates a factory function that set the  */
+export function createSetValue(builder: AngularReactiveFormBuilderBridge) {
   return function setValue(
     g: FormGroup<any>,
     key: string,
@@ -89,26 +118,17 @@ export function setPropertyFactory(builder: AngularReactiveFormBuilderBridge) {
     if (ac && value) {
       if (ac instanceof FormGroup) {
         setFormGroupValue(ac, value);
-      } else if (
-        ac instanceof FormArray &&
-        Boolean(i?.isRepeatable) === true &&
-        ((i as InputGroup)?.children ?? []).length > 0
-      ) {
-        const controls = (i as InputGroup)?.children;
-        const leaf = Array.isArray(controls)
-          ? controls
-          : [controls].filter(
-              (current) => typeof current !== 'undefined' && current !== null
-            );
+      } else if (ac instanceof FormArray && isrepeatablegroup(i)) {
+        const leaf = getinputgroupinputs(i);
         const items = Array.isArray(value) ? value : [];
         const a = (g.get(key) as FormArray<any>) ?? new FormArray<any>([]);
         for (const current of items) {
-          const t = builder.group(leaf) as FormGroup;
+          const t = builder.group(leaf);
           setFormGroupValue(t, current);
           a.push(t);
         }
         g.setControl(key, a);
-      } else if (ac instanceof FormArray && Boolean(i?.isRepeatable)) {
+      } else if (ac instanceof FormArray && isrepeatableinput(i)) {
         const items = Array.isArray(value) ? value : [];
         const a = (g.get(key) as FormArray<any>) ?? new FormArray<any>([]);
         for (const current of items) {
@@ -161,83 +181,28 @@ function isHidden(values: unknown[], value: unknown) {
         isNaN(value as number) ? value : +(value as string)
       )
     : values || [];
-  return !_values.includes(value) ? true : false;
+  return !_values.includes(value);
 }
 
-/** @internal Hidden attribute setter */
-export function setHiddenPropertyFactory(
-  inputs: InputConfigInterface[],
-  b: BindingInterface,
-  v: any
-) {
-  return (builder: AngularReactiveFormBuilderBridge, g: FormGroup) => {
-    const changes: ChangedInputStateType = [];
-    // TODO: Provide a way to update array input property as current implementation does not work on array
-    inputs = Array.isArray(inputs) ? [...inputs] : [];
-    function setProperty(_inputs: InputConfigInterface[], n: string) {
-      for (const i of _inputs) {
-        if (
-          (i as InputGroup).children?.length > 0 &&
-          // we perform recursive call only if `n` contains `.`
-          n.indexOf('.') !== -1 &&
-          // we perform recusive call only if n starts with input property name
-          n.substring(0, i.name.length) === i.name &&
-          // and we perform recursive call only of `n` is not equals to input property name
-          n !== i.name
-        ) {
-          // Continue trimming the binding key until we read the last property name
-          // which should be equals to the input name in order to update input
-          setProperty(
-            (i as InputGroup).children,
-            n.split('.').slice(1).join('.')
-          );
-          // Case `n` matches the input name property
-          // we can proceed to input update
-        } else if (i.name === n) {
-          const values = i.requiredIf?.values ?? [];
-          const _previous = i.hidden ?? false;
-          i.hidden = isHidden(values, v);
-          const _current = i.hidden;
-          if (_previous !== _current) {
-            changes.push({ name: b.key, value: _current });
-          }
-          // We find the parent node of the property to update
-          // on which .get(), .removeControl() and .addControl() will be called
-          const r = findAbstractControlParent(g, b.key);
-          if (r === null) {
-            return;
-          }
-          const c = r.get(n);
-          if (i.hidden && c) {
-            b.setValueFactory = () => (_g: FormGroup<any>, k: string) => {
-              return setPropertyFactory(builder)(_g, k, c?.getRawValue(), i);
-            };
-            r.removeControl(n);
-            // Case previous value does not equals current value but the control is not
-            // defined, we add the control to the list of form controls
-          } else if (_previous !== _current && !c) {
-            const result = cloneAbstractControl(b.abstractControl);
-            r.addControl(n, result);
-            const { setValueFactory } = b;
-            if (setValueFactory) {
-              setValueFactory()(r, n);
-            }
-          }
-        } else {
-        }
-      }
-    }
+function hasleaf(input: InputConfigInterface): input is InputGroup {
+  const x = input as InputGroup;
+  return (
+    typeof x === 'object' &&
+    'children' in x &&
+    x !== null &&
+    x.children &&
+    x.children.length > 0
+  );
+}
 
-    // Call set property on inputs
-    setProperty(inputs, b.key);
+function before(haystack: string, char: string) {
+  const index = haystack.indexOf(char);
+  return index === -1 ? '' : haystack.substring(0, index);
+}
 
-    // Return the updated g and input properties
-    return [g, inputs, changes] as [
-      FormGroup,
-      InputConfigInterface[],
-      ChangedInputStateType
-    ];
-  };
+function after(haystack: string, char: string) {
+  const index = haystack.indexOf(char);
+  return index === -1 ? '' : haystack.substring(index + char.length);
 }
 
 // tslint:disable-next-line: typedef
@@ -245,56 +210,218 @@ export function bindingsFactory(inputs: InputConfigInterface[]) {
   return (g: FormGroup) => {
     const b: Map<string, BindingInterface> = new Map();
     if (Array.isArray(inputs) && inputs.length !== 0 && g) {
-      // // First we retrieve input config having requiredIf property definition
-      const result: { rIf: InputRequireIfConfig; name: string }[] = [];
-      function findMatches(values: InputConfigInterface[], parent?: string) {
+      const result: [
+        string,
+        Omit<InputConfigInterface, 'requiredIf'> & {
+          requiredIf: InputRequireIfConfig;
+        }
+      ][] = [];
+      function findmatches(
+        values: InputConfigInterface[],
+        parent?: string,
+        repeatable: boolean = false
+      ) {
         for (const v of values) {
-          const hasLeaf =
-            (v as InputGroup).children && (v as InputGroup).children.length > 0;
-          if (hasLeaf) {
-            findMatches(
-              (v as InputGroup).children,
-              parent ? `${parent}.${v.name}` : v.name
-            );
+          if (hasleaf(v)) {
+            const label = parent ? `${parent}.${v.name}` : v.name;
+            findmatches(v.children, label, v.isRepeatable ?? false);
           }
 
-          if (v.requiredIf) {
-            result.push({
-              rIf: v.requiredIf,
-              name: parent ? `${parent}.${v.name}` : v.name,
-            });
+          const { requiredIf } = v;
+          if (requiredIf) {
+            let { name } = v;
+            if (parent) {
+              name = `${parent}${repeatable ? '.*' : ''}.${v.name}`;
+            }
+            result.push([name, { ...v, requiredIf }]);
           }
         }
       }
 
-      findMatches(inputs);
+      findmatches(inputs);
 
-      for (const r of result) {
-        const { rIf, name } = r;
-        const c = findAbstractControl(g, name);
-        if (c) {
-          b.set(name, {
-            key: name,
-            binding: rIf,
-            abstractControl: c,
-            validators: c.validator,
-            asyncValidators: c.asyncValidator,
-          });
-        }
+      for (const [name, inputConfig] of result) {
+        const position = name.indexOf('*');
+        const { requiredIf } = inputConfig;
+        b.set(name, {
+          isdependency: (p) => {
+            if (position !== -1) {
+              const str = before(requiredIf.name, '*');
+              return p.trim().startsWith(str.substring(0, str.length - 1));
+            }
+            return String(p) === String(requiredIf.name);
+          },
+          binding: requiredIf,
+          dependencyChanged: (
+            detached: Map<string, AbstractControl>,
+            formgroup: FormGroup,
+            property: string,
+            value: unknown
+          ) => {
+            const output: [
+              [string, AbstractControl][],
+              [string, AbstractControl][]
+            ] = [[], []];
+            const params = requiredIf.values ?? [];
+            // case the selector key contains * and dependecy key starts with selector
+            // then the control is the control at the same index having the property after *
+            let str = before(name, '*');
+            str = str.trim().substring(0, str.length - 1); // str is the name of the parent input property
+            if (position !== -1 && property.trim().startsWith(str)) {
+              const parent = findcontrol(formgroup, str) as FormArray;
+              if (!parent) {
+                return output;
+              }
+
+              if (!(parent instanceof FormArray)) {
+                throw new Error(`parent at ${str} is not a form array`);
+              }
+
+              if (parent.length === 0) {
+                return output;
+              }
+
+              const input = after(name, `${str}.*.`).trim();
+              const dependency = after(requiredIf.name, `${str}.*.`).trim();
+
+              for (let index = 0; index < parent.length; index++) {
+                const item = parent.at(index);
+                if (!item) {
+                  continue;
+                }
+
+                let obselete: boolean = false;
+                let name: string;
+                let control: AbstractControl | undefined | null = null;
+                const dep =
+                  item instanceof FormGroup
+                    ? findcontrol(item, dependency)
+                    : null;
+
+                if (item instanceof FormGroup) {
+                  control = findcontrol(item, input);
+                  name = `${str}.${index}.${input}`;
+                  obselete = isHidden(params, dep?.value);
+                } else {
+                  control = item;
+                  name = `${str}.${index}`;
+                  obselete = isHidden(params, value);
+                }
+
+                // case we cannot select from the formgroup,
+                // we try to locate it from the detached controls
+                if (!control) {
+                  control = detached.get(name);
+                }
+
+                // case the control value is not defined, we ignore adding
+                // or removing control from detached controls
+                if (!control) {
+                  continue;
+                }
+
+                const found = findparent(formgroup, name);
+                const paths = name.split('.');
+                const path = paths[paths.length - 1];
+                if (!obselete) {
+                  // we add the control to the parent if it's missing
+                  const control = detached.get(name);
+                  if (!found?.get(path) && control) {
+                    found?.addControl(path, control);
+                    output[0].push([name, control]);
+                  }
+
+                  // remove the control from the detached list of controls
+                  if (detached.has(name)) {
+                    detached.delete(name);
+                  }
+                } else {
+                  // remove the control from the parent if it exists
+                  const at = found?.get(path);
+                  if (at) {
+                    found?.removeControl(path);
+                    output[1].push([name, at]);
+                  }
+
+                  // if name does not exist in detached, set name value to control
+                  if (!detached.has(name)) {
+                    detached.set(name, control);
+                  }
+                }
+              }
+
+              // drop out of the condition block and exit from the function
+              return output;
+            }
+
+            // case we are not handling form array
+            let control = findcontrol(g, name);
+            const obselete = isHidden(params, value);
+            // case we cannot select from the formgroup, we try to locate
+            // it from the detached controls
+            if (!control) {
+              control = detached.get(name) ?? null;
+            }
+
+            // case the control value is not defined, we ignore adding
+            // or removing control from detached controls
+            if (!control) {
+              return output;
+            }
+
+            const index = name.indexOf('.');
+            let parent: FormGroup | null;
+            let path: string;
+
+            const paths = name.split('.');
+            if (index !== -1) {
+              path = paths[paths.length - 1];
+              parent = findparent(formgroup, name);
+            } else {
+              path = name;
+              parent = formgroup;
+            }
+
+            if (!obselete) {
+              const control = detached.get(name);
+              if (!parent?.get(path) && control) {
+                parent?.addControl(path, control);
+                output[0].push([name, control]);
+              }
+
+              if (detached.has(name)) {
+                detached.delete(name);
+              }
+            } else {
+              const at = parent?.get(path);
+              if (at) {
+                parent?.removeControl(path);
+                output[1].push([name, at]);
+              }
+
+              if (!detached.has(name)) {
+                detached.set(name, control);
+              }
+            }
+
+            return output;
+          },
+        });
       }
     }
+
     return b;
   };
 }
 
-/** @description Query for an input configuration from the list of input configurations */
-export function pickInputConfig(
+/** @description query for an input configuration from the list of input configurations */
+export function pickconfig(
   inputs: InputConfigInterface[],
   key: string,
-  character: string = '.'
+  char: string = '.'
 ) {
   let items = [...inputs];
-  const keys = key.split(character);
+  const keys = key.split(char);
   let result: InputConfigInterface | null = null;
   for (const k of keys) {
     const input = items.find((i) => i.name === k);
@@ -307,45 +434,6 @@ export function pickInputConfig(
   }
 
   return result;
-}
-
-/** @internal set input properties */
-export function setInputsProperties(
-  builder: AngularReactiveFormBuilderBridge,
-  inputs: InputConfigInterface[],
-  b: Map<string, BindingInterface>,
-  g: FormGroup,
-  v?: any,
-  name?: string
-) {
-  let changes: ChangedInputStateType = [];
-  for (const item of b.values()) {
-    let c: ChangedInputStateType = [];
-    if (!item.binding) {
-      continue;
-    }
-    if (name && item.binding.name.toString() !== name.toString()) {
-      continue;
-    }
-    const factory = (
-      builder: AngularReactiveFormBuilderBridge,
-      formgroup: FormGroup
-    ) => {
-      return setHiddenPropertyFactory(
-        inputs ?? [],
-        item,
-        v ?? item.abstractControl.value
-      )(builder, formgroup);
-    };
-    [g, inputs, c] = factory(builder, g);
-    changes.push(...c);
-  }
-
-  return [g, inputs, changes] as [
-    FormGroup,
-    InputConfigInterface[],
-    ChangedInputStateType
-  ];
 }
 
 /** @description Query for the value located at a given leaf of the tree of control in an abstract control */
@@ -405,6 +493,7 @@ export function getInputValue<TReturn = any>(
   ) {
     return v ?? null;
   }
+
   character = character ?? '.';
 
   const properties = key.split(character);
@@ -430,8 +519,8 @@ export function getInputValue<TReturn = any>(
   return carry ?? null;
 }
 
-/** @description Query for the value located at a given leaf of the tree of control in an abstract control */
-export function pickAbstractControl(
+/** @description query for the value located at a given leaf of the tree of control in an abstract control */
+export function pickcontrol(
   model: AbstractControl | null,
   key: string,
   character: string = '.'
@@ -473,7 +562,6 @@ export function pickAbstractControl(
 
 /** @internal */
 export function useSupportedAggregations() {
-  //#region Supported aggregation function
   function avg(...args: unknown[]) {
     return sum(...args) / args.length;
   }
@@ -544,7 +632,6 @@ export function useSupportedAggregations() {
         return carry;
       }, Number(args[0]));
   }
-  //#region Supported aggregation function
 
   const aggregations: Record<string, (...args: any) => unknown> = {
     avg,
@@ -563,8 +650,10 @@ export function useSupportedAggregations() {
   return aggregations;
 }
 
+type ArgsBuilderType = (model: any, params: unknown[]) => void;
+
 /**
- * @description Computes a dependencies trees of input that has their value that needs to be computed
+ * computes a dependencies trees of input that has their value that needs to be computed
  * based on other input value or provided raw values
  */
 export function createComputableDepencies(
@@ -578,69 +667,70 @@ export function createComputableDepencies(
 
   const decorated = (values: InputConfigInterface[]) => {
     for (const input of values) {
-      const hasLeaf = ((input as InputGroup)?.children ?? []).length > 0;
-      if (hasLeaf) {
-        decorated((input as InputGroup).children);
+      if (hasleaf(input)) {
+        decorated(input.children);
         continue;
       }
+
       if (input.compute) {
         if (typeof input.compute.fn === 'string') {
           const method = aggregations[input.compute.fn];
           const args = (input.compute as { fn: string; args: string[] }).args;
-          const argumentBuilders: ((model: any, params: unknown[]) => void)[] =
-            [];
+          const argbuilders: ArgsBuilderType[] = [];
           const deps: string[] = [];
           for (const arg of args) {
-            // Case the argument value starts with [ and ends with ], the argument is considered a dependency
+            // case the argument value starts with [ and ends with ], the argument is considered a dependency
             if (String(arg).startsWith('[') && arg.endsWith(']')) {
               const name = arg.slice(1, arg.length - 1);
-              // In case we are in presence of a form array value selection
+              // case we are in presence of a form array value selection
               // the dependency is the form array itself
-              const start_index = name.indexOf('*');
+              const star_index = name.indexOf('*');
 
-              // Due to issue not being able to listen for formgroup control valueChanges event
+              // due to issue not being able to listen for formgroup control valueChanges event
               // current implementation will listen for entire inner formgroup changes
               // if any is request, and we will use `getObjectProperty` to query for
               // the value of the requested control
-              const dot_start_index = name.indexOf('.');
-              const after_dot_index = name.slice(dot_start_index + 1);
+              const dot_index = name.indexOf('.');
+              const after_dot = name.slice(dot_index + 1);
               const depName =
-                start_index !== -1
-                  ? name.slice(0, start_index - 1)
-                  : dot_start_index !== -1
-                  ? name.slice(0, dot_start_index)
+                star_index !== -1
+                  ? name.slice(0, star_index - 1)
+                  : dot_index !== -1
+                  ? name.slice(0, dot_index)
                   : name;
 
-              // Push the property on top of dependencies array
+              // push the property on top of dependencies array
               deps.push(depName);
+              // create control property value resolver and push it on top of arguments builder
+              let builder: ArgsBuilderType;
 
-              // Create control property value resolver and push it on top of arguments builder
-              const builder =
-                start_index !== -1
-                  ? (model: any, p: unknown[]) => {
-                      const result = getInputValue<unknown[]>(
-                        model,
-                        name.slice(start_index)
-                      );
-                      if (result) {
-                        p.push(...result);
-                      }
-                    }
-                  : dot_start_index !== -1 && after_dot_index.trim() !== ''
-                  ? (model: any, p: unknown[]) => {
-                      p.push(getInputValue<unknown>(model, after_dot_index));
-                    }
-                  : (model: any, p: unknown[]) => {
-                      p.push(model);
-                    };
+              if (star_index !== -1) {
+                builder = (model: any, stack: unknown[]) => {
+                  const result =
+                    getInputValue<unknown[]>(model, name.slice(star_index)) ??
+                    [];
+                  if (result) {
+                    stack.push(...result);
+                  }
+                };
+              } else if (dot_index !== -1 && after_dot.trim() !== '') {
+                builder = (model: any, stack: unknown[]) => {
+                  stack.push(getInputValue<unknown>(model, after_dot));
+                };
+              } else {
+                builder = (model: any, stack: unknown[]) => {
+                  stack.push(model);
+                };
+              }
 
-              argumentBuilders.push(builder);
+              argbuilders.push(builder);
             } else {
-              argumentBuilders.push((_, p: unknown[]) => {
+              argbuilders.push((_, p: unknown[]) => {
                 p.push(arg);
               });
             }
           }
+
           for (const dep of deps) {
             const current = dependencies[dep] ?? {
               values: [],
@@ -651,7 +741,7 @@ export function createComputableDepencies(
               name: input.name,
               fn: (model: any) => {
                 const stack: unknown[] = [];
-                for (const builder of argumentBuilders) {
+                for (const builder of argbuilders) {
                   builder(model, stack);
                 }
                 return method(...stack);
@@ -694,7 +784,7 @@ export function createComputableDepencies(
   return dependencies;
 }
 
-/** @internal Recursively get errors from an angular reactive control (eg: FormGroup, FormControl, FormArray) */
+/** @internal recursively get errors from an angular reactive control (eg: FormGroup, FormControl, FormArray) */
 export function collectErrors(control: AbstractControl) {
   const errors: ValidationErrors[] = [];
   const getErrors = (c: AbstractControl, _name?: string) => {

@@ -10,17 +10,17 @@ export {
 
 export {
   bindingsFactory,
-  setHiddenPropertyFactory,
-  setInputsProperties,
+  // setHiddenPropertyFactory,
+  // setInputsProperties,
   setFormValue,
-  setPropertyFactory,
+  createSetValue as setPropertyFactory,
   getPropertyValue,
   createComputableDepencies,
   useSupportedAggregations,
-  pickAbstractControl,
-  pickInputConfig,
-  findAbstractControlParent,
-  collectErrors
+  pickcontrol,
+  pickconfig,
+  findparent as findAbstractControlParent,
+  collectErrors,
 } from './core';
 
 export { useBearerTokenInterceptor } from './interceptors';

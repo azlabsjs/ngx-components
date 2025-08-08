@@ -44,6 +44,7 @@ export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
   //#region component inputs
   @Input() inline = false;
   @Input() describe = true;
+  @Input() hidden: boolean | undefined = false;
   @Input() countries!: string[];
   private _inputConfig!: InputConfigInterface;
   @Input() set config(value: InputConfigInterface) {

@@ -187,6 +187,7 @@
         "readonly": false,
         "unique": false,
         "isRepeatable": true,
+        "requiredIf": "category_id:1",
         "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-3",
         "id": 1249,
         "label": "No. Téléphone",
@@ -406,6 +407,7 @@
         "placeholder": "...",
         "type": "control_group",
         "classes": "controls-header",
+        "requiredIf": "profession:3",
         "multiple": 0,
         "options": [],
         "children": [

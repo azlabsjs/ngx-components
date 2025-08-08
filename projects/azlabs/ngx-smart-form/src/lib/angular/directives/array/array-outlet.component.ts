@@ -35,6 +35,7 @@ export class NgxFormArrayOutletComponent
   @Input({ alias: 'auto-upload' }) autoupload: boolean = true;
   @Input({ alias: 'no-grid-layout' }) noGridLayout = true;
   @Input() template!: TemplateRef<any>;
+  @Input({ required: true }) detached!: AbstractControl[];
   //#endregion Component inputs
 
   //#region Component output
@@ -53,14 +54,14 @@ export class NgxFormArrayOutletComponent
     const element = this.containerRef?.createComponent(
       NgxSmartFormArrayItemComponent
     );
-    // Initialize child component input properties
+
     element.instance.controls = [...this.inputs];
     element.instance.formGroup = input as FormGroup;
     element.instance.template = this.template;
     element.instance.autoupload = this.autoupload;
     element.instance.index = index;
     element.instance.noGridLayout = this.noGridLayout;
-    // Ends child component properties initialization
+    element.instance.detached = this.detached;
 
     const ref: RefType<ComponentRef<NgxSmartFormArrayItemComponent>> = {
       index: element.instance.index,

@@ -1,5 +1,6 @@
 import {
   AfterContentInit,
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -11,7 +12,7 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { FormArray, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
@@ -39,8 +40,11 @@ import { RefType, ViewRefFactory } from '../types';
   styleUrls: ['./array.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
-  //#region Component inputs definitions
+export class NgxSmartFormArrayComponent
+  implements AfterContentInit, OnDestroy, AfterViewInit
+{
+  //#region component inputs definitions
+  @Input({ required: true }) detached!: AbstractControl[];
   @Input({ alias: 'formArray' }) array!: FormArray;
   @Input('no-grid-layout') noGridLayout = false;
   @Input() template!: TemplateRef<any>;
@@ -64,70 +68,52 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
     },
   })
   cssClass!: string | string[];
-  //#endregion Component inputs definitions
+  //#endregion
 
-  //#region Component outputs
+  //#region component outputs
   @Output() listChange = new EventEmitter<number>();
-  //#endregion Component outputs
+  //#endregion
 
   // #region View children
   @ViewChild('container', { static: false })
   viewFactory!: ViewRefFactory<any>;
-  // #endregion View children
+  // #endregion
 
-  // #region Component properties
-  _refCount = 0;
+  // #region component properties
+  _ref = 0;
   get refCount() {
-    return this._refCount;
+    return this._ref;
   }
   private refs: RefType<unknown>[] = [];
-  /** Helps in calling appendControls in both ngAfterViewInit and `@Input() set setArray()` closure  */
   private destroy$ = new Subject<void>();
-  // #endregion Component properties
+  // #endregion
 
-  // Component instance initializer
+  // component instance initializer
   constructor(
     private cdRef: ChangeDetectorRef | null,
     @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
     private builder: AngularReactiveFormBuilderBridge
   ) {}
 
+  ngAfterViewInit(): void {
+    this.update.bind(this).call(null);
+  }
+
   ngAfterContentInit(): void {
     this.array.valueChanges
-      .pipe(
-        takeUntil(this.destroy$),
-        tap(() => {
-          const length = this.array.controls.length;
-          const count = length - this._refCount;
-          if (count > 0) {
-            for (let index = 0; index < count; index++) {
-              const refIndex = this._refCount + index;
-              this.refs.push(
-                this.viewFactory?.createView(refIndex, this.array.at(refIndex))
-              );
-            }
-            this.setRefCount(this._refCount + count);
-          }
-
-          if (count < 0) {
-            const refCount = this._refCount > 0 ? this._refCount - 1 : 0;
-            this.setRefCount(refCount);
-            this.listChange.emit(refCount);
-          }
-        })
-      )
+      .pipe(takeUntil(this.destroy$), tap(this.update.bind(this)))
       .subscribe();
   }
 
-  handleAddView(event: Event) {
+  add(event: Event) {
     const g = this.builder.group(this.inputs);
     const clone = cloneAbstractControl(g) as FormGroup;
     this.array.push(clone);
     event.preventDefault();
   }
 
-  handleRemoved<T>(ref: RefType<T>) {
-    if (this._refCount >= 0) {
+  removed<T>(ref: RefType<T>) {
+    if (this._ref >= 0) {
       const index = this.refs.findIndex((c) => {
         return c.index === ref.index;
       });
@@ -144,8 +130,28 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy {
     this.destroy$.next();
   }
 
+  private update() {
+    const length = this.array.controls.length;
+    const count = length - this._ref;
+    if (count > 0) {
+      for (let i = 0; i < count; i++) {
+        const index = this._ref + i;
+        const { viewFactory: factory } = this;
+        const view = factory.createView(index, this.array.at(index));
+        this.refs.push(view);
+      }
+      this.setRefCount(this._ref + count);
+    }
+
+    if (count < 0) {
+      const refCount = this._ref > 0 ? this._ref - 1 : 0;
+      this.setRefCount(refCount);
+      this.listChange.emit(refCount);
+    }
+  }
+
   private setRefCount(value: number) {
-    this._refCount = value;
+    this._ref = value;
     this.cdRef?.markForCheck();
   }
 }

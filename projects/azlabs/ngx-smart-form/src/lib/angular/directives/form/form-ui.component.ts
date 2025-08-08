@@ -9,8 +9,7 @@ import { NgxSmartFormArrayComponent } from '../array';
 import { NgxSmartFormGroupHeaderPipe } from '../group';
 import { NgxSmartFormControlArrayComponent } from '../control-array';
 import { PIPES } from '../../pipes';
-import { FormConfigInterface } from '@azlabsjs/smart-form-core';
-import { FormGroup } from '@angular/forms';
+import { FormModelState } from './types';
 
 @Component({
   selector: 'ngx-form-ui',
@@ -28,8 +27,7 @@ import { FormGroup } from '@angular/forms';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxFormComponent {
-  @Input() formGroup!: FormGroup<any>;
-  @Input() inputs!: FormConfigInterface['controlConfigs'];
+  @Input({ required: true }) state!: FormModelState;
   @Input() template!: TemplateRef<any>;
   @Input({ alias: 'add-template' }) addTemplate!: TemplateRef<any>;
   @Input() label!: TemplateRef<any>;

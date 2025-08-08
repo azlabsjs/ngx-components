@@ -32,7 +32,7 @@ export class NgxFormDirective
   private changeSubscription: Subscription | null = null;
 
   get formGroup() {
-    return this.model.formGroup;
+    return this.model.state.formGroup;
   }
 
   private _value!: { [k: string]: unknown };
@@ -50,7 +50,11 @@ export class NgxFormDirective
     this.updateModel(value);
   }
   get form() {
-    return this.model.form;
+    return this.model.state.form;
+  }
+
+  get state() {
+    return this.model.state;
   }
 
   @Output() valueChanges = new EventEmitter<unknown>();
@@ -75,9 +79,7 @@ export class NgxFormDirective
   }
 
   addAsyncValidator(validator: AsyncValidatorFn, control?: string): void {
-    const c = control
-      ? this.model.formGroup.get(control)
-      : this.model.formGroup;
+    const c = control ? this.formGroup.get(control) : this.formGroup;
     if (c) {
       c.addAsyncValidators(validator);
     }
@@ -92,9 +94,7 @@ export class NgxFormDirective
   }
 
   addValidator(validator: ValidatorFn, control?: string): void {
-    const c = control
-      ? this.model.formGroup.get(control)
-      : this.model.formGroup;
+    const c = control ? this.formGroup.get(control) : this.formGroup;
     if (c) {
       c.addValidators(validator);
     }
@@ -110,8 +110,7 @@ export class NgxFormDirective
       changes['state'].currentValue !== changes['state'].previousValue
     ) {
       const { currentValue: state } = changes['state'];
-      const { form, formGroup } = this.model;
-      if (form && formGroup && state) {
+      if (this.form && this.formGroup && state) {
         this.setValue(this._value);
       }
     }
@@ -120,7 +119,7 @@ export class NgxFormDirective
   validate() {
     this.model.validate();
 
-    const subscription = this.model.formGroup.statusChanges
+    const subscription = this.formGroup.statusChanges
       .pipe(filter((status) => ['PENDING', 'DISABLED'].indexOf(status) === -1))
       .subscribe(() => this.cdRef?.markForCheck());
 
@@ -139,12 +138,12 @@ export class NgxFormDirective
 
   private updateModel(f: FormConfigInterface, g?: FormGroup) {
     this.model.update(f, g);
-    if (this.model.formGroup) {
+    if (this.formGroup) {
       if (this.changeSubscription) {
         this.changeSubscription.unsubscribe();
       }
-      const subscription = this.model.formGroup.valueChanges.subscribe(
-        (value) => this.valueChanges.emit(value)
+      const subscription = this.formGroup.valueChanges.subscribe((value) =>
+        this.valueChanges.emit(value)
       );
       this.changeSubscription = subscription;
     }

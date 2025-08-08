@@ -1,4 +1,4 @@
-<div class="ngx-form-control" *ngIf="formControl">
+<div [hidden]="hidden ?? false" class="ngx-form-control" *ngIf="formControl">
   <ng-container [ngSwitch]="inputConfig.type">
     <!-- File Input -->
     <ng-container *ngSwitchCase="inputTypes.FILE_INPUT">

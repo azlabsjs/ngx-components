@@ -1,11 +1,14 @@
-<ngx-form-control-array-outlet (removed)="handleRemoved($event)" [inputConfig]="inputConfig" [auto-upload]="autoupload"
+<ngx-form-control-array-outlet
+  (removed)="removed($event)"
+  [config]="config"
+  [auto-upload]="autoupload"
   [template]="template"
-  #container></ngx-form-control-array-outlet>
+  [detached]="detached"
+  [hidden]="(config | isHidden) || (array | inarray : detached)"
+  #container
+></ngx-form-control-array-outlet>
 
-<ng-container *ngTemplateOutlet="
-    addButtonRef ? addButtonRef : addTemplate;
-    context: { $implicit: handleAddView.bind(this) }
-  "></ng-container>
+<ng-container *ngTemplateOutlet="addButtonRef ? addButtonRef : addTemplate; context: { $implicit: add.bind(this) }"></ng-container>
 
 <ng-template #addTemplate let-handler>
   <ngx-add-button (click)="handler($event)"></ngx-add-button>

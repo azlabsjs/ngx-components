@@ -7,32 +7,39 @@ import {
   Output,
   TemplateRef,
 } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { NgxSmartFormGroupComponent } from '../group';
 import { BUTTON_DIRECTIVES } from '../buttons';
+import { PIPES } from '../../pipes';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, NgxSmartFormGroupComponent, ...BUTTON_DIRECTIVES],
+  imports: [
+    CommonModule,
+    NgxSmartFormGroupComponent,
+    ...BUTTON_DIRECTIVES,
+    ...PIPES,
+  ],
   selector: 'ngx-smart-form-array-item',
   templateUrl: './array-item.component.html',
   styleUrls: ['./array-item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFormArrayItemComponent {
-  //#region Component inputs
+  //#region component inputs
   @Input() formGroup!: FormGroup;
   @Input() controls!: InputConfigInterface[];
   @Input() template!: TemplateRef<HTMLElement>;
   @Input() autoupload: boolean = false;
   @Input() index!: number;
   @Input('no-grid-layout') noGridLayout = false;
-  //#endregion Component inputs
+  @Input({ required: true }) detached!: AbstractControl[];
+  //#endregion
 
-  // #region Component outputs
+  // #region component outputs
   @Output() componentDestroyer = new EventEmitter();
-  // #endregion Component outputs
+  // #endregion
 
   onButtonClick(event: Event) {
     this.componentDestroyer.emit();

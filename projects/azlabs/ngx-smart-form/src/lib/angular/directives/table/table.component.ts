@@ -38,22 +38,23 @@ type ContextType = {
 export class NgxTableForm
   implements AfterViewInit, ViewRefFactory<EmbeddedViewRef<any>>, OnDestroy
 {
-  //#region Component inputs
+  //#region component inputs
   @Input({ alias: 'inputs' }) configs: InputConfigInterface[] = [];
   @Input({ alias: 'auto-upload' }) autoupload: boolean = true;
   @Input({ alias: 'template' }) view!: TemplateRef<any>;
-  //#endregion Component inputs
+  @Input({ required: true }) detached!: AbstractControl[];
+  //#endregion
 
-  //#region Component output
+  //#region component output
   @Output() removed = new EventEmitter<RefType<EmbeddedViewRef<any>>>();
-  //#endregion Component output
+  //#endregion
 
-  //#region Component properties
+  //#region component properties
   @ViewChild('container', { read: ViewContainerRef, static: false })
   containerRef!: ViewContainerRef;
   @ViewChild('template', { static: false }) templateRef!: TemplateRef<any>;
   private destroy$ = new Subject<void>();
-  //#endregion Component properties
+  //#endregion
 
   createView(index: number, input: AbstractControl) {
     const subject = new Subject<number>();

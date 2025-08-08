@@ -1,15 +1,18 @@
 <div class="ngx__form_control_array">
-    <div class="ngx__form_array__card__card_block">
-        <ng-container *ngIf="control">
-            <ng-container *ngTemplateOutlet="
-            template;
-            context: {
-              control: this.control,
-              value: inputConfig,
-              autoupload: this.autoupload
-            }
-          "></ng-container>
-        </ng-container>
-    </div>
-    <ngx-close-button (click)="onButtonClick($event)"></ngx-close-button>
+  <div class="ngx__form_array__card__card_block">
+    <ng-container *ngIf="control">
+      <ng-container
+        *ngTemplateOutlet="
+          template;
+          context: {
+            control,
+            value: config,
+            autoupload: this.autoupload,
+            hidden: (config | isHidden) || (control | inarray : detached)
+          }
+        "
+      ></ng-container>
+    </ng-container>
+  </div>
+  <ngx-close-button (click)="clicked($event)"></ngx-close-button>
 </div>

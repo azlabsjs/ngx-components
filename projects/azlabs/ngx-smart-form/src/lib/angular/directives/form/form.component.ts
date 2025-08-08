@@ -33,10 +33,7 @@ import { collectErrors } from '../../helpers';
 import { ControlsStateMap, ReactiveFormComponentInterface } from '../../types';
 import { HTTP_REQUEST_CLIENT } from '../../tokens';
 import { CommonModule } from '@angular/common';
-import { NgxSmartFormArrayComponent } from '../array';
 import { PIPES } from '../../pipes';
-import { NgxSmartFormControlArrayComponent } from '../control-array';
-import { NgxSmartFormGroupHeaderPipe } from '../group';
 import { FormModel } from './form.component.model';
 import { NgxFormComponent } from './form-ui.component';
 
@@ -61,11 +58,11 @@ export class NgxSmartFormComponent
     OnChanges
 {
   get formGroup() {
-    return this.model.formGroup;
+    return this.model.state.formGroup;
   }
 
   get form() {
-    return this.model.form;
+    return this.model.state.form;
   }
 
   //#region component inputs
@@ -111,7 +108,7 @@ export class NgxSmartFormComponent
   private changeSubscription: Subscription | null = null;
 
   public constructor(
-    private model: FormModel,
+    protected readonly model: FormModel,
     private cdRef: ChangeDetectorRef | null,
     @Inject(HTTP_REQUEST_CLIENT) @Optional() private client?: RequestClient
   ) {
@@ -127,8 +124,7 @@ export class NgxSmartFormComponent
       changes['state'].currentValue !== changes['state'].previousValue
     ) {
       const { currentValue: state } = changes['state'];
-      const { form, formGroup } = this.model;
-      if (form && formGroup && state) {
+      if (this.form && this.formGroup && state) {
         this.setValue(state);
       }
     }
@@ -150,39 +146,35 @@ export class NgxSmartFormComponent
     }, 700);
   }
 
-  //#region component interface Methods definitions
+  //#region component interface method definitions
   controlValueChanges(name: string): Observable<unknown> {
-    return this.model.formGroup?.get(name)?.valueChanges ?? EMPTY;
+    return this.formGroup?.get(name)?.valueChanges ?? EMPTY;
   }
 
   getControlValue(control: string, _default?: any): unknown {
-    const value = this.model.formGroup.get(control)?.value;
+    const value = this.formGroup?.get(control)?.value;
     return value || _default || undefined;
   }
 
   setControlValue(control: string, value: any): void {
-    this.model.formGroup.get(control)?.setValue(value);
+    this.formGroup.get(control)?.setValue(value);
   }
 
   disableControls(controls: ControlsStateMap): void {
     for (const [key, entry] of Object.entries(controls)) {
-      this.model.formGroup.get(key)?.disable(entry);
+      this.formGroup?.get(key)?.disable(entry);
     }
   }
 
   addAsyncValidator(validator: AsyncValidatorFn, control?: string) {
-    const _control = control
-      ? this.model.formGroup.get(control)
-      : this.model.formGroup;
-    if (_control) {
-      _control.addAsyncValidators(validator);
+    const input = control ? this.formGroup?.get(control) : this.formGroup;
+    if (input) {
+      input.addAsyncValidators(validator);
     }
   }
 
   addValidator(validator: ValidatorFn, control?: string) {
-    const _control = control
-      ? this.model.formGroup.get(control)
-      : this.model.formGroup;
+    const _control = control ? this.formGroup?.get(control) : this.formGroup;
     if (_control) {
       _control.addValidators(validator);
     }
@@ -190,25 +182,25 @@ export class NgxSmartFormComponent
 
   enableControls(controls: ControlsStateMap): void {
     for (const [key, entry] of Object.entries(controls)) {
-      this.model.formGroup.get(key)?.enable(entry);
+      this.formGroup?.get(key)?.enable(entry);
     }
   }
 
   addControl(name: string, control: AbstractControl): void {
-    if (this.model.formGroup.get(name)) {
-      this.model.formGroup.get(name)?.setValue(control.value);
+    if (this.formGroup?.get(name)) {
+      this.formGroup?.get(name)?.setValue(control.value);
     }
-    this.model.formGroup.addControl(name, control);
+    this.formGroup?.addControl(name, control);
   }
 
   getControl(name: string): AbstractControl | undefined {
-    return this.model.formGroup.get(name) ?? undefined;
+    return this.formGroup?.get(name) ?? undefined;
   }
 
   async onSubmit(event: Event) {
     event.preventDefault();
 
-    if (!this.model.formGroup) {
+    if (!this.formGroup) {
       return;
     }
 
@@ -217,22 +209,24 @@ export class NgxSmartFormComponent
 
     // wait the for status changes of the formgroup
     // to make sure ui update error message
-    const subscription = this.model.formGroup.statusChanges
+    const subscription = this.formGroup?.statusChanges
       .pipe(filter((status) => ['PENDING', 'DISABLED'].indexOf(status) === -1))
       .subscribe(() => this.cdRef?.detectChanges());
 
-    this.subscriptions.push(subscription);
+    if (subscription) {
+      this.subscriptions.push(subscription);
+    }
 
     // We simply return without performing any further action if the validation fails
     // Due to some issue with form group being invalid while all controls does not
     // have error, we are adding a check that verifies if all controls has error before
     // breaking out of the function
-    const errors = collectErrors(this.model.formGroup);
-    if (!this.model.formGroup.valid && errors.length > 0) {
+    const errors = collectErrors(this.formGroup);
+    if (!this.formGroup.valid && errors.length > 0) {
       return;
     }
 
-    const path = this.path ?? this.model.form.endpointURL;
+    const path = this.path ?? this.form.endpointURL;
     const clientDefined =
       typeof this.client !== 'undefined' && this.client !== null;
     const pathDefined = path !== null && path !== 'undefined';
@@ -265,7 +259,7 @@ export class NgxSmartFormComponent
         isRepeatable: current.isRepeatable ?? false,
       }));
       const form = { ...value, controlConfigs: controls };
-      this.updateModel(form, this.model.formGroup);
+      this.updateModel(form, this.formGroup);
     }
   }
 
@@ -282,11 +276,11 @@ export class NgxSmartFormComponent
   setControlConfig(config?: InputConfigInterface, name?: string) {
     if (config) {
       name = name ?? config.name;
-      const controls = [...(this.model.form.controlConfigs ?? [])];
+      const controls = [...(this.form.controlConfigs ?? [])];
       const index = controls.findIndex((current) => current.name === name);
       controls.splice(index, 1, config);
-      const form = { ...this.model.form, controlConfigs: controls };
-      this.updateModel(form, this.model.formGroup);
+      const form = { ...this.form, controlConfigs: controls };
+      this.updateModel(form, this.formGroup);
     }
   }
 
@@ -321,12 +315,12 @@ export class NgxSmartFormComponent
 
   private updateModel(f: FormConfigInterface, g?: FormGroup) {
     this.model.update(f, g);
-    if (this.model.formGroup) {
+    if (this.formGroup) {
       if (this.changeSubscription) {
         this.changeSubscription.unsubscribe();
       }
-      const subscription = this.model.formGroup.valueChanges.subscribe(
-        (value) => this.formGroupChange.emit(value)
+      const subscription = this.formGroup.valueChanges.subscribe((value) =>
+        this.formGroupChange.emit(value)
       );
       this.changeSubscription = subscription;
     }

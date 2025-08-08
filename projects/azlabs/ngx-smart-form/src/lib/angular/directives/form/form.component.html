@@ -1,12 +1,10 @@
 <ngx-form-ui
-  *ngIf="formGroup"
-  [formGroup]="formGroup"
   [template]="template"
   [add-template]="addTemplate"
   [label]="label"
   [autoupload]="autoupload"
   [no-grid-layout]="noGridLayout"
-  [inputs]="form.controlConfigs"
+  [state]="model.state"
 >
   <section before>
     <ng-content select="[before]"></ng-content>

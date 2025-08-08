@@ -1,16 +1,34 @@
-<ngx-form-array-outlet (removed)="handleRemoved($event)" [inputs]="inputs" [auto-upload]="autoupload"
-  [template]="template" [no-grid-layout]="noGridLayout" *ngIf="!cssClass.includes('table')"
-  #container></ngx-form-array-outlet>
+<ngx-form-array-outlet
+  (removed)="removed($event)"
+  [inputs]="inputs"
+  [auto-upload]="autoupload"
+  [template]="template"
+  [no-grid-layout]="noGridLayout"
+  [detached]="detached"
+  *ngIf="!cssClass.includes('table')"
+  #container
+></ngx-form-array-outlet>
 
-<!-- Add ngx-form-table -->
-<ngx-table-form (removed)="handleRemoved($event)" [inputs]="inputs" [auto-upload]="autoupload" [template]="template"
-  *ngIf="cssClass.includes('table')" #container></ngx-table-form>
+<ngx-table-form
+  (removed)="removed($event)"
+  [inputs]="inputs"
+  [auto-upload]="autoupload"
+  [template]="template"
+  [detached]="detached"
+  *ngIf="cssClass.includes('table')"
+  #container
+></ngx-table-form>
 
-<div *ngIf="!cssClass.includes('table') && refCount === 0" class="placeholder"></div>
-<ng-container *ngTemplateOutlet="
+<div
+  *ngIf="!cssClass.includes('table') && refCount === 0"
+  class="placeholder"
+></div>
+<ng-container
+  *ngTemplateOutlet="
     addGroupRef ? addGroupRef : addTemplate;
-    context: { $implicit: handleAddView.bind(this) }
-  "></ng-container>
+    context: { $implicit: add.bind(this) }
+  "
+></ng-container>
 
 <ng-template #addTemplate let-handler>
   <ngx-add-button (click)="handler($event)"></ngx-add-button>
