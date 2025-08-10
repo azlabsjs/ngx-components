@@ -8,6 +8,7 @@ import {
   InputConfigInterface,
   InputGroup,
   InputRequireIfConfig,
+  OptionsInput,
 } from '@azlabsjs/smart-form-core';
 import { isNumber } from '@azlabsjs/utilities';
 import {
@@ -16,13 +17,36 @@ import {
   ComputedInputValueConfigType,
 } from '../types';
 import { cloneAbstractControl } from './clone';
-import { Subject } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
+
+/** @internal */
+type Tuple = [k: string | number, control: AbstractControl | null];
+
+function before(haystack: string, char: string) {
+  const index = haystack.indexOf(char);
+  return index === -1 ? '' : haystack.substring(0, index);
+}
+
+function after(haystack: string, char: string) {
+  const index = haystack.indexOf(char);
+  return index === -1 ? '' : haystack.substring(index + char.length);
+}
 
 function isinputgroup(input: InputConfigInterface): input is InputGroup {
   return (
     typeof input === 'object' &&
     input !== null &&
     ((input as InputGroup).children ?? []).length > 0
+  );
+}
+
+function isoptionsinput(
+  config: InputConfigInterface
+): config is Required<OptionsInput> {
+  return (
+    'optionsConfig' in config &&
+    typeof (config as OptionsInput).optionsConfig === 'object' &&
+    (config as OptionsInput).optionsConfig !== null
   );
 }
 
@@ -48,7 +72,7 @@ function getinputgroupinputs(input: InputGroup) {
 }
 
 /** @internal */
-type ChangedInputStateType = { name: string; value: boolean }[];
+// type ChangedInputStateType = { name: string; value: boolean }[];
 
 /** @internal */
 function findarray<T extends AbstractControl>(g: T, keys: string[]) {
@@ -193,16 +217,6 @@ function hasleaf(input: InputConfigInterface): input is InputGroup {
     x.children &&
     x.children.length > 0
   );
-}
-
-function before(haystack: string, char: string) {
-  const index = haystack.indexOf(char);
-  return index === -1 ? '' : haystack.substring(0, index);
-}
-
-function after(haystack: string, char: string) {
-  const index = haystack.indexOf(char);
-  return index === -1 ? '' : haystack.substring(index + char.length);
 }
 
 // tslint:disable-next-line: typedef
@@ -810,4 +824,110 @@ export function collectErrors(control: AbstractControl) {
 
   // Return the list of error from the control element
   return errors;
+}
+
+export function querymutableinputs(inputs: Tuple[]) {
+  const names: [string, AbstractControl][] = [];
+  function resolve(items: Tuple[], root: string = '') {
+    for (const [n, control] of items) {
+      if (!control) {
+        continue;
+      }
+
+      if (control instanceof FormGroup) {
+        const controls = Object.keys(control.controls).map((k) => [
+          k,
+          control.get(k),
+        ]) as [string, AbstractControl][];
+
+        resolve(controls, root.trim() !== '' ? `${root}.${n}` : String(n));
+        continue;
+      }
+
+      const name = root.trim() !== '' ? `${root}.${n}` : String(n);
+      names.push([name, control]);
+    }
+  }
+
+  resolve(inputs);
+
+  return names;
+}
+
+/** @internal */
+export function withRefetchObservable(
+  inputs: InputConfigInterface[],
+  formgroup: FormGroup
+): InputConfigInterface[] {
+  for (const input of inputs) {
+    if (isinputgroup(input)) {
+      input.children = withRefetchObservable(input.children, formgroup);
+    }
+
+    if (
+      isoptionsinput(input) &&
+      'refetch' in input.optionsConfig &&
+      Array.isArray(input.optionsConfig['refetch'])
+    ) {
+      const { refetch } = input.optionsConfig;
+      input.optionsConfig.refetch = new Observable((subscriber) => {
+        const subscriptions: Subscription[] = [];
+        for (const item of refetch) {
+          // TODO: figure out how to subscribe to blur event
+          const { trigger, query } = item;
+          const { input: name, event: _ } =
+            typeof trigger === 'object' && trigger !== null
+              ? trigger
+              : { input: trigger, event: 'change' };
+
+          if (name.indexOf('*') !== -1) {
+            // we must listen for changes on a formarray
+            const str = before(name, '*');
+            const str2 = after(name, '*').substring(1);
+            const array: FormArray | null = findcontrol(
+              formgroup,
+              str.substring(0, str.length - 1)
+            );
+
+            if (array instanceof FormArray) {
+              const len = array.length;
+              for (let i = 0; i < len; i++) {
+                const at = array.at(i);
+                const c =
+                  str2.trim() !== '' && at instanceof FormGroup
+                    ? findcontrol(at, str2)
+                    : at;
+
+                if (c && query) {
+                  const subscription = c.valueChanges.subscribe((value) => {
+                    subscriber.next({ [query]: value });
+                  });
+
+                  subscriptions.push(subscription);
+                }
+              }
+            }
+          } else {
+            const c = findcontrol(formgroup, name);
+            const q = query ?? name;
+            if (c && query) {
+              const subscription = c.valueChanges.subscribe((value) => {
+                subscriber.next({ [q]: value });
+              });
+
+              subscriptions.push(subscription);
+            }
+          }
+        }
+
+        return () => {
+          for (const subscription of subscriptions) {
+            subscription?.unsubscribe();
+          }
+        };
+      });
+    }
+  }
+
+  return inputs;
 }

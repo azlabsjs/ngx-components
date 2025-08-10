@@ -276,10 +276,10 @@ export class NgxSmartFormComponent
   setControlConfig(config?: InputConfigInterface, name?: string) {
     if (config) {
       name = name ?? config.name;
-      const controls = [...(this.form.controlConfigs ?? [])];
-      const index = controls.findIndex((current) => current.name === name);
-      controls.splice(index, 1, config);
-      const form = { ...this.form, controlConfigs: controls };
+      const { controlConfigs: inputs } = this.form;
+      const index = inputs?.findIndex((current) => current.name === name);
+      inputs?.splice(index, 1, config);
+      const form = { ...this.form, controlConfigs: inputs };
       this.updateModel(form, this.formGroup);
     }
   }

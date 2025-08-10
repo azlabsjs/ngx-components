@@ -14,6 +14,12 @@
   </p>
 </div>
 <div class="container">
+  <h4>Ngx option input</h4>
+  <div fetchOptions [config]="fetchConfig" (optionsChange)="options = $event">
+    <pre>{{ options | json }}</pre>
+  </div>
+</div>
+<div class="container">
   <app-form-control></app-form-control>
 </div>
 <div class="container">

@@ -32,9 +32,17 @@ import {
 import {
   FileInput,
   FormConfigInterface,
+  InputOption,
   InputTypes,
 } from '@azlabsjs/smart-form-core';
-import { BehaviorSubject, filter, Subject, takeUntil, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  filter,
+  Observable,
+  Subject,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { TestPipe, TRANSLATE_PIPES } from './pipes';
 import { FORM_CONTROL_DIRECTIVES } from '@azlabsjs/ngx-clr-form-control';
 import { DIRECTIVES as GRID_DIRECTIVES } from '@azlabsjs/ngx-clr-smart-grid';
@@ -104,6 +112,24 @@ type ValuesType = typeof _values;
   standalone: false,
 })
 export class AppComponent implements OnInit {
+  options: InputOption[] = [];
+  fetchConfig = {
+    source: {
+      resource: 'http://127.0.0.1:3000/cities',
+      raw: 'http://127.0.0.1:3000/cities',
+    },
+    refetch: new Observable<{[k: string]: unknown}>((subscriber) => {
+      const interval = setInterval(() => {
+        const id = Math.floor(Math.random() * (3 - 1 + 1)) + 1;
+        subscriber.next({ country_id: id });
+      }, 30000);
+
+      return () => {
+        clearInterval(interval);
+      };
+    }),
+  };
+
   formControl = new FormControl<string | undefined>(undefined);
   input: FileInput = {
     uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',

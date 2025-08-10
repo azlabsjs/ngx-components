@@ -39,6 +39,7 @@ import {
 import { RouterModule } from '@angular/router';
 import { HTTPValuePipe, TRANSLATE_PIPES } from './pipes';
 import {
+  OPTIONS_DIRECTIVES,
   provideCacheConfig,
   provideQueryClient,
 } from '@azlabsjs/ngx-options-input';
@@ -82,6 +83,7 @@ export function createTranslateLoader() {
     ...TRANSLATE_PIPES,
     ...FORM_CONTROL_DIRECTIVES,
     ...FORM_DIRECTIVES,
+    ...OPTIONS_DIRECTIVES,
     FormControlComponent,
     NgxDropzoneModule.forRoot(),
   ],

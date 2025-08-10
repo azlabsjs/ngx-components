@@ -100,7 +100,6 @@ function rxRequest(
       body,
       options: {
         headers: _headers,
-        // withCredentials: true,
         responseType,
         interceptors,
       },
@@ -189,21 +188,18 @@ export function optionsQueryClient(
       optionsConfig: OptionsConfig & { name?: string },
       searchParams?: Record<string, unknown>
     ) => {
-      let _endpoint: string | undefined = endpoint;
       const { source, name } = optionsConfig;
       // We build the request query
       //#region For custom URL configurations, we attempt to build the final URL and update the
       // the resource entry if source property of the option configurations
-      let url = source.resource;
-      if (isCustomURL(url ?? '')) {
-        const hostConfig =
-          typeof queriesConfig?.queries !== 'undefined' &&
-          queriesConfig?.queries !== null &&
-          typeof name !== 'undefined' &&
-          name !== null
-            ? resolveURLHost(queriesConfig, name, _endpoint ?? '')
-            : _endpoint ?? '';
-        url = customToResourceURL(url, hostConfig);
+      let { resource: url } = source;
+      if (isCustomURL(url ?? '') && queriesConfig) {
+        const { queries } = queriesConfig;
+        const host =
+          typeof queries && name
+            ? resolveURLHost(queriesConfig, name, endpoint ?? '')
+            : endpoint ?? '';
+        url = customToResourceURL(url, host);
         url = url[0] === '/' ? url.substring(1) : url;
         optionsConfig = {
           ...optionsConfig,
@@ -213,8 +209,8 @@ export function optionsQueryClient(
       //#endregion
       const request = {
         ...optionsConfig,
-        url: createRequestURL(optionsConfig, _endpoint ?? ''),
-        searchParams,
+        url: createRequestURL(optionsConfig, endpoint ?? ''),
+        search: searchParams,
       };
       return _requestClient(
         request,
@@ -257,6 +253,7 @@ export function queryOptions(
     : {
         table_config: source.raw,
       };
+
   return rxRequest({
     url,
     method: 'GET',

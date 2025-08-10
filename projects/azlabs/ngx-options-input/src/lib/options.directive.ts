@@ -18,9 +18,17 @@ import {
   mapStringListToInputOptions,
   OptionsConfig,
 } from '@azlabsjs/smart-form-core';
-import { Subject, Subscription, from, lastValueFrom, of } from 'rxjs';
+import { Subject, from, lastValueFrom, of } from 'rxjs';
 import { debounceTime, first, map, switchMap, tap } from 'rxjs/operators';
-import { InputOptionsClient } from './types';
+import {
+  InputOptionsClient,
+  ObservableOptionsConfig,
+  OptionsConfigType,
+  QueryType,
+  Subscribable,
+  KeyType as _KeyType,
+  Subscription,
+} from './types';
 import { INPUT_OPTIONS_CLIENT, OPTIONS_CACHE } from './tokens';
 import { CacheType } from './cache';
 
@@ -39,6 +47,30 @@ export function createIntersectionObserver(
   return new IntersectionObserver(callback, options);
 }
 
+function isresource(source: OptionsConfig['source']) {
+  if (!source) {
+    return false;
+  }
+  const { resource, raw } = source;
+  return (
+    isCustomURL(resource) ||
+    isValidHttpUrl(resource) ||
+    (raw.match(/table:/) && raw.match(/keyfield:/))
+  );
+}
+
+function isobservable(o: OptionsConfigType): o is ObservableOptionsConfig {
+  return (
+    typeof o === 'object' &&
+    o !== null &&
+    'refetch' in o &&
+    'refetch' in o &&
+    typeof o['refetch'] === 'object' &&
+    typeof (o['refetch'] as ObservableOptionsConfig['refetch']).subscribe ===
+      'function'
+  );
+}
+
 @Directive({
   standalone: true,
   selector: '[fetchOptions]',
@@ -46,11 +78,22 @@ export function createIntersectionObserver(
 export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   //#region directive inputs
   @Input() loaded!: boolean;
-  @Input({ alias: 'config' }) options!: OptionsConfig | undefined;
   @Input() name!: string;
   @Input() auto: boolean = true;
   @Input({ alias: 'query' }) search: string = 'label';
   @Input({ alias: 'limit' }) limit!: number;
+  private _options!: OptionsConfigType | undefined;
+  @Input({ alias: 'config' }) set options(
+    value: OptionsConfigType | undefined
+  ) {
+    this._options = value;
+    if (value && isobservable(value)) {
+      this.observable = value.refetch;
+    }
+  }
+  get options() {
+    return this._options;
+  }
   //#endregion
 
   //#region directive outputs
@@ -60,10 +103,13 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
 
   // directive properties
   private observer!: IntersectionObserver;
-  _search$ = new Subject<[Record<string, unknown>, OptionsConfig]>();
-  private _subscriptions: Subscription[] = [];
+  search$ = new Subject<
+    [_KeyType, Omit<OptionsConfigType, 'refetch'>, QueryType]
+  >();
+  private subscriptions: Subscription[] = [];
+  private observable!: Subscribable<{ [k: string]: unknown }>;
 
-  // Directive constructor
+  // directive constructor
   constructor(
     private elemRef: ElementRef,
     @Inject(INPUT_OPTIONS_CLIENT) private client: InputOptionsClient,
@@ -72,25 +118,24 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     @Optional()
     private cache: CacheType<Record<string, unknown>, InputOptions>
   ) {
-    this._subscriptions.push(
-      this._search$
+    this.subscriptions.push(
+      this.search$
         .asObservable()
         .pipe(
           debounceTime(500),
-          switchMap(([params, options]) => {
-            const key: Record<string, unknown> = { ...options, ...params };
+          switchMap(([key, options, params]) => {
             const result = this.cache.get(key);
             return result
               ? of({ key, params, options, values: result })
-              : from(this.sendRequest(options, params)).pipe(
+              : from(this.sendRequest(options as OptionsConfig, params)).pipe(
                   map((values) => ({ key, params, options, values }))
                 );
           }),
           tap((state) => {
             const { key, options, params, values } = state;
-            // Put value into cache and configure the update fonction to equal
+            // put value into cache and configure the update fonction to equal
             this.cache.put(key, values, (_values) => {
-              return this.sendRequest(options, params);
+              return this.sendRequest(options as OptionsConfig, params);
             });
             this.loadingChange.emit(false);
             this.optionsChange.emit(values);
@@ -104,7 +149,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     if (this.auto) {
       const { defaultView } = this.document ?? ({} as Document);
       const view = defaultView as any;
-      // If The intersection API is missing we execute the load query
+      // if intersection API is missing we execute the load query
       // When the view initialize
       view &&
       !('IntersectionObserver' in view) &&
@@ -113,32 +158,44 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
         ? this.query()
         : this.observeView();
     }
+
+    // subscribe to observable
+    if (this.observable) {
+      const subscription = this.observable.subscribe((value) => {
+        this.fetch(undefined, value);
+      });
+
+      this.subscriptions.push(subscription);
+    }
   }
 
-  /**
-   * @internal a private API method that might not be used externally
-   */
+  /** @internal a private API method that might not be used externally */
   async query() {
-    if (
-      this.loaded ||
-      typeof this.options === 'undefined' ||
-      this.options === null
-    ) {
+    const { loaded, options } = this;
+    if (loaded || typeof options === 'undefined' || options === null) {
       return;
     }
+
     this.loadingChange.emit(true);
-    return isCustomURL(this.options.source.resource) ||
-      isValidHttpUrl(this.options.source.resource) ||
-      (this.options.source.raw.match(/table:/) &&
-        this.options.source.raw.match(/keyfield:/))
-      ? this.fetchAsync(this.options)
-      : this.fetchSync(this.options);
+
+    const { source } = options;
+    if (isresource(source)) {
+      return this.fetchAsync(options);
+    }
+
+    return this.fetchSync(options);
   }
 
-  fetch(value?: string) {
-    if (typeof this.options !== 'undefined' && this.options !== null) {
+  fetch(value?: string, query?: { [k: string]: unknown }) {
+    const { options, search } = this;
+    if (typeof options !== 'undefined' && options !== null) {
       this.loadingChange.emit(true);
-      this.fetchAsync(this.options, value ? { [this.search]: value } : {});
+      let queryParam = query ?? {};
+      if (value) {
+        queryParam[search] = value;
+      }
+
+      this.fetchAsync(options, queryParam);
     }
   }
 
@@ -146,8 +203,8 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     if (this.observer) {
       this.observer.disconnect();
     }
-    // We create an intersection observer that execute load query
-    // when the HTML element is intersecting
+    // we create an intersection observer that execute
+    // load query when the html element is intersecting
     this.observer = createIntersectionObserver((entries, _) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -155,28 +212,32 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
         }
       });
     });
+
     this.observer.observe(this.elemRef.nativeElement);
   }
 
-  private fetchSync(options: OptionsConfig) {
+  private fetchSync(options: OptionsConfigType) {
+    options;
     this.loadingChange.emit(false);
     this.optionsChange.emit(mapStringListToInputOptions(options.source.raw));
   }
 
   /** @interal */
   private async fetchAsync(
-    options: OptionsConfig,
+    options: OptionsConfigType,
     params: Record<string, unknown> = {}
   ) {
-    this._search$.next([
+    const query =
       typeof this.limit !== 'undefined' && this.limit !== null
         ? { page: 1, per_page: this.limit, ...params }
-        : { ...params },
-      options,
-    ]);
+        : { ...params };
+    const { refetch, ...rest } = options;
+    const key = { ...rest, ...params };
+
+    // dispatch search query
+    this.search$.next([key, rest, query]);
   }
 
-  /** @internal */
   private sendRequest(options: OptionsConfig, params: Record<string, unknown>) {
     return lastValueFrom(
       this.client.request({ ...options, name: this.name }, params).pipe(
@@ -194,10 +255,10 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Disconnect from the observer
+    // disconnect from the observer
     this.observer?.disconnect();
 
-    for (const subscripton of this._subscriptions) {
+    for (const subscripton of this.subscriptions) {
       subscripton.unsubscribe();
     }
   }

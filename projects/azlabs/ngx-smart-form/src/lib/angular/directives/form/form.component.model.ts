@@ -11,8 +11,10 @@ import {
   ComponentReactiveFormHelpers,
   createComputableDepencies,
   pickcontrol,
+  querymutableinputs,
   setFormValue,
   useSupportedAggregations,
+  withRefetchObservable,
 } from '../../helpers';
 import { memoize } from '@azlabsjs/functional';
 import {
@@ -34,33 +36,7 @@ const aggregations = useSupportedAggregations();
 /** @internal */
 type Tuple = [k: string | number, control: AbstractControl | null];
 
-function querymutableinputs(inputs: Tuple[]) {
-  const names: [string, AbstractControl][] = [];
-  function resolve(items: Tuple[], root: string = '') {
-    for (const [n, control] of items) {
-      if (!control) {
-        continue;
-      }
 
-      if (control instanceof FormGroup) {
-        const controls = Object.keys(control.controls).map((k) => [
-          k,
-          control.get(k),
-        ]) as [string, AbstractControl][];
-
-        resolve(controls, root.trim() !== '' ? `${root}.${n}` : String(n));
-        continue;
-      }
-
-      const name = root.trim() !== '' ? `${root}.${n}` : String(n);
-      names.push([name, control]);
-    }
-  }
-
-  resolve(inputs);
-
-  return names;
-}
 
 @Injectable()
 export class FormModel implements OnDestroy {
@@ -98,23 +74,19 @@ export class FormModel implements OnDestroy {
   update(f: FormConfigInterface, formgroup?: FormGroup) {
     // each type form configuration changes, we set the list of computed properties
     const { controlConfigs: inputs } = f;
+    const initialized = !formgroup;
     this.computedInputs = memoizedComputeProperties(inputs, aggregations);
 
-    // we create an instance of angular Reactive Formgroup instance from input configurations
-    // if formgroup parameter is null or undefined
     if (!formgroup) {
-      const { builder, value } = this;
+      const { builder } = this;
       formgroup = builder.group(f);
-      // we only initialy set the form state to initialize component when we create
-      // a new form group instance because, the next time this function is called
-      // `form` and `formGroup` will have initial values
-      this.setFormState(f, formgroup);
-
-      // in case state property of the current component is defined, we set the value of the
-      if (value) {
-        this.setValue(value);
-      }
     }
+
+    if (initialized && this.value) {
+      this.setValue(this.value);
+    }
+
+    this.setFormState(f, formgroup);
 
     // we unregister from previous event each time we set the form value
     this.unsubscribe();
@@ -309,11 +281,16 @@ export class FormModel implements OnDestroy {
     }
   }
 
-  private setFormState(f: FormConfigInterface, g?: FormGroup) {
-    this._form = this._form ? { ...this._form, ...f } : f;
-    if (g) {
-      this._formGroup = g;
-    }
+  private setFormState(f: FormConfigInterface, g: FormGroup) {
+    this._formGroup = g;
+    const form = this._form ? { ...this._form, ...f } : f;
+    this._form = {
+      ...form,
+      controlConfigs: withRefetchObservable(
+        form.controlConfigs,
+        this._formGroup
+      ),
+    };
     this._detectChanges$.next();
   }
 

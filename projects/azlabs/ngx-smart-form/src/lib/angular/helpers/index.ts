@@ -10,8 +10,6 @@ export {
 
 export {
   bindingsFactory,
-  // setHiddenPropertyFactory,
-  // setInputsProperties,
   setFormValue,
   createSetValue as setPropertyFactory,
   getPropertyValue,
@@ -19,8 +17,11 @@ export {
   useSupportedAggregations,
   pickcontrol,
   pickconfig,
-  findparent as findAbstractControlParent,
+  findparent,
   collectErrors,
+  findcontrol,
+  withRefetchObservable,
+  querymutableinputs
 } from './core';
 
 export { useBearerTokenInterceptor } from './interceptors';

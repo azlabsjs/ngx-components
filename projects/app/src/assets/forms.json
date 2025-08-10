@@ -180,6 +180,70 @@
       },
       {
         "formId": 220,
+        "controlName": "country",
+        "controlIndex": 8,
+        "required": true,
+        "disabled": false,
+        "readonly": false,
+        "unique": false,
+        "isRepeatable": false,
+        "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-3",
+        "id": 1240,
+        "label": "PAYS",
+        "placeholder": "...",
+        "type": "select",
+        "classes": "clr-input",
+        "selectableModel": "http://127.0.0.1:3000/countries",
+        "exists": {
+          "url": "http://127.0.0.1:3000/countries",
+          "conditions": []
+        },
+        "keyfield": "id",
+        "valuefield": "name",
+        "groupfield": "id"
+      },
+      {
+        "formId": 220,
+        "controlName": "city",
+        "controlIndex": 8,
+        "required": true,
+        "disabled": false,
+        "readonly": false,
+        "unique": false,
+        "isRepeatable": false,
+        "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-3",
+        "id": 1240,
+        "label": "VILLE",
+        "placeholder": "...",
+        "type": "select",
+        "classes": "clr-input",
+        "selectableModel": {
+          "source": {
+            "resource": "http://127.0.0.1:3000/cities",
+            "raw": "http://127.0.0.1:3000/cities",
+            "params": {
+              "keyBy": "id",
+              "groupBy": "id",
+              "valueBy": "label"
+            }
+          },
+          "refetch": [
+            {
+              "trigger": "country",
+              "query": "country_id"
+            }
+          ]
+        },
+        "exists": {
+          "url": "http://127.0.0.1:3000/cities",
+          "conditions": []
+        },
+        "keyfield": "id",
+        "valuefield": "name",
+        "groupfield": "id"
+      },
+      {
+        "formId": 220,
         "controlName": "phonenumber",
         "controlIndex": 8,
         "required": true,
