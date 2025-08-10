@@ -36,8 +36,6 @@ const aggregations = useSupportedAggregations();
 /** @internal */
 type Tuple = [k: string | number, control: AbstractControl | null];
 
-
-
 @Injectable()
 export class FormModel implements OnDestroy {
   _detectChanges$ = new Subject<void>();

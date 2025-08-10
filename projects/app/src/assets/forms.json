@@ -492,7 +492,6 @@
             "classes": "clr-input",
             "maxLength": 100,
             "multiple": 0,
-            "requiredIf": "category_id:1",
             "options": [],
             "children": []
           },
