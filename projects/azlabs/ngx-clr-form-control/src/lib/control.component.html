@@ -30,7 +30,7 @@
 
             <small
               class="required-text"
-              *ngIf="config.rules?.isRequired ?? !!config.constraints?.required"
+              *ngIf="config.rules?.isRequired ?? (config | required)"
             >
               (*)
             </small>
@@ -91,10 +91,7 @@
           ></ng-container>
           <small
             class="required-text"
-            *ngIf="
-              inputConfig.rules?.isRequired ??
-              !!inputConfig.constraints?.required
-            "
+            *ngIf="inputConfig.rules?.isRequired ?? (inputConfig | required)"
           >
             (*)
           </small>
@@ -130,10 +127,7 @@
             ></ng-container>
             <span
               class="required-text"
-              *ngIf="
-                inputConfig.rules?.isRequired ??
-                !!inputConfig.constraints?.required
-              "
+              *ngIf="inputConfig.rules?.isRequired ?? (inputConfig | required)"
             >
               (*)
             </span>
@@ -217,9 +211,7 @@
               ></ng-container>
               <span
                 class="required-text"
-                *ngIf="
-                  config.rules?.isRequired ?? !!config.constraints?.required
-                "
+                *ngIf="config.rules?.isRequired ?? (config | required)"
               >
                 (*)
               </span>
@@ -279,9 +271,7 @@
                 ></ng-container>
                 <span
                   class="required-text"
-                  *ngIf="
-                    config.rules?.isRequired ?? !!config.constraints?.required
-                  "
+                  *ngIf="config.rules?.isRequired ?? (config | required)"
                 >
                   (*)
                 </span>
@@ -342,9 +332,7 @@
                 ></ng-container>
                 <span
                   class="required-text"
-                  *ngIf="
-                    config.rules?.isRequired ?? !!config.constraints?.required
-                  "
+                  *ngIf="config.rules?.isRequired ?? (config | required)"
                 >
                   (*)
                 </span>
@@ -418,9 +406,7 @@
                 ></ng-container>
                 <span
                   class="required-text"
-                  *ngIf="
-                    config.rules?.isRequired ?? !!config.constraints?.required
-                  "
+                  *ngIf="config.rules?.isRequired ?? (config | required)"
                 >
                   (*)
                 </span>
@@ -481,9 +467,7 @@
               ></ng-container>
               <span
                 class="required-text"
-                *ngIf="
-                  config.rules?.isRequired ?? !!config.constraints?.required
-                "
+                *ngIf="config.rules?.isRequired ?? (config | required)"
               >
                 (*)
               </span>
@@ -534,10 +518,7 @@
           ></ng-container>
           <small
             class="required-text"
-            *ngIf="
-              inputConfig.rules?.isRequired ??
-              !!inputConfig.constraints?.required
-            "
+            *ngIf="inputConfig.rules?.isRequired ?? (inputConfig | required)"
           >
             (*)
           </small>
@@ -592,8 +573,7 @@
                 <small
                   class="required-text"
                   *ngIf="
-                    inputConfig.rules?.isRequired ??
-                    !!inputConfig.constraints?.required
+                    inputConfig.rules?.isRequired ?? (inputConfig | required)
                   "
                 >
                   (*)
@@ -690,7 +670,7 @@
             ></ng-container>
             <small
               class="required-text"
-              *ngIf="config.rules?.isRequired ?? !!config.constraints?.required"
+              *ngIf="config.rules?.isRequired ?? (config | required)"
             >
               (*)
             </small>

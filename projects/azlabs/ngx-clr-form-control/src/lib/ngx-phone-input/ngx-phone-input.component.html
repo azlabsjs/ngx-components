@@ -1,27 +1,50 @@
 <ng-container *ngIf="state">
-  <ngx-intl-tel-input *ngIf="control" [disabled]="state.disabled" (error)="onError($event, control.value)"
-    (valueChange)="control.setValue($event)" [value]="state.value ?? ''" (blur)="onBlur($event)"
-    (focus)="onFocus($event)" [class]="cssClass" [required]="config.rules?.isRequired ?? !!config.constraints?.required"
-    [preferredCountries]="preferredCountries" [country]="'tg'" [name]="config.name">
-    <ng-template #input let-keypress="keypress" let-selected="selected" let-change="change" let-required="required"
-      let-disabled="disabled" let-value="value">
-      <ng-container *ngTemplateOutlet="
-        inputRef;
-        context: {
-          value,
-          keypress,
-          selected,
-          required,
-          disabled,
-          config,
-          change: change,
-          onBlur: onBlur.bind(this),
-          onFocus: onFocus.bind(this)
-        }
-      "></ng-container>
+  <ngx-intl-tel-input
+    *ngIf="control"
+    [disabled]="state.disabled"
+    (error)="onError($event, control.value)"
+    (valueChange)="control.setValue($event)"
+    [value]="state.value ?? ''"
+    (blur)="onBlur($event)"
+    (focus)="onFocus($event)"
+    [class]="cssClass"
+    [required]="config.rules?.isRequired ?? (config | required)"
+    [preferredCountries]="preferredCountries"
+    [country]="'tg'"
+    [name]="config.name"
+  >
+    <ng-template
+      #input
+      let-keypress="keypress"
+      let-selected="selected"
+      let-change="change"
+      let-required="required"
+      let-disabled="disabled"
+      let-value="value"
+    >
+      <ng-container
+        *ngTemplateOutlet="
+          inputRef;
+          context: {
+            value,
+            keypress,
+            selected,
+            required,
+            disabled,
+            config,
+            change: change,
+            onBlur: onBlur.bind(this),
+            onFocus: onFocus.bind(this)
+          }
+        "
+      ></ng-container>
     </ng-template>
   </ngx-intl-tel-input>
 </ng-container>
 
 <!-- Conntrol description -->
-<span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="config!.description || '' | trustHtml"></span>
+<span
+  [class]="'input__subtext'"
+  *ngIf="describe"
+  [innerHTML]="config!.description || '' | trustHtml"
+></span>

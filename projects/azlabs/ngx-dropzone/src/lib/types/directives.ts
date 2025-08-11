@@ -18,7 +18,7 @@ export interface DropzoneComponentInterface extends DropzoneDirectiveInterface {
   dropzone(): Dropzone;
 
   /**
-   * @description Defines the disabled state of the dropzone component object
+   * @description defines the disabled state of the dropzone component object
    */
   disabled: boolean;
 }

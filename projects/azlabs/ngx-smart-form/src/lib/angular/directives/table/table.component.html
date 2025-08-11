@@ -1,12 +1,9 @@
 <table class="table table-compact">
   <thead>
     <tr>
-      <th *ngFor="let i of configs" class="left">
-        <span>{{ i.label | text }}</span>
-        <small
-          class="required"
-          *ngIf="i.rules?.isRequired ?? !!i.constraints?.required"
-        >
+      <th *ngFor="let item of configs" class="left">
+        <span>{{ item.label | text }}</span>
+        <small class="required" *ngIf="item.rules?.isRequired ?? (item | required)">
           (*)
         </small>
       </th>
@@ -44,7 +41,9 @@
               value: input,
               autoupload,
               describe: false,
-              hidden: (input | isHidden) || (control | inarray : detached: input.name)
+              hidden:
+                (input | isHidden) ||
+                (control | inarray : detached : input.name)
             }
           "
         ></ng-container>

@@ -12,15 +12,15 @@ import {
 import { from, lastValueFrom } from 'rxjs';
 import { RequestClient } from '../../http';
 
-/** @description Async constraint type declaration */
+/** @description async constraint type declaration */
 export type AsyncConstraint<T = boolean> = {
   query?: string;
   /**
-   * Constraint handler function
+   * constraint handler function
    */
   fn: string | ((control: string, value: unknown) => T | Promise<T>);
   /**
-   * Provides the list of conditions applied on properties of the return value of the
+   * provides the list of conditions applied on properties of the return value of the
    * `fn` function.
    */
   conditions?: string[] | ((result: unknown, source: unknown) => boolean);
@@ -51,7 +51,7 @@ function restQueryFactory(
 }
 
 /**
- * Creates an existance validation function
+ * creates an existance validation function
  */
 export function existsValidator(
   requestClient: RequestClient,
@@ -86,7 +86,7 @@ export function existsValidator(
 }
 
 /**
- * Creates a unique validation function
+ * creates a unique validation function
  */
 export function uniqueValidator(
   requestClient: RequestClient,
@@ -121,7 +121,7 @@ export function uniqueValidator(
 }
 
 /**
- * Creates an equals validation function
+ * creates an equals validation function
  */
 export function equalsValidator(name: string) {
   return (control: AbstractControl) => {
@@ -170,7 +170,7 @@ export function equalsValidator(name: string) {
 }
 
 /**
- * Creates a pattern validation function
+ * creates a pattern validation function
  */
 export function patternValidator(pattern: string) {
   return (control: AbstractControl) => {

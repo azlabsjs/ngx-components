@@ -211,6 +211,7 @@
         "readonly": false,
         "unique": false,
         "isRepeatable": false,
+        "disabledIf": "country:__empty__",
         "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-3",
         "id": 1240,
         "label": "VILLE",

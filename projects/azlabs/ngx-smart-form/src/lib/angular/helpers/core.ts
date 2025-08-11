@@ -7,13 +7,15 @@ import {
 import {
   InputConfigInterface,
   InputGroup,
-  InputRequireIfConfig,
+  Conditional,
   OptionsInput,
+  RequiredIfConstraint,
+  DisabledIfConstraint,
 } from '@azlabsjs/smart-form-core';
 import { isNumber } from '@azlabsjs/utilities';
 import {
   AngularReactiveFormBuilderBridge,
-  BindingInterface,
+  Condition,
   ComputedInputValueConfigType,
 } from '../types';
 import { cloneAbstractControl } from './clone';
@@ -179,8 +181,8 @@ export function setFormGroupValue(
   }
 }
 
-/** @internal check if the input should be hidden or not */
-function isHidden(values: unknown[], value: unknown) {
+/** @internal check if the input should matches any of the provided values or conditions */
+function matchany(value: unknown, values: unknown[]) {
   if (values.includes('*')) {
     return !(
       typeof value !== 'undefined' &&
@@ -219,55 +221,95 @@ function hasleaf(input: InputConfigInterface): input is InputGroup {
   );
 }
 
-// tslint:disable-next-line: typedef
-export function bindingsFactory(inputs: InputConfigInterface[]) {
-  return (g: FormGroup) => {
-    const b: Map<string, BindingInterface> = new Map();
-    if (Array.isArray(inputs) && inputs.length !== 0 && g) {
-      const result: [
-        string,
-        Omit<InputConfigInterface, 'requiredIf'> & {
-          requiredIf: InputRequireIfConfig;
-        }
-      ][] = [];
-      function findmatches(
-        values: InputConfigInterface[],
-        parent?: string,
-        repeatable: boolean = false
-      ) {
-        for (const v of values) {
-          if (hasleaf(v)) {
-            const label = parent ? `${parent}.${v.name}` : v.name;
-            findmatches(v.children, label, v.isRepeatable ?? false);
-          }
+// @internal conditial properties
+const CONDITION_PROPERTIES = ['requiredIf', 'disabledIf'] as const;
+type ConditionProperty = (typeof CONDITION_PROPERTIES)[number];
+type Nullable<T> = T | undefined | null;
+type ClauseFn = (
+  control: AbstractControl,
+  name: string,
+  parent: FormGroup | null
+) => void;
 
-          const { requiredIf } = v;
-          if (requiredIf) {
-            let { name } = v;
-            if (parent) {
-              name = `${parent}${repeatable ? '.*' : ''}.${v.name}`;
-            }
-            result.push([name, { ...v, requiredIf }]);
-          }
-        }
+function findconditions(
+  inputs: InputConfigInterface[],
+  prop: ConditionProperty
+) {
+  const conditions: [string, Conditional][] = [];
+  function isconditional(
+    property: ConditionProperty,
+    constraint: InputConfigInterface['constraints']
+  ): constraint is RequiredIfConstraint & DisabledIfConstraint {
+    if (!constraint) {
+      return false;
+    }
+    return (
+      CONDITION_PROPERTIES.indexOf(property) !== -1 && property in constraint
+    );
+  }
+
+  function search(
+    property: ConditionProperty,
+    values: InputConfigInterface[],
+    parent?: string,
+    repeatable: boolean = false
+  ) {
+    for (const v of values) {
+      if (hasleaf(v)) {
+        const label = parent ? `${parent}.${v.name}` : v.name;
+        search(property, v.children, label, v.isRepeatable ?? false);
       }
 
-      findmatches(inputs);
+      let cond: Conditional | undefined | null;
+      if (v.constraints) {
+        const { constraints } = v;
 
-      for (const [name, inputConfig] of result) {
+        cond = isconditional(property, constraints)
+          ? (constraints[property] as Conditional)
+          : undefined;
+      }
+
+      if (!cond) {
+        const { [property]: condition } = v;
+        cond = condition;
+      }
+
+      if (cond) {
+        let { name } = v;
+        if (parent) {
+          name = `${parent}${repeatable ? '.*' : ''}.${v.name}`;
+        }
+        conditions.push([name, cond]);
+      }
+    }
+  }
+
+  search(prop, inputs);
+
+  return conditions;
+}
+
+export function useCondition(
+  prop: ConditionProperty,
+  then: ClauseFn,
+  _else: ClauseFn,
+  query?: (name: string) => AbstractControl | null
+) {
+  return (inputs: InputConfigInterface[]) => {
+    const items: Condition[] = [];
+    if (Array.isArray(inputs) && inputs.length !== 0) {
+      const conditions = findconditions(inputs, prop);
+      for (const [name, condition] of conditions) {
         const position = name.indexOf('*');
-        const { requiredIf } = inputConfig;
-        b.set(name, {
-          isdependency: (p) => {
+        items.push({
+          match: (p) => {
             if (position !== -1) {
-              const str = before(requiredIf.name, '*');
+              const str = before(condition.name, '*');
               return p.trim().startsWith(str.substring(0, str.length - 1));
             }
-            return String(p) === String(requiredIf.name);
+            return String(p) === String(condition.name);
           },
-          binding: requiredIf,
           dependencyChanged: (
-            detached: Map<string, AbstractControl>,
             formgroup: FormGroup,
             property: string,
             value: unknown
@@ -276,7 +318,7 @@ export function bindingsFactory(inputs: InputConfigInterface[]) {
               [string, AbstractControl][],
               [string, AbstractControl][]
             ] = [[], []];
-            const params = requiredIf.values ?? [];
+            const params = condition.values ?? [];
             // case the selector key contains * and dependecy key starts with selector
             // then the control is the control at the same index having the property after *
             let str = before(name, '*');
@@ -296,7 +338,7 @@ export function bindingsFactory(inputs: InputConfigInterface[]) {
               }
 
               const input = after(name, `${str}.*.`).trim();
-              const dependency = after(requiredIf.name, `${str}.*.`).trim();
+              const dependency = after(condition.name, `${str}.*.`).trim();
 
               for (let index = 0; index < parent.length; index++) {
                 const item = parent.at(index);
@@ -304,9 +346,9 @@ export function bindingsFactory(inputs: InputConfigInterface[]) {
                   continue;
                 }
 
-                let obselete: boolean = false;
+                let truthy: boolean = false;
                 let name: string;
-                let control: AbstractControl | undefined | null = null;
+                let control: Nullable<AbstractControl> = null;
                 const dep =
                   item instanceof FormGroup
                     ? findcontrol(item, dependency)
@@ -315,17 +357,17 @@ export function bindingsFactory(inputs: InputConfigInterface[]) {
                 if (item instanceof FormGroup) {
                   control = findcontrol(item, input);
                   name = `${str}.${index}.${input}`;
-                  obselete = isHidden(params, dep?.value);
+                  truthy = matchany(dep?.value, params);
                 } else {
                   control = item;
                   name = `${str}.${index}`;
-                  obselete = isHidden(params, value);
+                  truthy = matchany(value, params);
                 }
 
                 // case we cannot select from the formgroup,
                 // we try to locate it from the detached controls
-                if (!control) {
-                  control = detached.get(name);
+                if (!control && !!query) {
+                  control = query(name);
                 }
 
                 // case the control value is not defined, we ignore adding
@@ -337,29 +379,17 @@ export function bindingsFactory(inputs: InputConfigInterface[]) {
                 const found = findparent(formgroup, name);
                 const paths = name.split('.');
                 const path = paths[paths.length - 1];
-                if (!obselete) {
-                  // we add the control to the parent if it's missing
-                  const control = detached.get(name);
-                  if (!found?.get(path) && control) {
-                    found?.addControl(path, control);
+                if (!truthy) {
+                  then(control, path, found);
+                  if (control) {
                     output[0].push([name, control]);
-                  }
-
-                  // remove the control from the detached list of controls
-                  if (detached.has(name)) {
-                    detached.delete(name);
                   }
                 } else {
                   // remove the control from the parent if it exists
                   const at = found?.get(path);
+                  _else(control, path, found);
                   if (at) {
-                    found?.removeControl(path);
                     output[1].push([name, at]);
-                  }
-
-                  // if name does not exist in detached, set name value to control
-                  if (!detached.has(name)) {
-                    detached.set(name, control);
                   }
                 }
               }
@@ -369,16 +399,15 @@ export function bindingsFactory(inputs: InputConfigInterface[]) {
             }
 
             // case we are not handling form array
-            let control = findcontrol(g, name);
-            const obselete = isHidden(params, value);
-            // case we cannot select from the formgroup, we try to locate
-            // it from the detached controls
-            if (!control) {
-              control = detached.get(name) ?? null;
+            let control = findcontrol(formgroup, name);
+            const truthy = matchany(value, params);
+
+            // case we cannot select from the formgroup, we try to locate it using the query function
+            if (!control && !!query) {
+              control = query(name);
             }
 
-            // case the control value is not defined, we ignore adding
-            // or removing control from detached controls
+            // case the control value is not defined, we do not proceed any further
             if (!control) {
               return output;
             }
@@ -396,25 +425,15 @@ export function bindingsFactory(inputs: InputConfigInterface[]) {
               parent = formgroup;
             }
 
-            if (!obselete) {
-              const control = detached.get(name);
-              if (!parent?.get(path) && control) {
-                parent?.addControl(path, control);
+            if (!truthy) {
+              then(control, path, parent);
+              if (control) {
                 output[0].push([name, control]);
               }
-
-              if (detached.has(name)) {
-                detached.delete(name);
-              }
             } else {
-              const at = parent?.get(path);
-              if (at) {
-                parent?.removeControl(path);
-                output[1].push([name, at]);
-              }
-
-              if (!detached.has(name)) {
-                detached.set(name, control);
+              _else(control, path, parent);
+              if (control) {
+                output[1].push([name, control]);
               }
             }
 
@@ -424,7 +443,7 @@ export function bindingsFactory(inputs: InputConfigInterface[]) {
       }
     }
 
-    return b;
+    return items;
   };
 }
 
@@ -826,7 +845,7 @@ export function collectErrors(control: AbstractControl) {
   return errors;
 }
 
-export function querymutableinputs(inputs: Tuple[]) {
+export function flatteninputs(inputs: Tuple[]) {
   const names: [string, AbstractControl][] = [];
   function resolve(items: Tuple[], root: string = '') {
     for (const [n, control] of items) {

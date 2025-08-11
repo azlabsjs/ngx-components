@@ -133,6 +133,21 @@ export class InArrayPipe implements PipeTransform {
   }
 }
 
+@Pipe({
+  name: 'required',
+  pure: true,
+  standalone: true,
+})
+export class RequiredPipe implements PipeTransform {
+  transform(value: InputConfigInterface) {
+    return (
+      !!value.constraints &&
+      'required' in value.constraints &&
+      !!value.constraints.required
+    );
+  }
+}
+
 /** @description exported pipes */
 export const PIPES = [
   SafeHTMLPipe,
@@ -144,4 +159,5 @@ export const PIPES = [
   KeysPipe,
   AsInputConfigArray,
   InArrayPipe,
+  RequiredPipe,
 ] as const;

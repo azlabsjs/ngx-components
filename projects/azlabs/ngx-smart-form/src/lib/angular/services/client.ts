@@ -14,7 +14,7 @@ import { CACHE_PROVIDER } from '../tokens';
   providedIn: 'any',
 })
 export class JSONFormsClient implements FormsClient {
-  /** @description Creates an instance of JSONFormsClient class */
+  /** @description creates an instance of forms client */
   constructor(@Inject(CACHE_PROVIDER) private provider: CacheProvider) {}
 
   get(id: string | number): Observable<FormConfigInterface> {

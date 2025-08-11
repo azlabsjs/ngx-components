@@ -1,4 +1,4 @@
-export { BindingInterface, DetachedInputType } from './bindings';
+export { Condition, DetachedInputType } from './bindings';
 
 export {
   ControlsStateMap,

@@ -2,16 +2,16 @@ import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import {
   AngularReactiveFormBuilderBridge,
-  BindingInterface,
+  Condition,
   ComputedInputValueConfigType,
 } from '../../types';
 import { FormConfigInterface } from '@azlabsjs/smart-form-core';
 import {
-  bindingsFactory,
+  useCondition,
   ComponentReactiveFormHelpers,
   createComputableDepencies,
   pickcontrol,
-  querymutableinputs,
+  flatteninputs,
   setFormValue,
   useSupportedAggregations,
   withRefetchObservable,
@@ -29,10 +29,8 @@ import { FormModelState } from './types';
 
 /** @internal */
 const memoizedComputeProperties = memoize(createComputableDepencies);
-
 /** @internal */
 const aggregations = useSupportedAggregations();
-
 /** @internal */
 type Tuple = [k: string | number, control: AbstractControl | null];
 
@@ -90,29 +88,89 @@ export class FormModel implements OnDestroy {
     this.unsubscribe();
 
     const { controlConfigs: values } = this._form;
-    const factory = bindingsFactory(values ?? []);
-    const b = factory(this._formGroup);
+    const required = useCondition(
+      'requiredIf',
+      // case condition evaluates to true, add the control to it parent
+      (control, name, parent) => {
+        if (parent && !parent.get(name) && control) {
+          parent?.addControl(name, control);
+        }
 
-    this.registerDependenciesChanges(Object.entries(this.computedInputs ?? {}));
+        // remove the control from the detached list of controls
+        if (this._detached.has(name)) {
+          this._detached.delete(name);
+        }
+      },
+      // else remove the control from and add it to the list of detached controls
+      (control, name, parent) => {
+        parent?.removeControl(name);
+
+        if (!this._detached.has(name) && control) {
+          this._detached.set(name, control);
+        }
+      },
+      (name) => this._detached.get(name) ?? null
+    )(values ?? []);
+
+    //#TODO: find out why control is not being disabled on the ui
+    //#TODO: try input types other than select input first
+    const disabled = useCondition(
+      'disabledIf',
+      // case condition evaluates to true, we mark control as disabled
+      (control) => {
+        control.disable({ onlySelf: false });
+      },
+      // else mark control as enabled
+      (control) => {
+        control.enable({ onlySelf: false });
+      }
+    )(values ?? []);
+
+    // compute input values
+    this.compute(Object.entries(this.computedInputs ?? {}));
 
     // register controls value changes and update ui based on requiredIf configuration on form inputs
     const controls: [string, AbstractControl | null][] = Object.keys(
       this._formGroup.controls
     ).map((k) => [k, this._formGroup.get(k)]);
+    const items = flatteninputs(controls);
 
-    // add a dependency hook which execute input bindings on controls
-    this.addDependencyHook(controls, b, (control, name, bindings) => {
-      this.onValueChange.bind(this).call(null, name, control.value, bindings);
+    // we add a condition hook based on disabled conditions definition
+    this.addConditionHook(items, disabled, (control, name, conditions) => {
+      for (const item of conditions) {
+        item.dependencyChanged(this._formGroup, name, control.value);
+      }
     });
 
-    // add a dependency hook which listen for control value changes and set bindings
-    this.addDependencyHook(controls, b, (control, name, bindings) => {
-      if (bindings.length !== 0) {
+    // add a condition hook based on disabled conditions definition which executes each time control value chnages
+    this.addConditionHook(items, disabled, (control, name, conditions) => {
+      if (conditions.length !== 0) {
+        const subscription = control.valueChanges
+          .pipe(
+            distinctUntilChanged(),
+            tap((value) => {
+              for (const item of conditions) {
+                item.dependencyChanged(this._formGroup, name, value);
+              }
+            })
+          )
+          .subscribe();
+
+        this.subscriptions.push(subscription);
+      }
+    });
+
+    this.addConditionHook(items, required, (control, name, conditions) => {
+      this.onValueChange.bind(this).call(null, name, control.value, conditions);
+    });
+
+    this.addConditionHook(items, required, (control, name, conditions) => {
+      if (conditions.length !== 0) {
         const subscription = control.valueChanges
           .pipe(
             distinctUntilChanged(),
             tap((value) =>
-              this.onValueChange.bind(this).call(null, name, value, bindings)
+              this.onValueChange.bind(this).call(null, name, value, conditions)
             )
           )
           .subscribe();
@@ -157,38 +215,24 @@ export class FormModel implements OnDestroy {
     this.destroy();
   }
 
-  private addDependencyHook(
-    controls: Tuple[],
-    b: Map<string, BindingInterface>,
+  private addConditionHook(
+    controls: [string, AbstractControl][],
+    values: Condition[],
     callback: (
       control: AbstractControl,
       name: string,
-      bindings: BindingInterface[]
+      conditions: Condition[]
     ) => void
   ) {
-    for (const [name, control] of querymutableinputs(controls)) {
-      const bindings: BindingInterface[] = [];
-      for (const item of b.values()) {
-        if (!item.binding) {
-          continue;
-        }
-
-        if (!item.isdependency(name)) {
-          continue;
-        }
-
-        bindings.push(item);
-      }
-
-      if (bindings.length !== 0) {
-        callback(control, name, bindings);
+    for (const [name, control] of controls) {
+      const conditions = values.filter((item) => item.match(name));
+      if (conditions.length !== 0) {
+        callback(control, name, conditions);
       }
     }
   }
 
-  private registerDependenciesChanges(
-    deps: [string, ComputedInputValueConfigType, ...any][]
-  ) {
+  private compute(deps: [string, ComputedInputValueConfigType, ...any][]) {
     for (const dep of deps) {
       const [name, config] = dep;
       // case we are already tracking the dependency we continue to the next iteration
@@ -217,19 +261,10 @@ export class FormModel implements OnDestroy {
     }
   }
 
-  private onValueChange(
-    name: string,
-    value: unknown,
-    bindings: BindingInterface[]
-  ) {
+  private onValueChange(name: string, value: unknown, conditions: Condition[]) {
     const { _formGroup: fg } = this;
-    for (const item of bindings) {
-      const [visible, invisible] = item.dependencyChanged(
-        this._detached,
-        fg,
-        name,
-        value
-      );
+    for (const item of conditions) {
+      const [visible, invisible] = item.dependencyChanged(fg, name, value);
       // case a given input changes
       if (this.computedInputs) {
         for (const [prop] of invisible) {
@@ -274,7 +309,7 @@ export class FormModel implements OnDestroy {
             );
           }
         }
-        this.registerDependenciesChanges(computations);
+        this.compute(computations);
       }
     }
   }

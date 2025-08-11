@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { FileInput } from '@azlabsjs/smart-form-core';
+import { FileInput, InputConfigInterface } from '@azlabsjs/smart-form-core';
 
 @Pipe({
   name: 'accept',
@@ -17,5 +17,20 @@ export class AcceptFilePipe implements PipeTransform {
   }
 }
 
+@Pipe({
+  name: 'required',
+  pure: true,
+  standalone: true,
+})
+export class RequiredPipe implements PipeTransform {
+  transform(value: InputConfigInterface) {
+    return (
+      !!value.constraints &&
+      'required' in value.constraints &&
+      !!value.constraints.required
+    );
+  }
+}
+
 // exported standalone pipes
-export const PIPES = [AcceptFilePipe] as const;
+export const PIPES = [AcceptFilePipe, RequiredPipe] as const;

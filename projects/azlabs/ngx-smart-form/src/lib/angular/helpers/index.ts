@@ -9,7 +9,7 @@ export {
 } from './builders';
 
 export {
-  bindingsFactory,
+  useCondition,
   setFormValue,
   createSetValue as setPropertyFactory,
   getPropertyValue,
@@ -21,7 +21,7 @@ export {
   collectErrors,
   findcontrol,
   withRefetchObservable,
-  querymutableinputs
+  flatteninputs,
 } from './core';
 
 export { useBearerTokenInterceptor } from './interceptors';

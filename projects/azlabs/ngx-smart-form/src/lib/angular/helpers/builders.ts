@@ -43,6 +43,22 @@ function nullIfEmpty<T>(value: T) {
   return value as T;
 }
 
+function required(config: InputConfigInterface) {
+  return (
+    !!config.constraints &&
+    'required' in config.constraints &&
+    Boolean(config.constraints.required)
+  );
+}
+
+function disabled(config: InputConfigInterface) {
+  return (
+    !!config.constraints &&
+    'disabled' in config.constraints &&
+    Boolean(config.constraints.disabled)
+  );
+}
+
 /** @description Helper class for generating angular reactive form controls with errors validation */
 export class ComponentReactiveFormHelpers {
   /**
@@ -75,7 +91,7 @@ export class ComponentReactiveFormHelpers {
             config.children,
             requestClient
           );
-        if (!!input?.rules?.isRequired || !!input?.constraints?.required) {
+        if (!!input?.rules?.isRequired || required(input)) {
           formgroup.addValidators(Validators.required);
         }
         group.addControl(input.name, formgroup);
@@ -125,7 +141,7 @@ export class ComponentReactiveFormHelpers {
     requestClient?: RequestClient
   ) {
     const validators = [
-      !!config.rules?.isRequired || !!config?.constraints?.required
+      !!config.rules?.isRequired || required(config)
         ? Validators.required
         : Validators.nullValidator,
     ];
@@ -257,7 +273,7 @@ export class ComponentReactiveFormHelpers {
     const control = builder.control(
       {
         value: config.value,
-        disabled: config.constraints?.disabled ?? config.disabled,
+        disabled: disabled(config) ?? config.disabled,
       },
       {
         validators: Validators.compose(validators),
@@ -293,7 +309,7 @@ export class ComponentReactiveFormHelpers {
       )
       .subscribe();
 
-    if (!!config.rules?.isRequired || !!config.constraints?.required) {
+    if (!!config.rules?.isRequired || required(config)) {
       array.setValidators(Validators.required);
     }
     return array;

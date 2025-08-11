@@ -22,7 +22,7 @@ export function preloadAppForms(service: CacheProvider, assets: string) {
   };
 }
 
-/** @description Provides `FORM_LOADER` service implementation */
+/** @description provides `FORM_LOADER` service implementation */
 export function provideFormsLoader(loadFormsHandler?: LoadFormsRequestHandler) {
   return {
     provide: FORMS_LOADER,
@@ -36,7 +36,7 @@ export function provideFormsLoader(loadFormsHandler?: LoadFormsRequestHandler) {
   } as Provider;
 }
 
-/** @description Provide an http or request client used when submit forms or form component is sending requests */
+/** @description provides an http or request client used when submit forms or form component is sending requests */
 export function provideHttpClient(
   host?: string,
   interceptor?: InterceptorFactory<HTTPRequest>
@@ -50,7 +50,7 @@ export function provideHttpClient(
   };
 }
 
-/** @description Provides forms endpoints host url */
+/** @description provides forms endpoints host url */
 export function provideFormsHost(host?: string) {
   return {
     provide: API_HOST,

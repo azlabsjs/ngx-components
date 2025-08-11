@@ -83,7 +83,7 @@ export interface FormComponentInterface {
   controlValueChanges(control: string): Observable<unknown>;
 
   /**
-   * Reads current value of a given control using the control name.
+   * reads current value of a given control using the control name.
    *
    * If the control is not found, the default value is provided or an
    * undefined is returned if default value is not passed
@@ -102,7 +102,7 @@ export interface FormComponentInterface {
   setControlValue(control: string, value: any): void;
 
   /**
-   * Disable list on control using a map of configuration
+   * disable list on control using a map of configuration
    * for each control to be disabled.
    *
    * @param controls
@@ -110,7 +110,7 @@ export interface FormComponentInterface {
   disableControls(controls: ControlsStateMap): void;
 
   /**
-   * Enable list on control using a map of configuration
+   * enable list on control using a map of configuration
    * for each control to be enabled.
    *
    * @param controls
@@ -118,7 +118,7 @@ export interface FormComponentInterface {
   enableControls(controls: ControlsStateMap): void;
 
   /**
-   * Add a new control to the internal form group container
+   * add a new control to the internal form group container
    *
    * @param name
    * @param control
@@ -126,7 +126,7 @@ export interface FormComponentInterface {
   addControl(name: string, control: AbstractControl): void;
 
   /**
-   * Get a control object from the internal form group
+   * get a control object from the internal form group
    *
    * @param name
    */
@@ -146,7 +146,7 @@ export interface FormComponentInterface {
   onSubmit(event: Event): void | Observable<void> | ObservableInput<void>;
 
   /**
-   * Form value setter function
+   * form value setter function
    *
    * @param value
    */

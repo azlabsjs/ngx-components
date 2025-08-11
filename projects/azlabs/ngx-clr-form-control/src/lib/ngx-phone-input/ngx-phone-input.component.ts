@@ -15,6 +15,7 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { distinctUntilChanged, Subscription, tap } from 'rxjs';
 import { NgxCommonModule } from '../common';
 import { INTL_TEL_INPUT_DIRECTIVES } from '@azlabsjs/ngx-intl-tel-input';
+import { PIPES } from '../pipes';
 
 /** @internal */
 type SetStateParam<T> = (state: T) => T;
@@ -27,27 +28,27 @@ type StateType = {
 
 @Component({
   standalone: true,
-  imports: [NgxCommonModule, ...INTL_TEL_INPUT_DIRECTIVES],
+  imports: [NgxCommonModule, ...INTL_TEL_INPUT_DIRECTIVES, ...PIPES],
   selector: 'ngx-phone-input',
   templateUrl: './ngx-phone-input.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
-  //#region Component inputs
+  //#region component inputs
   @Input() control!: AbstractControl;
   @Input() describe = true;
   @Input('inputConfig') config!: InputConfigInterface;
   @Input('class') cssClass!: string;
   @Input('countries') preferredCountries!: string[];
   @ContentChild('input') inputRef!: TemplateRef<any>;
-  //#endregion Component inputs
+  //#endregion
 
-  //#region Component event emitter
+  //#region component event emitter
   @Output() focus = new EventEmitter<FocusEvent>();
   @Output() blur = new EventEmitter<FocusEvent>();
-  //#endregion Component event emitter
+  //#endregion
 
-  // #region Component state
+  // #region component state
   _state: StateType = {
     disabled: false,
     value: undefined as string | undefined,
@@ -55,13 +56,13 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
   get state() {
     return this._state;
   }
-  // #endregion Component state
+  // #endregion
 
-  //#region Class properties
+  //#region class properties
   private subscriptions: Subscription[] = [];
-  //#endregion Class properties
+  //#endregion
 
-  /** @description Phone input component class constructor */
+  /** @description phone input component class constructor */
   constructor(private cdRef: ChangeDetectorRef) {}
 
   onBlur(event: FocusEvent) {
@@ -76,7 +77,6 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.subscriptions.push(
-      // Listen for control value changes to update component `value` state
       this.control.valueChanges
         .pipe(
           distinctUntilChanged(),
@@ -86,7 +86,6 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
         )
         .subscribe(),
 
-      // Listen for control status changes to update component `disabled` state
       this.control.statusChanges
         .pipe(
           tap((status) => {
@@ -99,7 +98,7 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
         .subscribe()
     );
 
-    // Set the current state based on the control value
+    // set the current state based on the control value
     this.setState((state) => ({
       ...state,
       disabled: this.control.status.toLocaleLowerCase() === 'disabled',
