@@ -221,8 +221,8 @@
         "disabledIf": "country:__empty__",
         "selectableModel": {
           "source": {
-            "resource": "http://127.0.0.1:3000/cities",
-            "raw": "http://127.0.0.1:3000/cities",
+            "resource": "http://127.0.0.1:3000/cities?disabled=false",
+            "raw": "http://127.0.0.1:3000/cities?disabled=false",
             "params": {
               "keyBy": "id",
               "groupBy": "id",

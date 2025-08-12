@@ -238,24 +238,21 @@ export function queryOptions(
   interceptorFactory?: InterceptorFactory<HTTPRequest>
 ) {
   const { source, url, search } = optionsConfig;
-  // We provides a request body only if the resource object is not a valid
-  // HTTP URI because in such case the request is being send to form API server
-  // instead of any resource server
-  const body = isValidHttpUrl(source.resource)
-    ? typeof search !== 'undefined' && search !== null
-      ? search
-      : undefined
-    : typeof search !== 'undefined' && search !== null
-    ? {
-        ...search,
-        table_config: source.raw,
-      }
-    : {
-        table_config: source.raw,
-      };
+  let uri = url;
+  let searchQuery = search ?? {};
+  let body: Record<string, unknown> | undefined = undefined;
+
+  if (isValidHttpUrl(source.resource)) {
+    const query = new URL(source.resource).search;
+    const params = Object.fromEntries(new URLSearchParams(query).entries());
+    body = { ...params, ...searchQuery };
+    uri = (url ?? source.resource).replace(`?${query}`, '');
+  } else {
+    body = { ...searchQuery, table_config: source.raw };
+  }
 
   return rxRequest({
-    url,
+    url: uri,
     method: 'GET',
     body,
     headers: {
