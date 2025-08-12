@@ -10,10 +10,10 @@ import { NgxCommonModule } from '../common';
   templateUrl: './ngx-time-input.component.html',
 })
 export class NgxTimeInputComponent {
-  //#region Component inputs
+  //#region component inputs
   @Input() control!: AbstractControl;
   @Input() describe = true;
-  @Input() inputConfig!: TimeInput;
+  @Input() config!: TimeInput;
   @ContentChild('input') inputRef!: TemplateRef<any>;
-  //#endregion Component inputs
+  //#endregion
 }

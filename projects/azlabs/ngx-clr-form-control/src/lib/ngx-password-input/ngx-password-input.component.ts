@@ -26,8 +26,7 @@ type StateType = {
 export class NgxPasswordInputComponent {
   @Input() control!: AbstractControl;
   @Input() describe = true;
-  // Configuration parameters of the input
-  @Input() inputConfig!: TextInput;
+  @Input() config!: TextInput;
   @ContentChild('input') inputRef!: TemplateRef<any>;
 
   // tslint:disable-next-line: variable-name
@@ -45,10 +44,9 @@ export class NgxPasswordInputComponent {
     }));
   }
 
-  /** @description Creates new class instances */
   constructor(private cdRef: ChangeDetectorRef) {}
 
-  /** @description update component state and notify ui of state changes */
+  /** update component state and notify ui of state changes */
   private setState(state: (s: StateType) => StateType) {
     this._state = state(this._state);
     this.cdRef?.markForCheck();

@@ -10,7 +10,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { FormConfigInterface } from '@azlabsjs/smart-form-core';
-import { FormModel } from './form.component.model';
+import { FormModel } from './form.model';
 import { filter, Subscription } from 'rxjs';
 import { AsyncValidatorFn, FormGroup, ValidatorFn } from '@angular/forms';
 import { ReactiveFormDirectiveInterface } from '../../types';

@@ -15,17 +15,10 @@ type EqualFn = (a: KeyType, b: KeyType) => boolean;
 function createCache(equals?: EqualFn, interval?: number, ttl?: number) {
   let cache = new Cache<KeyType, InputOptions>(equals, interval, ttl);
   return {
-    put: (key, value, update?) => {
-      return cache.put(key, value, update);
-    },
-
-    get: (key) => {
-      return cache.get(key);
-    },
-
-    delete: (key) => {
-      cache.delete(key);
-    },
+    put: (key, value, update?) => cache.put(key, value, update),
+    get: (key) => cache.get(key),
+    delete: (key) => cache.delete(key),
+    dispose: (key) => cache.dispose(key),
   } as CacheType<KeyType, InputOptions>;
 }
 

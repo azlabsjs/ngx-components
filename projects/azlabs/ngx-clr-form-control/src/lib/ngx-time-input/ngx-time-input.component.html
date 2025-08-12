@@ -1,12 +1,17 @@
-<ng-container *ngTemplateOutlet="
+<ng-container
+  *ngTemplateOutlet="
     inputRef;
     context: {
-      max: inputConfig.max,
-      min: inputConfig.min,
-      config: inputConfig,
+      max: config.constraints?.max,
+      min: config.constraints?.min,
+      config: config,
       control
     }
-  "></ng-container>
+  "
+></ng-container>
 
-<!-- Control description -->
-<span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="inputConfig.description || '' | trustHtml"></span>
+<span
+  [class]="'input__subtext'"
+  *ngIf="describe"
+  [innerHTML]="config.description || '' | trustHtml"
+></span>

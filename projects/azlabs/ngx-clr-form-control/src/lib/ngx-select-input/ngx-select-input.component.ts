@@ -9,10 +9,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormControl, FormsModule } from '@angular/forms';
-import {
-  InputOptions,
-  OptionsInputConfigInterface,
-} from '@azlabsjs/smart-form-core';
+import { InputOptions, OptionsInput } from '@azlabsjs/smart-form-core';
 import { InputEventArgs } from '../types';
 import {
   FetchOptionsDirective,
@@ -24,7 +21,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 /** @internal */
 type StateType = {
   performingAction: boolean;
-  config: OptionsInputConfigInterface | null;
+  config: OptionsInput | null;
   loaded: boolean;
 };
 
@@ -44,7 +41,7 @@ type StateType = {
       :host ::ng-deep .ng-select {
         display: block;
         max-width: 100% !important;
-        width: 100%;
+        width: auto;
       }
       .ng-select.flat {
         border-radius: 0 !important;
@@ -78,9 +75,7 @@ export class NgxSelectInputComponent {
   //#region component inputs
   @Input() control!: FormControl<any>;
   @Input() describe = true;
-  @Input({ alias: 'inputConfig' }) set setInputConfig(
-    inputConfig: OptionsInputConfigInterface
-  ) {
+  @Input() set config(inputConfig: OptionsInput) {
     this.setState((state) => ({
       ...state,
       config: inputConfig,
@@ -88,6 +83,7 @@ export class NgxSelectInputComponent {
     }));
   }
   @Input({ alias: 'loading-text' }) loadingText!: string;
+  @Input() disabled: boolean = false;
   //#endregion
 
   //#region component outputs
@@ -123,7 +119,7 @@ export class NgxSelectInputComponent {
 
   optionsChange(options: InputOptions) {
     const { config } = this._state;
-    let _c = config ?? ({} as OptionsInputConfigInterface);
+    let _c = config ?? ({} as OptionsInput);
     _c = {
       ..._c,
       options: options.map((state) => ({
@@ -153,11 +149,11 @@ export class NgxSelectInputComponent {
     this.cdRef?.markForCheck();
   }
 
-  removed(e: unknown, config: OptionsInputConfigInterface) {
+  removed(e: unknown, config: OptionsInput) {
     this.remove.emit({ name: config.name, event: e });
   }
 
-  select(e: unknown, config: OptionsInputConfigInterface) {
+  select(e: unknown, config: OptionsInput) {
     this.selected.emit({ name: config.name, value: e });
   }
 }

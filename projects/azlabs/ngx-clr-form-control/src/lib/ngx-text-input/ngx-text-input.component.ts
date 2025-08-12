@@ -1,6 +1,6 @@
 import { Component, Input, ContentChild, TemplateRef } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
-import { InputTypes, TextInput } from '@azlabsjs/smart-form-core';
+import { TextInput } from '@azlabsjs/smart-form-core';
 import { NgxCommonModule } from '../common';
 
 @Component({
@@ -10,15 +10,14 @@ import { NgxCommonModule } from '../common';
   templateUrl: './ngx-text-input.component.html',
 })
 export class NgxTextInputComponent {
-  //#region Component inputs
+  //#region component inputs
   @Input() control!: AbstractControl;
   @Input() describe = true;
-  @Input() inputConfig!: TextInput;
+  @Input() config!: TextInput;
   @ContentChild('input') inputRef!: TemplateRef<any>;
-  //#endregion Component inputs
+  //#endregion
 
-  //#region Component properties
-  inputTypes = InputTypes;
+  //#region component properties
   Mt = Math;
-  //#region Component properties
+  //#region
 }

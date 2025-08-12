@@ -72,7 +72,7 @@
     <ng-container *ngSwitchCase="inputTypes.SELECT_INPUT">
       <ngx-select-input
         [control]="formControl"
-        [inputConfig]="inputConfig | selectInput"
+        [config]="inputConfig | selectInput"
         [describe]="describe"
         [loading-text]="loadingText"
         (remove)="remove.emit($event)"
@@ -135,7 +135,7 @@
 
           <ngx-phone-input
             [control]="formControl"
-            [inputConfig]="inputConfig"
+            [config]="inputConfig"
             [describe]="describe"
             [class]="'clr-input'"
             [countries]="countries"
@@ -188,7 +188,7 @@
     <ng-container *ngSwitchCase="inputTypes.DATE_INPUT">
       <ngx-date-input
         [control]="formControl"
-        [inputConfig]="inputConfig | dateInput"
+        [config]="inputConfig | dateInput"
         [describe]="describe"
       >
         <ng-template
@@ -247,7 +247,7 @@
     <ng-container *ngSwitchCase="inputTypes.TIME_INPUT">
       <ngx-time-input
         [control]="formControl"
-        [inputConfig]="inputConfig | timeInput"
+        [config]="inputConfig | timeInput"
         [describe]="describe"
       >
         <ng-template
@@ -314,7 +314,7 @@
       <ng-container *ngIf="!inline; else textInput">
         <ngx-textarea-input
           [control]="formControl"
-          [inputConfig]="inputConfig | textAreaInput"
+          [config]="inputConfig | textAreaInput"
           [describe]="describe"
         >
           <ng-template #input let-config="config" let-control="control">
@@ -383,7 +383,7 @@
       <ngx-number-input
         [control]="formControl"
         [describe]="describe"
-        [inputConfig]="inputConfig | numberInput"
+        [config]="inputConfig | numberInput"
       >
         <ng-template
           #input
@@ -448,7 +448,7 @@
     <ng-container *ngSwitchCase="inputTypes.RADIO_INPUT">
       <ngx-radio-input
         [control]="formControl"
-        [inputConfig]="inputConfig | selectInput"
+        [config]="inputConfig | selectInput"
         [describe]="describe"
       >
         <ng-template
@@ -506,7 +506,7 @@
     <ng-container *ngSwitchCase="inputTypes.CHECKBOX_INPUT">
       <ngx-checkbox-input
         [control]="formControl"
-        [inputConfig]="inputConfig | selectInput"
+        [config]="inputConfig | selectInput"
         [describe]="describe"
       >
         <label label class="clr-control-label" *ngIf="describe">
@@ -541,7 +541,7 @@
     <ng-container *ngSwitchCase="inputTypes.PASSWORD_INPUT">
       <ngx-password-input
         [control]="formControl"
-        [inputConfig]="inputConfig | textInput"
+        [config]="inputConfig | textInput"
         [describe]="describe"
       >
         <ng-template
@@ -644,11 +644,7 @@
 </div>
 <!-- Text Input -->
 <ng-template #textInput let-control="control" let-config="config">
-  <ngx-text-input
-    [control]="control"
-    [inputConfig]="config"
-    [describe]="describe"
-  >
+  <ngx-text-input [control]="control" [config]="config" [describe]="describe">
     <ng-template
       #input
       let-config="config"

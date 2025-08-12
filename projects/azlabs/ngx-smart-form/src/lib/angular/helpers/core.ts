@@ -24,6 +24,10 @@ import { Observable, Subject, Subscription } from 'rxjs';
 /** @internal */
 type Tuple = [k: string | number, control: AbstractControl | null];
 
+function isformgroup(x: AbstractControl): x is FormGroup {
+  return x instanceof FormGroup;
+}
+
 function before(haystack: string, char: string) {
   const index = haystack.indexOf(char);
   return index === -1 ? '' : haystack.substring(0, index);
@@ -184,21 +188,22 @@ export function setFormGroupValue(
 /** @internal check if the input should matches any of the provided values or conditions */
 function matchany(value: unknown, values: unknown[]) {
   if (values.includes('*')) {
-    return !(
+    return (
       typeof value !== 'undefined' &&
       value !== null &&
       String(value).trim() !== ''
     );
   }
+
   if (
     values.includes('__null__') ||
     values.includes('__undefined__') ||
     values.includes('__empty__')
   ) {
     return (
-      typeof value !== 'undefined' &&
-      value !== null &&
-      String(value).trim() !== ''
+      typeof value === 'undefined' ||
+      value === null ||
+      String(value).trim() === ''
     );
   }
   value = isNaN(value as any) ? value : +(value as string);
@@ -207,7 +212,8 @@ function matchany(value: unknown, values: unknown[]) {
         isNaN(value as number) ? value : +(value as string)
       )
     : values || [];
-  return !_values.includes(value);
+
+  return _values.includes(value);
 }
 
 function hasleaf(input: InputConfigInterface): input is InputGroup {
@@ -228,7 +234,8 @@ type Nullable<T> = T | undefined | null;
 type ClauseFn = (
   control: AbstractControl,
   name: string,
-  parent: FormGroup | null
+  parent: FormGroup | null,
+  path: string
 ) => void;
 
 function findconditions(
@@ -319,10 +326,10 @@ export function useCondition(
               [string, AbstractControl][]
             ] = [[], []];
             const params = condition.values ?? [];
-            // case the selector key contains * and dependecy key starts with selector
+            // case the selector key contains * and dependecy key starts with string before `*`
             // then the control is the control at the same index having the property after *
             let str = before(name, '*');
-            str = str.trim().substring(0, str.length - 1); // str is the name of the parent input property
+            str = str.trim().substring(0, str.length - 1); // remove the trailing `.` at the end of `str`
             if (position !== -1 && property.trim().startsWith(str)) {
               const parent = findcontrol(formgroup, str) as FormArray;
               if (!parent) {
@@ -338,58 +345,54 @@ export function useCondition(
               }
 
               const input = after(name, `${str}.*.`).trim();
-              const dependency = after(condition.name, `${str}.*.`).trim();
-
               for (let index = 0; index < parent.length; index++) {
                 const item = parent.at(index);
                 if (!item) {
                   continue;
                 }
 
-                let truthy: boolean = false;
-                let name: string;
-                let control: Nullable<AbstractControl> = null;
-                const dep =
-                  item instanceof FormGroup
-                    ? findcontrol(item, dependency)
-                    : null;
+                const prefix = `${str}.${index}`;
+                let name = isformgroup(item)
+                  ? `${prefix}.${input}`
+                  : `${prefix}`;
+                let control = isformgroup(item)
+                  ? findcontrol(item, input)
+                  : item;
+                let dependency = isformgroup(item)
+                  ? findcontrol(item, after(condition.name, `${str}.*.`).trim())
+                  : item;
 
-                if (item instanceof FormGroup) {
-                  control = findcontrol(item, input);
-                  name = `${str}.${index}.${input}`;
-                  truthy = matchany(dep?.value, params);
-                } else {
-                  control = item;
-                  name = `${str}.${index}`;
-                  truthy = matchany(value, params);
+                // case the dependency cannot be located continue to next iteration
+                if (!dependency) {
+                  continue;
                 }
 
                 // case we cannot select from the formgroup,
-                // we try to locate it from the detached controls
+                // we try to locate it from using the query function
                 if (!control && !!query) {
                   control = query(name);
                 }
 
-                // case the control value is not defined, we ignore adding
-                // or removing control from detached controls
+                // case the control value is not defined, we continue with the next iteration
+                // as we don't need to handle missing inputs
                 if (!control) {
                   continue;
                 }
 
+                const truthy = matchany(dependency.value, params);
                 const found = findparent(formgroup, name);
                 const paths = name.split('.');
                 const path = paths[paths.length - 1];
-                if (!truthy) {
-                  then(control, path, found);
+                if (truthy) {
+                  then(control, path, found, name);
                   if (control) {
                     output[0].push([name, control]);
                   }
                 } else {
-                  // remove the control from the parent if it exists
-                  const at = found?.get(path);
-                  _else(control, path, found);
-                  if (at) {
-                    output[1].push([name, at]);
+                  _else(control, path, found, name);
+                  const item = found?.get(path);
+                  if (item) {
+                    output[1].push([name, item]);
                   }
                 }
               }
@@ -398,7 +401,7 @@ export function useCondition(
               return output;
             }
 
-            // case we are not handling form array
+            // case we are not handling form array)
             let control = findcontrol(formgroup, name);
             const truthy = matchany(value, params);
 
@@ -425,13 +428,13 @@ export function useCondition(
               parent = formgroup;
             }
 
-            if (!truthy) {
-              then(control, path, parent);
+            if (truthy) {
+              then(control, path, parent, name);
               if (control) {
                 output[0].push([name, control]);
               }
             } else {
-              _else(control, path, parent);
+              _else(control, path, parent, name);
               if (control) {
                 output[1].push([name, control]);
               }
@@ -845,21 +848,16 @@ export function collectErrors(control: AbstractControl) {
   return errors;
 }
 
-export function flatteninputs(inputs: Tuple[]) {
+export function flatteninputs(formgroup: FormGroup) {
   const names: [string, AbstractControl][] = [];
-  function resolve(items: Tuple[], root: string = '') {
-    for (const [n, control] of items) {
+  function resolve(formgroup: FormGroup, root: string = '') {
+    for (const [n, control] of Object.entries(formgroup.controls)) {
       if (!control) {
         continue;
       }
 
       if (control instanceof FormGroup) {
-        const controls = Object.keys(control.controls).map((k) => [
-          k,
-          control.get(k),
-        ]) as [string, AbstractControl][];
-
-        resolve(controls, root.trim() !== '' ? `${root}.${n}` : String(n));
+        resolve(control, root.trim() !== '' ? `${root}.${n}` : String(n));
         continue;
       }
 
@@ -868,7 +866,7 @@ export function flatteninputs(inputs: Tuple[]) {
     }
   }
 
-  resolve(inputs);
+  resolve(formgroup);
 
   return names;
 }
@@ -919,7 +917,7 @@ export function withRefetchObservable(
 
                 if (c && query) {
                   const subscription = c.valueChanges.subscribe((value) => {
-                    subscriber.next({ [query]: value });
+                    subscriber.next(value ? { [query]: value } : {});
                   });
 
                   subscriptions.push(subscription);
@@ -931,7 +929,7 @@ export function withRefetchObservable(
             const q = query ?? name;
             if (c && query) {
               const subscription = c.valueChanges.subscribe((value) => {
-                subscriber.next({ [q]: value });
+                subscriber.next(value ? { [q]: value } : {});
               });
 
               subscriptions.push(subscription);

@@ -37,10 +37,14 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
   //#region component inputs
   @Input() control!: AbstractControl;
   @Input() describe = true;
-  @Input('inputConfig') config!: InputConfigInterface;
+  @Input() config!: InputConfigInterface;
   @Input('class') cssClass!: string;
   @Input('countries') preferredCountries!: string[];
   @ContentChild('input') inputRef!: TemplateRef<any>;
+  @Input() set disabled(value: boolean) {
+    const { _state: state } = this;
+    this._state = { ...state, disabled: value };
+  }
   //#endregion
 
   //#region component event emitter
@@ -62,7 +66,7 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   //#endregion
 
-  /** @description phone input component class constructor */
+  /** phone input component class constructor */
   constructor(private cdRef: ChangeDetectorRef) {}
 
   onBlur(event: FocusEvent) {

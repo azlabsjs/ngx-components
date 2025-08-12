@@ -19,6 +19,9 @@ export type CacheType<TKey, TValue> = {
 
   /** remove value at the given key in cache */
   delete(key: TKey): void;
+
+  /** dispose the previous key removing it cleaning up any resource */
+  dispose(key: TKey): void;
 };
 
 /** @intrenal cached value type definition */
@@ -43,7 +46,7 @@ function pair<TKey, TValue>(key: TKey, value?: TValue) {
 /** @internal checks if a value is a Promise A+ instance */
 function isPromise(p: unknown): p is Promise<unknown> {
   return (
-    typeof p === "object" && typeof (p as Promise<unknown>)?.then === "function"
+    typeof p === 'object' && typeof (p as Promise<unknown>)?.then === 'function'
   );
 }
 
@@ -69,7 +72,7 @@ function cached<TValue>(
   // set the expiresAt variable value if ttl is provided
   function setExpiredDate(ttl: number | undefined) {
     if (ttl) {
-      const t = new Date()
+      const t = new Date();
       const date = new Date();
       date.setSeconds(date.getSeconds() + ttl);
       expiresAt = date;
@@ -109,7 +112,7 @@ function cached<TValue>(
     }, refetchTime * 1000);
   }
 
-  Object.defineProperty(o, "dispose", {
+  Object.defineProperty(o, 'dispose', {
     value: () => {
       if (timeout !== null) {
         clearInterval(timeout);
@@ -132,7 +135,7 @@ export class Cache<TKey, TValue> implements CacheType<TKey, TValue> {
   public constructor(equals?: EqualFn<TKey>, interval?: number, ttl?: number) {
     this.equals = equals ?? ((a, b) => a === b);
     this.interval = interval ?? 60 * 60; // cached item will be refetched after each 1h by default
-    this.ttl = ttl ?? (3600 - 1); // cached value will expire after 59min after it has been cached or updated
+    this.ttl = ttl ?? 3600 - 1; // cached value will expire after 59min after it has been cached or updated
   }
 
   put(key: TKey, value: TValue, update?: ValueResolver<TValue>) {
@@ -155,8 +158,7 @@ export class Cache<TKey, TValue> implements CacheType<TKey, TValue> {
     ];
   }
 
-
-  getCached(key: TKey): ValueType<TValue>|undefined {
+  private getCached(key: TKey): ValueType<TValue> | undefined {
     const index = this.items.findIndex(([k]) => this.equals(k, key));
     if (-1 === index) {
       return undefined;
@@ -171,7 +173,11 @@ export class Cache<TKey, TValue> implements CacheType<TKey, TValue> {
       // in cache therefore must be refetched manually
       return undefined;
     }
-    return v
+    return v;
+  }
+
+  dispose(key: TKey): void {
+    this.getCached(key)?.dispose();
   }
 
   get(key: TKey) {

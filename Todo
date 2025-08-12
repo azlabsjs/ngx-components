@@ -13,5 +13,6 @@
 - Mark clr-form-control component keyup, kewdown, etc... event as deprecated []
 - Review dropzone directive and component implementations []
 - Update smart-form library to support max attribute as constraint [x]
-- update source code to support conditional diabled property on input []
-- Fix bug with requiredIf implementation on form group []
+- update source code to support conditional diabled property on input [x]
+- Fix bug with requiredIf implementation on form group [x]
+- Fix issue with phone input not updated [x]

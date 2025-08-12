@@ -14,7 +14,7 @@ export class NgxTextAreaInputComponent {
   //#region Component inputs
   @Input() control!: AbstractControl;
   @Input() describe = true;
-  @Input() inputConfig!: TextAreaInput;
+  @Input() config!: TextAreaInput;
   @ContentChild('input') inputRef!: TemplateRef<any>;
   //#endregion Component inputs
 }

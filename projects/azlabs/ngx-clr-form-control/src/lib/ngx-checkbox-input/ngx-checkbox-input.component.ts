@@ -16,10 +16,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { OPTIONS_DIRECTIVES } from '@azlabsjs/ngx-options-input';
-import {
-  InputOptions,
-  OptionsInputConfigInterface,
-} from '@azlabsjs/smart-form-core';
+import { InputOptions, OptionsInput } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { distinctUntilChanged, tap } from 'rxjs/operators';
 import { NgxCommonModule } from '../common';
@@ -32,7 +29,7 @@ type SelectionState = { value: unknown; checked: boolean };
 /** @internal */
 type StateType = {
   loaded: boolean;
-  config: OptionsInputConfigInterface;
+  config: OptionsInput;
   selection: SelectionState[];
 };
 
@@ -55,9 +52,7 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
   @Input() disabled = false;
   @Input() describe = true;
   @Input() control!: AbstractControl;
-  @Input({ alias: 'inputConfig' }) set setInputConfig(
-    value: OptionsInputConfigInterface
-  ) {
+  @Input() set config(value: OptionsInput) {
     this.setState((state) => ({
       ...state,
       config: value,
@@ -68,13 +63,13 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
   //#endregion
 
   //#region component outputs
-  @Output() inputConfigChange = new EventEmitter<OptionsInputConfigInterface>();
+  @Output() inputConfigChange = new EventEmitter<OptionsInput>();
   @Output() change = new EventEmitter<unknown[]>();
   //#endregion
 
   // #region component properties
   private _state: StateType = {
-    config: {} as OptionsInputConfigInterface,
+    config: {} as OptionsInput,
     loaded: false,
     selection: [],
   };
@@ -84,7 +79,7 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
   private _destroy$ = new Subject<void>();
   // #endregion
 
-  /** @description create an instance of ngx checkbox input component  */
+  /** create an instance of ngx checkbox input component  */
   constructor(private changes: ChangeDetectorRef) {}
 
   ngOnInit(): void {
@@ -110,7 +105,7 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
    */
   onOptionsChange(options: InputOptions) {
     const { config } = this._state;
-    let _config = config ?? ({} as OptionsInputConfigInterface);
+    let _config = config ?? ({} as OptionsInput);
     _config = { ..._config, options };
     this.setState((state) => ({
       ...state,

@@ -1,5 +1,5 @@
 import { Inject, Injectable, OnDestroy } from '@angular/core';
-import { AbstractControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import {
   AngularReactiveFormBuilderBridge,
   Condition,
@@ -59,6 +59,8 @@ export class FormModel implements OnDestroy {
       form: this._form,
     };
   }
+  private requiredConditions: Condition[] = [];
+  private disabledConditions: Condition[] = [];
   //#endregion
 
   // form component model class constructor
@@ -78,112 +80,125 @@ export class FormModel implements OnDestroy {
       formgroup = builder.group(f);
     }
 
-    if (initialized && this.value) {
-      this.setValue(this.value);
-    }
-
     this.setFormState(f, formgroup);
 
     // we unregister from previous event each time we set the form value
     this.unsubscribe();
 
     const { controlConfigs: values } = this._form;
-    const required = useCondition(
+    this.requiredConditions = useCondition(
       'requiredIf',
       // case condition evaluates to true, add the control to it parent
-      (control, name, parent) => {
+      (control, name, parent, path) => {
         if (parent && !parent.get(name) && control) {
           parent?.addControl(name, control);
         }
 
         // remove the control from the detached list of controls
-        if (this._detached.has(name)) {
-          this._detached.delete(name);
+        if (this._detached.has(path)) {
+          this._detached.delete(path);
         }
       },
       // else remove the control from and add it to the list of detached controls
-      (control, name, parent) => {
-        parent?.removeControl(name);
+      (control, name, parent, path) => {
+        if (parent && !!parent.get(name)) {
+          parent?.removeControl(name);
+        }
 
-        if (!this._detached.has(name) && control) {
-          this._detached.set(name, control);
+        if (!this._detached.has(path) && control) {
+          this._detached.set(path, control);
         }
       },
       (name) => this._detached.get(name) ?? null
     )(values ?? []);
 
-    //#TODO: find out why control is not being disabled on the ui
-    //#TODO: try input types other than select input first
-    const disabled = useCondition(
+    this.disabledConditions = useCondition(
       'disabledIf',
       // case condition evaluates to true, we mark control as disabled
-      (control) => {
-        control.disable({ onlySelf: false });
+      (control, name) => {
+        if (control instanceof FormArray) {
+          for (let index = 0; index < control.length; index++) {
+            const item = control.at(index);
+            if (item) {
+              item.disable({ onlySelf: true, emitEvent: true });
+            }
+          }
+        } else {
+          control.disable({ onlySelf: true, emitEvent: true });
+        }
       },
       // else mark control as enabled
       (control) => {
-        control.enable({ onlySelf: false });
+        if (control instanceof FormArray) {
+          for (let index = 0; index < control.length; index++) {
+            const item = control.at(index);
+            if (item) {
+              item.enable({ onlySelf: true, emitEvent: true });
+            }
+          }
+        } else {
+          control.enable({ onlySelf: true, emitEvent: true });
+        }
       }
     )(values ?? []);
 
     // compute input values
     this.compute(Object.entries(this.computedInputs ?? {}));
 
-    // register controls value changes and update ui based on requiredIf configuration on form inputs
-    const controls: [string, AbstractControl | null][] = Object.keys(
-      this._formGroup.controls
-    ).map((k) => [k, this._formGroup.get(k)]);
-    const items = flatteninputs(controls);
+    if (initialized && this.value) {
+      this.setValue(this.value);
+    }
 
-    // we add a condition hook based on disabled conditions definition
-    this.addConditionHook(items, disabled, (control, name, conditions) => {
-      for (const item of conditions) {
-        item.dependencyChanged(this._formGroup, name, control.value);
-      }
-    });
-
-    // add a condition hook based on disabled conditions definition which executes each time control value chnages
-    this.addConditionHook(items, disabled, (control, name, conditions) => {
-      if (conditions.length !== 0) {
-        const subscription = control.valueChanges
-          .pipe(
-            distinctUntilChanged(),
-            tap((value) => {
-              for (const item of conditions) {
-                item.dependencyChanged(this._formGroup, name, value);
-              }
-            })
-          )
-          .subscribe();
-
-        this.subscriptions.push(subscription);
-      }
-    });
-
-    this.addConditionHook(items, required, (control, name, conditions) => {
-      this.onValueChange.bind(this).call(null, name, control.value, conditions);
-    });
-
-    this.addConditionHook(items, required, (control, name, conditions) => {
-      if (conditions.length !== 0) {
-        const subscription = control.valueChanges
-          .pipe(
-            distinctUntilChanged(),
-            tap((value) =>
-              this.onValueChange.bind(this).call(null, name, value, conditions)
+    const items = flatteninputs(this._formGroup);
+    this.addConditionHook(
+      items,
+      this.disabledConditions,
+      (control, name, conditions) => {
+        if (conditions.length !== 0) {
+          const subscription = control.valueChanges
+            .pipe(
+              distinctUntilChanged(),
+              tap((value) => {
+                for (const item of conditions) {
+                  item.dependencyChanged(this._formGroup, name, value);
+                }
+              })
             )
-          )
-          .subscribe();
+            .subscribe();
 
-        this.subscriptions.push(subscription);
+          this.subscriptions.push(subscription);
+        }
       }
-    });
+    );
+
+    this.addConditionHook(
+      items,
+      this.requiredConditions,
+      (control, name, conditions) => {
+        if (conditions.length !== 0) {
+          const subscription = control.valueChanges
+            .pipe(
+              distinctUntilChanged(),
+              tap((value) =>
+                this.onValueChange
+                  .bind(this)
+                  .call(null, name, value, conditions)
+              )
+            )
+            .subscribe();
+
+          this.subscriptions.push(subscription);
+        }
+      }
+    );
   }
 
   setValue(value: { [k: string]: unknown }): void {
     // set or update the form value
     const { controlConfigs } = this._form;
     setFormValue(this.builder, this._formGroup, value, controlConfigs ?? []);
+    const items = flatteninputs(this._formGroup);
+    this.addConditions(items);
   }
 
   getValue(): { [k: string]: unknown } {
@@ -213,6 +228,27 @@ export class FormModel implements OnDestroy {
   // angular compatible destroy member function
   ngOnDestroy(): void {
     this.destroy();
+  }
+
+  private addConditions(items: [string, AbstractControl<any, any>][]) {
+    this.addConditionHook(
+      items,
+      this.disabledConditions,
+      (control, name, conditions) => {
+        for (const item of conditions) {
+          item.dependencyChanged(this._formGroup, name, control.value);
+        }
+      }
+    );
+    this.addConditionHook(
+      items,
+      this.requiredConditions,
+      (control, name, conditions) => {
+        this.onValueChange
+          .bind(this)
+          .call(null, name, control.value, conditions);
+      }
+    );
   }
 
   private addConditionHook(

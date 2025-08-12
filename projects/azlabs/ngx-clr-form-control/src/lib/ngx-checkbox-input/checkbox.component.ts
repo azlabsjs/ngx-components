@@ -31,7 +31,7 @@ export class CheckboxComponent {
   //#region component inputs
   @Input() text!: string | undefined;
   @Input() disabled = false;
-  @Input({ alias: 'checked' }) checked = false;
+  @Input() checked = false;
   //#endregion
 
   //#region component outputs

@@ -34,7 +34,7 @@ import { ControlsStateMap, ReactiveFormComponentInterface } from '../../types';
 import { HTTP_REQUEST_CLIENT } from '../../tokens';
 import { CommonModule } from '@angular/common';
 import { PIPES } from '../../pipes';
-import { FormModel } from './form.component.model';
+import { FormModel } from './form.model';
 import { NgxFormComponent } from './form-ui.component';
 
 /** @internal */

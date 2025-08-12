@@ -31,6 +31,7 @@ import {
 } from './types';
 import { INPUT_OPTIONS_CLIENT, OPTIONS_CACHE } from './tokens';
 import { CacheType } from './cache';
+import { deepEqual } from '@azlabsjs/utilities';
 
 /** @internal */
 type ObservationOptions = {
@@ -108,6 +109,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   >();
   private subscriptions: Subscription[] = [];
   private observable!: Subscribable<{ [k: string]: unknown }>;
+  private key!: _KeyType;
 
   // directive constructor
   constructor(
@@ -234,7 +236,11 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     const { refetch, ...rest } = options;
     const key = { ...rest, ...params };
 
-    // dispatch search query
+    if (this.key && !deepEqual(this.key, key)) {
+      this.cache.dispose(this.key);
+    }
+    this.key = key;
+
     this.search$.next([key, rest, query]);
   }
 

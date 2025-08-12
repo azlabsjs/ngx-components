@@ -19,17 +19,17 @@ import { NgxCommonModule } from '../common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxDateInputComponent {
-  // #region Component inputs
+  // #region component inputs
   @Input() control!: AbstractControl;
   @Input() describe = true;
-  @Input() inputConfig!: DateInput;
-  // #endregion Component inputs
+  @Input() config!: DateInput;
+  // #endregion
+
   @ContentChild('input') inputRef!: TemplateRef<any>;
 
-  /** @description Creates an instance of Date Input Component */
+  /** @description creates an instance of date input */
   constructor(@Inject(LOCALE_ID) private locale: string) {}
 
-  // tslint:disable-next-line: typedef
   onBlur() {
     const locale = this.locale;
     if (this.control.value) {

@@ -23,22 +23,18 @@ import { createSlide } from '@azlabsjs/ngx-slides';
 import {
   FormsClient,
   FORM_CLIENT,
-  ReactiveFormComponentInterface,
   uniqueValidator,
   HTTP_REQUEST_CLIENT,
   RequestClient,
-  FORM_DIRECTIVES,
 } from '@azlabsjs/ngx-smart-form';
 import {
   FileInput,
   FormConfigInterface,
-  InputOption,
   InputTypes,
 } from '@azlabsjs/smart-form-core';
 import {
   BehaviorSubject,
   filter,
-  Observable,
   Subject,
   takeUntil,
   tap,
@@ -112,24 +108,6 @@ type ValuesType = typeof _values;
   standalone: false,
 })
 export class AppComponent implements OnInit {
-  options: InputOption[] = [];
-  fetchConfig = {
-    source: {
-      resource: 'http://127.0.0.1:3000/cities',
-      raw: 'http://127.0.0.1:3000/cities',
-    },
-    refetch: new Observable<{[k: string]: unknown}>((subscriber) => {
-      const interval = setInterval(() => {
-        const id = Math.floor(Math.random() * (3 - 1 + 1)) + 1;
-        subscriber.next({ country_id: id });
-      }, 30000);
-
-      return () => {
-        clearInterval(interval);
-      };
-    }),
-  };
-
   formControl = new FormControl<string | undefined>(undefined);
   input: FileInput = {
     uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',

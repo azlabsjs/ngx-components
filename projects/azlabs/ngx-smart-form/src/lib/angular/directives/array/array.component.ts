@@ -44,14 +44,14 @@ export class NgxSmartFormArrayComponent
   implements AfterContentInit, OnDestroy, AfterViewInit
 {
   //#region component inputs definitions
-  @Input({ required: true }) detached!: AbstractControl[];
-  @Input({ alias: 'formArray' }) array!: FormArray;
-  @Input('no-grid-layout') noGridLayout = false;
+  @Input() detached!: AbstractControl[];
   @Input() template!: TemplateRef<any>;
   @Input() addGroupRef!: TemplateRef<Node>;
   @Input() name!: string;
   @Input() autoupload: boolean = true;
   @Input({ alias: 'controls' }) inputs!: InputConfigInterface[];
+  @Input({ alias: 'formArray' }) array!: FormArray;
+  @Input({ alias: 'no-grid-layout' }) noGridLayout = false;
   @Input({
     alias: 'class',
     transform: (value: string | string[]) => {
