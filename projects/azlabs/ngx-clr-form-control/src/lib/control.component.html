@@ -35,18 +35,20 @@
               (*)
             </small>
           </label>
-          <ng-container
-            *ngTemplateOutlet="
-              error ?? errorRef;
-              context: {
-                touched: formControl.touched,
-                $implicit: formControl.errors,
-                errors: formControl.errors
-              }
-            "
-          ></ng-container>
         </ngx-file-input>
       </ng-container>
+  
+      <!-- Error -->
+      <ng-container
+        *ngTemplateOutlet="
+          error ?? errorRef;
+          context: {
+            touched: formControl.touched,
+            $implicit: formControl.errors,
+            errors: formControl.errors
+          }
+        "
+      ></ng-container>
     </ng-container>
     <!--\ File Input -->
 
@@ -97,6 +99,8 @@
           </small>
         </label>
       </ngx-select-input>
+
+      <!-- Error -->
       <ng-container
         *ngTemplateOutlet="
           error ?? errorRef;
@@ -171,6 +175,8 @@
           </ngx-phone-input>
         </div>
       </div>
+
+      <!-- Error -->
       <ng-container
         *ngTemplateOutlet="
           error ?? errorRef;
@@ -227,19 +233,20 @@
               clrDate
             />
           </clr-date-container>
-          <!-- Input errors -->
-          <ng-container
-            *ngTemplateOutlet="
-              error ?? errorRef;
-              context: {
-                touched: control.touched,
-                $implicit: control.errors,
-                errors: control.errors
-              }
-            "
-          ></ng-container>
         </ng-template>
       </ngx-date-input>
+
+      <!-- Error -->
+      <ng-container
+        *ngTemplateOutlet="
+          error ?? errorRef;
+          context: {
+            touched: formControl.touched,
+            $implicit: formControl.errors,
+            errors: formControl.errors
+          }
+        "
+      ></ng-container>
     </ng-container>
     <!--\ Date Input -->
 
@@ -293,19 +300,20 @@
               />
             </div>
           </div>
-          <!-- Input errors -->
-          <ng-container
-            *ngTemplateOutlet="
-              error ?? errorRef;
-              context: {
-                touched: control.touched,
-                $implicit: control.errors,
-                errors: control.errors
-              }
-            "
-          ></ng-container>
         </ng-template>
       </ngx-time-input>
+
+      <!-- Error -->
+      <ng-container
+        *ngTemplateOutlet="
+          error ?? errorRef;
+          context: {
+            touched: formControl.touched,
+            $implicit: formControl.errors,
+            errors: formControl.errors
+          }
+        "
+      ></ng-container>
     </ng-container>
     <!--\ Time Input -->
 
@@ -361,19 +369,20 @@
                 </div>
               </div>
             </div>
-            <!-- Input errors -->
-            <ng-container
-              *ngTemplateOutlet="
-                error ?? errorRef;
-                context: {
-                  touched: control.touched,
-                  $implicit: control.errors,
-                  errors: control.errors
-                }
-              "
-            ></ng-container>
           </ng-template>
         </ngx-textarea-input>
+
+        <!-- Error -->
+        <ng-container
+          *ngTemplateOutlet="
+            error ?? errorRef;
+            context: {
+              touched: formControl.touched,
+              $implicit: formControl.errors,
+              errors: formControl.errors
+            }
+          "
+        ></ng-container>
       </ng-container>
     </ng-container>
     <!--\ Textarea Input -->
@@ -428,19 +437,20 @@
               />
             </div>
           </div>
-          <!-- Input errors -->
-          <ng-container
-            *ngTemplateOutlet="
-              error ?? errorRef;
-              context: {
-                touched: control.touched,
-                $implicit: control.errors,
-                errors: control.errors
-              }
-            "
-          ></ng-container>
         </ng-template>
       </ngx-number-input>
+
+      <!-- Error -->
+      <ng-container
+        *ngTemplateOutlet="
+          error ?? errorRef;
+          context: {
+            touched: formControl.touched,
+            $implicit: formControl.errors,
+            errors: formControl.errors
+          }
+        "
+      ></ng-container>
     </ng-container>
     <!--\ Number Input -->
 
@@ -486,19 +496,20 @@
               <label>{{ option.description ?? option.name }}</label>
             </clr-radio-wrapper>
           </clr-radio-container>
-          <!-- Input errors -->
-          <ng-container
-            *ngTemplateOutlet="
-              error ?? errorRef;
-              context: {
-                touched: control.touched,
-                $implicit: control.errors,
-                errors: control.errors
-              }
-            "
-          ></ng-container>
         </ng-template>
       </ngx-radio-input>
+
+      <!-- Error -->
+      <ng-container
+        *ngTemplateOutlet="
+          error ?? errorRef;
+          context: {
+            touched: formControl.touched,
+            $implicit: formControl.errors,
+            errors: formControl.errors
+          }
+        "
+      ></ng-container>
     </ng-container>
     <!--\ Radio Input -->
 
@@ -523,17 +534,19 @@
             (*)
           </small>
         </label>
-        <ng-container
-          *ngTemplateOutlet="
-            error ?? errorRef;
-            context: {
-              touched: formControl.touched,
-              $implicit: formControl.errors,
-              errors: formControl.errors
-            }
-          "
-        ></ng-container>
       </ngx-checkbox-input>
+
+      <!-- Error -->
+      <ng-container
+        *ngTemplateOutlet="
+          error ?? errorRef;
+          context: {
+            touched: formControl.touched,
+            $implicit: formControl.errors,
+            errors: formControl.errors
+          }
+        "
+      ></ng-container>
     </ng-container>
     <!--\ Checkbox Input -->
 
@@ -613,19 +626,20 @@
               ></cds-icon>
             </div>
           </div>
-          <!-- Input errors -->
-          <ng-container
-            *ngTemplateOutlet="
-              error ?? errorRef;
-              context: {
-                touched: control.touched,
-                $implicit: control.errors,
-                errors: control.errors
-              }
-            "
-          ></ng-container>
         </ng-template>
       </ngx-password-input>
+
+      <!-- Error -->
+      <ng-container
+        *ngTemplateOutlet="
+          error ?? errorRef;
+          context: {
+            touched: formControl.touched,
+            $implicit: formControl.errors,
+            errors: formControl.errors
+          }
+        "
+      ></ng-container>
     </ng-container>
     <!--\ Password Input -->
 
@@ -687,19 +701,20 @@
           />
         </div>
       </div>
-      <!-- Input errors -->
-      <ng-container
-        *ngTemplateOutlet="
-          error ?? errorRef;
-          context: {
-            touched: control.touched,
-            $implicit: control.errors,
-            errors: control.errors
-          }
-        "
-      ></ng-container>
     </ng-template>
   </ngx-text-input>
+  
+  <!-- Error -->
+  <ng-container
+    *ngTemplateOutlet="
+      error ?? errorRef;
+      context: {
+        touched: formControl.touched,
+        $implicit: formControl.errors,
+        errors: formControl.errors
+      }
+    "
+  ></ng-container>
 </ng-template>
 <!--\ Text Input -->
 
