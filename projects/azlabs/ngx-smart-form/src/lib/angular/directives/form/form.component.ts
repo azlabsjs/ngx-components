@@ -226,7 +226,7 @@ export class NgxSmartFormComponent
       return;
     }
 
-    const path = this.path ?? this.form.endpointURL;
+    const path = this.path ?? this.form?.endpointURL;
     const clientDefined =
       typeof this.client !== 'undefined' && this.client !== null;
     const pathDefined = path !== null && path !== 'undefined';
@@ -274,14 +274,23 @@ export class NgxSmartFormComponent
   //#endregion
 
   setControlConfig(config?: InputConfigInterface, name?: string) {
-    if (config) {
-      name = name ?? config.name;
-      const { controlConfigs: inputs } = this.form;
-      const index = inputs?.findIndex((current) => current.name === name);
-      inputs?.splice(index, 1, config);
-      const form = { ...this.form, controlConfigs: inputs };
-      this.updateModel(form, this.formGroup);
+    if (!this.form) {
+      return;
     }
+
+    if (!config) {
+      return;
+    }
+    name = name ?? config.name;
+    const { controlConfigs: inputs } = this.form ?? {};
+    const index = inputs?.findIndex((current) => current.name === name);
+    if (!index) {
+      return;
+    }
+
+    inputs?.splice(index, 1, config);
+    const form = { ...this.form, controlConfigs: inputs };
+    this.updateModel(form, this.formGroup);
   }
 
   ngOnDestroy(): void {

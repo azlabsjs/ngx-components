@@ -52,7 +52,7 @@ export class FormModel implements OnDestroy {
   // @internal
   private _formGroup!: FormGroup;
   private _form!: FormConfigInterface;
-  get state(): FormModelState {
+  get state(): Required<FormModelState> {
     return {
       formGroup: this._formGroup,
       detached: Array.from(this._detached.values()),

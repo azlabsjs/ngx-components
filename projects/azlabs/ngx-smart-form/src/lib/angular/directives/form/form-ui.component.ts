@@ -9,7 +9,8 @@ import { NgxSmartFormArrayComponent } from '../array';
 import { NgxSmartFormGroupHeaderPipe } from '../group';
 import { NgxSmartFormControlArrayComponent } from '../control-array';
 import { PIPES } from '../../pipes';
-import { FormModelState } from './types';
+import { FormGroupState } from './types';
+import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 
 @Component({
   selector: 'ngx-form-ui',
@@ -27,7 +28,9 @@ import { FormModelState } from './types';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxFormComponent {
-  @Input({ required: true }) state!: FormModelState;
+  @Input({ required: true }) state!: FormGroupState & { [k: string]: unknown }; // we add { [k: string]: unknown } to support 
+                                                                                // FormModelState which includes form property but not required on this component
+  @Input({ required: true }) inputs!: InputConfigInterface[];
   @Input() template!: TemplateRef<any>;
   @Input({ alias: 'add-template' }) addTemplate!: TemplateRef<any>;
   @Input() label!: TemplateRef<any>;
