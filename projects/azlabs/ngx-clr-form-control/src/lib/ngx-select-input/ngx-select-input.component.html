@@ -29,7 +29,6 @@
       (change)="select($event, state.config)"
       [appendTo]="'body'"
       [disabled]="disabled || control.disabled"
-      [contentEditable]="true"
     >
       <ng-template ng-option-tmp let-item="item">
         <label class="form-check-label ml-2"> {{ item?.name }} </label>
