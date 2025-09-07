@@ -16,8 +16,14 @@ type BaseGridColumnType = {
   transformTitle?: PipeTransformType | PipeTransformType[];
   transform?: PipeTransformType | PipeTransformType[];
   style?: {
-    class?: string | string[];
-    styles?: string[] | string;
+    class?:
+      | string
+      | string[]
+      | ((value: unknown, model: Record<string, unknown>) => string);
+    styles?:
+      | string[]
+      | string
+      | ((value: unknown, model: Record<string, unknown>) => string);
   };
   type?: 'string' | 'number';
   field?: string;

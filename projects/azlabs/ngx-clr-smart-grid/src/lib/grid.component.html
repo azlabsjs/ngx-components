@@ -53,13 +53,20 @@
       </clr-dg-action-overflow>
       <ng-container *ngFor="let column of columns">
         <clr-dg-cell (click)="onItemClick($event, current)">
-          <span class="cell-value" [ngClass]="column.style.class ?? ''" [style]="column.style.styles">
             <ng-container
               *ngIf="current|propValue:column.property | transform: column.transform | pipeResult as result">
-              <ng-container *ngIf="result.value | isAsync; else noAsyncRef">{{result.value | async}}</ng-container>
-              <ng-template #noAsyncRef>{{ result.value }}</ng-template>
-            </ng-container>
-          </span>
+                <ng-container *ngIf="result.value | isAsync; else noAsyncRef">
+                  <span *ngIf="result.value | async as value" class="cell-value" [ngClass]="column.style.class | cssclass:value:current" [style]="column.style.styles | cssstyle:value:current">
+                    {{value}}
+                  </span>
+                </ng-container>
+                  
+                <ng-template #noAsyncRef>
+                  <span class="cell-value" [ngClass]="column.style.class | cssclass:result.value:current" [style]="column.style.styles | cssstyle:result.value:current">
+                    {{ result.value }}
+                  </span>
+                </ng-template>
+              </ng-container>
         </clr-dg-cell>
       </ng-container>
       <!-- USING ngProjectAs as recommended by the documentation -->

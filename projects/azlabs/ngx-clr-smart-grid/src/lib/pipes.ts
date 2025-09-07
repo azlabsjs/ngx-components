@@ -16,3 +16,44 @@ export class GridRowClassPipe implements PipeTransform {
       : '';
   }
 }
+
+@Pipe({
+  name: 'cssclass',
+  pure: true,
+  standalone: true,
+})
+export class CellClassPipe implements PipeTransform {
+  transform(
+    value:
+      | string
+      | string[]
+      | ((value: unknown, model: Record<string, unknown>) => string)
+      | undefined,
+    p: unknown,
+    model: Record<string, unknown>
+  ) {
+    return typeof value === 'function' ? value(p, model) : value ?? '';
+  }
+}
+
+@Pipe({
+  name: 'cssstyle',
+  pure: true,
+  standalone: true,
+})
+export class CellStylePipe implements PipeTransform {
+  transform(
+    value:
+      | string
+      | string[]
+      | ((value: unknown, model: Record<string, unknown>) => string)
+      | undefined,
+    p: unknown,
+    model: Record<string, unknown>
+  ) {
+    return typeof value === 'function' ? value(p, model) : value ?? '';
+  }
+}
+
+// exported standalone pipes
+export const PIPES = [GridRowClassPipe, CellClassPipe, CellStylePipe] as const;

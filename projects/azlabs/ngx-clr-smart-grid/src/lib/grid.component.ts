@@ -20,7 +20,7 @@ import {
 } from './core';
 import { CommonModule } from '@angular/common';
 import { NgxClrGridSelectDirective } from './directives';
-import { GridRowClassPipe } from './pipes';
+import { PIPES } from './pipes';
 import {
   AsyncPipe,
   CurrencyPipe,
@@ -31,7 +31,7 @@ import {
   SlicePipe,
   UpperCasePipe,
 } from '@angular/common';
-import { COMMON_PIPES, CommonTextPipe } from '@azlabsjs/ngx-common';
+import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 
 /** @internal */
 const GRID_CONFIG: Required<GridConfigType> = {
@@ -67,7 +67,7 @@ type StateType = {
     ClarityModule,
     ...COMMON_PIPES,
     NgxClrGridSelectDirective,
-    GridRowClassPipe,
+    ...PIPES,
   ],
   providers: [
     UpperCasePipe,

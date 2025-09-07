@@ -32,13 +32,7 @@ import {
   FormConfigInterface,
   InputTypes,
 } from '@azlabsjs/smart-form-core';
-import {
-  BehaviorSubject,
-  filter,
-  Subject,
-  takeUntil,
-  tap,
-} from 'rxjs';
+import { BehaviorSubject, filter, Subject, takeUntil, tap } from 'rxjs';
 import { TestPipe, TRANSLATE_PIPES } from './pipes';
 import { FORM_CONTROL_DIRECTIVES } from '@azlabsjs/ngx-clr-form-control';
 import { DIRECTIVES as GRID_DIRECTIVES } from '@azlabsjs/ngx-clr-smart-grid';
@@ -156,6 +150,13 @@ export class AppComponent implements OnInit {
     {
       title: 'app.modules.persons.gender',
       property: 'sex',
+      style: {
+        class: (value) => {
+          return String(value) === 'F'
+            ? 'label label-success'
+            : 'label label-danger';
+        },
+      },
     },
     {
       title: 'app.modules.persons.nationality',
@@ -167,7 +168,7 @@ export class AppComponent implements OnInit {
       property: 'test',
       transform: 'testPipe',
       style: {
-        class: 'label label-success p-top-bottom-12',
+        // class: ,
       },
     },
   ];
