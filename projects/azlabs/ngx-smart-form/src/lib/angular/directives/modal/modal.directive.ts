@@ -23,6 +23,7 @@ export class ModalDirective {
   @Input() title!: string;
   @Input() detached!: AbstractControl[];
   @Input() view!: TemplateRef<any>;
+  @Input() name!: string;
   //#endregion
 
   //#region directive outputs

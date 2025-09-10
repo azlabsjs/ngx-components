@@ -53,6 +53,7 @@ export class NgxTableForm
   @Input({ required: true }) detached!: AbstractControl[];
   @Input() title!: string;
   @Input() modal!: ModalDirective;
+  @Input() name!: string;
   //#endregion
 
   //#region component output
@@ -78,6 +79,7 @@ export class NgxTableForm
       this.modal.title = this.title;
       this.modal.detached = this.detached;
       this.modal.view = this.view;
+      this.modal.name = this.name;
       this.modal.stateChanged();
       this.modal.open();
     }
