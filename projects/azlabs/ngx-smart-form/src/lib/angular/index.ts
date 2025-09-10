@@ -5,7 +5,8 @@ import {
   NgxSmartFormGroupComponent,
   NgxTableForm,
   NgxFormDirective,
-  NgxFormComponent
+  NgxFormComponent,
+  ModalDirective
 } from './directives';
 
 /** @deprecated */
@@ -76,5 +77,6 @@ export const FORM_DIRECTIVES = [
   NgxSmartFormArrayItemComponent,
   SafeHTMLPipe,
   NgxTableForm,
-  NgxFormComponent
+  NgxFormComponent,
+  ModalDirective
 ] as const;

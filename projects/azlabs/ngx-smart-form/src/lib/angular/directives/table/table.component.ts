@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
   Component,
+  ContentChild,
   EmbeddedViewRef,
   EventEmitter,
   Input,
@@ -12,12 +13,13 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import { RefType, ViewRefFactory } from '../types';
-import { AbstractControl } from '@angular/forms';
+import { AbstractControl, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { BUTTON_DIRECTIVES } from '../buttons';
 import { PIPES } from '../../pipes';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
+import { ModalDirective } from '../modal';
 
 /** @internal */
 type ContextType = {
@@ -30,7 +32,13 @@ type ContextType = {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ...COMMON_PIPES, ...BUTTON_DIRECTIVES, ...PIPES],
+  imports: [
+    CommonModule,
+    ...COMMON_PIPES,
+    ...BUTTON_DIRECTIVES,
+    ...PIPES,
+    // ...MODAL_DIRECTIVES,
+  ],
   selector: 'ngx-table-form',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
@@ -43,6 +51,8 @@ export class NgxTableForm
   @Input({ alias: 'auto-upload' }) autoupload: boolean = true;
   @Input({ alias: 'template' }) view!: TemplateRef<any>;
   @Input({ required: true }) detached!: AbstractControl[];
+  @Input() title!: string;
+  @Input() modal!: ModalDirective;
   //#endregion
 
   //#region component output
@@ -56,14 +66,28 @@ export class NgxTableForm
   private destroy$ = new Subject<void>();
   //#endregion
 
-  createView(index: number, input: AbstractControl) {
+  createView(index: number, formgroup: AbstractControl) {
     const subject = new Subject<number>();
+    const inputs = [...this.configs];
+
+    // case a modal component is provided we open the modal and pass required input configuration to it
+    if (this.modal) {
+      this.modal.formgroup = formgroup as FormGroup;
+      this.modal.input = inputs;
+      this.modal.autoupload = this.autoupload;
+      this.modal.title = this.title;
+      this.modal.detached = this.detached;
+      this.modal.view = this.view;
+      this.modal.stateChanged();
+      this.modal.open();
+    }
+
     const element = this.containerRef?.createEmbeddedView<ContextType>(
       this.templateRef,
       {
-        formgroup: input,
+        formgroup,
         autoupload: this.autoupload,
-        inputs: [...this.configs],
+        inputs,
         remove: (e: Event) => {
           e?.preventDefault();
           ref?.destroy();

@@ -36,6 +36,7 @@ import { CommonModule } from '@angular/common';
 import { PIPES } from '../../pipes';
 import { FormModel } from './form.model';
 import { NgxFormComponent } from './form-ui.component';
+import { ModalDirective } from '../modal';
 
 /** @internal */
 const AUTO_SUBMIT_ERROR_MESSAGE =
@@ -102,6 +103,7 @@ export class NgxSmartFormComponent
 
   //#region component children
   @ContentChild('submitButton') submitRef!: TemplateRef<Node>;
+  @ContentChild(ModalDirective) modal!: ModalDirective;
   //#endregion
 
   private subscriptions: Subscription[] = [];

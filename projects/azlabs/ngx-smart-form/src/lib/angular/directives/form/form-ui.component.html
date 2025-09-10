@@ -93,16 +93,14 @@
                 [class]="value.classes"
                 [no-grid-layout]="noGridLayout"
                 [formArray]="local"
-                [controls]="
-                  (value | asInputGroup).children || [] | inputConfigArray
-                "
+                [controls]="(value | asInputGroup).children || [] | inputConfigArray"
                 [template]="template"
                 [addGroupRef]="addTemplate"
                 [name]="value.name"
+                [title]="value.label"
                 [autoupload]="autoupload"
-                [hidden]="
-                  (value | isHidden) || (local | inarray : state.detached)
-                "
+                [hidden]="(value | isHidden) || (local | inarray : state.detached)"
+                [modal]="modalDirective ?? modal"
               >
               </ngx-smart-form-array>
             </ng-container>

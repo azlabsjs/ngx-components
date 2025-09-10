@@ -54,18 +54,17 @@ export class LengthPipe implements PipeTransform {
 }
 
 @Pipe({
+  name: 'join',
   standalone: true,
   pure: true,
-  name: 'join',
 })
-@Injectable({ providedIn: 'any' })
 export class JoinPipe implements PipeTransform {
   /**
    * @description Join the list of using the provided character.
    *
    * **Note** By default it uses the `,` to join the elements
    */
-  transform(value: unknown[], character = ',') {
-    return value.join(character);
+  transform<T>(values: T[], separator: string = ' ') {
+    return values.join(separator);
   }
 }

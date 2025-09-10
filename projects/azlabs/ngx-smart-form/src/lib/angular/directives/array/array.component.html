@@ -15,21 +15,14 @@
   [auto-upload]="autoupload"
   [template]="template"
   [detached]="detached"
+  [title]="title"
+  [modal]="modal"
   *ngIf="cssClass.includes('table')"
   #container
-></ngx-table-form>
-
-<div
-  *ngIf="!cssClass.includes('table') && refCount === 0"
-  class="placeholder"
-></div>
-<ng-container
-  *ngTemplateOutlet="
-    addGroupRef ? addGroupRef : addTemplate;
-    context: { $implicit: add.bind(this) }
-  "
-></ng-container>
-
-<ng-template #addTemplate let-handler>
-  <ngx-add-button (click)="handler($event)"></ngx-add-button>
-</ng-template>
+>
+  <div *ngIf="!cssClass.includes('table') && refCount === 0" class="placeholder"></div>
+  <ng-container *ngTemplateOutlet=" addGroupRef ? addGroupRef : _add; context: { $implicit: add.bind(this) }"></ng-container>
+  <ng-template #_add let-handler>
+    <ngx-add-button (click)="handler($event)"></ngx-add-button>
+  </ng-template>
+</ngx-table-form>

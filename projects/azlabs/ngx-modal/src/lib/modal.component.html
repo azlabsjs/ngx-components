@@ -1,0 +1,84 @@
+<!-- modal -->
+<div
+  class="modal"
+  [class]="cssClass | appendCssClasses : state.size | join"
+  [ngClass]="{ opened: state.opened }"
+>
+  <!-- modal content -->
+  <ng-container *ngIf="animation === 'fade'">
+    <div
+      class="modal-content"
+      [@fadeInOutSlideBottom]="state.opened ? 'open' : 'close'"
+    >
+      <ng-container *ngTemplateOutlet="actionsRef"></ng-container>
+      <ng-container
+        *ngTemplateOutlet="
+          templateRef ?? _template;
+          context: {
+            onClose: onClose.bind(this),
+            $implicit: onClose.bind(this)
+          }
+        "
+      ></ng-container>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="animation === 'scale'">
+    <div class="modal-content" [@scaleUpDown]="state.opened ? 'open' : 'close'">
+      <ng-container *ngTemplateOutlet="actionsRef"></ng-container>
+      <ng-container *ngIf="!!outlet; else template">
+        <ng-container
+          *ngComponentOutlet="
+            outlet.component;
+            inputs: outlet.inputs | inputs;
+            ngModule: outlet.module;
+            injector: outlet.injector;
+            content: outlet.content
+          "
+        >
+        </ng-container>
+      </ng-container>
+
+      <ng-template #template>
+        <ng-container
+          *ngTemplateOutlet="
+            templateRef ?? _template;
+            context: {
+              onClose: onClose.bind(this),
+              $implicit: onClose.bind(this)
+            }
+          "
+        ></ng-container>
+      </ng-template>
+    </div>
+  </ng-container>
+</div>
+
+<ng-template #_template>
+  <ng-content></ng-content>
+</ng-template>
+
+<ng-template #actionsRef>
+  <div class="actions">
+    <div class="user-actions">
+      <ng-container *ngIf="actions; else _custom">
+        <ng-container *ngTemplateOutlet="actions; context: {resize: resize.bind(this), close: close.bind(this)}"></ng-container>
+      </ng-container>
+      <ng-template #_custom>
+        <ng-content select="[custom-actions]"></ng-content>
+      </ng-template>
+    </div>
+    <svg
+      (click)="onClose($event)"
+      *ngIf="closeable"
+      [ngClass]="{ full: size === 'full' }"
+      class="toggle-close icon"
+      viewBox="0 0 36 36"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M19.41,18l7.29-7.29a1,1,0,0,0-1.41-1.41L18,16.59,10.71,9.29a1,1,0,0,0-1.41,1.41L16.59,18,9.29,25.29a1,1,0,1,0,1.41,1.41L18,19.41l7.29,7.29a1,1,0,0,0,1.41-1.41Z"
+      ></path>
+    </svg>
+  </div>
+</ng-template>

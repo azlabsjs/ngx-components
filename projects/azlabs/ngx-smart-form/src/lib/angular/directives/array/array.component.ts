@@ -25,6 +25,7 @@ import { PIPES } from '../../pipes';
 import { NgxTableForm } from '../table';
 import { NgxFormArrayOutletComponent } from './array-outlet.component';
 import { RefType, ViewRefFactory } from '../types';
+import { ModalDirective } from '../modal';
 
 @Component({
   standalone: true,
@@ -44,10 +45,12 @@ export class NgxSmartFormArrayComponent
   implements AfterContentInit, OnDestroy, AfterViewInit
 {
   //#region component inputs definitions
+  @Input() modal!: ModalDirective;
   @Input() detached!: AbstractControl[];
   @Input() template!: TemplateRef<any>;
   @Input() addGroupRef!: TemplateRef<Node>;
   @Input() name!: string;
+  @Input() title!: string;
   @Input() autoupload: boolean = true;
   @Input({ alias: 'controls' }) inputs!: InputConfigInterface[];
   @Input({ alias: 'formArray' }) array!: FormArray;

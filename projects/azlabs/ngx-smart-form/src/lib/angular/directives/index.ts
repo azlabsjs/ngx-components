@@ -19,6 +19,8 @@ export {
   NgxFormComponent,
 } from './form';
 
-export { BUTTON_DIRECTIVES } from '../directives/buttons';
+export { BUTTON_DIRECTIVES } from './buttons';
 
 export { NgxTableForm } from './table';
+
+export { ModalDirective } from './modal';

@@ -1,0 +1,236 @@
+/* modal (background) */
+.modal {
+  display: none;
+  /* hidden by default */
+  position: fixed;
+  /* stay in place */
+  z-index: var(--ngx-modal-z-index, 1050);
+  
+  /* sit on top */
+  /* location of the box */
+  left: 0;
+  top: 0;
+  width: 100vw;
+
+  /* full width */
+  height: 100vh;
+
+  /* full height */
+  overflow: auto;
+
+  /* enable scroll if needed */
+  background-color: rgb(0, 0, 0);
+
+  /* fallback color */
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* modal opened state */
+.modal.opened {
+  display: block;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 0;
+}
+
+.modal.full.opened {
+  padding: 0;
+}
+
+.modal .modal-content {
+  min-height: var(--search-modal-min-height, 220px) !important;
+  max-height: calc(100vh - 8px);
+}
+
+.modal.sm .modal-content {
+  width: 14.4rem;
+  min-height: var(--search-modal-min-height, 220px) !important;
+  max-height: calc(100vh - 8px);
+}
+
+.modal.md .modal-content {
+  width: 36.4rem;
+  min-height: var(--search-modal-min-height, 220px) !important;
+  max-height: calc(100vh - 8px);
+}
+
+.modal.lg .modal-content {
+  width: 43.2rem;
+  min-height: var(--search-modal-min-height, 220px) !important;
+  max-height: calc(100vh - 8px);
+}
+
+.modal.xl .modal-content {
+  width: 80%;
+  height: auto;
+  max-height: calc(100vh - 8px);
+}
+
+.modal.full .modal-content {
+  height: 100vh;
+  max-height: 100vh;
+  width: 100%;
+}
+
+/* modal content */
+.modal .modal-content {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 1;
+  position: relative;
+  z-index: var(--ngx-modal-z-index, 1050);
+  background-color: var(--ngx-modal-content-bg-color, #fefefe);
+  margin: auto;
+}
+
+.modal:not(.no-padding) .modal-content {
+  padding: var(--ngx-modal-content-padding, 24px);
+}
+
+.modal .modal-content {
+  border-radius: var(--ngx-modal-content-border-radius, 5px);
+}
+
+.modal.full .modal-content {
+  border: 1px solid var(--ngx-modal-content-border-color, #888);
+  border-radius: var(--ngx-modal-content-border-radius, 0.15rem);
+  box-shadow: 0 0.05rem 0rem 0rem
+    var(--ngx-modal-content-box-shadow-color, rgba(0, 0, 0, 0.1));
+}
+/* modal content*/
+
+/* modal title */
+:host ::ng-deep .modal-title,
+:host ::ng-deep .ngx-modal-title {
+  flex-grow: 0;
+  padding: 0rem 2rem;
+}
+
+/*! modal title !*/
+
+/* modal body */
+:host ::ng-deep .modal-body,
+:host ::ng-deep .ngx-modal-body {
+  flex-grow: 3;
+}
+
+:host ::ng-deep .modal-body,
+:host ::ng-deep .ngx-modal-body {
+  display: block;
+  overflow-y: scroll;
+  scrollbar-width: thin;
+  padding: 0.5rem 2rem;
+  margin: var(--search-modal-margin, 0) !important;
+}
+
+.modal.full :host ::ng-deep .ngx-modal-body {
+  margin: var(--search-modal-margin, 0) !important;
+}
+/*! modal body !*/
+
+/* modal footer */
+:host ::ng-deep .modal-footer,
+:host ::ng-deep .ngx-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: row;
+  padding: var(--ngx-modal-footer-padding, 0.8rem 0 0 0);
+  flex-grow: 0;
+}
+
+/*! modal footer !*/
+
+/* close Button */
+.toggle-close {
+  display: inline;
+  color: var(--ngx-modal-icon-color, #aaaaaa);
+  letter-spacing: var(--ngx-modal-icon-letter-spacing, 8px);
+  width: var(--ngx-modal-icon-width, 24px);
+  height: var(--ngx-modal-icon-width, 24px);
+}
+
+.toggle-close.full {
+  width: var(--ngx-modal-full-icon-width, 32px);
+  height: var(--ngx-modal-full-icon-width, 32px);
+}
+
+.toggle-close path {
+  color: var(--ngx-modal-icon-color, #aaaaaa);
+  fill: var(--ngx-modal-icon-color, #aaaaaa);
+}
+
+.modal:not(.full) .modal-content .actions {
+  margin-top: var(--ngx-modal-actions-top, 20px);
+  align-self: flex-end;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal.full .modal-content .actions {
+  display: flex;
+  justify-content: space-between;
+  top: var(--ngx-modal-icon-top, 20px);
+  position: fixed;
+  right: var(--ngx-modal-icon-right, 42px);
+}
+
+.modal.full .modal-content .user-actions {
+  position: relative;
+  display: inline;
+}
+
+.toggle-close:hover,
+.toggle-close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/*! close button*/
+
+/* Animation styles */
+@keyframes scaleOut {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes scaleDown {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes contentScaleUp {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  99.9% {
+    transform: scale(2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+
+@keyframes contentScaleDown {
+  0% {
+    transform: scale(2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+/*! Animation styles */

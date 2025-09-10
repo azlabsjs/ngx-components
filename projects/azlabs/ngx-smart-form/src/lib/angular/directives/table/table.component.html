@@ -3,7 +3,10 @@
     <tr>
       <th *ngFor="let item of configs" class="left">
         <span>{{ item.label | text }}</span>
-        <small class="required" *ngIf="item.rules?.isRequired ?? (item | required)">
+        <small
+          class="required"
+          *ngIf="item.rules?.isRequired ?? (item | required)"
+        >
           (*)
         </small>
       </th>
@@ -13,7 +16,9 @@
   <tbody #container></tbody>
 </table>
 
-<!-- HTML Table layout component -->
+<ng-content></ng-content>
+
+<!-- table layout component -->
 <ng-template
   #template
   let-formgroup="formgroup"

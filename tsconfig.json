@@ -3,6 +3,9 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
+      "@azlabs/ngx-modal": [
+        "./dist/azlabs/ngx-modal"
+      ],
       "@azlabsjs/ngx-clr-form-control": [
         "dist/azlabs/ngx-clr-form-control"
       ],
