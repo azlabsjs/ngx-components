@@ -23,7 +23,6 @@ import {
 import { OutletConfig, SizeType } from './types';
 import { PIPES } from './pipes';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
-import { CdkDragPlaceholder } from "@angular/cdk/drag-drop";
 
 /** @internal */
 type StateType = {
@@ -32,7 +31,7 @@ type StateType = {
 };
 
 @Component({
-  imports: [CommonModule, ...PIPES, COMMON_PIPES, CdkDragPlaceholder],
+  imports: [CommonModule, ...PIPES, COMMON_PIPES],
   selector: 'ngx-modal',
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.scss'],

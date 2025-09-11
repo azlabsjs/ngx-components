@@ -49,6 +49,7 @@ export class NgxSmartFormArrayComponent
   @Input() detached!: AbstractControl[];
   @Input() template!: TemplateRef<any>;
   @Input() addGroupRef!: TemplateRef<Node>;
+  @Input() label!: TemplateRef<any>;
   @Input() name!: string;
   @Input() title!: string;
   @Input() autoupload: boolean = true;
@@ -89,6 +90,7 @@ export class NgxSmartFormArrayComponent
   }
   private refs: RefType<unknown>[] = [];
   private destroy$ = new Subject<void>();
+  private triggered = false;
   // #endregion
 
   // component instance initializer
@@ -108,11 +110,11 @@ export class NgxSmartFormArrayComponent
       .subscribe();
   }
 
-  add(event: Event) {
+  add(_: Event) {
     const g = this.builder.group(this.inputs);
     const clone = cloneAbstractControl(g) as FormGroup;
+    this.triggered = true;
     this.array.push(clone);
-    event.preventDefault();
   }
 
   removed<T>(ref: RefType<T>) {
@@ -140,7 +142,11 @@ export class NgxSmartFormArrayComponent
       for (let i = 0; i < count; i++) {
         const index = this._ref + i;
         const { viewFactory: factory } = this;
-        const view = factory.createView(index, this.array.at(index));
+        const view = factory.createView(
+          index,
+          this.array.at(index),
+          this.triggered
+        );
         this.refs.push(view);
       }
       this.setRefCount(this._ref + count);
@@ -151,6 +157,9 @@ export class NgxSmartFormArrayComponent
       this.setRefCount(refCount);
       this.listChange.emit(refCount);
     }
+
+    // set the tiggered value to false after each update call to reset it state
+    this.triggered = false;
   }
 
   private setRefCount(value: number) {

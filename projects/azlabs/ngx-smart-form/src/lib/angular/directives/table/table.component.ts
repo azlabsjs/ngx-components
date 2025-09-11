@@ -47,9 +47,10 @@ export class NgxTableForm
   implements AfterViewInit, ViewRefFactory<EmbeddedViewRef<any>>, OnDestroy
 {
   //#region component inputs
+  @Input() label!: TemplateRef<any>;
+  @Input({ alias: 'template' }) view!: TemplateRef<any>;
   @Input({ alias: 'inputs' }) configs: InputConfigInterface[] = [];
   @Input({ alias: 'auto-upload' }) autoupload: boolean = true;
-  @Input({ alias: 'template' }) view!: TemplateRef<any>;
   @Input({ required: true }) detached!: AbstractControl[];
   @Input() title!: string;
   @Input() modal!: ModalDirective;
@@ -67,19 +68,24 @@ export class NgxTableForm
   private destroy$ = new Subject<void>();
   //#endregion
 
-  createView(index: number, formgroup: AbstractControl) {
+  createView(
+    index: number,
+    formgroup: AbstractControl,
+    triggered: boolean = false
+  ) {
     const subject = new Subject<number>();
     const inputs = [...this.configs];
 
     // case a modal component is provided we open the modal and pass required input configuration to it
-    if (this.modal) {
+    if (triggered && this.modal) {
       this.modal.formgroup = formgroup as FormGroup;
-      this.modal.input = inputs;
+      this.modal.inputs = inputs;
       this.modal.autoupload = this.autoupload;
       this.modal.title = this.title;
       this.modal.detached = this.detached;
       this.modal.view = this.view;
       this.modal.name = this.name;
+      this.modal.label = this.label;
       this.modal.stateChanged();
       this.modal.open();
     }

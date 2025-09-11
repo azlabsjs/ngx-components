@@ -39,6 +39,28 @@
       [path]="'http://localhost:3000/customers'"
       [template]="controlTemplate"
     >
+      <ngx-modal
+        #modal
+        (openChange)="onOpenChange(modal)"
+        (stateChange)="formModalStateChange()"
+        ngxformmodal
+        #formmodal="formmodal"
+      >
+        <div class="ngx-modal-body">
+          <ngx-form-ui
+            *ngIf="formmodal.formgroup"
+            [no-grid-layout]="false"
+            [autoupload]="true"
+            [template]="formmodal.view"
+            [label]="formmodal.label"
+            [state]="{formGroup: formmodal.formgroup,detached: formmodal.detached}"
+            [inputs]="formmodal.inputs"
+          >
+          </ngx-form-ui>
+        </div>
+        <div class="ngx-modal-footer"></div>
+      </ngx-modal>
+      <!-- <p modal>I am a modal</p> -->
       <ng-template
         #controlTemplate
         let-config="value"

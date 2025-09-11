@@ -8,13 +8,9 @@
   [modal]="modal"
   [inputs]="model.state.form.controlConfigs || []"
 >
-  <section before>
-    <ng-content select="[before]"></ng-content>
-  </section>
-
-  <section after>
-    <ng-content select="[after]"></ng-content>
-  </section>
+  <section before><ng-content select="[before]"></ng-content></section>
+  <section after><ng-content select="[after]"></ng-content></section>
+  <ng-content></ng-content>
 
   <section submit>
     <ng-container *ngIf="submitable">

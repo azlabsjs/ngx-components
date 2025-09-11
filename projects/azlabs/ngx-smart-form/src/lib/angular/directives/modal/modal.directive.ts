@@ -14,16 +14,18 @@ export type SizeType = 'sm' | 'md' | 'lg' | 'xl' | 'full';
 @Directive({
   standalone: true,
   selector: '[ngxformmodal]',
+  exportAs: 'formmodal'
 })
 export class ModalDirective {
   //#region directive inputs
   @Input() formgroup!: FormGroup;
-  @Input() input!: InputConfigInterface[];
+  @Input() inputs!: InputConfigInterface[];
   @Input() autoupload!: boolean;
   @Input() title!: string;
   @Input() detached!: AbstractControl[];
-  @Input() view!: TemplateRef<any>;
   @Input() name!: string;
+  @Input() view!: TemplateRef<any>;
+  @Input() label!: TemplateRef<any>;
   //#endregion
 
   //#region directive outputs

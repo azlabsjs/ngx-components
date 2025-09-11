@@ -52,6 +52,7 @@ import {
 } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { useTranslationsFactory } from './translations';
+import { MODAL_DIRECTIVES } from '@azlabs/ngx-modal';
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
@@ -84,6 +85,7 @@ export function createTranslateLoader() {
     ...FORM_CONTROL_DIRECTIVES,
     ...FORM_DIRECTIVES,
     ...OPTIONS_DIRECTIVES,
+    ...MODAL_DIRECTIVES,
     FormControlComponent,
     NgxDropzoneModule.forRoot(),
   ],

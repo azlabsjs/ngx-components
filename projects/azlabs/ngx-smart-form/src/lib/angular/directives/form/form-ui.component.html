@@ -5,21 +5,15 @@
   <!--\ before-->
 
   <!-- inputs -->
-  <ng-container
-    *ngTemplateOutlet="
-      recursiveTemplate;
-      context: {
-        group: state.formGroup,
-        controls: inputs,
-        autoupload
-      }
-    "
-  ></ng-container>
+  <ng-container *ngTemplateOutlet=" recursiveTemplate; context: { group: state.formGroup, controls: inputs, autoupload }"></ng-container>
   <!--\ inputs -->
 
   <!-- after-->
   <ng-content select="[after]"></ng-content>
   <!--\ after-->
+
+  <!-- holds any projected content -->
+  <ng-content></ng-content>
 
   <!-- submit -->
   <ng-content select="[submit]"></ng-content>
@@ -101,6 +95,7 @@
                 [autoupload]="autoupload"
                 [hidden]="(value | isHidden) || (local | inarray : state.detached)"
                 [modal]="modalDirective ?? modal"
+                [label]="label"
               >
               </ngx-smart-form-array>
             </ng-container>

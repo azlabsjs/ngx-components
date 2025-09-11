@@ -11,9 +11,11 @@ import {
 } from '@angular/common';
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   Inject,
   OnInit,
+  Optional,
   ViewChild,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
@@ -39,6 +41,7 @@ import { DIRECTIVES as GRID_DIRECTIVES } from '@azlabsjs/ngx-clr-smart-grid';
 import { FormControlComponent } from './form-control/form-control.component';
 import { ClarityModule } from '@clr/angular';
 import { ReactiveFormDirectiveInterface } from 'projects/azlabs/ngx-smart-form/src/lib';
+import { ModalComponent } from '@azlabs/ngx-modal';
 
 const _values = {
   data: [
@@ -229,7 +232,8 @@ export class AppComponent implements OnInit {
   public constructor(
     @Inject(FORM_CLIENT) private client: FormsClient,
     private lowercasePipe: LowerCasePipe,
-    @Inject(HTTP_REQUEST_CLIENT) private httpClient: RequestClient
+    @Inject(HTTP_REQUEST_CLIENT) private httpClient: RequestClient,
+    @Optional() private cdRef: ChangeDetectorRef | null
   ) {
     this.client
       .get(220)
@@ -241,6 +245,16 @@ export class AppComponent implements OnInit {
       )
       .subscribe();
   }
+
+  onOpenChange(_t28: ModalComponent) {
+    console.log('modal: ', _t28);
+    _t28.open();
+  }
+
+  formModalStateChange() {
+    this.cdRef?.detectChanges();
+  }
+
   ngOnInit(): void {
     setTimeout(() => {
       this._pageResult$.next(_values);
