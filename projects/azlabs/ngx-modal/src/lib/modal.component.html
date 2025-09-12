@@ -1,26 +1,10 @@
 <!-- modal -->
- <pre>State: {{ state | json }}</pre>
-<div
-  class="modal"
-  [class]="cssClass | appendCssClasses : state.size | join"
-  [ngClass]="{ opened: state.opened }"
->
+<div class="modal" [class]="cssClass | appendCssClasses : state.size | join" [ngClass]="{ opened: state.opened }">
   <!-- modal content -->
   <ng-container *ngIf="animation === 'fade'">
-    <div
-      class="modal-content"
-      [@fadeInOutSlideBottom]="state.opened ? 'open' : 'close'"
-    >
+    <div class="modal-content" [@fadeInOutSlideBottom]="state.opened ? 'open' : 'close'">
       <ng-container *ngTemplateOutlet="actionsRef"></ng-container>
-      <ng-container
-        *ngTemplateOutlet="
-          templateRef ?? _template;
-          context: {
-            onClose: onClose.bind(this),
-            $implicit: onClose.bind(this)
-          }
-        "
-      ></ng-container>
+      <ng-container *ngTemplateOutlet="templateRef ?? _template; context: { onClose: onClose.bind(this), $implicit: onClose.bind(this) }"></ng-container>
     </div>
   </ng-container>
 
@@ -28,28 +12,12 @@
     <div class="modal-content" [@scaleUpDown]="state.opened ? 'open' : 'close'">
       <ng-container *ngTemplateOutlet="actionsRef"></ng-container>
       <ng-container *ngIf="!!outlet; else template">
-        <ng-container
-          *ngComponentOutlet="
-            outlet.component;
-            inputs: outlet.inputs | inputs;
-            ngModule: outlet.module;
-            injector: outlet.injector;
-            content: outlet.content
-          "
-        >
+        <ng-container *ngComponentOutlet="outlet.component; inputs: outlet.inputs | inputs; ngModule: outlet.module; injector: outlet.injector; content: outlet.content">
         </ng-container>
       </ng-container>
 
       <ng-template #template>
-        <ng-container
-          *ngTemplateOutlet="
-            templateRef ?? _template;
-            context: {
-              onClose: onClose.bind(this),
-              $implicit: onClose.bind(this)
-            }
-          "
-        ></ng-container>
+        <ng-container *ngTemplateOutlet="templateRef ?? _template; context: { onClose: onClose.bind(this), $implicit: onClose.bind(this) }"></ng-container>
       </ng-template>
     </div>
   </ng-container>
