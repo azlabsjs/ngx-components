@@ -1,6 +1,6 @@
 {
   "name": "@azlabsjs/ngx-common",
-  "version": "0.17.66",
+  "version": "0.17.67",
   "peerDependencies": {
     "@angular/common": ">=17.0.0 | <20.0.0",
     "@angular/core": ">=17.0.0 | <20.0.0",
