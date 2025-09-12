@@ -12,6 +12,19 @@ import {
 import { from, lastValueFrom } from 'rxjs';
 import { RequestClient } from '../../http';
 
+function isDefined(value: unknown): value is AbstractControl {
+  return !!value;
+}
+
+function createError(constraint: AsyncConstraint, def: string, value: unknown) {
+  if ('error' in constraint && constraint.error) {
+    return {
+      [`custom_${def}`]: { message: constraint.error, params: { value } },
+    };
+  }
+  return { [def]: value };
+}
+
 /** @description async constraint type declaration */
 export type AsyncConstraint<T = boolean> = {
   query?: string;
@@ -24,15 +37,14 @@ export type AsyncConstraint<T = boolean> = {
    * `fn` function.
    */
   conditions?: string[] | ((result: unknown, source: unknown) => boolean);
-};
 
-function isDefined(value: unknown): value is AbstractControl {
-  return !!value;
-}
+  /** error message to be displayed to user whenever validation fails */
+  error?: string;
+};
 
 /** @internal */
 function restQueryFactory(
-  requestClient: RequestClient,
+  client: RequestClient,
   url: string,
   value: unknown,
   query?: string
@@ -41,95 +53,77 @@ function restQueryFactory(
     return await lastValueFrom(
       query
         ? from(
-            requestClient.request(url, 'GET', null, {
+            client.request(url, 'GET', null, {
               query: { [query]: value },
             })
           )
-        : from(requestClient.request(`${url}/${value}`, 'GET', null))
+        : from(client.request(`${url}/${value}`, 'GET', null))
     );
   };
 }
 
-/**
- * creates an existance validation function
- */
+/** creates an existance validation function */
 export function existsValidator(
-  requestClient: RequestClient,
+  client: RequestClient,
   constraint: AsyncConstraint<boolean>
 ): AsyncValidatorFn {
   return async (control: AbstractControl) => {
     try {
-      const _value = control.value;
+      const value = control.value;
       const { fn, conditions, query } = constraint;
       const _fn =
         typeof fn === 'string'
-          ? restQueryFactory(requestClient, fn, _value, query)
+          ? restQueryFactory(client, fn, value, query)
           : fn;
-      // Transform the function provided by the developper into one compatible with
-      // exists async constraint required type
-      const _conditions =
+      const y =
         typeof conditions === 'function'
-          ? (value: unknown) => {
-              return conditions(value, _value);
-            }
+          ? (x: unknown) => conditions(x, value)
           : (conditions as string[]);
 
-      // Call the exist constaint on the _fn function
-      const _result = await createExistsConstraint(_conditions)(_fn);
+      const result = await createExistsConstraint(y)(_fn);
 
-      // Returns validation error if _result evaluate to true
-      return _result ? null : { exists: _value };
+      return result ? null : createError(constraint, 'exists', value);
     } catch (_) {
-      return { exists: control.value };
+      return createError(constraint, 'exists', control.value);
     }
   };
 }
 
-/**
- * creates a unique validation function
- */
+/** creates a unique validation function */
 export function uniqueValidator(
   requestClient: RequestClient,
   constraint: AsyncConstraint<boolean>
 ): AsyncValidatorFn {
   return async (control: AbstractControl) => {
     try {
-      const _value = control.value;
+      const value = control.value;
       const { fn, conditions, query } = constraint;
       const _fn =
         typeof fn === 'string'
-          ? restQueryFactory(requestClient, fn, _value, query)
+          ? restQueryFactory(requestClient, fn, value, query)
           : fn;
-      // Transform the function provided by the developper into one compatible with
-      // exists async constraint required type
-      const _conditions =
+      const y =
         typeof conditions === 'function'
-          ? (value: unknown) => {
-              return conditions(value, _value);
-            }
+          ? (x: unknown) => conditions(x, value)
           : (conditions as string[]);
 
-      // Call the exist constaint on the _fn function
-      const _result = await createUniqueConstraint(_conditions ?? [])(_fn);
+      const result = await createUniqueConstraint(y ?? [])(_fn);
 
-      // Returns validation error if _result evaluate to true
-      return _result ? null : { unique: _value };
+      return result ? null : createError(constraint, 'unique', value);
     } catch (_) {
       return null;
     }
   };
 }
 
-/**
- * creates an equals validation function
- */
+/** creates an equals validation function */
 export function equalsValidator(name: string) {
   return (control: AbstractControl) => {
     const group = control.parent;
     if (!group) {
       return null;
     }
-    const _constraint$ = createEqualsConstraint();
+    const constraint = createEqualsConstraint();
     const control2 = group.get(name);
 
     if (!isDefined(control2)) {
@@ -142,10 +136,8 @@ export function equalsValidator(name: string) {
       return null;
     }
 
-    // Call the constraint on the values
-    const _result = _constraint$(value1, value2);
-
-    if (_result) {
+    const result = constraint(value1, value2);
+    if (result) {
       const { errors } = control2;
       // Case the result of the constraint is a truthy value
       // we remove the equals error on the other control
@@ -164,14 +156,11 @@ export function equalsValidator(name: string) {
       return null;
     }
 
-    // return the validation result after applying constraint
     return { equals: name };
   };
 }
 
-/**
- * creates a pattern validation function
- */
+/** creates a pattern validation function */
 export function patternValidator(pattern: string) {
   return (control: AbstractControl) => {
     const _constraint$ = createPatternConstraint(pattern);

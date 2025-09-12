@@ -28,6 +28,7 @@ import {
   uniqueValidator,
   HTTP_REQUEST_CLIENT,
   RequestClient,
+  existsValidator,
 } from '@azlabsjs/ngx-smart-form';
 import {
   FileInput,
@@ -275,14 +276,15 @@ export class AppComponent implements OnInit {
   onFormReadyState(event: FormConfigInterface) {
     setTimeout(() => {
       this.smartForm?.addAsyncValidator(
-        uniqueValidator(this.httpClient, {
-          query: 'user_details__email',
-          fn: `http://127.0.0.1:3000/professions`,
+        existsValidator(this.httpClient, {
+          // query: 'user_details__email',
+          fn: `http://127.0.0.1:3000/categories`,
           conditions: (_: unknown) => {
             return false;
           },
+          // error: 'Adresse mail non existant!'
         }),
-        'email'
+        'category_id'
       );
     }, 1000);
 

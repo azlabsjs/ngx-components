@@ -19,7 +19,20 @@ export class CustomErrorsPipe implements PipeTransform {
       ? Object.keys(errors)
           .filter((v) => DEFAULT_ERRORS.indexOf(v) === -1)
           .map((curr) => {
-            return errors[curr];
+            const error = errors[curr];
+            const terror = typeof error;
+
+            if (terror === 'string') {
+              return { message: error, params: {} };
+            }
+
+            if (terror !== 'object') {
+              throw Error(
+                'custom errors must be of type {"message": string, "params": object|undefined}'
+              );
+            }
+
+            return { message: error['message'] ?? '', params: error['params'] };
           })
       : [];
   }

@@ -82,14 +82,8 @@
             <span>{{ label }}</span>
           </ng-template>
           <ng-template #error let-touched="touched" let-errors>
-            <ngx-input-error
-              *ngIf="touched"
-              [errors]="errors"
-              [template]="template"
-            >
-              <ng-template #template let-value>
-                <span>{{ value }}</span>
-              </ng-template>
+            <ngx-input-error *ngIf="touched" [errors]="errors" [template]="template">
+              <ng-template #template let-value> <span>{{ value }}</span> </ng-template>
             </ngx-input-error>
           </ng-template>
         </ngx-clr-form-control>
