@@ -20,7 +20,6 @@ type StateType = {
   imports: [NgxCommonModule],
   selector: 'ngx-password-input',
   templateUrl: './ngx-password-input.component.html',
-  styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxPasswordInputComponent {

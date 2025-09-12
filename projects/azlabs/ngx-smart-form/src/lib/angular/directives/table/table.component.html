@@ -3,12 +3,7 @@
     <tr>
       <th *ngFor="let item of configs" class="left">
         <span>{{ item.label | text }}</span>
-        <small
-          class="required"
-          *ngIf="item.rules?.isRequired ?? (item | required)"
-        >
-          (*)
-        </small>
+        <small class="required" *ngIf="item.rules?.isRequired ?? (item | required)">(*)</small>
       </th>
       <th></th>
     </tr>
@@ -49,9 +44,7 @@
               hidden:
                 (input | isHidden) ||
                 (control | inarray : detached : input.name)
-            }
-          "
-        ></ng-container>
+            }"></ng-container>
       </ng-container>
     </td>
     <td class="middle center">

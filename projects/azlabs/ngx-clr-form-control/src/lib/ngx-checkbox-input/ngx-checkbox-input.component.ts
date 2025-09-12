@@ -21,7 +21,7 @@ import { Subject } from 'rxjs';
 import { distinctUntilChanged, tap } from 'rxjs/operators';
 import { NgxCommonModule } from '../common';
 import { CheckboxComponent } from './checkbox.component';
-import { IsCheckedPipe, PIPES } from './pipes';
+import { PIPES } from './pipes';
 
 /** @internal */
 type SelectionState = { value: unknown; checked: boolean };
@@ -52,18 +52,26 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
   @Input() disabled = false;
   @Input() describe = true;
   @Input() control!: AbstractControl;
-  @Input() set config(value: OptionsInput) {
+  @Input() set config(config: OptionsInput) {
+    if (!config) {
+      return;
+    }
+
+    let { options } = config;
+    this.autoSelect(config);
+  
+    options = options ?? [];
     this.setState((state) => ({
       ...state,
-      config: value,
-      loaded: (value?.options ?? []).length !== 0,
+      config,
+      loaded: options.length !== 0,
     }));
   }
   @ContentChild('input') inputRef!: TemplateRef<any>;
   //#endregion
 
   //#region component outputs
-  @Output() inputConfigChange = new EventEmitter<OptionsInput>();
+  @Output() configChange = new EventEmitter<OptionsInput>();
   @Output() change = new EventEmitter<unknown[]>();
   //#endregion
 
@@ -104,20 +112,23 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
    * options change event listener
    */
   onOptionsChange(options: InputOptions) {
-    const { config } = this._state;
-    let _config = config ?? ({} as OptionsInput);
-    _config = { ..._config, options };
+    let { config } = this._state;
+    if (!config) {
+      return;
+    }
+
+    config = { ...config, options };
+    this.autoSelect(config);
+
     this.setState((state) => ({
       ...state,
-      config: _config,
+      config: config,
       loaded: true,
     }));
-    this.inputConfigChange.emit(_config);
+    this.configChange.emit(config);
   }
 
-  /**
-   * handle checkbox click of selection change event
-   */
+  /** handle checkbox click of selection change event */
   onChange(e: SelectionState) {
     const { selection } = this._state;
     const _index = selection.findIndex((el) => el.value === e.value);
@@ -136,5 +147,12 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
   private setState(state: (s: StateType) => StateType) {
     this._state = state(this._state);
     this.changes.markForCheck();
+  }
+
+  private autoSelect(config: OptionsInput) {
+    const { autoselect, options: items } = config;
+    if (autoselect && items.length === 1) {
+      this.control.setValue(items[0].value);
+    }
   }
 }

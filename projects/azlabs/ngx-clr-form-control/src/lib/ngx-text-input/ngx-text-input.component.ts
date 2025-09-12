@@ -1,4 +1,4 @@
-import { Component, Input, ContentChild, TemplateRef } from '@angular/core';
+import { Component, Input, ContentChild, TemplateRef, ChangeDetectionStrategy } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { TextInput } from '@azlabsjs/smart-form-core';
 import { NgxCommonModule } from '../common';
@@ -8,6 +8,7 @@ import { NgxCommonModule } from '../common';
   imports: [NgxCommonModule],
   selector: 'ngx-text-input',
   templateUrl: './ngx-text-input.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxTextInputComponent {
   //#region component inputs

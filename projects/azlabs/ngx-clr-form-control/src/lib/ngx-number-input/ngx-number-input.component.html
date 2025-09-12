@@ -1,11 +1,2 @@
-<ng-container
-  *ngTemplateOutlet="
-    inputRef;
-    context: { max: Mt.pow(2, 31) - 1, config: config, control }
-  "
-></ng-container>
-<span
-  [class]="'input__subtext'"
-  *ngIf="describe"
-  [innerHTML]="config.description || '' | trustHtml"
-></span>
+<ng-container *ngTemplateOutlet="inputRef; context: { max: Mt.pow(2, 31) - 1, config: config, control }"></ng-container>
+<span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="config.description || '' | trustHtml"></span>

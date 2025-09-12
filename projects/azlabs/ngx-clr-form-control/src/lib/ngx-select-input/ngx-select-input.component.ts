@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import {
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   EventEmitter,
@@ -30,8 +31,8 @@ type StateType = {
   imports: [
     NgxCommonModule,
     FormsModule,
-    ...OPTIONS_DIRECTIVES,
     NgSelectModule,
+    ...OPTIONS_DIRECTIVES,
   ],
   selector: 'ngx-select-input',
   templateUrl: './ngx-select-input.component.html',
@@ -58,6 +59,7 @@ type StateType = {
       }
     `,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxSelectInputComponent {
   //#region component properties
@@ -75,15 +77,23 @@ export class NgxSelectInputComponent {
   //#region component inputs
   @Input() control!: FormControl<any>;
   @Input() describe = true;
-  @Input() set config(inputConfig: OptionsInput) {
+  @Input() disabled = false;
+  @Input() set config(config: OptionsInput) {
+    if (!config) {
+      return;
+    }
+
+    let { options } = config;
+    this.autoSelect(config);
+
+    options = options ?? [];
     this.setState((state) => ({
       ...state,
-      config: inputConfig,
-      loaded: (inputConfig.options ?? [])?.length !== 0,
+      config,
+      loaded: options.length !== 0,
     }));
   }
   @Input({ alias: 'loading-text' }) loadingText!: string;
-  @Input() disabled: boolean = false;
   //#endregion
 
   //#region component outputs
@@ -98,12 +108,17 @@ export class NgxSelectInputComponent {
     @Inject(DOCUMENT) private document: Document,
     private cdRef: ChangeDetectorRef
   ) {
-    const { defaultView } = this.document;
+    const { defaultView: view } = this.document;
+
+    if (!view) {
+      return;
+    }
+
+    const { IntersectionObserverEntry: entry } = view;
     this.fetchOnFocus = !(
-      defaultView !== null &&
-      'IntersectionObserver' in defaultView &&
-      'IntersectionObserverEntry' in defaultView &&
-      'intersectionRatio' in defaultView.IntersectionObserverEntry.prototype
+      'IntersectionObserver' in view &&
+      'IntersectionObserverEntry' in view &&
+      'intersectionRatio' in entry.prototype
     );
   }
 
@@ -118,20 +133,27 @@ export class NgxSelectInputComponent {
   }
 
   optionsChange(options: InputOptions) {
-    const { config } = this._state;
-    let _c = config ?? ({} as OptionsInput);
-    _c = {
-      ..._c,
+    let { config } = this._state;
+
+    if (!config) {
+      return;
+    }
+
+    config = {
+      ...config,
       options: options.map((state) => ({
         ...state,
         name: state?.name?.toUpperCase(),
         description: state.description?.toUpperCase(),
       })),
     };
+
+    this.autoSelect(config);
+
     this.setState((state) => ({
       ...state,
       performingAction: false,
-      config: _c,
+      config: config,
     }));
   }
 
@@ -156,4 +178,12 @@ export class NgxSelectInputComponent {
   select(e: unknown, config: OptionsInput) {
     this.selected.emit({ name: config.name, value: e });
   }
+
+  private autoSelect(config: OptionsInput) {
+    const { autoselect, options: items } = config;
+    if (autoselect && items.length === 1) {
+      this.control.setValue(items[0].value);
+    }
+  }
+
 }

@@ -43,8 +43,4 @@
 </ng-container>
 
 <!-- Conntrol description -->
-<span
-  [class]="'input__subtext'"
-  *ngIf="describe"
-  [innerHTML]="config!.description || '' | trustHtml"
-></span>
+<span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="config!.description || '' | trustHtml"></span>

@@ -30,10 +30,18 @@ export class NgxRadioInputComponent {
   // #region component input properties
   @Input() control!: AbstractControl;
   @Input() set config(config: OptionsInput) {
+    if (!config) {
+      return;
+    }
+
+    let { options } = config;
+    this.autoSelect(config);
+
+    options = options ?? [];
     this.setState((state) => ({
       ...state,
       config,
-      loaded: (config?.options ?? []).length !== 0,
+      loaded: options.length !== 0,
     }));
   }
   @Input() describe = true;
@@ -59,19 +67,31 @@ export class NgxRadioInputComponent {
   constructor(private cdRef: ChangeDetectorRef) {}
 
   onOptionsChange(options: InputOptions) {
-    const { config } = this._state;
-    let _config = config ?? ({} as OptionsInput);
-    _config = { ..._config, options };
+    let { config } = this._state;
+    if (!config) {
+      return;
+    }
+
+    config = { ...config, options };
+    this.autoSelect(config);
+
     this.setState((state) => ({
       ...state,
-      config: _config,
+      config: config,
       loaded: true,
     }));
-    this.configChange.emit(_config);
+    this.configChange.emit(config);
   }
 
   setState(state: (state: StateType) => StateType) {
     this._state = state(this._state);
     this.cdRef?.markForCheck();
+  }
+
+  private autoSelect(config: OptionsInput) {
+    const { autoselect, options: items } = config;
+    if (autoselect && items.length === 1) {
+      this.control.setValue(items[0].value);
+    }
   }
 }

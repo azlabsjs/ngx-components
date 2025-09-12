@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import {
-  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
-  ContentChild,
   EmbeddedViewRef,
   EventEmitter,
   Input,
   OnDestroy,
+  Optional,
   Output,
   TemplateRef,
   ViewChild,
@@ -15,11 +16,15 @@ import {
 import { RefType, ViewRefFactory } from '../types';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import {
+  Observable,
+  Subject,
+  Subscription,
+} from 'rxjs';
 import { BUTTON_DIRECTIVES } from '../buttons';
-import { PIPES } from '../../pipes';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 import { ModalDirective } from '../modal';
+import { PIPES } from './pipes';
 
 /** @internal */
 type ContextType = {
@@ -30,21 +35,21 @@ type ContextType = {
   destroy: Observable<number>;
 };
 
+// @internal
+type StateType = {
+  form: Record<string, unknown>;
+};
+
 @Component({
   standalone: true,
-  imports: [
-    CommonModule,
-    ...COMMON_PIPES,
-    ...BUTTON_DIRECTIVES,
-    ...PIPES,
-    // ...MODAL_DIRECTIVES,
-  ],
+  imports: [CommonModule, ...COMMON_PIPES, ...BUTTON_DIRECTIVES, ...PIPES],
   selector: 'ngx-table-form',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxTableForm
-  implements AfterViewInit, ViewRefFactory<EmbeddedViewRef<any>>, OnDestroy
+  implements ViewRefFactory<EmbeddedViewRef<any>>, OnDestroy
 {
   //#region component inputs
   @Input() label!: TemplateRef<any>;
@@ -65,8 +70,15 @@ export class NgxTableForm
   @ViewChild('container', { read: ViewContainerRef, static: false })
   containerRef!: ViewContainerRef;
   @ViewChild('template', { static: false }) templateRef!: TemplateRef<any>;
-  private destroy$ = new Subject<void>();
   //#endregion
+
+  private _state: StateType = { form: {} };
+  get state() {
+    return this._state;
+  }
+  private subscriptions: Subscription[] = [];
+
+  constructor(@Optional() private cdRef: ChangeDetectorRef | null) {}
 
   createView(
     index: number,
@@ -110,9 +122,10 @@ export class NgxTableForm
       destroy: () => element.destroy(),
     };
 
-    element.context.destroy
-      .pipe(takeUntil(this.destroy$))
+    const subscription = element.context.destroy
       .subscribe(() => this.removed.emit(ref));
+
+    this.subscriptions.push(subscription);
 
     return ref;
   }
@@ -121,9 +134,14 @@ export class NgxTableForm
     this.containerRef?.clear();
   }
 
-  ngAfterViewInit(): void {}
+  private setState(state: (s: StateType) => StateType) {
+    this._state = state(this._state);
+    this.cdRef?.markForCheck();
+  }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
+    for (const subscription of this.subscriptions) {
+      subscription?.unsubscribe();
+    }
   }
 }

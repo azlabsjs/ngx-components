@@ -28,16 +28,11 @@
       (remove)="removed($event, state.config)"
       (change)="select($event, state.config)"
       [appendTo]="'body'"
-      [disabled]="disabled || control.disabled"
-    >
+      [disabled]="disabled || control.disabled">
       <ng-template ng-option-tmp let-item="item">
-        <label class="form-check-label ml-2"> {{ item?.name }} </label>
+        <label class="form-check-label ml-2"> {{ item?.name }}</label>
       </ng-template>
     </ng-select>
-    <span
-      *ngIf="describe"
-      class="input__subtext"
-      [innerHTML]="config.description || '' | trustHtml"
-    ></span>
+    <span *ngIf="describe" class="input__subtext" [innerHTML]="config.description || '' | trustHtml"></span>
   </div>
 </ng-container>

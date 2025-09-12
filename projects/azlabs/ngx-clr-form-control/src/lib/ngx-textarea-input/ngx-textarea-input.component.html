@@ -1,9 +1,2 @@
-<ng-container
-  *ngTemplateOutlet="inputRef; context: { config: config, control }"
-></ng-container>
-
-<span
-  [class]="'input__subtext'"
-  *ngIf="describe"
-  [innerHTML]="config.description || '' | trustHtml"
-></span>
+<ng-container *ngTemplateOutlet="inputRef; context: { config: config, control }"></ng-container>
+<span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="config.description || '' | trustHtml"></span>

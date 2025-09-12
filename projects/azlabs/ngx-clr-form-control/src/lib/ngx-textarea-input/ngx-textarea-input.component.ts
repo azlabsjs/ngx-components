@@ -1,4 +1,4 @@
-import { Component, Input, ContentChild, TemplateRef } from '@angular/core';
+import { Component, Input, ContentChild, TemplateRef, ChangeDetectionStrategy } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { TextAreaInput } from '@azlabsjs/smart-form-core';
 import { NgxCommonModule } from '../common';
@@ -8,13 +8,13 @@ import { NgxCommonModule } from '../common';
   imports: [NgxCommonModule],
   selector: 'ngx-textarea-input',
   templateUrl: './ngx-textarea-input.component.html',
-  styles: [],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxTextAreaInputComponent {
-  //#region Component inputs
+  //#region component inputs
   @Input() control!: AbstractControl;
   @Input() describe = true;
   @Input() config!: TextAreaInput;
   @ContentChild('input') inputRef!: TemplateRef<any>;
-  //#endregion Component inputs
+  //#endregion
 }
