@@ -6,6 +6,7 @@ import {
   TemplateRef,
 } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
+import { ComponentReactiveFormHelpers } from '@azlabsjs/ngx-smart-form';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 
 /** @description modal size type declaration */
@@ -14,7 +15,7 @@ export type SizeType = 'sm' | 'md' | 'lg' | 'xl' | 'full';
 @Directive({
   standalone: true,
   selector: '[ngxformmodal]',
-  exportAs: 'formmodal'
+  exportAs: 'formmodal',
 })
 export class ModalDirective {
   //#region directive inputs
@@ -49,5 +50,9 @@ export class ModalDirective {
 
   stateChanged() {
     this.stateChange.emit();
+  }
+
+  validate() {
+    ComponentReactiveFormHelpers.validateFormGroupFields(this.formgroup);
   }
 }
