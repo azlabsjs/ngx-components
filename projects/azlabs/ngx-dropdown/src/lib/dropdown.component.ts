@@ -61,7 +61,6 @@ export class DropdownComponent implements OnChanges {
 
   @HostListener('window:click', ['$event'])
   onClick(e: MouseEvent) {
-    console.log('Target classlist: ', (e.target as Element).classList)
     if (!(e.target as Element).classList.contains('dropdown-container') && this._state.active) {
       this.setState((state) => ({
         ...state,
