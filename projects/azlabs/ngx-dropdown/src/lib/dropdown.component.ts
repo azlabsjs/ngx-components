@@ -1,16 +1,13 @@
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {
-  AfterContentInit,
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ContentChild,
   ElementRef,
-  Inject,
+  HostListener,
   Input,
   OnChanges,
-  OnDestroy,
-  OnInit,
-  Optional,
   SimpleChanges,
   TemplateRef,
   ViewChild,
@@ -18,11 +15,13 @@ import {
 import { computeCssClass, computeMenuClass } from './helpers';
 import { Animation, Orientation } from './types';
 
-/** @internal */
+// @internal
 type StateType = {
   active: boolean;
-  cssClass: Record<string, boolean>;
-  menuClass: Record<string, boolean>;
+  css: {
+    dropdown: Record<string, boolean>;
+    menu: Record<string, boolean>;
+  };
 };
 
 @Component({
@@ -31,10 +30,20 @@ type StateType = {
   selector: 'ngx-azl-dropdown',
   templateUrl: './dropdown.component.html',
   styleUrls: ['./dropdown.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DropdownComponent
-  implements OnDestroy, OnChanges, AfterContentInit
-{
+export class DropdownComponent implements OnChanges {
+  _state: StateType = {
+    active: false,
+    css: {
+      dropdown: {} as Record<string, boolean>,
+      menu: {} as Record<string, boolean>,
+    },
+  };
+  get state() {
+    return this._state;
+  }
+
   @Input() orientation: Orientation = 'right';
   @Input() animation: Animation = 'scaleY';
   @Input() text!: string;
@@ -42,38 +51,36 @@ export class DropdownComponent
   @Input({ alias: 'no-hover' }) noHover: boolean = false;
   @Input() disabled: boolean = false;
 
-  // #region component view children
+  // #region component projected contents
   @ViewChild('dropdownHeader', { static: false })
-  headerRef!: ElementRef<HTMLElement>;
+  header!: ElementRef<HTMLElement>;
   @ViewChild('dropdownMenu', { static: false })
-  dropdownMenuRef!: ElementRef<HTMLElement>;
-  @ContentChild('dropdownToggle') dropdownToggleRef!: TemplateRef<any>;
-  // #endregion component view children
+  menu!: ElementRef<HTMLElement>;
+  @ContentChild('dropdownToggle') toggle!: TemplateRef<any>;
+  // #endregion
 
-  _state: StateType = {
-    active: false,
-    cssClass: {} as Record<string, boolean>,
-    menuClass: {} as Record<string, boolean>,
-  };
-  get state() {
-    return this._state;
+  @HostListener('window:click', ['$event'])
+  onClick(e: MouseEvent) {
+    console.log('Target classlist: ', (e.target as Element).classList)
+    if (!(e.target as Element).classList.contains('dropdown-container') && this._state.active) {
+      this.setState((state) => ({
+        ...state,
+        active: false,
+        css: {
+          menu: computeMenuClass(this.orientation, this.animation),
+          dropdown: computeCssClass(
+            this.cssClass,
+            this.noHover,
+            !state.active,
+            this.disabled
+          ),
+        },
+      }));
+    }
   }
-  private defaultView!: Window | null;
 
-  /** @description Creates component instances */
-  constructor(
-    private cdRef: ChangeDetectorRef | null,
-    @Inject(DOCUMENT) @Optional() document?: Document
-  ) {
-    const { defaultView } = document ?? ({} as Document);
-    this.defaultView = defaultView;
-  }
-  ngAfterContentInit(): void {
-    this.defaultView?.addEventListener(
-      'click',
-      this.handleClickEvent.bind(this)
-    );
-  }
+  /** @description creates component instances */
+  constructor(private cdRef: ChangeDetectorRef | null) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (
@@ -85,13 +92,15 @@ export class DropdownComponent
     ) {
       this.setState((state) => ({
         ...state,
-        menuClass: computeMenuClass(this.orientation, this.animation),
-        cssClass: computeCssClass(
-          this.cssClass,
-          this.noHover,
-          state.active,
-          this.disabled
-        ),
+        css: {
+          menu: computeMenuClass(this.orientation, this.animation),
+          dropdown: computeCssClass(
+            this.cssClass,
+            this.noHover,
+            state.active,
+            this.disabled
+          ),
+        },
       }));
     }
   }
@@ -101,53 +110,19 @@ export class DropdownComponent
       this.setState((state) => ({
         ...state,
         active: !state.active,
-        menuClass: computeMenuClass(this.orientation, this.animation),
-        cssClass: computeCssClass(
-          this.cssClass,
-          this.noHover,
-          !state.active,
-          this.disabled
-        ),
-      }));
-    }
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
-  ngOnDestroy(): void {
-    this.defaultView?.removeEventListener(
-      'click',
-      this.handleClickEvent.bind(this)
-    );
-  }
-
-  private handleClickEvent(e: MouseEvent) {
-    const { active } = this._state;
-    const { dropdownMenuRef } = this;
-    if (dropdownMenuRef.nativeElement) {
-      const { nativeElement } = dropdownMenuRef;
-      const { x, y, width, height } = nativeElement.getBoundingClientRect();
-      const { clientX, clientY } = e;
-      if (
-        clientX >= x &&
-        clientX <= x + width &&
-        clientY >= y &&
-        clientY <= y + height &&
-        active
-      ) {
-        this.setState((state) => ({
-          ...state,
-          active: !state.active,
-          menuClass: computeMenuClass(this.orientation, this.animation),
-          cssClass: computeCssClass(
+        css: {
+          menu: computeMenuClass(this.orientation, this.animation),
+          dropdown: computeCssClass(
             this.cssClass,
             this.noHover,
             !state.active,
             this.disabled
           ),
-        }));
-      }
+        },
+      }));
     }
+    e.preventDefault();
+    e.stopPropagation();
   }
 
   /** @description update component state and notify ui of state changes */
