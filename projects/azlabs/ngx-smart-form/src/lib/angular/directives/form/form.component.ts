@@ -82,6 +82,7 @@ export class NgxSmartFormComponent
   @Input() autoupload: boolean = false;
   @Input() action: HTTPRequestMethods = 'POST';
   @Input('no-grid-layout') noGridLayout = false;
+  @Input() modal!: ModalDirective;
   //#endregion
 
   //#region component outputs
@@ -103,7 +104,7 @@ export class NgxSmartFormComponent
 
   //#region component children
   @ContentChild('submitButton') submitRef!: TemplateRef<Node>;
-  @ContentChild(ModalDirective) modal!: ModalDirective;
+  @ContentChild(ModalDirective) formmodal!: ModalDirective | null;
   //#endregion
 
   private subscriptions: Subscription[] = [];

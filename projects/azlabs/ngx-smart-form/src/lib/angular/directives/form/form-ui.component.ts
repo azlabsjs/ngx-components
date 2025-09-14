@@ -31,8 +31,7 @@ import { ModalDirective } from '../modal';
 })
 export class NgxFormComponent {
   @Input() modal!: ModalDirective;
-  @Input({ required: true }) state!: FormGroupState & { [k: string]: unknown }; // we add { [k: string]: unknown } to support
-  // FormModelState which includes form property but not required on this component
+  @Input({ required: true }) state!: FormGroupState & { [k: string]: unknown };
   @Input({ required: true }) inputs!: InputConfigInterface[];
   @Input() template!: TemplateRef<any>;
   @Input({ alias: 'add-template' }) addTemplate!: TemplateRef<any>;
@@ -41,9 +40,6 @@ export class NgxFormComponent {
   @Input('no-grid-layout') noGridLayout = false;
 
   //#region projected content
-  @ContentChild(ModalDirective) modalDirective!:
-    | ModalDirective
-    | null
-    | undefined;
+  @ContentChild(ModalDirective) formmodal!: ModalDirective | null;
   //#endregion
 }

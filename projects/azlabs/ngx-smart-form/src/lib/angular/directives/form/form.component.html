@@ -5,7 +5,7 @@
   [autoupload]="autoupload"
   [no-grid-layout]="noGridLayout"
   [state]="model.state"
-  [modal]="modal"
+  [modal]="formmodal ?? modal"
   [inputs]="model.state.form.controlConfigs || []"
 >
   <section before><ng-content select="[before]"></ng-content></section>
