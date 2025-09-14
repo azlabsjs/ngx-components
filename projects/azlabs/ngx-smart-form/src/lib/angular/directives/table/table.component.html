@@ -1,17 +1,21 @@
-<table class="table table-compact">
-  <thead>
-    <tr>
-      <th *ngFor="let item of configs" class="left">
-        <span>{{ item.label | text }}</span>
-        <small class="required" *ngIf="item.rules?.isRequired ?? (item | required)">(*)</small>
-      </th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody #container></tbody>
-</table>
+<div class="table-wrapper">
+  <table class="table table-compact">
+    <thead>
+      <tr>
+        <th *ngFor="let item of configs" class="left">
+          <span>{{ item.label | text }}</span>
+          <small class="required" *ngIf="item.rules?.isRequired ?? (item | required)">(*)</small>
+        </th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody #container></tbody>
+  </table>
+</div>
 
-<ng-content></ng-content>
+<div class="table-footer">
+  <ng-content></ng-content>
+</div>
 
 <!-- table layout component -->
 <ng-template
