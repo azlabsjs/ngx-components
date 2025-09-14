@@ -6,8 +6,8 @@ import {
   TemplateRef,
 } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
-import { ComponentReactiveFormHelpers } from '@azlabsjs/ngx-smart-form';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
+import { ComponentReactiveFormHelpers } from '../../helpers';
 
 /** @description modal size type declaration */
 export type SizeType = 'sm' | 'md' | 'lg' | 'xl' | 'full';
