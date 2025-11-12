@@ -26,7 +26,7 @@ export function createPipeTransform<T extends PipeTransform>(
 
 
 /**
- * Returns the strings after the first occurence the specified character
+ * returns the strings after the first occurence the specified character
  *
  * @example
  * const substr = after('o', 'Hello World!'); // output " World!"
@@ -52,9 +52,7 @@ export function before(char: string, haystack: string) {
   return haystack.slice(0, haystack.indexOf(char));
 }
 
-/**
- * Creates pipe transform parameter from provided transform definition rules
- */
+/** creates pipe transform parameter from provided transform definition rules */
 export function createParams(transform: string) {
   const hasParams = transform.indexOf(':') !== -1;
   const pipe = hasParams ? before(':', transform) : transform;
@@ -76,9 +74,7 @@ export function createParams(transform: string) {
   return [pipe, ...params];
 }
 
-/**
- * Compute the substring of the `value` string
- */
+/** compute the substring of the `value` string */
 export function substr(value: string, start: number, length?: number) {
   if (typeof value !== 'string') {
     return '';

@@ -1,4 +1,5 @@
 <ngx-form-array-outlet
+  [class.hidden]="hidden"
   (removed)="removed($event)"
   [inputs]="inputs"
   [auto-upload]="autoupload"
@@ -9,7 +10,7 @@
   #container
 ></ngx-form-array-outlet>
 
-<ngx-table-form (removed)="removed($event)" [inputs]="inputs" [auto-upload]="autoupload" [template]="template" [label]="label" [detached]="detached" [title]="title" [modal]="modal" [name]="name" *ngIf="cssClass.includes('table')" #container>
+<ngx-table-form [class.hidden]="hidden" (removed)="removed($event)" [inputs]="inputs" [auto-upload]="autoupload" [template]="template" [label]="label" [detached]="detached" [title]="title" [modal]="modal" [name]="name" *ngIf="cssClass.includes('table')" #container>
   <div *ngIf="!cssClass.includes('table') && refCount === 0" class="placeholder"></div>
   <ng-container *ngTemplateOutlet=" addGroupRef ? addGroupRef : _add; context: { $implicit: add.bind(this) }"></ng-container>
   <ng-template #_add let-handler><ngx-add-button (click)="handler($event)"></ngx-add-button></ng-template>

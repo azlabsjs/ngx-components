@@ -16,11 +16,7 @@ import {
 import { RefType, ViewRefFactory } from '../types';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
-import {
-  Observable,
-  Subject,
-  Subscription,
-} from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { BUTTON_DIRECTIVES } from '../buttons';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 import { ModalDirective } from '../modal';
@@ -52,7 +48,7 @@ export class NgxTableForm
   implements ViewRefFactory<EmbeddedViewRef<any>>, OnDestroy
 {
   //#region component inputs
-  @Input() label!: TemplateRef<any>;
+  @Input() label!: TemplateRef<any> | null | undefined;
   @Input({ alias: 'template' }) view!: TemplateRef<any>;
   @Input({ alias: 'inputs' }) configs: InputConfigInterface[] = [];
   @Input({ alias: 'auto-upload' }) autoupload: boolean = true;
@@ -97,7 +93,10 @@ export class NgxTableForm
       this.modal.detached = this.detached;
       this.modal.view = this.view;
       this.modal.name = this.name;
-      this.modal.label = this.label;
+      if (this.label) {
+        this.modal.label = this.label;
+      }
+      
       this.modal.stateChanged();
       this.modal.open();
     }
@@ -122,8 +121,9 @@ export class NgxTableForm
       destroy: () => element.destroy(),
     };
 
-    const subscription = element.context.destroy
-      .subscribe(() => this.removed.emit(ref));
+    const subscription = element.context.destroy.subscribe(() =>
+      this.removed.emit(ref)
+    );
 
     this.subscriptions.push(subscription);
 

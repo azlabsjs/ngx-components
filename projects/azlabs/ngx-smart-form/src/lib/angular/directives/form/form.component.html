@@ -6,30 +6,17 @@
   [no-grid-layout]="noGridLayout"
   [state]="model.state"
   [modal]="formmodal ?? modal"
-  [inputs]="model.state.form.controlConfigs || []"
->
+  [inputs]="model.state.form.controlConfigs || []">
   <section before><ng-content select="[before]"></ng-content></section>
   <section after><ng-content select="[after]"></ng-content></section>
   <ng-content></ng-content>
 
   <section submit>
     <ng-container *ngIf="submitable">
-      <ng-container
-        *ngTemplateOutlet="
-          submitRef ? submitRef : _submitRef;
-          context: { $implicit: onSubmit.bind(this) }
-        "
-      ></ng-container>
+      <ng-container *ngTemplateOutlet="submitRef ? submitRef : _submitRef; context: { $implicit: onSubmit.bind(this) }"></ng-container>
     </ng-container>
     <ng-template #_submitRef let-handler>
-      <button
-        type="button"
-        [disabled]="performingAction || disabled"
-        class="btn btn-primary"
-        (click)="handler($event)"
-      >
-        SUBMIT
-      </button>
+      <button type="button" [disabled]="performingAction || disabled" class="btn btn-primary" (click)="handler($event)">SUBMIT</button>
     </ng-template>
   </section>
 </ngx-form-ui>

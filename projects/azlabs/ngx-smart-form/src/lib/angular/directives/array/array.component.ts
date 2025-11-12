@@ -49,7 +49,7 @@ export class NgxSmartFormArrayComponent
   @Input() detached!: AbstractControl[];
   @Input() template!: TemplateRef<any>;
   @Input() addGroupRef!: TemplateRef<Node>;
-  @Input() label!: TemplateRef<any>;
+  @Input() label!: TemplateRef<any> | null | undefined;
   @Input() name!: string;
   @Input() title!: string;
   @Input() autoupload: boolean = true;
@@ -72,6 +72,7 @@ export class NgxSmartFormArrayComponent
     },
   })
   cssClass!: string | string[];
+  @Input() hidden: boolean = false;
   //#endregion
 
   //#region component outputs

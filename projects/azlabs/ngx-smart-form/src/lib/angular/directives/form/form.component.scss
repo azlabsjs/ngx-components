@@ -71,3 +71,8 @@ div.control__group__header,
   border-bottom-color: transparent !important;
   background-size: 0;
 }
+
+
+:host ::ng-deep .hidden, .hidden {
+  display: none;
+}

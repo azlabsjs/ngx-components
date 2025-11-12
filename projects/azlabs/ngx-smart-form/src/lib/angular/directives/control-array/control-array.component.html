@@ -8,8 +8,8 @@
   #container
 ></ngx-form-control-array-outlet>
 
-<ng-container *ngTemplateOutlet="addButtonRef ? addButtonRef : addTemplate; context: { $implicit: add.bind(this) }"></ng-container>
+<ng-container *ngTemplateOutlet="addButtonRef ? addButtonRef : _add; context: { $implicit: add.bind(this) }"></ng-container>
 
-<ng-template #addTemplate let-handler>
+<ng-template #_add let-handler>
   <ngx-add-button (click)="handler($event)"></ngx-add-button>
 </ng-template>

@@ -5,7 +5,7 @@
   <!--\ before-->
 
   <!-- inputs -->
-  <ng-container *ngTemplateOutlet=" recursiveTemplate; context: { group: state.formGroup, controls: inputs, autoupload }"></ng-container>
+  <ng-container *ngTemplateOutlet=" _recursive; context: { group: state.formGroup, controls: inputs, autoupload }"></ng-container>
   <!--\ inputs -->
 
   <!-- after-->
@@ -22,26 +22,25 @@
 </ng-container>
 <!--\ main -->
 
-<ng-template #recursiveTemplate let-controls="controls" let-group="group" let-autoupload="autoupload">
+<ng-template #_recursive let-controls="controls" let-group="group" let-autoupload="autoupload">
   <div class="input-row" *ngIf="!noGridLayout">
-    <ng-container *ngTemplateOutlet="previewTemplate; context: { controls, group, autoupload }"></ng-container>
+    <ng-container *ngTemplateOutlet="_layout; context: { controls, group, autoupload }"></ng-container>
   </div>
   <ng-container *ngIf="!!noGridLayout">
-    <ng-container *ngTemplateOutlet="previewTemplate; context: { controls, group, autoupload }"></ng-container>
+    <ng-container *ngTemplateOutlet="_layout; context: { controls, group, autoupload }"></ng-container>
   </ng-container>
-  <ng-template #previewTemplate let-controls="controls" let-group="group" let-autoupload="autoupload">
+  <ng-template #_layout let-controls="controls" let-group="group" let-autoupload="autoupload">
     <ng-container *ngFor="let value of controls | asInputs">
-
-      <ng-container *ngIf="value | asInputGroup | hasChildren; else inputRef">
-        <div [class]="noGridLayout ? 'ngx-form-no-grid' : value.containerClass" [hidden]="(value | isHidden) || (group | inarray : state.detached)">
-          <ng-container *ngIf="group?.get(value.name) as local">
-            <ng-container *ngTemplateOutlet="label ?? labelRef; context: { $implicit: value.label, config: value, control: group }"></ng-container>
+      <ng-container *ngIf="value | asInputGroup | hasChildren; else _input">
+        <div *ngIf="group?.get(value.name) as local" [class]="noGridLayout | containercssclass: value.containerClass | csshidden : (value | isHidden) || (local | inarray : state.detached)" [hidden]="(value | isHidden) || (local | inarray : state.detached)">
+            <ng-container *ngTemplateOutlet="label ?? labelRef; context: { $implicit: value.label, config: value, control: local }"></ng-container>
             <ng-template #labelRef let-label let-config="config" let-control="control">
-              <div [innerHTML]="config.label | ngxGroupHeader | safeHtml" [hidden]="(config | isHidden) || (local | inarray : state.detached)"></div>
+              <div [class.hidden]="(config | isHidden) || (local | inarray : state.detached)" [innerHTML]="config.label | ngxGroupHeader | safeHtml" [hidden]="(config | isHidden) || (local | inarray : state.detached)"></div>
             </ng-template>
 
-            <ng-container *ngIf="value | repeatable; else inputGroupRef">
+            <ng-container *ngIf="value | repeatable; else _norepeat">
               <ngx-smart-form-array
+                [class.hidden]="(value | isHidden) || (local | inarray : state.detached)"
                 [detached]="state.detached"
                 [class]="value.classes"
                 [no-grid-layout]="noGridLayout"
@@ -57,26 +56,25 @@
                 [label]="label"></ngx-smart-form-array>
             </ng-container>
 
-            <ng-template #inputGroupRef>
-              <ng-container *ngTemplateOutlet="recursiveTemplate; context: {controls: (value | asInputGroup)!.children || [], group: local, autoupload}"></ng-container>
+            <ng-template #_norepeat>
+              <ng-container *ngTemplateOutlet="_recursive; context: {controls: (value | asInputGroup)!.children || [], group: local, autoupload}"></ng-container>
             </ng-template>
-          </ng-container>
         </div>
       </ng-container>
 
-      <ng-template #inputRef>
-        <div [class]="noGridLayout ? 'ngx-form-no-grid' : value.containerClass" [hidden]="(value | isHidden) || (group | inarray : state.detached)">
-          <ng-container *ngTemplateOutlet="formTemplate; context: {value, group, autoupload}"></ng-container>
+      <ng-template #_input>
+        <div *ngIf="group?.get(value.name) as local" [class]="noGridLayout | containercssclass : value.containerClass | csshidden : (value | isHidden) || (local | inarray : state.detached)" [hidden]="(value | isHidden) || (local | inarray : state.detached)">
+          <ng-container *ngTemplateOutlet="_template; context: {value, control: local, autoupload}"></ng-container>
         </div>
       </ng-template>
     </ng-container>
   </ng-template>
 </ng-template>
 
-<ng-template #formTemplate let-group="group" let-value="value">
-  <ng-container *ngIf="group?.get(value.name) as control">
+<ng-template #_template let-control="control" let-value="value">
     <ng-container *ngIf="value | repeatable; else notRepeatableRef">
       <ngx-smart-form-control-array
+        [class.hidden]="(value | isHidden) || (control | inarray : state.detached)"
         [formArray]="control"
         [config]="value"
         [template]="template"
@@ -91,7 +89,4 @@
     <ng-template #notRepeatableRef>
       <ng-container *ngTemplateOutlet="template; context: {control, value, autoupload, template: { label }, hidden: (value | isHidden) || (control | inarray : state.detached)}"></ng-container>
     </ng-template>
-
-  </ng-container>
-
 </ng-template>

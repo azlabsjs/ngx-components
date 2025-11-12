@@ -13,6 +13,7 @@ import { PIPES } from '../../pipes';
 import { FormGroupState } from './types';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { ModalDirective } from '../modal';
+import { FORM_PIPES } from './pipes';
 
 @Component({
   selector: 'ngx-form-ui',
@@ -25,6 +26,7 @@ import { ModalDirective } from '../modal';
     NgxSmartFormControlArrayComponent,
     NgxSmartFormGroupHeaderPipe,
     ...PIPES,
+    ...FORM_PIPES,
   ],
   styleUrls: ['./form-grid.scss', './form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,7 +37,7 @@ export class NgxFormComponent {
   @Input({ required: true }) inputs!: InputConfigInterface[];
   @Input() template!: TemplateRef<any>;
   @Input({ alias: 'add-template' }) addTemplate!: TemplateRef<any>;
-  @Input() label!: TemplateRef<any>;
+  @Input() label!: TemplateRef<any> | undefined | null;
   @Input() autoupload: boolean = false;
   @Input('no-grid-layout') noGridLayout = false;
 
