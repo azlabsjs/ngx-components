@@ -63,8 +63,8 @@ export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
   @Input({ alias: 'tooltip-error' }) tooltipError!: TemplateRef<any>;
   @Input({ alias: 'loading-text' }) loadingText!: string;
 
-  @Input() label!: TemplateRef<any>;
-  @Input() error!: TemplateRef<any>;
+  @Input() label!: TemplateRef<any> | null | undefined;
+  @Input() error!: TemplateRef<any> | null | undefined;
   @Input() textView!: TemplateRef<any>;
   //#endregion
 
