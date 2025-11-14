@@ -45,6 +45,9 @@ export {
   ArrayPipe,
   JoinPipe,
   LengthPipe,
+  ConcatPipe,
+  ContainsPipe,
+  IsarrayPipe,
 } from './common/arrays.pipe';
 
 /** types & declarations from transform namespace */
