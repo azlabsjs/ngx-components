@@ -90,11 +90,10 @@
               <ng-container *ngTemplateOutlet="label ?? _label; context: { $implicit: config!.label, config }"></ng-container>
               <span class="required-text" *ngIf="config.rules?.isRequired ?? (config | required)">(*)</span>
             </label>
-            <input noAutoComplete type="date" [attr.title]="config!.label" (blur)="onBlur($event)" [formControl]="control" [value]="control.value" [min]="config!.minDate" [max]="config.maxDate" clrDate />
+            <input noAutoComplete type="date" [attr.title]="config!.label" (blur)="onBlur($event)" [formControl]="control" [value]="control.value" [min]="config!.minDate ?? config.constraints?.min" [max]="config.maxDate ?? config.constraints?.max" clrDate />
           </clr-date-container>
         </ng-template>
       </ngx-date-input>
-
       <!-- error -->
       <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
     </ng-container>

@@ -83,7 +83,9 @@
           </ng-template>
           <ng-template #error let-touched="touched" let-errors>
             <ngx-input-error *ngIf="touched" [errors]="errors" [template]="template">
-              <ng-template #template let-value> <span>{{ value }}</span> </ng-template>
+              <ng-template #template let-value let-params="params">
+                <span [class]="config.type + '-input'">{{ "validation.[value]" | parseStr : { value } | text | parseStr : params }}</span>
+              </ng-template>
             </ngx-input-error>
           </ng-template>
         </ngx-clr-form-control>

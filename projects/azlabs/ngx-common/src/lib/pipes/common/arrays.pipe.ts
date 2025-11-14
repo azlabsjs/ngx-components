@@ -16,11 +16,37 @@ export class ArrayPipe implements PipeTransform {
 @Pipe({
   standalone: true,
   pure: true,
+  name: 'contains',
+})
+@Injectable({ providedIn: 'any' })
+export class ContainsPipe implements PipeTransform {
+  transform<T = unknown>(value: T[], arg: T) {
+    return value.includes(arg);
+  }
+}
+
+/** @deprecated use isarray instead */
+@Pipe({
+  standalone: true,
+  pure: true,
   name: 'isArray',
 })
 @Injectable({ providedIn: 'any' })
 export class IsArrayPipe implements PipeTransform {
-  /** Returns an empty array if the provided value is null or undefined or the value else */
+  /** returns an empty array if the provided value is null or undefined or the value else */
+  transform<T>(value: undefined | T[]): value is T[] {
+    return Array.isArray(value);
+  }
+}
+
+@Pipe({
+  pure: true,
+  standalone: true,
+  name: 'isarray',
+})
+@Injectable({ providedIn: 'any' })
+export class IsarrayPipe implements PipeTransform {
+  /** returns an empty array if the provided value is null or undefined or the value else */
   transform<T>(value: undefined | T[]): value is T[] {
     return Array.isArray(value);
   }
@@ -50,6 +76,18 @@ export class LengthPipe implements PipeTransform {
   /** Returns an empty array if the provided value is null or undefined or the value else */
   transform<T>(value: undefined | T[]): number {
     return (value ?? []).length;
+  }
+}
+
+@Pipe({
+  standalone: true,
+  pure: true,
+  name: 'concat',
+})
+@Injectable({ providedIn: 'any' })
+export class ConcatPipe implements PipeTransform {
+  transform<T>(value: T[], ...args: ConcatArray<T>[]) {
+    return value.concat(...args);
   }
 }
 
