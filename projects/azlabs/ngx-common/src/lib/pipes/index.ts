@@ -37,7 +37,7 @@ export {
 export { IsAsyncPipe, AsObservablePipe } from './common/async.pipe';
 export { PipeResultPipe } from './common/pipe-result.pipe';
 export { ParseIntPipe } from './common/parse-int.pipe';
-export { ParseStrPipe, StrLengthPipe } from './common/str.pipe';
+export { ParseStrPipe, StrLengthPipe, FormatPipe } from './common/str.pipe';
 export { PropertyValuePipe } from './common/property.pipe';
 export {
   ArrayLengthPipe,
