@@ -39,14 +39,14 @@
         <clr-dg-cell (click)="onItemClick($event, current)">
             <ng-container *ngIf="current|propValue:column.property | transform: column.transform | pipeResult as result">
                 <ng-container *ngIf="result.value | isAsync; else noAsyncRef">
-                  <ng-container *ngTemplateOutlet="cell ?? _cell; context: {$implicit: result.value | async, column}"></ng-container>
+                  <ng-container *ngTemplateOutlet="cell ?? _cell; context: {$implicit: result.value | async, column, item: current}"></ng-container>
                 </ng-container>
                 <ng-template #noAsyncRef>
-                  <ng-container *ngTemplateOutlet="cell ?? _cell; context: {$implicit: result.value, column}"></ng-container>
+                  <ng-container *ngTemplateOutlet="cell ?? _cell; context: {$implicit: result.value, column, item: current}"></ng-container>
                 </ng-template>
 
-                <ng-template #_cell let-value let-column="column">
-                  <span class="cell-value" [ngClass]="column.style.class | cssclass:value:current" [style]="column.style.styles | cssstyle:value:current">{{ value }}</span>
+                <ng-template #_cell let-value let-column="column" let-item="item">
+                  <span class="cell-value" [ngClass]="column.style.class | cssclass:value:item" [style]="column.style.styles | cssstyle:value:item">{{ value }}</span>
                 </ng-template>
               </ng-container>
         </clr-dg-cell>
