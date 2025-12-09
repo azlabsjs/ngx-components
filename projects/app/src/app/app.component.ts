@@ -184,7 +184,7 @@ export class AppComponent implements OnInit {
   gridConfig: Partial<GridConfigType> = {
     selectable: true,
     singleSelection: false,
-    transformColumnTitle: ['asyncText'],
+    // transformColumnTitle: ['asyncText'],
     capitalizeColumnTitle: true,
     useServerPagination: true,
     projectRowClass: (current: { id: number }) => {
@@ -258,6 +258,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     setTimeout(() => {
+      console.log('Loaded values: ', _values)
       this._pageResult$.next(_values);
       this.placeholder = undefined;
     }, 3000);

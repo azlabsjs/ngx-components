@@ -7,10 +7,15 @@ import {
   ConcatPipe,
   ContainsPipe,
   IsarrayPipe,
+  InArrayPipe,
+  MergePipe,
+  ArrayFindPipe,
+  ArrayFirstPipe,
+  AsArrayPipe,
 } from './common/arrays.pipe';
 import { IsAsyncPipe, AsObservablePipe } from './common/async.pipe';
 import { ParseIntPipe } from './common/parse-int.pipe';
-import { ParseStrPipe, StrLengthPipe, FormatPipe } from './common/str.pipe';
+import { ParseStrPipe, StrLengthPipe, FormatPipe, StrPipe } from './common/str.pipe';
 import { PipeResultPipe } from './common/pipe-result.pipe';
 import { PropertyValuePipe } from './common/property.pipe';
 import { NgxTransformPipe } from './transform';
@@ -37,7 +42,7 @@ export {
 export { IsAsyncPipe, AsObservablePipe } from './common/async.pipe';
 export { PipeResultPipe } from './common/pipe-result.pipe';
 export { ParseIntPipe } from './common/parse-int.pipe';
-export { ParseStrPipe, StrLengthPipe, FormatPipe } from './common/str.pipe';
+export { ParseStrPipe, StrLengthPipe, FormatPipe, StrPipe } from './common/str.pipe';
 export { PropertyValuePipe } from './common/property.pipe';
 export {
   ArrayLengthPipe,
@@ -48,6 +53,11 @@ export {
   ConcatPipe,
   ContainsPipe,
   IsarrayPipe,
+  InArrayPipe,
+  MergePipe,
+  ArrayFindPipe,
+  ArrayFirstPipe,
+  AsArrayPipe
 } from './common/arrays.pipe';
 
 /** types & declarations from transform namespace */
@@ -82,7 +92,13 @@ export const COMMON_PIPES = [
   KeysPipe,
   EmptyPipe,
   NotEmptyPipe,
+  InArrayPipe,
+  MergePipe,
+  ArrayFindPipe,
+  ArrayFirstPipe,
   ConcatPipe,
   ContainsPipe,
   IsarrayPipe,
+  StrPipe,
+  AsArrayPipe
 ] as const;

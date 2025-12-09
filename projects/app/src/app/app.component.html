@@ -109,6 +109,9 @@
     [pageResult]="pageResult$ | async"
     (dgRefresh)="onDgRefresh($event)"
     (selectedChange)="onSelectedChanges($event)"
-    [config]="gridConfig"
-  ></ngx-clr-smart-grid>
+    [config]="gridConfig">
+    <ng-template #title let-value let-capitalize="capitalize">
+      {{ capitalize ? (value | text | uppercase) : value }}
+    </ng-template>
+</ngx-clr-smart-grid>
 </div>

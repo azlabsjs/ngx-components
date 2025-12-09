@@ -1,114 +1,89 @@
-<clr-datagrid clrGridSelect [selectionConfig]="{
-    selectable: config.selectable,
-    singleSelection: config.singleSelection
-  }" [(selectState)]="selected" [class]="config.class || ''" (clrDgRefresh)="onDgRefresh($event)"
-  [clrDgPreserveSelection]="config.preserveSelection || false" [clrDgLoading]="loading"
-  (selectStateChange)="onSelectedStateChanges($event)">
+<clr-datagrid clrGridSelect [selectionConfig]="{selectable: config.selectable, singleSelection: config.singleSelection}" [(selectState)]="selected" [class]="config.class || ''" (clrDgRefresh)="onDgRefresh($event)" [clrDgPreserveSelection]="config.preserveSelection || false" [clrDgLoading]="loading" (selectStateChange)="onSelectedStateChanges($event)">
   <clr-dg-action-bar>
-    <ng-container *ngTemplateOutlet="dgActionBarRef; context: { $implicit: selected }"></ng-container>
+    <ng-container *ngTemplateOutlet="dgactionbar; context: { $implicit: selected }"></ng-container>
   </clr-dg-action-bar>
-  <!-- DATA GRID COLUMNS -->
+
   <ng-container *ngFor="let column of columns">
-    <clr-dg-column [ngClass]="config.columnHeadersClass" [clrDgColType]="column.type" [clrDgField]="column.field"
-      [clrDgSortBy]="column.sort || ''">
-      <ng-container
-        *ngIf="column.title | transform : (column.transformTitle ?? config.transformColumnTitle) | pipeResult as result">
-        <ng-container *ngIf="result.value | isAsync; else noAsyncRef">{{ config.capitalizeColumnTitle ? (result.value |
-          async|uppercase) : (result.value | async) }} </ng-container>
-        <ng-template #noAsyncRef>{{ config.capitalizeColumnTitle ? (result.value|uppercase) : result.value }}
+    <clr-dg-column [ngClass]="config.columnHeadersClass" [clrDgColType]="column.type" [clrDgField]="column.field" [clrDgSortBy]="column.sort || ''">
+      <ng-container *ngIf="column.title | transform : (column.transformTitle || config.transformColumnTitle) | pipeResult as result">
+        <ng-container *ngIf="result.value | isAsync; else noAsyncRef">
+          <ng-container *ngTemplateOutlet="title ?? _title; context: {$implicit: result.value | async, value: result.value | async, capitalize: config.capitalizeColumnTitle}"></ng-container>
+        </ng-container>
+        <ng-template #noAsyncRef>
+          <ng-container *ngTemplateOutlet="title ?? _title; context: {$implicit: result.value, value: result.value, capitalize: config.capitalizeColumnTitle}"></ng-container>
         </ng-template>
+        <ng-template #_title let-value let-capitalize="capitalize">{{ capitalize ? (value | uppercase) : value }}</ng-template>
       </ng-container>
-      <clr-dg-filter *ngIf="config.useCustomFilters">
-        <ng-content select=".dg-filter"></ng-content>
-      </clr-dg-filter>
+      <clr-dg-filter *ngIf="config.useCustomFilters"> <ng-content select=".dg-filter"></ng-content> </clr-dg-filter>
     </clr-dg-column>
   </ng-container>
-  <!--\ DATA GRID COLUMNS -->
 
-  <!-- DATA GRID ROWS -->
-  <!-- IF USER SPECIFY TO SERVER SIDE PAGINATION WE USE DEFAULT *ngFor directive -->
   <ng-container *ngIf="config.useServerPagination; else smart">
-    <ng-container *ngFor="let item of state.data ?? []">
-      <ng-container *ngTemplateOutlet="dgRowRef ?? defaultRowRef; context: { $implicit: item }"
-        ngProjectAs="clr-dg-row"></ng-container>
+    <ng-container *ngFor="let item of state.data || []">
+      <ng-container *ngTemplateOutlet="dgrow ?? _row; context: { $implicit: item }" ngProjectAs="clr-dg-row"></ng-container>
     </ng-container>
   </ng-container>
-  <!-- ELSE WE FALL BACK TO *clrDgItems smart iterator directive directive -->
+
   <ng-template #smart>
-    <ng-container *clrDgItems="let item of state.data ?? []">
-      <ng-container *ngTemplateOutlet="dgRowRef ?? defaultRowRef; context: { $implicit: item }"
-        ngProjectAs="clr-dg-row"></ng-container>
+    <ng-container *clrDgItems="let item of state.data || []">
+      <ng-container *ngTemplateOutlet="dgrow ?? _row; context: { $implicit: item }" ngProjectAs="clr-dg-row"></ng-container>
     </ng-container>
   </ng-template>
-  <!-- DATA GRID ROWS -->
-  <ng-template #defaultRowRef let-current>
-    <clr-dg-row [class]="config|gridRowClass:current" [clrDgItem]="current"
-      [clrDgSelectable]="current[config.selectableProp || ''] || true">
-      <clr-dg-action-overflow *ngIf="config.hasActionOverflow">
-        <!-- ACTION OVERFLOW BUTTON PROJECTION -->
-        <ng-container *ngTemplateOutlet="
-            dgActionOverflowRef;
-            context: { $implicit: current }
-          "></ng-container>
+
+  <ng-template #_row let-current>
+    <clr-dg-row [class]="config|gridRowClass:current" [clrDgItem]="current" [clrDgSelectable]="current[config.selectableProp || ''] || true">
+      <clr-dg-action-overflow *ngIf="config.hasActionOverflow && !!dgoverflow">
+        <ng-container *ngTemplateOutlet=" dgoverflow; context: { $implicit: current }"></ng-container>
       </clr-dg-action-overflow>
       <ng-container *ngFor="let column of columns">
         <clr-dg-cell (click)="onItemClick($event, current)">
-            <ng-container
-              *ngIf="current|propValue:column.property | transform: column.transform | pipeResult as result">
+            <ng-container *ngIf="current|propValue:column.property | transform: column.transform | pipeResult as result">
                 <ng-container *ngIf="result.value | isAsync; else noAsyncRef">
-                  <span *ngIf="result.value | async as value" class="cell-value" [ngClass]="column.style.class | cssclass:value:current" [style]="column.style.styles | cssstyle:value:current">
-                    {{value}}
-                  </span>
+                  <ng-container *ngTemplateOutlet="cell ?? _cell; context: {$implicit: result.value | async, column}"></ng-container>
                 </ng-container>
-                  
                 <ng-template #noAsyncRef>
-                  <span class="cell-value" [ngClass]="column.style.class | cssclass:result.value:current" [style]="column.style.styles | cssstyle:result.value:current">
-                    {{ result.value }}
-                  </span>
+                  <ng-container *ngTemplateOutlet="cell ?? _cell; context: {$implicit: result.value, column}"></ng-container>
+                </ng-template>
+
+                <ng-template #_cell let-value let-column="column">
+                  <span class="cell-value" [ngClass]="column.style.class | cssclass:value:current" [style]="column.style.styles | cssstyle:value:current">{{ value }}</span>
                 </ng-template>
               </ng-container>
         </clr-dg-cell>
       </ng-container>
-      <!-- USING ngProjectAs as recommended by the documentation -->
-      <ng-container ngProjectAs="clr-dg-row-detail" *ngIf="config.hasExpandableRows">
+
+      <ng-container ngProjectAs="clr-dg-row-detail" *ngIf="config.hasExpandableRows && !!dgrowdetail">
         <clr-dg-row-detail *clrIfExpanded>
-          <ng-container *ngTemplateOutlet="dgRowDetailRef; context: { $implicit: current }"></ng-container>
+          <ng-container *ngTemplateOutlet="dgrowdetail; context: { $implicit: current }"></ng-container>
         </clr-dg-row-detail>
       </ng-container>
-      <!--\ USING ngProjectAs as recommended by the documentation -->
+
     </clr-dg-row>
   </ng-template>
-  <!--\ DATA GRID ROWS -->
 
-  <!-- DATAGRID PLACEHOLDER WHEN data IS EMPTY -->
-  <!-- DEFAULT -->
-  <ng-template #defaultPlaceHolder>
-    <clr-dg-placeholder *ngIf="placeholder">{{ placeholder || 'We couldn\'t find any data!'}}</clr-dg-placeholder>
+
+  <ng-container ngProjectAs="clr-dg-placeholder" *ngTemplateOutlet="dgplaceholder || _placeholder"></ng-container>
+  <ng-template #_placeholder>
+    <clr-dg-placeholder *ngIf="placeholder">{{ placeholder || 'we couldn\'t find any data!'}}</clr-dg-placeholder>
   </ng-template>
-  <!-- DEFAULT -->
-  <ng-container ngProjectAs="clr-dg-placeholder"
-    *ngTemplateOutlet="dgPlaceHolderRef || defaultPlaceHolder"></ng-container>
-  <!--\ DATAGRID PLACEHOLDER WHEN data IS EMPTY -->
 
-  <!-- DATAGRID PANE -->
-  <ng-container ngProjectAs="clr-dg-detail" *ngIf="config.hasDetails">
+
+  <ng-container ngProjectAs="clr-dg-detail" *ngIf="config.hasDetails && !!dgdetail">
     <ng-template clrIfDetail let-detail (clrIfDetailChange)="detailChange.emit($event)">
       <clr-dg-detail>
         <clr-dg-detail-header>
           <ng-content select=".dg-detail-header"></ng-content>
         </clr-dg-detail-header>
         <clr-dg-detail-body>
-          <ng-container *ngTemplateOutlet="dgDetailBodyRef; context: { $implicit: detail }"></ng-container>
+          <ng-container *ngTemplateOutlet="dgdetail; context: { $implicit: detail }"></ng-container>
         </clr-dg-detail-body>
       </clr-dg-detail>
     </ng-template>
   </ng-container>
 
-  <!-- Data grid footer definitions -->
   <clr-dg-footer>
     {{ state.total || state.data.length }} {{ config.totalItemLabel }}
-    <clr-dg-pagination [clrDgPageSize]="config.pageSize" #pagination
-      [clrDgTotalItems]="state.total || state.data.length">
+    <clr-dg-pagination [clrDgPageSize]="config.pageSize" #pagination [clrDgTotalItems]="state.total || state.data.length">
       <clr-dg-page-size [clrPageSizeOptions]="config.sizeOptions"></clr-dg-page-size>
     </clr-dg-pagination>
   </clr-dg-footer>

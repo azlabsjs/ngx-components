@@ -60,3 +60,14 @@ export class StrLengthPipe implements PipeTransform {
       : String(value).length;
   }
 }
+
+@Pipe({
+  name: 'str',
+  standalone: true,
+  pure: true,
+})
+export class StrPipe implements PipeTransform {
+  transform(value: unknown) {
+    return String(value);
+  }
+}
