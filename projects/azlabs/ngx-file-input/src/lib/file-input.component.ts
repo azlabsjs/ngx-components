@@ -1,13 +1,19 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   Inject,
   Injector,
   Input,
   Output,
   TemplateRef,
+  ViewChild,
+  Optional as NgOptional,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
 import {
   HTTPRequest,
@@ -31,10 +37,14 @@ import {
   UploadOptionsType,
   ValueType,
 } from './types';
-import { UPLOADER_OPTIONS } from './tokens';
+import { DOWNLOAD_API, UPLOADER_OPTIONS } from './tokens';
 import { CommonModule } from '@angular/common';
 import { HTMLFileInputDirective } from './file-input.directive';
 import { PIPES } from './pipes';
+import { createWithFetchAPI } from './fetch';
+
+/** @internal */
+type Optional<T> = T | null | undefined;
 
 @Component({
   standalone: true,
@@ -59,7 +69,7 @@ import { PIPES } from './pipes';
       .tooltip {
         position: relative;
         margin: 0;
-        padding: 0
+        padding: 0;
       }
 
       .tooltip > svg {
@@ -74,8 +84,8 @@ import { PIPES } from './pipes';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxSmartFileInputComponent {
-  //#region component inputs
+export class NgxSmartFileInputComponent implements AfterViewInit, OnChanges {
+  //#region input properties
   @Input({ alias: 'upload-as' }) uploadAs!: string | undefined;
   @Input({ alias: 'placeholder' }) placeholder!: string | undefined;
   @Input({ alias: 'class' }) cssClass!: string | undefined;
@@ -92,26 +102,31 @@ export class NgxSmartFileInputComponent {
    * be uploaded when the get accepted by the component
    */
   @Input({ alias: 'autoupload' }) autoupload: boolean = false;
-  @Input({ alias: 'tooltip-error' }) tooltip!: TemplateRef<any>;
-
+  @Input({ alias: 'tooltip-error' }) tooltip!: Optional<TemplateRef<any>>;
   /** @deprecated */
   @Input({ alias: 'file-size-error' }) fileSizeError!: string;
   /** @deprecated */
   @Input({ alias: 'file-upload-error' }) fileUploadError!: string;
+
+  /** file object or url to file stream */
+  @Input() file: Optional<string | File>;
   //#endregion
 
-  // #region component properties
+  // #region local properties
   _state: StateType = { uploading: false, error: undefined };
   get state() {
     return this._state;
   }
+  private _api: (url: string) => Promise<File | null>;
   // #endregion
 
-  // #region component outputs
+  // #region output properties
   @Output() reset = new EventEmitter<void>();
   @Output() value = new EventEmitter<ValueType>();
   @Output() error = new EventEmitter<ErrorStateType>();
   // #endregion
+
+  @ViewChild('input', { static: false }) input: Optional<ElementRef>;
 
   // Class constructor
   constructor(
@@ -119,8 +134,30 @@ export class NgxSmartFileInputComponent {
     @Inject(UPLOADER_OPTIONS)
     public readonly uploadOptions: UploadOptionsType<HTTPRequest, HTTPResponse>,
     private uploadEvents: NgxUploadsEventsService,
-    private injector: Injector
-  ) {}
+    private injector: Injector,
+    @NgOptional()
+    @Inject(DOWNLOAD_API)
+    api: (url: string) => Promise<File | null>
+  ) {
+    this._api = api ?? createWithFetchAPI();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes &&
+      'file' in changes &&
+      changes['file'].currentValue !== changes['file'].previousValue
+    ) {
+      this.setInputValue(changes['file'].currentValue);
+    }
+  }
+
+  async ngAfterViewInit() {
+    if (!this.file) {
+      return;
+    }
+    this.setInputValue(this.file);
+  }
 
   sizeError(e: File[]) {
     const error: ErrorStateType = { type: 'size', data: e };
@@ -273,11 +310,41 @@ export class NgxSmartFileInputComponent {
   }
 
   /**
-   * Local state management API that marks component for update on
+   * local state management API that marks component for update on
    * each state changes
    */
   private setState(state: SetStateParam<StateType>) {
     this._state = state(this._state);
     this.cdRef?.markForCheck();
+  }
+
+  private async setInputValue(content: Optional<string | File>) {
+    let input: HTMLInputElement | null | undefined;
+    if (this.input && this.input.nativeElement) {
+      input = this.input.nativeElement as HTMLInputElement;
+    }
+
+    if (!input) {
+      return;
+    }
+
+    if (input.files?.length === 0) {
+      const file =
+        typeof content === 'string'
+          ? await this._api.call(this._api, content)
+          : content;
+
+      if (!content) {
+        return;
+      }
+
+      if (!file) {
+        return;
+      }
+
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+    }
   }
 }

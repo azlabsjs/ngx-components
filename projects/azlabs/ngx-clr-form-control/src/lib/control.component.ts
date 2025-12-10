@@ -24,6 +24,9 @@ import { PIPES } from './pipes';
 // Register clarity eye icons
 ClarityIcons.addIcons(eyeHideIcon, eyeIcon);
 
+/** @internal */
+type Optional<T> = T | null | undefined;
+
 @Component({
   standalone: true,
   imports: [
@@ -44,7 +47,7 @@ export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
   //#region component inputs
   @Input() inline = false;
   @Input() describe = true;
-  @Input() hidden: boolean | undefined = false;
+  @Input() hidden: Optional<boolean> = false;
   @Input() countries!: string[];
   private _inputConfig!: InputConfigInterface;
   @Input() set config(value: InputConfigInterface) {
@@ -60,12 +63,11 @@ export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
   /** @deprecated */
   @Input({ alias: 'class' }) cssClass = 'clr-form-control';
   @Input({ alias: 'control' }) formControl!: FormControl<any>;
-  @Input({ alias: 'tooltip-error' }) tooltipError!: TemplateRef<any>;
+  @Input({ alias: 'tooltip-error' }) tooltiperror!: Optional<TemplateRef<any>>;
   @Input({ alias: 'loading-text' }) loadingText!: string;
-
-  @Input() label!: TemplateRef<any> | null | undefined;
-  @Input() error!: TemplateRef<any> | null | undefined;
-  @Input() textView!: TemplateRef<any>;
+  @Input() label!: Optional<TemplateRef<any>>;
+  @Input() error!: Optional<TemplateRef<any>>;
+  @Input() textview!: Optional<TemplateRef<any>>;
   //#endregion
 
   //#region component outputs

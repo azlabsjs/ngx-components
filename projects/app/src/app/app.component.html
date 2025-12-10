@@ -1,12 +1,6 @@
 <div class="container">
   <h4>Ngx Common</h4>
-  <p
-    *ngIf="
-      230
-        | transform : ['httpValue:http://localhost:3000/professions;label']
-        | pipeResult as result
-    "
-  >
+  <p *ngIf="230 | transform : ['httpValue:http://localhost:3000/professions;label'] | pipeResult as result">
     <ng-container *ngIf="result.value | isAsync; else defaultRef">
       Async : {{ result.value | async }}
     </ng-container>
@@ -19,9 +13,9 @@
     <pre>{{ options | json }}</pre>
   </div>
 </div> -->
-<!-- <div class="container">
+<div class="container">
   <app-form-control></app-form-control>
-</div> -->
+</div>
 <div class="container">
   <h3>{{ "app.modules.users.title" | text }}</h3>
   <ng-container *ngIf="state$ | async as form">
@@ -37,15 +31,8 @@
       [form]="form"
       [autoSubmit]="true"
       [path]="'http://localhost:3000/customers'"
-      [template]="controlTemplate"
-    >
-      <ngx-modal
-        #modal
-        (openChange)="onOpenChange(modal)"
-        (stateChange)="formModalStateChange()"
-        ngxformmodal
-        #formmodal="formmodal"
-      >
+      [template]="controlTemplate">
+      <ngx-modal #modal (openChange)="onOpenChange(modal)" (stateChange)="formModalStateChange()" ngxformmodal #formmodal="formmodal">
         <div class="ngx-modal-body">
           <ngx-form-ui
             *ngIf="formmodal.formgroup"
@@ -54,30 +41,14 @@
             [template]="formmodal.view"
             [label]="formmodal.label"
             [state]="{formGroup: formmodal.formgroup,detached: formmodal.detached}"
-            [inputs]="formmodal.inputs"
-          >
+            [inputs]="formmodal.inputs">
           </ngx-form-ui>
         </div>
         <div class="ngx-modal-footer"></div>
       </ngx-modal>
       <!-- <p modal>I am a modal</p> -->
-      <ng-template
-        #controlTemplate
-        let-config="value"
-        let-control="control"
-        let-describe="describe"
-        let-hidden="hidden"
-      >
-        <ngx-clr-form-control
-          class="ngx-smart-form-control"
-          [hidden]="config.hidden"
-          [control]="control"
-          [hidden]="hidden"
-          [inputConfig]="config"
-          [describe]="describe ?? true"
-          [error]="error"
-          [label]="label"
-        >
+      <ng-template #controlTemplate let-config="value" let-control="control" let-describe="describe" let-hidden="hidden">
+        <ngx-clr-form-control class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control" [hidden]="hidden" [inputConfig]="config" [describe]="describe ?? true" [error]="error" [label]="label">
           <ng-template #label let-label>
             <span>{{ label }}</span>
           </ng-template>

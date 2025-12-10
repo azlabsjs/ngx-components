@@ -200,6 +200,7 @@ export class AppComponent implements OnInit {
   ];
 
   fromState = {
+    document_id: 'https://storagev2.lik.tg/api/storage/object/download?name=17652725236937ebcb22e06493916050&signature=63a33124004cb0a0ca3450230f5204b09442f911409d178a8f5b2d3679238675',
     fruits: ['2', '3', '4'],
     category_id: 1,
     lastname: 'AZOMEDOH',
@@ -240,7 +241,7 @@ export class AppComponent implements OnInit {
       .get(220)
       .pipe(
         filter((state) => typeof state !== 'undefined' && state !== null),
-        tap((state) => console.log('Form: ', state)),
+        // tap((state) => console.log('Form: ', state)),
         tap((state) => this._state$.next(state)),
         takeUntil(this._destroy$)
       )
@@ -248,7 +249,7 @@ export class AppComponent implements OnInit {
   }
 
   onOpenChange(_t28: ModalComponent) {
-    console.log('modal: ', _t28);
+    // console.log('modal: ', _t28);
     _t28.open();
   }
 
@@ -258,7 +259,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     setTimeout(() => {
-      console.log('Loaded values: ', _values)
+      // console.log('Loaded values: ', _values)
       this._pageResult$.next(_values);
       this.placeholder = undefined;
     }, 3000);
