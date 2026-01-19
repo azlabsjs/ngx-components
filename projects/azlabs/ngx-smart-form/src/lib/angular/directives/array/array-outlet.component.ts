@@ -30,25 +30,25 @@ export class NgxFormArrayOutletComponent
     OnDestroy,
     ViewRefFactory<ComponentRef<NgxSmartFormArrayItemComponent>>
 {
-  //#region Component inputs
+  //#region input properties
   @Input() inputs: InputConfigInterface[] = [];
   @Input({ alias: 'auto-upload' }) autoupload: boolean = true;
   @Input({ alias: 'no-grid-layout' }) noGridLayout = true;
   @Input() template!: TemplateRef<any>;
   @Input({ required: true }) detached!: AbstractControl[];
-  //#endregion Component inputs
+  //#endregion
 
-  //#region Component output
+  //#region output properties
   @Output() removed = new EventEmitter<
     RefType<ComponentRef<NgxSmartFormArrayItemComponent>>
   >();
-  //#endregion Component output
+  //#endregion
 
-  //#region Component properties
+  //#region local properties
   @ViewChild('container', { read: ViewContainerRef, static: false })
   containerRef!: ViewContainerRef;
   private destroy$ = new Subject<void>();
-  //#endregion Component properties
+  //#endregion
 
   createView(index: number, input: AbstractControl) {
     const element = this.containerRef?.createComponent(

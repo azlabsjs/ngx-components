@@ -18,24 +18,9 @@
 </div>
 
 <!-- table layout component -->
-<ng-template
-  #template
-  let-formgroup="formgroup"
-  let-autoupload="autoupload"
-  let-inputs="inputs"
-  let-remove="remove"
->
+<ng-template #template let-formgroup="formgroup" let-autoupload="autoupload" let-inputs="inputs" let-remove="remove">
   <tr>
-    <td
-      *ngFor="let input of inputs"
-      class="bottom"
-      [ngClass]="{
-        error:
-          formgroup.get(input.name)?.touched &&
-          formgroup.get(input.name)?.errors &&
-          (formgroup.get(input.name)?.errors | keys).length > 0
-      }"
-    >
+    <td *ngFor="let input of inputs" class="bottom" [ngClass]="{error: formgroup.get(input.name)?.touched && formgroup.get(input.name)?.errors && (formgroup.get(input.name)?.errors | keys).length > 0}">
       <ng-container *ngIf="formgroup.get(input.name) as control">
         <ng-container
           *ngTemplateOutlet="

@@ -303,7 +303,7 @@
         "placeholder": "...",
         "requiredIf": "category_id:1",
         "type": "control_group",
-        "classes": "controls-header table",
+        "classes": "controls-header",
         "multiple": 0,
         "options": [],
         "children": [

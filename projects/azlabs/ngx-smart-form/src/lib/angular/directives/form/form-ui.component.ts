@@ -14,6 +14,7 @@ import { FormGroupState } from './types';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { ModalDirective } from '../modal';
 import { FORM_PIPES } from './pipes';
+import { ComponentReactiveFormHelpers } from '../../helpers';
 
 @Component({
   selector: 'ngx-form-ui',
@@ -41,7 +42,9 @@ export class NgxFormComponent {
   @Input() autoupload: boolean = false;
   @Input('no-grid-layout') noGridLayout = false;
 
-  //#region projected content
   @ContentChild(ModalDirective) formmodal!: ModalDirective | null;
-  //#endregion
+
+  public validate() {
+    ComponentReactiveFormHelpers.validateFormGroupFields(this.state.formGroup);
+  }
 }

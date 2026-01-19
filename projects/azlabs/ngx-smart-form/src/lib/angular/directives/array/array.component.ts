@@ -21,11 +21,15 @@ import { AngularReactiveFormBuilderBridge } from '../../types';
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
 import { CommonModule } from '@angular/common';
 import { BUTTON_DIRECTIVES } from '../buttons';
-import { PIPES } from '../../pipes';
+import { PIPES as BASE_PIPES } from '../../pipes';
 import { NgxTableForm } from '../table';
 import { NgxFormArrayOutletComponent } from './array-outlet.component';
 import { RefType, ViewRefFactory } from '../types';
 import { ModalDirective } from '../modal';
+import { PIPES } from './pipes';
+
+// @internal
+type Optional<T> = T | null |undefined;
 
 @Component({
   standalone: true,
@@ -34,6 +38,7 @@ import { ModalDirective } from '../modal';
     NgxTableForm,
     NgxFormArrayOutletComponent,
     ...BUTTON_DIRECTIVES,
+    ...BASE_PIPES,
     ...PIPES,
   ],
   selector: 'ngx-smart-form-array',
@@ -44,14 +49,15 @@ import { ModalDirective } from '../modal';
 export class NgxSmartFormArrayComponent
   implements AfterContentInit, OnDestroy, AfterViewInit
 {
-  //#region component inputs definitions
+  //#region inputs properties
   @Input() modal!: ModalDirective;
   @Input() detached!: AbstractControl[];
   @Input() template!: TemplateRef<any>;
-  @Input() addGroupRef!: TemplateRef<Node>;
-  @Input() label!: TemplateRef<any> | null | undefined;
+  @Input() addGroupRef!: Optional<TemplateRef<Node>>;
+  @Input() label!: Optional<TemplateRef<any>>;
   @Input() name!: string;
   @Input() title!: string;
+  @Input() placeholder!: Optional<string>;
   @Input() autoupload: boolean = true;
   @Input({ alias: 'controls' }) inputs!: InputConfigInterface[];
   @Input({ alias: 'formArray' }) array!: FormArray;
@@ -75,16 +81,16 @@ export class NgxSmartFormArrayComponent
   @Input() hidden: boolean = false;
   //#endregion
 
-  //#region component outputs
+  //#region output properties
   @Output() listChange = new EventEmitter<number>();
   //#endregion
 
-  // #region View children
+  // #region view children
   @ViewChild('container', { static: false })
   viewFactory!: ViewRefFactory<any>;
   // #endregion
 
-  // #region component properties
+  // #region local properties
   _ref = 0;
   get refCount() {
     return this._ref;

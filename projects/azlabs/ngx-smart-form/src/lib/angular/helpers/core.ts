@@ -22,7 +22,24 @@ import { cloneAbstractControl } from './clone';
 import { Observable, Subject, Subscription } from 'rxjs';
 
 /** @internal */
-type Tuple = [k: string | number, control: AbstractControl | null];
+type Optional<T> = T | null | undefined;
+
+function safeSetValue<T = unknown>(
+  a: Optional<AbstractControl>,
+  value: T,
+  logger?: (err: unknown) => void,
+) {
+  if (!a) {
+    return;
+  }
+  try {
+    a.setValue(value);
+  } catch (error) {
+    if (logger) {
+      logger(error);
+    }
+  }
+}
 
 function isformgroup(x: AbstractControl): x is FormGroup {
   return x instanceof FormGroup;
@@ -47,7 +64,7 @@ function isinputgroup(input: InputConfigInterface): input is InputGroup {
 }
 
 function isoptionsinput(
-  config: InputConfigInterface
+  config: InputConfigInterface,
 ): config is Required<OptionsInput> {
   return (
     'optionsConfig' in config &&
@@ -73,7 +90,7 @@ function getinputgroupinputs(input: InputGroup) {
   return Array.isArray(children)
     ? children
     : [children].filter(
-        (current) => typeof current !== 'undefined' && current !== null
+        (current) => typeof current !== 'undefined' && current !== null,
       );
 }
 
@@ -103,7 +120,7 @@ function findarray<T extends AbstractControl>(g: T, keys: string[]) {
 /** @internal helper function to find the parent of a given abstract control specialy if using . separated property names */
 export function findparent<T extends FormGroup | null>(
   g: FormGroup,
-  key: string
+  key: string,
 ) {
   const keys = key.split('.');
   keys.pop();
@@ -113,7 +130,7 @@ export function findparent<T extends FormGroup | null>(
 /** @description search for an abstract control using dot seperated property names  */
 export function findcontrol<T extends AbstractControl | null>(
   g: FormGroup,
-  key: string
+  key: string,
 ) {
   return findarray(g, key.split('.')) as T;
 }
@@ -123,7 +140,7 @@ export function setFormValue(
   builder: AngularReactiveFormBuilderBridge,
   formgroup: FormGroup,
   values: { [index: string]: any },
-  inputs?: InputConfigInterface[] | InputConfigInterface
+  inputs?: InputConfigInterface[] | InputConfigInterface,
 ) {
   for (const [key, value] of Object.entries(values)) {
     const i = Array.isArray(inputs)
@@ -142,7 +159,7 @@ export function createSetValue(builder: AngularReactiveFormBuilderBridge) {
     g: FormGroup<any>,
     key: string,
     value: any,
-    i: InputConfigInterface
+    i: InputConfigInterface,
   ) {
     const ac = g.controls[key];
     if (ac && value) {
@@ -163,12 +180,12 @@ export function createSetValue(builder: AngularReactiveFormBuilderBridge) {
         const a = (g.get(key) as FormArray<any>) ?? new FormArray<any>([]);
         for (const current of items) {
           const t = builder.control(i);
-          t.setValue(current);
+          safeSetValue(t, current, console.error);
           a.push(t);
         }
         g.setControl(key, a);
       } else {
-        g.controls[key]?.setValue(value);
+        safeSetValue(g.controls[key], value, console.error);
       }
     }
   };
@@ -177,10 +194,10 @@ export function createSetValue(builder: AngularReactiveFormBuilderBridge) {
 /** @internal */
 export function setFormGroupValue(
   formgroup: FormGroup,
-  values: { [index: string]: any }
+  values: { [index: string]: any },
 ) {
   for (const [key, value] of Object.entries(values)) {
-    formgroup.controls[key]?.setValue(value);
+    safeSetValue(formgroup.controls[key], value, console.error)
     formgroup.updateValueAndValidity();
   }
 }
@@ -209,7 +226,7 @@ function matchany(value: unknown, values: unknown[]) {
   value = isNaN(value as any) ? value : +(value as string);
   const _values = isNumber(value)
     ? values.map((value) =>
-        isNaN(value as number) ? value : +(value as string)
+        isNaN(value as number) ? value : +(value as string),
       )
     : values || [];
 
@@ -235,17 +252,17 @@ type ClauseFn = (
   control: AbstractControl,
   name: string,
   parent: FormGroup | null,
-  path: string
+  path: string,
 ) => void;
 
 function findconditions(
   inputs: InputConfigInterface[],
-  prop: ConditionProperty
+  prop: ConditionProperty,
 ) {
   const conditions: [string, Conditional][] = [];
   function isconditional(
     property: ConditionProperty,
-    constraint: InputConfigInterface['constraints']
+    constraint: InputConfigInterface['constraints'],
   ): constraint is RequiredIfConstraint & DisabledIfConstraint {
     if (!constraint) {
       return false;
@@ -259,7 +276,7 @@ function findconditions(
     property: ConditionProperty,
     values: InputConfigInterface[],
     parent?: string,
-    repeatable: boolean = false
+    repeatable: boolean = false,
   ) {
     for (const v of values) {
       if (hasleaf(v)) {
@@ -300,7 +317,7 @@ export function useCondition(
   prop: ConditionProperty,
   then: ClauseFn,
   _else: ClauseFn,
-  query?: (name: string) => AbstractControl | null
+  query?: (name: string) => AbstractControl | null,
 ) {
   return (inputs: InputConfigInterface[]) => {
     const items: Condition[] = [];
@@ -319,11 +336,11 @@ export function useCondition(
           dependencyChanged: (
             formgroup: FormGroup,
             property: string,
-            value: unknown
+            value: unknown,
           ) => {
             const output: [
               [string, AbstractControl][],
-              [string, AbstractControl][]
+              [string, AbstractControl][],
             ] = [[], []];
             const params = condition.values ?? [];
             // case the selector key contains * and dependecy key starts with string before `*`
@@ -454,7 +471,7 @@ export function useCondition(
 export function pickconfig(
   inputs: InputConfigInterface[],
   key: string,
-  char: string = '.'
+  char: string = '.',
 ) {
   let items = [...inputs];
   const keys = key.split(char);
@@ -476,7 +493,7 @@ export function pickconfig(
 export function getPropertyValue<TReturn = any>(
   model: AbstractControl | null,
   key: string,
-  character: string = '.'
+  character: string = '.',
 ): TReturn {
   if (
     key === '' ||
@@ -498,7 +515,7 @@ export function getPropertyValue<TReturn = any>(
       if (property === '*' && carry instanceof FormArray) {
         const least = properties.slice(i + 1).join(character);
         return carry.controls.map((c) =>
-          getPropertyValue(c, least, character)
+          getPropertyValue(c, least, character),
         ) as any as TReturn;
       }
       if (carry instanceof FormGroup) {
@@ -518,7 +535,7 @@ export function getPropertyValue<TReturn = any>(
 export function getInputValue<TReturn = any>(
   v: any,
   key: string,
-  character: string = '.'
+  character: string = '.',
 ): TReturn {
   if (
     key === '' ||
@@ -541,7 +558,7 @@ export function getInputValue<TReturn = any>(
     if (property === '*' && Array.isArray(carry)) {
       const least = properties.slice(i + 1).join(character);
       return carry.map((c) =>
-        getInputValue(c, least, character)
+        getInputValue(c, least, character),
       ) as any as TReturn;
     }
     if (typeof carry === 'object') {
@@ -559,7 +576,7 @@ export function getInputValue<TReturn = any>(
 export function pickcontrol(
   model: AbstractControl | null,
   key: string,
-  character: string = '.'
+  character: string = '.',
 ): AbstractControl | null {
   if (
     key === '' ||
@@ -694,7 +711,7 @@ type ArgsBuilderType = (model: any, params: unknown[]) => void;
  */
 export function createComputableDepencies(
   items: InputConfigInterface[],
-  aggregations: Record<string, (...args: any) => unknown>
+  aggregations: Record<string, (...args: any) => unknown>,
 ) {
   const dependencies: {
     [prop: string]: ComputedInputValueConfigType<any>;
@@ -732,8 +749,8 @@ export function createComputableDepencies(
                 star_index !== -1
                   ? name.slice(0, star_index - 1)
                   : dot_index !== -1
-                  ? name.slice(0, dot_index)
-                  : name;
+                    ? name.slice(0, dot_index)
+                    : name;
 
               // push the property on top of dependencies array
               deps.push(depName);
@@ -874,7 +891,7 @@ export function flatteninputs(formgroup: FormGroup) {
 /** @internal */
 export function withRefetchObservable(
   inputs: InputConfigInterface[],
-  formgroup: FormGroup
+  formgroup: FormGroup,
 ): InputConfigInterface[] {
   for (const input of inputs) {
     if (isinputgroup(input)) {
@@ -903,7 +920,7 @@ export function withRefetchObservable(
             const str2 = after(name, '*').substring(1);
             const array: FormArray | null = findcontrol(
               formgroup,
-              str.substring(0, str.length - 1)
+              str.substring(0, str.length - 1),
             );
 
             if (array instanceof FormArray) {

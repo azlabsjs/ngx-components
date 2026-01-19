@@ -50,6 +50,7 @@
                 [addGroupRef]="addTemplate"
                 [name]="value.name"
                 [title]="value.label"
+                [placeholder]="value.placeholder"
                 [autoupload]="autoupload"
                 [hidden]="(value | isHidden) || (local | inarray : state.detached)"
                 [modal]="formmodal ?? modal"

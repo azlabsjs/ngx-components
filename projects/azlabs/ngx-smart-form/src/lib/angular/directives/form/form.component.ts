@@ -96,7 +96,7 @@ export class NgxSmartFormComponent
   //#endregion
 
   @HostListener('keyup.enter', ['$event'])
-  onEnterButtonCliked(event: KeyboardEvent) {
+  onEnterButtonCliked(event: Event) {
     if (!this.performingAction) {
       this.onSubmit(event);
     }
