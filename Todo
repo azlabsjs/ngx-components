@@ -16,3 +16,5 @@
 - update source code to support conditional diabled property on input [x]
 - Fix bug with requiredIf implementation on form group [x]
 - Fix issue with phone input not updated [x]
+- rename `ngx__form_array__card` from form array item component to `ngx__form_array` []
+- rename `ngx__form_array__card__card_block` from form array item component to `ngx__form_array_block` []
