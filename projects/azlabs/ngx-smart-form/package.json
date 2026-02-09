@@ -1,6 +1,6 @@
 {
   "name": "@azlabsjs/ngx-smart-form",
-  "version": "0.17.93",
+  "version": "0.17.94",
   "peerDependencies": {
     "@angular/common": ">=17.0.0 | <20.0.0",
     "@angular/core": ">=17.0.0 | <20.0.0",
