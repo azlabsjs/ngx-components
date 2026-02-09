@@ -1,6 +1,6 @@
 {
   "name": "@azlabsjs/ngx-options-input",
-  "version": "0.17.83",
+  "version": "0.17.84",
   "peerDependencies": {
     "@angular/common": ">=17.0.0 | <20.0.0",
     "@angular/core": ">=17.0.0 | <20.0.0",
