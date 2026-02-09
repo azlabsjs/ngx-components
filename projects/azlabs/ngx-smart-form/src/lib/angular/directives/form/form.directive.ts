@@ -14,7 +14,7 @@ import {
 import { FormConfigInterface } from '@azlabsjs/smart-form-core';
 import { FormModel } from './form.model';
 import { filter, first, Subscription } from 'rxjs';
-import { AsyncValidatorFn, FormGroup, ValidatorFn } from '@angular/forms';
+import { AsyncValidatorFn, ValidatorFn } from '@angular/forms';
 import { ReactiveFormDirectiveInterface } from '../../types';
 import { Optional } from './types';
 import { collectErrors } from '../../helpers';
@@ -83,14 +83,18 @@ export class NgxFormDirective
   }
 
   ngOnInit(): void {
-    if (this.form && this.formGroup && this._value) {
-      this.setValue(this._value);
-    }
+    this.setValue(this._value);
   }
 
   setValue(state: { [k: string]: unknown }): void {
+    if (!this.form || !this.formGroup) {
+      return;
+    }
+
     // set or update the form state of the current component
-    this.model.setValue(state);
+    if (state) {
+      this.model.setValue(state);
+    }
 
     // notify ui for value changes
     this.cdRef?.markForCheck();
@@ -122,10 +126,11 @@ export class NgxFormDirective
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if ('state' in changes || ('value' in changes && this.valueHasChanged(changes['value']))) {
-      if (this.form && this.formGroup && this._value) {
-        this.setValue(this._value);
-      }
+    if (
+      'state' in changes ||
+      ('value' in changes && this.valueHasChanged(changes['value']))
+    ) {
+      this.setValue(this._value);
     }
   }
 
@@ -167,21 +172,39 @@ export class NgxFormDirective
     this.changeSubscription = null;
   }
 
-  private updateModel(f: FormConfigInterface, g?: FormGroup) {
-    this.model.update(f, g);
-    if (this.formGroup) {
+  private updateModel(config: FormConfigInterface) {
+    const formgroup = this.formGroup;
+    const value = formgroup ? formgroup.getRawValue() : null;
+
+    // update model configuration
+    this.model.update(config);
+
+    // if current directive model formgroup value is undefined, we drop from the execution context
+    if (!this.formGroup) {
+      return;
+    }
+
+    // case the formgroup reference changes, subscribe to the new formgroup valueChanges
+    if (this.formGroup !== formgroup) {
       if (this.changeSubscription) {
         this.changeSubscription.unsubscribe();
       }
-      const subscription = this.formGroup.valueChanges.subscribe((value) =>
+
+      // subscribe to new formgroup changes
+      this.changeSubscription = this.formGroup.valueChanges.subscribe((value) =>
         this.valueChanges.emit(value),
       );
-      this.changeSubscription = subscription;
+    }
+
+    // we maintain the state of the directive by setting
+    // it model state to the previous state.
+    if (value) {
+      this.setValue(value);
     }
   }
 
   private valueHasChanged(change: SimpleChange) {
-    const {previousValue, currentValue} = change;
+    const { previousValue, currentValue } = change;
     return !deepEqual(previousValue, currentValue);
   }
 }

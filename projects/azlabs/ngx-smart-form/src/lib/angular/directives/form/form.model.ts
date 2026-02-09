@@ -67,19 +67,19 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
     private builder: AngularReactiveFormBuilderBridge,
   ) {}
 
-  update(f: T, formgroup?: FormGroup) {
+  update(config: T, formgroup?: FormGroup) {
     // each type form configuration changes, we set the list of computed properties
-    const { controlConfigs: inputs } = f;
+    const { controlConfigs: inputs } = config;
     const initialized = !formgroup;
     this.computed = memoizedComputeProperties(inputs, aggregations);
 
     if (!formgroup) {
       const { builder } = this;
-      const { controlConfigs } = f;
+      const { controlConfigs } = config;
       formgroup = builder.group(controlConfigs);
     }
 
-    this.setFormState(f, formgroup);
+    this.setFormState(config, formgroup);
 
     // we unregister from previous event each time we set the form value
     this.unsubscribe();
@@ -329,16 +329,12 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
     }
   }
 
-  private setFormState(f: T, g: FormGroup) {
-    this._formGroup = g;
-    const form = this._form ? { ...this._form, ...f } : f;
-    this._form = {
-      ...form,
-      controlConfigs: withRefetchObservable(
-        form.controlConfigs,
-        this._formGroup,
-      ),
-    };
+  private setFormState(config: T, formgroup: FormGroup) {
+    this._formGroup = formgroup;
+    const form = this._form ? { ...this._form, ...config } : config;
+    const { controlConfigs } = config;
+    const inputs = withRefetchObservable(controlConfigs, formgroup);
+    this._form = { ...form, controlConfigs: inputs };
     this._detectChanges$.next();
   }
 
