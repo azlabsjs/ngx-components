@@ -46,7 +46,6 @@
         </div>
         <div class="ngx-modal-footer"></div>
       </ngx-modal>
-      <!-- <p modal>I am a modal</p> -->
       <ng-template #controlTemplate let-config="value" let-control="control" let-describe="describe" let-hidden="hidden">
         <ngx-clr-form-control class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control" [hidden]="hidden" [inputConfig]="config" [describe]="describe ?? true" [error]="error" [label]="label">
           <ng-template #label let-label>
@@ -69,6 +68,39 @@
       </ng-template>
       <pre after>{{ formRef?.formGroup?.getRawValue() | json }}</pre>
     </ngx-smart-form>
+
+
+    <!-- <div #formRef="ngxform" [ngxform]="form" [value]="formValue">
+      <ngx-form-ui #formui *ngIf="formRef.formGroup" [no-grid-layout]="false" [autoupload]="true" [template]="template" [label]="label" [state]="{ formGroup: formRef.formGroup, detached: formRef.state.detached }" [inputs]="formRef.form.controlConfigs">
+          <ng-template #template let-config="value" let-control="control" let-describe="describe">
+            <ngx-clr-form-control class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control" [inputConfig]="config" [describe]="describe ?? true" [error]="error" [label]="label">
+              <ng-template #label let-label>
+                <span>{{ label }}</span>
+              </ng-template>
+              <ng-template #error let-touched="touched" let-errors>
+                <ngx-input-error *ngIf="touched" [errors]="errors" [template]="template">
+                  <ng-template #template let-value let-params="params">
+                    <span [class]="config.type + '-input'">{{ "validation.[value]" | parseStr : { value } | text | parseStr : params }}</span>
+                  </ng-template>
+                </ngx-input-error>
+              </ng-template>
+            </ngx-clr-form-control>
+          </ng-template>
+
+          <ng-template #label let-label>
+              <ng-container *ngIf="label | text | uppercase | safeHtml as content">
+                  <div *ngIf="content | notEmpty" class="control__group__header" [innerHTML]="content"></div>
+              </ng-container>
+          </ng-template>
+
+          <div class="flex justify-between mt-10" submit>
+            <button class="btn btn-primary" (click)="formRef.submit.bind(formRef)()">
+              <cds-icon shape="circle-arrow" dir="up"></cds-icon>
+              SOUMETTRE
+            </button>
+          </div>
+      </ngx-form-ui>
+    </div> -->
   </ng-container>
 </div>
 <div class="container">

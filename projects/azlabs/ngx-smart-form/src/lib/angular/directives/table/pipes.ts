@@ -11,7 +11,6 @@ import { JSObject } from '@azlabsjs/js-object';
 export class WithConfigValuePipe implements PipeTransform {
   transform(input: InputConfigInterface, state: Record<string, any>) {
     const value = JSObject.getProperty(state, input.name);
-    console.log('withconfigvalue: ', state, value)
     if (value) {
       return { ...input, value };
     }

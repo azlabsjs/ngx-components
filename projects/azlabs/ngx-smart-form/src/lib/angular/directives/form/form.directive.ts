@@ -6,15 +6,19 @@ import {
   Input,
   OnChanges,
   OnDestroy,
+  OnInit,
   Output,
+  SimpleChange,
   SimpleChanges,
 } from '@angular/core';
 import { FormConfigInterface } from '@azlabsjs/smart-form-core';
 import { FormModel } from './form.model';
-import { filter, Subscription } from 'rxjs';
+import { filter, first, Subscription } from 'rxjs';
 import { AsyncValidatorFn, FormGroup, ValidatorFn } from '@angular/forms';
 import { ReactiveFormDirectiveInterface } from '../../types';
-import { FormConfigType, FormModelState } from './types';
+import { Optional } from './types';
+import { collectErrors } from '../../helpers';
+import { deepEqual } from '@azlabsjs/utilities';
 
 @Directive({
   selector: '[ngxform]',
@@ -25,20 +29,33 @@ import { FormConfigType, FormModelState } from './types';
 export class NgxFormDirective
   implements
     ReactiveFormDirectiveInterface,
+    OnInit,
     OnDestroy,
     OnChanges,
     AfterViewInit
 {
+  //#region local properties
   private subscriptions: Subscription[] = [];
   private changeSubscription: Subscription | null = null;
+  //#endregion
 
   get formGroup() {
     return this.model.state.formGroup;
   }
+  get form() {
+    return this.model.state.form;
+  }
+  get state() {
+    return this.model.state;
+  }
 
   private _value!: { [k: string]: unknown };
-  @Input({ alias: 'value' }) set value(value: { [k: string]: unknown }) {
-    this._value = value;
+  @Input({ alias: 'value' }) set value(
+    value: Optional<{ [k: string]: unknown }>,
+  ) {
+    if (typeof value !== 'undefined' && value !== null) {
+      this._value = value;
+    }
   }
   get value() {
     return this.model.getValue();
@@ -50,25 +67,25 @@ export class NgxFormDirective
   @Input() set form(value: FormConfigInterface) {
     this.updateModel(value);
   }
-  get form() {
-    return this.model.state.form;
-  }
-
-  get state() {
-    return this.model.state;
-  }
 
   @Output() valueChanges = new EventEmitter<unknown>();
   @Output() ready = new EventEmitter<void>();
+  @Output() submitted = new EventEmitter<{ [k: string]: unknown }>();
 
   public constructor(
     private model: FormModel<FormConfigInterface>,
-    private cdRef: ChangeDetectorRef | null
+    private cdRef: ChangeDetectorRef | null,
   ) {
     const subscription = this.model.detectChanges$.subscribe(() =>
-      this.cdRef?.detectChanges()
+      this.cdRef?.detectChanges(),
     );
     this.subscriptions.push(subscription);
+  }
+
+  ngOnInit(): void {
+    if (this.form && this.formGroup && this._value) {
+      this.setValue(this._value);
+    }
   }
 
   setValue(state: { [k: string]: unknown }): void {
@@ -87,7 +104,6 @@ export class NgxFormDirective
   }
 
   ngAfterViewInit(): void {
-    // timeout and notify parent component of ready state
     const t = setTimeout(() => {
       this.ready.emit();
       clearTimeout(t);
@@ -106,12 +122,8 @@ export class NgxFormDirective
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (
-      'state' in changes &&
-      changes['state'].currentValue !== changes['state'].previousValue
-    ) {
-      const { currentValue: state } = changes['state'];
-      if (this.form && this.formGroup && state) {
+    if ('state' in changes || ('value' in changes && this.valueHasChanged(changes['value']))) {
+      if (this.form && this.formGroup && this._value) {
         this.setValue(this._value);
       }
     }
@@ -121,10 +133,28 @@ export class NgxFormDirective
     this.model.validate();
 
     const subscription = this.formGroup.statusChanges
-      .pipe(filter((status) => ['PENDING', 'DISABLED'].indexOf(status) === -1))
+      .pipe(
+        filter((status) => ['PENDING', 'DISABLED'].indexOf(status) === -1),
+        first(),
+      )
       .subscribe(() => this.cdRef?.markForCheck());
 
     this.subscriptions.push(subscription);
+  }
+
+  submit() {
+    if (!this.formGroup) {
+      return;
+    }
+
+    this.validate();
+
+    const errors = collectErrors(this.formGroup);
+    if (!this.formGroup.valid && errors.length > 0) {
+      return;
+    }
+
+    this.submitted.emit(this.formGroup.getRawValue());
   }
 
   ngOnDestroy(): void {
@@ -144,9 +174,14 @@ export class NgxFormDirective
         this.changeSubscription.unsubscribe();
       }
       const subscription = this.formGroup.valueChanges.subscribe((value) =>
-        this.valueChanges.emit(value)
+        this.valueChanges.emit(value),
       );
       this.changeSubscription = subscription;
     }
+  }
+
+  private valueHasChanged(change: SimpleChange) {
+    const {previousValue, currentValue} = change;
+    return !deepEqual(previousValue, currentValue);
   }
 }
