@@ -52,11 +52,7 @@ const AUTO_SUBMIT_ERROR_MESSAGE =
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFormComponent
-  implements
-    ReactiveFormComponentInterface,
-    AfterViewInit,
-    OnDestroy,
-    OnChanges
+  implements ReactiveFormComponentInterface, AfterViewInit, OnDestroy, OnChanges
 {
   get formGroup() {
     return this.model.state.formGroup;
@@ -111,12 +107,12 @@ export class NgxSmartFormComponent
   private changeSubscription: Subscription | null = null;
 
   public constructor(
-    protected readonly model: FormModel,
+    protected readonly model: FormModel<FormConfigInterface>,
     private cdRef: ChangeDetectorRef | null,
-    @Inject(HTTP_REQUEST_CLIENT) @Optional() private client?: RequestClient
+    @Inject(HTTP_REQUEST_CLIENT) @Optional() private client?: RequestClient,
   ) {
     const subscription = this.model.detectChanges$.subscribe(() =>
-      this.cdRef?.detectChanges()
+      this.cdRef?.detectChanges(),
     );
     this.subscriptions.push(subscription);
   }
@@ -314,9 +310,9 @@ export class NgxSmartFormComponent
           (this.client as RequestClient).request(
             path || 'http://localhost',
             this.action ?? 'POST',
-            this.model.getValue()
-          )
-        )
+            this.model.getValue(),
+          ),
+        ),
       );
       this.performingRequest.emit(false);
       this.complete.emit(response);
@@ -332,7 +328,7 @@ export class NgxSmartFormComponent
         this.changeSubscription.unsubscribe();
       }
       const subscription = this.formGroup.valueChanges.subscribe((value) =>
-        this.formGroupChange.emit(value)
+        this.formGroupChange.emit(value),
       );
       this.changeSubscription = subscription;
     }

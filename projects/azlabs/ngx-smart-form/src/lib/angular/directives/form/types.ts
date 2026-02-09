@@ -1,5 +1,8 @@
 import { AbstractControl, FormGroup } from '@angular/forms';
-import { FormConfigInterface } from '@azlabsjs/smart-form-core';
+import { InputConfigInterface } from '@azlabsjs/smart-form-core';
+
+// @internal
+export type FormConfigType = { controlConfigs: InputConfigInterface[] };
 
 /** @internal */
 export type FormGroupState = {
@@ -8,8 +11,8 @@ export type FormGroupState = {
 };
 
 /** @internal */
-export type FormModelState = FormGroupState & {
-  form?: FormConfigInterface;
+export type FormModelState<T extends FormConfigType> = FormGroupState & {
+  form?: T;
 };
 
 /** @internal */
