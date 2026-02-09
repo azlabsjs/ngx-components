@@ -22,6 +22,7 @@ import { ComponentReactiveFormHelpers, setFormValue } from '../../helpers';
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
 import { AngularReactiveFormBuilderBridge } from '../../types';
 import { filter, Subscription } from 'rxjs';
+import { deepEqual } from '@azlabsjs/utilities';
 
 @Component({
   selector: 'ngx-form-ui',
@@ -51,13 +52,13 @@ export class NgxFormComponent implements OnDestroy {
 
   private _value!: { [k: string]: unknown };
   @Input() set value(value: { [k: string]: unknown }) {
-    this._value = value;
     this.setValue(value);
   }
   private _state!: FormGroupState & { [k: string]: unknown };
   @Input({ required: true }) set state(
     value: FormGroupState & { [k: string]: unknown },
   ) {
+    console.log('updating state: ', value)
     this._state = value;
     if (this._value) {
       this.setValue(this._value);
@@ -90,11 +91,17 @@ export class NgxFormComponent implements OnDestroy {
   }
 
   setValue(value: { [k: string]: unknown }): void {
+    if (deepEqual(this._value, value)) {
+      return;
+    }
     console.log('Setting value value...', value);
+
     if (this._state) {
       const { formGroup } = this._state;
       setFormValue(this.builder, formGroup, value, this.inputs ?? []);
     }
+
+    this._value = value;
     this.cdRef?.markForCheck();
   }
 
