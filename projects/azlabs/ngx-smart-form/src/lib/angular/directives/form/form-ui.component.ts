@@ -40,15 +40,29 @@ import { AngularReactiveFormBuilderBridge } from '../../types';
 export class NgxFormComponent {
   //#region input properties
   @Input() modal!: ModalDirective;
-  @Input({ required: true }) state!: FormGroupState & { [k: string]: unknown };
   @Input({ required: true }) inputs!: InputConfigInterface[];
   @Input() template!: TemplateRef<any>;
   @Input() label: Optional<TemplateRef<any>>;
   @Input() autoupload = false;
   @Input('no-grid-layout') nogridlayout = false;
   @Input({ alias: 'add-template' }) addref: Optional<TemplateRef<any>>;
+
+  private _value!: { [k: string]: unknown };
   @Input() set value(value: { [k: string]: unknown }) {
+    this._value = value;
     this.setValue(value);
+  }
+  private _state!: FormGroupState & { [k: string]: unknown };
+  @Input({ required: true }) set state(
+    value: FormGroupState & { [k: string]: unknown },
+  ) {
+    this._state = value;
+    if (this._value) {
+      this.setValue(this._value);
+    }
+  }
+  get state() {
+    return this._state;
   }
   //#endregion
 
@@ -65,7 +79,10 @@ export class NgxFormComponent {
   }
 
   setValue(value: { [k: string]: unknown }): void {
-    setFormValue(this.builder, this.state.formGroup, value, this.inputs ?? []);
+    if (this._state) {
+      const { formGroup } = this._state;
+      setFormValue(this.builder, formGroup, value, this.inputs ?? []);
+    }
     this.cdRef?.markForCheck();
   }
 }
