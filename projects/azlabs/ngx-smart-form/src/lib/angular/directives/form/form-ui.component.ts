@@ -7,6 +7,7 @@ import {
   Inject,
   Input,
   Optional as NgOptional,
+  OnDestroy,
   TemplateRef,
 } from '@angular/core';
 import { NgxSmartFormArrayComponent } from '../array';
@@ -20,6 +21,7 @@ import { FORM_PIPES } from './pipes';
 import { ComponentReactiveFormHelpers, setFormValue } from '../../helpers';
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
 import { AngularReactiveFormBuilderBridge } from '../../types';
+import { filter, Subscription } from 'rxjs';
 
 @Component({
   selector: 'ngx-form-ui',
@@ -37,7 +39,7 @@ import { AngularReactiveFormBuilderBridge } from '../../types';
   styleUrls: ['./form-grid.scss', './form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxFormComponent {
+export class NgxFormComponent implements OnDestroy {
   //#region input properties
   @Input() modal!: ModalDirective;
   @Input({ required: true }) inputs!: InputConfigInterface[];
@@ -68,6 +70,8 @@ export class NgxFormComponent {
 
   @ContentChild(ModalDirective) formmodal!: ModalDirective | null;
 
+  private subscriptions: Subscription[] = [];
+
   constructor(
     @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
     private builder: AngularReactiveFormBuilderBridge,
@@ -76,6 +80,13 @@ export class NgxFormComponent {
 
   validate() {
     ComponentReactiveFormHelpers.validateFormGroupFields(this.state.formGroup);
+    const subscription = this.state.formGroup?.statusChanges
+      .pipe(filter((status) => ['PENDING', 'DISABLED'].indexOf(status) === -1))
+      .subscribe(() => this.cdRef?.detectChanges());
+
+    if (subscription) {
+      this.subscriptions.push(subscription);
+    }
   }
 
   setValue(value: { [k: string]: unknown }): void {
@@ -84,5 +95,11 @@ export class NgxFormComponent {
       setFormValue(this.builder, formGroup, value, this.inputs ?? []);
     }
     this.cdRef?.markForCheck();
+  }
+
+  ngOnDestroy(): void {
+    for (const subscription of this.subscriptions) {
+      subscription.unsubscribe();
+    }
   }
 }
