@@ -53,14 +53,13 @@ export class NgxFormComponent implements OnDestroy {
   @Input({ alias: 'add-template' }) addref: Optional<TemplateRef<any>>;
 
   private _value!: { [k: string]: unknown };
-  @Input() set value(value: { [k: string]: unknown }) {
+  @Input() set value(value: Optional<{ [k: string]: unknown }>) {
     this.setValue(value);
   }
   private _state!: FormGroupState & { [k: string]: unknown };
   @Input({ required: true }) set state(
     value: FormGroupState & { [k: string]: unknown },
   ) {
-    console.log('updating state: ', value);
     this._state = value;
     if (this._value) {
       this.setValue(this._value);
@@ -92,15 +91,18 @@ export class NgxFormComponent implements OnDestroy {
     }
   }
 
-  setValue(value: { [k: string]: unknown }): void {
+  setValue(value: Optional<{ [k: string]: unknown }>): void {
+    if (!value) {
+      return;
+    }
+
     if (this._initialized && deepEqual(this._value, value)) {
       return;
     }
 
-    console.log('Setting value value...', value);
-
     if (this._state) {
       const { formGroup } = this._state;
+      console.log('Setting form value: ', value)
       setFormValue(this.builder, formGroup, value, this.inputs ?? []);
       this._initialized = true;
     }
