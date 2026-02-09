@@ -41,6 +41,8 @@ import { deepEqual } from '@azlabsjs/utilities';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxFormComponent implements OnDestroy {
+  private _initialized: boolean = false;
+
   //#region input properties
   @Input() modal!: ModalDirective;
   @Input({ required: true }) inputs!: InputConfigInterface[];
@@ -58,7 +60,7 @@ export class NgxFormComponent implements OnDestroy {
   @Input({ required: true }) set state(
     value: FormGroupState & { [k: string]: unknown },
   ) {
-    console.log('updating state: ', value)
+    console.log('updating state: ', value);
     this._state = value;
     if (this._value) {
       this.setValue(this._value);
@@ -91,18 +93,19 @@ export class NgxFormComponent implements OnDestroy {
   }
 
   setValue(value: { [k: string]: unknown }): void {
-    if (deepEqual(this._value, value)) {
+    if (this._initialized && deepEqual(this._value, value)) {
       return;
     }
+
     console.log('Setting value value...', value);
 
     if (this._state) {
       const { formGroup } = this._state;
       setFormValue(this.builder, formGroup, value, this.inputs ?? []);
+      this._initialized = true;
     }
 
     this._value = value;
-    this.cdRef?.markForCheck();
   }
 
   ngOnDestroy(): void {
