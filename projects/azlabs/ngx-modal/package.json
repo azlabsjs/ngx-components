@@ -1,6 +1,6 @@
 {
   "name": "@azlabsjs/ngx-modal",
-  "version": "0.17.92",
+  "version": "0.17.93",
   "peerDependencies": {
     "@angular/common": ">=17.0.0 | <20.0.0",
     "@angular/core": ">=17.0.0 | <20.0.0",
