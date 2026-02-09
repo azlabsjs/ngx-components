@@ -90,6 +90,7 @@ export class NgxFormComponent implements OnDestroy {
   }
 
   setValue(value: { [k: string]: unknown }): void {
+    console.log('Setting value value...', value);
     if (this._state) {
       const { formGroup } = this._state;
       setFormValue(this.builder, formGroup, value, this.inputs ?? []);
