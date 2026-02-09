@@ -29,7 +29,7 @@ import { ModalDirective } from '../modal';
 import { PIPES } from './pipes';
 
 // @internal
-type Optional<T> = T | null |undefined;
+type Optional<T> = T | null | undefined;
 
 @Component({
   standalone: true,
@@ -50,15 +50,15 @@ export class NgxSmartFormArrayComponent
   implements AfterContentInit, OnDestroy, AfterViewInit
 {
   //#region inputs properties
+  @Input() autoupload = true;
   @Input() modal!: ModalDirective;
   @Input() detached!: AbstractControl[];
   @Input() template!: TemplateRef<any>;
-  @Input() addGroupRef!: Optional<TemplateRef<Node>>;
   @Input() label!: Optional<TemplateRef<any>>;
   @Input() name!: string;
   @Input() title!: string;
   @Input() placeholder!: Optional<string>;
-  @Input() autoupload: boolean = true;
+  @Input({ alias: 'add-button' }) addref!: Optional<TemplateRef<Node>>;
   @Input({ alias: 'controls' }) inputs!: InputConfigInterface[];
   @Input({ alias: 'formArray' }) array!: FormArray;
   @Input({ alias: 'no-grid-layout' }) noGridLayout = false;
@@ -72,7 +72,7 @@ export class NgxSmartFormArrayComponent
             .split(' ')
             .map((i) => i.split(','))
             .flat()
-            .map((v) => v.trim())
+            .map((v) => v.trim()),
         )
         .flat();
     },
@@ -104,7 +104,7 @@ export class NgxSmartFormArrayComponent
   constructor(
     private cdRef: ChangeDetectorRef | null,
     @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
-    private builder: AngularReactiveFormBuilderBridge
+    private builder: AngularReactiveFormBuilderBridge,
   ) {}
 
   ngAfterViewInit(): void {
@@ -152,7 +152,7 @@ export class NgxSmartFormArrayComponent
         const view = factory.createView(
           index,
           this.array.at(index),
-          this.triggered
+          this.triggered,
         );
         this.refs.push(view);
       }

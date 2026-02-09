@@ -11,3 +11,6 @@ export type FormGroupState = {
 export type FormModelState = FormGroupState & {
   form?: FormConfigInterface;
 };
+
+/** @internal */
+export type Optional<T> = T | null | undefined;

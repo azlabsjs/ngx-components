@@ -23,16 +23,16 @@
 <!--\ main -->
 
 <ng-template #_recursive let-controls="controls" let-group="group" let-autoupload="autoupload">
-  <div class="input-row" *ngIf="!noGridLayout">
+  <div class="input-row" *ngIf="!nogridlayout">
     <ng-container *ngTemplateOutlet="_layout; context: { controls, group, autoupload }"></ng-container>
   </div>
-  <ng-container *ngIf="!!noGridLayout">
+  <ng-container *ngIf="!!nogridlayout">
     <ng-container *ngTemplateOutlet="_layout; context: { controls, group, autoupload }"></ng-container>
   </ng-container>
   <ng-template #_layout let-controls="controls" let-group="group" let-autoupload="autoupload">
     <ng-container *ngFor="let value of controls | asInputs">
       <ng-container *ngIf="value | asInputGroup | hasChildren; else _input">
-        <div *ngIf="group?.get(value.name) as local" [class]="noGridLayout | containercssclass: value.containerClass | csshidden : (value | isHidden) || (local | inarray : state.detached)" [hidden]="(value | isHidden) || (local | inarray : state.detached)">
+        <div *ngIf="group?.get(value.name) as local" [class]="nogridlayout | containercssclass: value.containerClass | csshidden : (value | isHidden) || (local | inarray : state.detached)" [hidden]="(value | isHidden) || (local | inarray : state.detached)">
             <ng-container *ngTemplateOutlet="label ?? labelRef; context: { $implicit: value.label, config: value, control: local }"></ng-container>
             <ng-template #labelRef let-label let-config="config" let-control="control">
               <div [class.hidden]="(config | isHidden) || (local | inarray : state.detached)" [innerHTML]="config.label | ngxGroupHeader | safeHtml" [hidden]="(config | isHidden) || (local | inarray : state.detached)"></div>
@@ -43,11 +43,11 @@
                 [class.hidden]="(value | isHidden) || (local | inarray : state.detached)"
                 [detached]="state.detached"
                 [class]="value.classes"
-                [no-grid-layout]="noGridLayout"
+                [no-grid-layout]="nogridlayout"
                 [formArray]="local"
                 [controls]="(value | asInputGroup).children || [] | inputConfigArray"
                 [template]="template"
-                [addGroupRef]="addTemplate"
+                [add-button]="addref"
                 [name]="value.name"
                 [title]="value.label"
                 [placeholder]="value.placeholder"
@@ -64,7 +64,7 @@
       </ng-container>
 
       <ng-template #_input>
-        <div *ngIf="group?.get(value.name) as local" [class]="noGridLayout | containercssclass : value.containerClass | csshidden : (value | isHidden) || (local | inarray : state.detached)" [hidden]="(value | isHidden) || (local | inarray : state.detached)">
+        <div *ngIf="group?.get(value.name) as local" [class]="nogridlayout | containercssclass : value.containerClass | csshidden : (value | isHidden) || (local | inarray : state.detached)" [hidden]="(value | isHidden) || (local | inarray : state.detached)">
           <ng-container *ngTemplateOutlet="_template; context: {value, control: local, autoupload}"></ng-container>
         </div>
       </ng-template>
@@ -79,7 +79,7 @@
         [formArray]="control"
         [config]="value"
         [template]="template"
-        [addButtonRef]="addTemplate"
+        [add-button]="addref"
         [name]="value.name"
         [autoupload]="autoupload"
         [hidden]="(value | isHidden) || (control | inarray : state.detached)"

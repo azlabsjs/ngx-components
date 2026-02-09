@@ -66,7 +66,7 @@ export class NgxSmartFormComponent
     return this.model.state.form;
   }
 
-  //#region component inputs
+  //#region input properties
   @Input() template!: TemplateRef<any>;
   @Input() addTemplate!: TemplateRef<any>;
   @Input() label!: TemplateRef<any>;
@@ -85,7 +85,7 @@ export class NgxSmartFormComponent
   @Input() modal!: ModalDirective;
   //#endregion
 
-  //#region component outputs
+  //#region output properties
   @Output() submit = new EventEmitter<{ [index: string]: any }>();
   @Output() ready = new EventEmitter();
   @Output() changes = new EventEmitter();
@@ -102,7 +102,7 @@ export class NgxSmartFormComponent
     }
   }
 
-  //#region component children
+  //#region
   @ContentChild('submitButton') submitRef!: TemplateRef<Node>;
   @ContentChild(ModalDirective) formmodal!: ModalDirective | null;
   //#endregion

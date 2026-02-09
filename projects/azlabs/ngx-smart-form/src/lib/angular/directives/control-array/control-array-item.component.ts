@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -12,6 +11,7 @@ import { AbstractControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { BUTTON_DIRECTIVES } from '../buttons';
 import { PIPES } from '../../pipes';
+import { Optional } from './types';
 
 @Component({
   standalone: true,
@@ -22,21 +22,22 @@ import { PIPES } from '../../pipes';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxArrayItemComponent {
-  //#region component inputs
+  //#region input properties
+  @Input() index!: number;
   @Input() control!: AbstractControl;
   @Input() config!: InputConfigInterface;
-  @Input() template!: TemplateRef<any>;
-  @Input() autoupload: boolean = false;
-  @Input() index!: number;
-  @Input({ required: true }) detached!: AbstractControl[];
+  @Input() template: Optional<TemplateRef<any>>;
+  @Input() autoupload = false;
+  @Input() detached: AbstractControl[] = [];
   //#endregion
 
-  // #region component outputs
-  @Output() componentDestroyer = new EventEmitter();
+  // #region output properties
+  @Output() destroy = new EventEmitter();
   // #endregion
 
   clicked(event: Event) {
-    this.componentDestroyer.emit();
+    this.destroy.emit();
+
     event.preventDefault();
   }
 }

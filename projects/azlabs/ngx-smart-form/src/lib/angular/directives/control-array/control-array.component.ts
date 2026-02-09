@@ -24,6 +24,7 @@ import { BUTTON_DIRECTIVES } from '../buttons';
 import { RefType, ViewRefFactory } from '../types';
 import { NgxFormControlArrayOutletComponent } from './control-array-outlet.component';
 import { PIPES } from '../../pipes';
+import { Optional } from './types';
 
 @Component({
   standalone: true,
@@ -40,36 +41,33 @@ import { PIPES } from '../../pipes';
 export class NgxSmartFormControlArrayComponent
   implements AfterContentInit, OnDestroy, AfterViewInit
 {
-  //#region Component inputs definitions
+  //#region input properties
   @Input({ alias: 'formArray' }) array!: FormArray;
-  @Input('no-grid-layout') noGridLayout = false;
-  @Input() template!: TemplateRef<any>;
-  @Input() addButtonRef!: TemplateRef<any>;
+  @Input('no-grid-layout') nogridlayout = false;
+  @Input('add-button') addButtonRef: Optional<TemplateRef<any>>;
+  @Input() template: Optional<TemplateRef<any>>;
   @Input() name!: string;
-  @Input() autoupload: boolean = true;
+  @Input() autoupload = true;
   @Input() config!: InputConfigInterface;
   @Input({ required: true }) detached!: AbstractControl[];
-  //#endregion Component inputs definitions
+  //#endregion
 
-  //#region Component outputs
+  //#region output properties
   @Output() listChange = new EventEmitter<number>();
   //#endregion
 
-  // #region View children
   @ViewChild('container', { static: false })
   viewFactory!: ViewRefFactory<any>;
-  // #endregion
 
-  // #region component properties
+  // #region local properties
   _refCount = 0;
   get refCount() {
     return this._refCount;
   }
   private refs: RefType<unknown>[] = [];
   private destroy$ = new Subject<void>();
-  // #endregion component
+  // #endregion
 
-  // Component instance initializer
   constructor(
     private cdRef: ChangeDetectorRef | null,
     @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)

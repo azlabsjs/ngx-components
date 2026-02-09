@@ -31,11 +31,6 @@ type ContextType = {
   destroy: Observable<number>;
 };
 
-// @internal
-type StateType = {
-  form: Record<string, unknown>;
-};
-
 @Component({
   standalone: true,
   imports: [CommonModule, ...COMMON_PIPES, ...BUTTON_DIRECTIVES, ...PIPES],
@@ -68,10 +63,6 @@ export class NgxTableForm
   @ViewChild('template', { static: false }) templateRef!: TemplateRef<any>;
   //#endregion
 
-  private _state: StateType = { form: {} };
-  get state() {
-    return this._state;
-  }
   private subscriptions: Subscription[] = [];
 
   constructor(@Optional() private cdRef: ChangeDetectorRef | null) {}
@@ -132,11 +123,6 @@ export class NgxTableForm
 
   clear(): void {
     this.containerRef?.clear();
-  }
-
-  private setState(state: (s: StateType) => StateType) {
-    this._state = state(this._state);
-    this.cdRef?.markForCheck();
   }
 
   ngOnDestroy(): void {

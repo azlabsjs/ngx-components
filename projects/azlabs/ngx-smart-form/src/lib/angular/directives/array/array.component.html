@@ -1,11 +1,11 @@
 <ngx-form-array-outlet [class.hidden]="hidden" (removed)="removed($event)" [inputs]="inputs" [auto-upload]="autoupload" [template]="template" [no-grid-layout]="noGridLayout" [detached]="detached" *ngIf="!(cssClass | istable)" #container>
   <div *ngIf="refCount === 0 && !!placeholder" class="placeholder"> {{ placeholder }}</div>
-  <ng-container *ngTemplateOutlet="addGroupRef ? addGroupRef : _add; context: { $implicit: add.bind(this) }"></ng-container>
+  <ng-container *ngTemplateOutlet="addref ? addref : _add; context: { $implicit: add.bind(this) }"></ng-container>
 </ngx-form-array-outlet>
 
 <!-- table layout -->
 <ngx-table-form [class.hidden]="hidden" (removed)="removed($event)" [inputs]="inputs" [auto-upload]="autoupload" [template]="template" [label]="label" [detached]="detached" [title]="title" [modal]="modal" [name]="name" *ngIf="cssClass.includes('table')" #container>
-  <ng-container *ngTemplateOutlet="addGroupRef ? addGroupRef : _add; context: { $implicit: add.bind(this) }"></ng-container>
+  <ng-container *ngTemplateOutlet="addref ? addref : _add; context: { $implicit: add.bind(this) }"></ng-container>
 </ngx-table-form>
 
 <ng-template #_add let-handler>

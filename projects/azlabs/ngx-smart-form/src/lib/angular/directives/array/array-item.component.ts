@@ -27,17 +27,17 @@ import { PIPES } from '../../pipes';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFormArrayItemComponent {
-  //#region component inputs
-  @Input() formGroup!: FormGroup;
+  //#region input properties
+  @Input() formgroup!: FormGroup;
   @Input() controls!: InputConfigInterface[];
   @Input() template!: TemplateRef<HTMLElement>;
-  @Input() autoupload: boolean = false;
   @Input() index!: number;
-  @Input('no-grid-layout') noGridLayout = false;
+  @Input() autoupload = false;
+  @Input('no-grid-layout') nogridlayout = false;
   @Input({ required: true }) detached!: AbstractControl[];
   //#endregion
 
-  // #region component outputs
+  // #region output properties
   @Output() componentDestroyer = new EventEmitter();
   // #endregion
 

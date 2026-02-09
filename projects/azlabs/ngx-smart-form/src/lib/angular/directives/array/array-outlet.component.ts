@@ -18,6 +18,9 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { NgxSmartFormArrayItemComponent } from './array-item.component';
 import { BUTTON_DIRECTIVES } from '../buttons';
 
+// @internal
+type ComponentRefType = RefType<ComponentRef<NgxSmartFormArrayItemComponent>>;
+
 @Component({
   standalone: true,
   imports: [CommonModule, ...BUTTON_DIRECTIVES, ...PIPES],
@@ -33,15 +36,13 @@ export class NgxFormArrayOutletComponent
   //#region input properties
   @Input() inputs: InputConfigInterface[] = [];
   @Input({ alias: 'auto-upload' }) autoupload: boolean = true;
-  @Input({ alias: 'no-grid-layout' }) noGridLayout = true;
+  @Input({ alias: 'no-grid-layout' }) nogridlayout = true;
   @Input() template!: TemplateRef<any>;
   @Input({ required: true }) detached!: AbstractControl[];
   //#endregion
 
   //#region output properties
-  @Output() removed = new EventEmitter<
-    RefType<ComponentRef<NgxSmartFormArrayItemComponent>>
-  >();
+  @Output() removed = new EventEmitter<ComponentRefType>();
   //#endregion
 
   //#region local properties
@@ -52,18 +53,18 @@ export class NgxFormArrayOutletComponent
 
   createView(index: number, input: AbstractControl) {
     const element = this.containerRef?.createComponent(
-      NgxSmartFormArrayItemComponent
+      NgxSmartFormArrayItemComponent,
     );
 
     element.instance.controls = [...this.inputs];
-    element.instance.formGroup = input as FormGroup;
+    element.instance.formgroup = input as FormGroup;
     element.instance.template = this.template;
     element.instance.autoupload = this.autoupload;
     element.instance.index = index;
-    element.instance.noGridLayout = this.noGridLayout;
+    element.instance.nogridlayout = this.nogridlayout;
     element.instance.detached = this.detached;
 
-    const ref: RefType<ComponentRef<NgxSmartFormArrayItemComponent>> = {
+    const ref: ComponentRefType = {
       index: element.instance.index,
       element,
       destroy: () => element.destroy(),

@@ -17,6 +17,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { BUTTON_DIRECTIVES } from '../buttons';
 import { NgxArrayItemComponent } from './control-array-item.component';
+import { Optional } from './types';
 
 @Component({
   standalone: true,
@@ -28,20 +29,20 @@ import { NgxArrayItemComponent } from './control-array-item.component';
 export class NgxFormControlArrayOutletComponent
   implements OnDestroy, ViewRefFactory<ComponentRef<NgxArrayItemComponent>>
 {
-  //#region component inputs
+  //#region input properties
   @Input({ required: true }) config!: InputConfigInterface;
-  @Input({ alias: 'auto-upload' }) autoupload: boolean = true;
-  @Input({ required: true }) template!: TemplateRef<any>;
+  @Input({ alias: 'auto-upload' }) autoupload = true;
+  @Input({ required: true }) template: Optional<TemplateRef<any>>;
   @Input({ required: true }) detached!: AbstractControl[];
   //#endregion
 
-  //#region component output
+  //#region output properties
   @Output() removed = new EventEmitter<
     RefType<ComponentRef<NgxArrayItemComponent>>
   >();
   //#endregion
 
-  //#region component properties
+  //#region local properties
   @ViewChild('container', { read: ViewContainerRef, static: false })
   container!: ViewContainerRef;
   private destroy$ = new Subject<void>();
@@ -63,7 +64,7 @@ export class NgxFormControlArrayOutletComponent
       destroy: () => e.destroy(),
     };
 
-    e.instance.componentDestroyer
+    e.instance.destroy
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         e?.destroy();

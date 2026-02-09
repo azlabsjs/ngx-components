@@ -153,7 +153,7 @@ export class ComponentReactiveFormHelpers {
       config.type === InputTypes.EMAIL_INPUT ||
       config.type === InputTypes.PASSWORD_INPUT
     ) {
-      // Checks if maxlength rule is set to true and apply the rule to the input
+      // checks if maxlength rule is set to true and apply the rule to the input
       !!config.rules?.maxLength || (config as TextInput).constraints?.max
         ? validators.push(
             Validators.maxLength(
