@@ -14,7 +14,7 @@ import { FormModel } from './form.model';
 import { filter, Subscription } from 'rxjs';
 import { AsyncValidatorFn, FormGroup, ValidatorFn } from '@angular/forms';
 import { ReactiveFormDirectiveInterface } from '../../types';
-import { FormModelState } from './types';
+import { FormConfigType, FormModelState } from './types';
 
 @Directive({
   selector: '[ngxform]',
@@ -62,7 +62,7 @@ export class NgxFormDirective
   @Output() ready = new EventEmitter<void>();
 
   public constructor(
-    private model: FormModel,
+    private model: FormModel<FormConfigInterface>,
     private cdRef: ChangeDetectorRef | null
   ) {
     const subscription = this.model.detectChanges$.subscribe(() =>
