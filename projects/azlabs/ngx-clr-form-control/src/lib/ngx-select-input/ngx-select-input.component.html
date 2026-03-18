@@ -7,7 +7,7 @@
       [items]="config.options || []" [bindLabel]="'name'" [bindValue]="'value'"
       [loading]="(!!state.performingAction && (state.config.options ?? []).length === 0)" [loadingText]="loadingText"
       [multiple]="config.multiple ?? false" [placeholder]="config.placeholder ?? ''" [groupBy]="'type'"
-      [ngModel]="control.value" [clearable]="true" [appendTo]="'.ng-select-container'"
+      [ngModel]="control.value" [clearable]="true" [appendTo]="parent ?? '.ng-select-container'"
       [disabled]="disabled || control.disabled" (ngModelChange)="modelChange($event)" (focus)="onFocus()"
       (remove)="removed($event, state.config)" (change)="select($event, state.config)">
       <ng-template ng-option-tmp let-item="item">
