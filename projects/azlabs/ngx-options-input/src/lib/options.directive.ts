@@ -68,7 +68,7 @@ function isobservable(o: OptionsConfigType): o is ObservableOptionsConfig {
     'refetch' in o &&
     typeof o['refetch'] === 'object' &&
     typeof (o['refetch'] as ObservableOptionsConfig['refetch']).subscribe ===
-      'function'
+    'function'
   );
 }
 
@@ -77,7 +77,7 @@ function isobservable(o: OptionsConfigType): o is ObservableOptionsConfig {
   selector: '[fetchOptions]',
 })
 export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
-  //#region directive inputs
+  //#region input properties
   @Input() loaded!: boolean;
   @Input() name!: string;
   @Input() auto: boolean = true;
@@ -97,16 +97,14 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   }
   //#endregion
 
-  //#region directive outputs
+  //#region outputs properties
   @Output() optionsChange = new EventEmitter<InputOptions>();
   @Output() loadingChange = new EventEmitter<boolean>();
   //#endregion
 
-  // directive properties
+  // local properties
   private observer!: IntersectionObserver;
-  search$ = new Subject<
-    [_KeyType, Omit<OptionsConfigType, 'refetch'>, QueryType]
-  >();
+  private search$ = new Subject<[_KeyType, Omit<OptionsConfigType, 'refetch'>, QueryType]>();
   private subscriptions: Subscription[] = [];
   private observable!: Subscribable<{ [k: string]: unknown }>;
   private key!: _KeyType;
@@ -129,16 +127,12 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
             const result = this.cache.get(key);
             return result
               ? of({ key, params, options, values: result })
-              : from(this.sendRequest(options as OptionsConfig, params)).pipe(
-                  map((values) => ({ key, params, options, values }))
-                );
+              : from(this.sendRequest(options as OptionsConfig, params)).pipe(map((values) => ({ key, params, options, values })));
           }),
           tap((state) => {
             const { key, options, params, values } = state;
-            // put value into cache and configure the update fonction to equal
-            this.cache.put(key, values, (_values) => {
-              return this.sendRequest(options as OptionsConfig, params);
-            });
+            this.cache.put(key, values, (_values) => this.sendRequest(options as OptionsConfig, params));
+
             this.loadingChange.emit(false);
             this.optionsChange.emit(values);
           })
@@ -151,12 +145,10 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     if (this.auto) {
       const { defaultView } = this.document ?? ({} as Document);
       const view = defaultView as any;
-      // if intersection API is missing we execute the load query
-      // When the view initialize
       view &&
-      !('IntersectionObserver' in view) &&
-      !('IntersectionObserverEntry' in view) &&
-      !('intersectionRatio' in view.IntersectionObserverEntry.prototype)
+        !('IntersectionObserver' in view) &&
+        !('IntersectionObserverEntry' in view) &&
+        !('intersectionRatio' in view.IntersectionObserverEntry.prototype)
         ? this.query()
         : this.observeView();
     }
@@ -171,33 +163,28 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     }
   }
 
-  /** @internal a private API method that might not be used externally */
-  async query() {
+  query() {
     const { loaded, options } = this;
     if (loaded || typeof options === 'undefined' || options === null) {
-      return;
+      return Promise.resolve();
     }
 
     this.loadingChange.emit(true);
-
     const { source } = options;
-    if (isresource(source)) {
-      return this.fetchAsync(options);
-    }
-
-    return this.fetchSync(options);
+    return isresource(source) ? this.fetchAsync(options) : this.fetchSync(options);
   }
 
   fetch(value?: string, query?: { [k: string]: unknown }) {
     const { options, search } = this;
     if (typeof options !== 'undefined' && options !== null) {
+
       this.loadingChange.emit(true);
-      let queryParam = query ?? {};
+      let searchquery = query ?? {};
       if (value) {
-        queryParam[search] = value;
+        searchquery[search] = value;
       }
 
-      this.fetchAsync(options, queryParam);
+      this.fetchAsync(options, searchquery);
     }
   }
 
@@ -205,8 +192,6 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     if (this.observer) {
       this.observer.disconnect();
     }
-    // we create an intersection observer that execute
-    // load query when the html element is intersecting
     this.observer = createIntersectionObserver((entries, _) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -219,9 +204,13 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   }
 
   private fetchSync(options: OptionsConfigType) {
-    options;
-    this.loadingChange.emit(false);
-    this.optionsChange.emit(mapStringListToInputOptions(options.source.raw));
+    return new Promise<void>(resolve => {
+      setTimeout(() => {
+        this.loadingChange.emit(false);
+        this.optionsChange.emit(mapStringListToInputOptions(options.source.raw));
+        resolve();
+      }, 500);
+    });
   }
 
   /** @interal */
@@ -229,16 +218,14 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     options: OptionsConfigType,
     params: Record<string, unknown> = {}
   ) {
-    const query =
-      typeof this.limit !== 'undefined' && this.limit !== null
-        ? { page: 1, per_page: this.limit, ...params }
-        : { ...params };
+    const query = typeof this.limit !== 'undefined' && this.limit !== null ? { page: 1, per_page: this.limit, ...params } : { ...params };
     const { refetch, ...rest } = options;
     const key = { ...rest, ...params };
 
     if (this.key && !deepEqual(this.key, key)) {
       this.cache.dispose(this.key);
     }
+
     this.key = key;
 
     this.search$.next([key, rest, query]);
@@ -248,14 +235,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     return lastValueFrom(
       this.client.request({ ...options, name: this.name }, params).pipe(
         first(),
-        map((state) => {
-          return state
-            ? mapIntoInputOptions(
-                options,
-                state as unknown as Record<string, unknown>[]
-              )
-            : [];
-        })
+        map((state) => state ? mapIntoInputOptions(options, state as unknown as Record<string, unknown>[]) : [])
       )
     );
   }

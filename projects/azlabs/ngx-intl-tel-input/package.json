@@ -5,11 +5,11 @@
     "@angular/common": ">=17.0.0 | <20.0.0",
     "@angular/core": ">=17.0.0 | <20.0.0",
     "@angular/cdk": ">=17.0.0 | <20.0.0",
-    "@azlabsjs/ngx-dropdown": "^0.17.0"
+    "@azlabsjs/ngx-dropdown": "^0.17.0",
+    "awesome-phonenumber": ">=7.5.0"
   },
   "dependencies": {
-    "tslib": "^2.3.0",
-    "awesome-phonenumber": "^7.5.0"
+    "tslib": "^2.3.0"
   },
   "repository": {
     "type": "git",

@@ -1,6 +1,6 @@
 <div class="container">
   <h4>Ngx Common</h4>
-  <p *ngIf="230 | transform : ['httpValue:http://localhost:3000/professions;label'] | pipeResult as result">
+  <p *ngIf="1 | transform : ['httpValue:http://localhost:3000/professions;label;'] | pipeResult as result">
     <ng-container *ngIf="result.value | isAsync; else defaultRef">
       Async : {{ result.value | async }}
     </ng-container>

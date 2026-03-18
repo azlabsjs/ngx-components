@@ -86,7 +86,8 @@
         "options": [],
         "children": [],
         "min": "1900-01-01",
-        "minDate": "1900-01-01"
+        "minDate": "1900-01-01",
+        "maxDate": "2026-03-17"
       },
       {
         "formId": 220,
@@ -126,7 +127,7 @@
         "placeholder": "...",
         "type": "select",
         "classes": "clr-input",
-        "selectableModel": "http://127.0.0.1:3000/categories",
+        "selectableModel": "http://localhost:3000/categories",
         "multiple": 0,
         "children": [],
         "keyfield": "",
@@ -191,10 +192,10 @@
         "placeholder": "...",
         "type": "select",
         "classes": "clr-input",
-        "selectableModel": "http://127.0.0.1:3000/professions",
+        "selectableModel": "http://localhost:3000/professions",
         "maxLength": 145,
         "exists": {
-          "url": "http://127.0.0.1:3000/professions",
+          "url": "http://localhost:3000/professions",
           "conditions": []
         },
         "multiple": 0,
@@ -216,9 +217,9 @@
         "placeholder": "...",
         "type": "select",
         "classes": "clr-input",
-        "selectableModel": "http://127.0.0.1:3000/countries",
+        "selectableModel": "http://localhost:3000/countries",
         "exists": {
-          "url": "http://127.0.0.1:3000/countries",
+          "url": "http://localhost:3000/countries",
           "conditions": []
         },
         "keyfield": "id",
@@ -243,8 +244,8 @@
         "disabledIf": "country:__empty__",
         "selectableModel": {
           "source": {
-            "resource": "http://127.0.0.1:3000/cities?disabled=false",
-            "raw": "http://127.0.0.1:3000/cities?disabled=false",
+            "resource": "http://localhost:3000/cities?disabled=false",
+            "raw": "http://localhost:3000/cities?disabled=false",
             "params": {
               "keyBy": "id",
               "groupBy": "id",
@@ -259,7 +260,7 @@
           ]
         },
         "exists": {
-          "url": "http://127.0.0.1:3000/cities",
+          "url": "http://localhost:3000/cities",
           "conditions": []
         },
         "keyfield": "id",
@@ -382,7 +383,7 @@
             "placeholder": "...",
             "type": "select",
             "classes": "clr-input",
-            "selectableModel": "http://127.0.0.1:3000/categories",
+            "selectableModel": "http://localhost:3000/categories",
             "multiple": 0,
             "children": [],
             "keyfield": "",

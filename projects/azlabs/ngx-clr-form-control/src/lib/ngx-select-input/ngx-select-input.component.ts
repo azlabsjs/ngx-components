@@ -4,6 +4,7 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
+  HostListener,
   Inject,
   Input,
   Output,
@@ -17,12 +18,15 @@ import {
   OPTIONS_DIRECTIVES,
 } from '@azlabsjs/ngx-options-input';
 import { NgxCommonModule } from '../common';
-import { NgSelectModule } from '@ng-select/ng-select';
+import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select';
+
+// @internal
+type OptionalConfig = Omit<OptionsInput, 'options'> & { options?: OptionsInput['options'] };
 
 /** @internal */
 type StateType = {
   performingAction: boolean;
-  config: OptionsInput | null;
+  config: OptionalConfig | null;
   loaded: boolean;
 };
 
@@ -36,29 +40,7 @@ type StateType = {
   ],
   selector: 'ngx-select-input',
   templateUrl: './ngx-select-input.component.html',
-  styles: [
-    `
-      .ng-select,
-      :host ::ng-deep .ng-select {
-        display: block;
-        max-width: 100% !important;
-        width: auto;
-      }
-      .ng-select.flat {
-        border-radius: 0 !important;
-      }
-      .ng-select.flat .ng-select-container {
-        border-radius: 0 !important;
-      }
-      :host ::ng-deep .ng-select .ng-select-container,
-      :host ::ng-deep .ng-select.ng-select-single .ng-select-container {
-        min-height: 26px;
-      }
-      :host ::ng-deep .ng-select.ng-select-single .ng-select-container {
-        height: 26px;
-      }
-    `,
-  ],
+  styleUrls: ['./ngx-select-input.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxSelectInputComponent {
@@ -103,6 +85,15 @@ export class NgxSelectInputComponent {
 
   @ViewChild('optionsRef', { static: false })
   options!: FetchOptionsDirective;
+
+  @ViewChild('ngselect', { static: false }) ngselect: NgSelectComponent | null | undefined;
+
+  @HostListener('window:scroll', [])
+  onScroll() {
+    if (this.ngselect && this.ngselect.isOpen) {
+      this.ngselect.close();
+    }
+  }
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -150,11 +141,7 @@ export class NgxSelectInputComponent {
 
     this.autoSelect(config);
 
-    this.setState((state) => ({
-      ...state,
-      performingAction: false,
-      config: config,
-    }));
+    this.setState((state) => ({ ...state, performingAction: false, config: config }));
   }
 
   modelChange(value: any) {
@@ -171,17 +158,17 @@ export class NgxSelectInputComponent {
     this.cdRef?.markForCheck();
   }
 
-  removed(e: unknown, config: OptionsInput) {
+  removed(e: unknown, config: OptionalConfig) {
     this.remove.emit({ name: config.name, event: e });
   }
 
-  select(e: unknown, config: OptionsInput) {
+  select(e: unknown, config: OptionalConfig) {
     this.selected.emit({ name: config.name, value: e });
   }
 
-  private autoSelect(config: OptionsInput) {
+  private autoSelect(config: OptionalConfig) {
     const { autoselect, options: items } = config;
-    if (autoselect && items.length === 1) {
+    if (items && autoselect && items.length === 1) {
       this.control.setValue(items[0].value);
     }
   }

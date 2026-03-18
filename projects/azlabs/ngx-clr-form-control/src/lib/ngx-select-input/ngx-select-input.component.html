@@ -1,25 +1,15 @@
 <ng-container *ngIf="state">
   <ng-content select="label"></ng-content>
-  <div *ngIf="state.config as config" #optionsRef fetchOptions [config]="config.optionsConfig" [loaded]="state.loaded" (optionsChange)="optionsChange($event)" (loadingChange)="loadingChange($event)" [name]="config.name">
-    <ng-select
-      [class]="config.multiple ? '' : 'not-multiple'"
-      [virtualScroll]="true"
-      [items]="config.options || []"
-      [bindLabel]="'name'"
-      [bindValue]="'value'"
-      [loading]="(!!state.performingAction && (config.options ?? []).length === 0)"
-      [loadingText]="loadingText"
-      [multiple]="config.multiple ?? false"
-      [placeholder]="config.placeholder ?? ''"
-      [groupBy]="'type'"
-      [ngModel]="control.value"
-      [clearable]="true"
-      [appendTo]="'body'"
-      [disabled]="disabled || control.disabled"
-      (ngModelChange)="modelChange($event)"
-      (focus)="onFocus()"
-      (remove)="removed($event, state.config)"
-      (change)="select($event, state.config)">
+  <div class="ng-select-container" style="position: relative" *ngIf="state.config as config" #optionsRef fetchOptions
+    [config]="config.optionsConfig" [loaded]="state.loaded" (optionsChange)="optionsChange($event)"
+    (loadingChange)="loadingChange($event)" [name]="config.name">
+    <ng-select #ngselect [class]="config.multiple ? '' : 'not-multiple'" [virtualScroll]="true"
+      [items]="config.options || []" [bindLabel]="'name'" [bindValue]="'value'"
+      [loading]="(!!state.performingAction && (state.config.options ?? []).length === 0)" [loadingText]="loadingText"
+      [multiple]="config.multiple ?? false" [placeholder]="config.placeholder ?? ''" [groupBy]="'type'"
+      [ngModel]="control.value" [clearable]="true" [appendTo]="'.ng-select-container'"
+      [disabled]="disabled || control.disabled" (ngModelChange)="modelChange($event)" (focus)="onFocus()"
+      (remove)="removed($event, state.config)" (change)="select($event, state.config)">
       <ng-template ng-option-tmp let-item="item">
         <label class="form-check-label ml-2"> {{ item?.name }}</label>
       </ng-template>

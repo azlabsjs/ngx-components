@@ -1,0 +1,28 @@
+.ng-select,
+:host ::ng-deep .ng-select {
+    // display: block;
+    max-width: var(--ng-select-max-width, 100%) !important;
+    width: auto;
+}
+
+.ng-select.flat {
+    border-radius: var(--ng-select-flat-border-radius, 0) !important;
+}
+
+.ng-select.flat .ng-select-container {
+    border-radius: var(--ng-select-flat-border-radius, 0) !important;
+}
+
+:host ::ng-deep .ng-select .ng-select-container,
+:host ::ng-deep .ng-select.ng-select-single .ng-select-container {
+    min-height: var(--ng-select-min-height, 26px);
+}
+
+:host ::ng-deep .ng-select.ng-select-single .ng-select-container {
+    height: var(--ng-select-height, 26px);
+}
+
+:host ::ng-deep .ng-dropdown-panel,
+.ng-dropdown-panel {
+    z-index: var(--ng-select-z-index, 9999) !important;
+}

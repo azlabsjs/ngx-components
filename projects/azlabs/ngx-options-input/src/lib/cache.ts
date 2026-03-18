@@ -58,45 +58,38 @@ function isPromise(p: unknown): p is Promise<unknown> {
  *
  */
 function cached<TValue>(
-  v: TValue,
+  value: TValue,
   update?: ValueResolver<TValue>,
   interval?: number,
   ttl?: number
 ) {
-  let x = v;
+  let x = value;
   const refetchTime = interval ?? -1;
   let timeout: ReturnType<typeof setInterval> | null = null;
   let expiresAt: Date | undefined;
   const fn = update ?? (() => Promise.resolve(x));
 
-  // set the expiresAt variable value if ttl is provided
   function setExpiredDate(ttl: number | undefined) {
     if (ttl) {
-      const t = new Date();
       const date = new Date();
       date.setSeconds(date.getSeconds() + ttl);
       expiresAt = date;
     }
   }
 
-  // set the expiration date when item is cached
   setExpiredDate(ttl);
-  const o = {
+  const cache = {
     value: () => x,
     refetch: () => {
       const result = fn(x);
-      // case a promise is returned, we resolve the value from the then callback
+
       if (isPromise(result)) {
         result.then((resolved) => {
           x = resolved;
-
-          // update the expiration date value
           setExpiredDate(ttl);
         });
       } else {
-        // else the value is equals to the update value
         x = result as TValue;
-        // update the expiration date value
         setExpiredDate(ttl);
       }
     },
@@ -106,13 +99,13 @@ function cached<TValue>(
     update: fn,
   } as ValueType<TValue>;
 
-  if (refetchTime !== -1 && refetchTime !== Infinity) {
+  if (refetchTime < 0 && refetchTime !== Infinity) {
     timeout = setInterval(() => {
-      o.refetch();
+      cache.refetch();
     }, refetchTime * 1000);
   }
 
-  Object.defineProperty(o, 'dispose', {
+  Object.defineProperty(cache, 'dispose', {
     value: () => {
       if (timeout !== null) {
         clearInterval(timeout);
@@ -120,7 +113,7 @@ function cached<TValue>(
     },
   });
 
-  return o;
+  return cache;
 }
 
 /** @internal  cache instance default implementation */
