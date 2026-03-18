@@ -20,7 +20,7 @@ import {
   SimpleChanges,
   TemplateRef,
 } from '@angular/core';
-import { OutletConfig, SizeType } from './types';
+import { Optional, OutletConfig, SizeType } from './types';
 import { PIPES } from './pipes';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 
@@ -38,17 +38,17 @@ type StateType = {
   animations: [
     trigger('fadeInOutSlideBottom', [
       transition('close => open', [
-        style({ transform: 'translateY(-1000)', opacity: 1 }),
+        style({ transform: 'translateY(-1000px)', opacity: 1 }),
         animate(
           '0.45s cubic-bezier(0.165, 0.84, 0.44, 1)',
-          style({ transform: 'translateY(0)', opacity: 1 })
+          style({ transform: 'translateY(0px)', opacity: 1 })
         ),
       ]),
       transition('open => close', [
-        style({ transform: 'translateY(0)', opacity: 1 }),
+        style({ transform: 'translateY(0px)', opacity: 1 }),
         animate(
           '0.45s cubic-bezier(0.165, 0.84, 0.44, 1)',
-          style({ transform: 'translateY(-1000)', opacity: 0 })
+          style({ transform: 'translateY(-1000px)', opacity: 0 })
         ),
       ]),
     ]),
@@ -111,7 +111,7 @@ export class ModalComponent implements OnChanges {
   }
   // #region
 
-  // #region component inputs
+  // #region input properties
   @Input() opened: boolean = false;
   private _size!: SizeType;
   @Input() set size(value: SizeType) {
@@ -127,16 +127,14 @@ export class ModalComponent implements OnChanges {
   @Input() actions!: TemplateRef<any>;
   // #endregion
 
-  // #region component output
+  // #region output properties
   @Output() openedChange = new EventEmitter<boolean>();
   // #region
 
-  // #region content children
-  @ContentChild('template') templateRef!: TemplateRef<unknown>;
-  // #endregion
+  @ContentChild('template') templateRef!: Optional<TemplateRef<unknown>>;
 
   @HostListener('document:keydown.escape', ['$event'])
-  onEscapeKeyPress(event: KeyboardEvent) {
+  onEscapeKeyPress(event: Event) {
     if (this._state.opened) {
       this.close();
       event?.stopPropagation();

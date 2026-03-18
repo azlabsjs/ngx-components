@@ -1,5 +1,8 @@
 import { Injector, Type } from '@angular/core';
 
+// @internal
+export type Optional<T> = T | null | undefined;
+
 /** @description modal component type reference */
 export type ModalElement = {
   /** manually closes the modal. */
