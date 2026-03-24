@@ -230,7 +230,6 @@ export function optionsQueryClient(
       }
 
       const request = { ...config, url: createRequestURL(config, endpoint ?? ''), search }
-      console.log( 'Request: ', request);
       return fn(request, injector, queries && name ? resolveInterceptorFactory(queries, name, factory) : factory);
     },
     configurable: true,
