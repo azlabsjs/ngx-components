@@ -24,48 +24,30 @@ import { Observable, Subject, Subscription } from 'rxjs';
 /** @internal */
 type Optional<T> = T | null | undefined;
 
-function safeSetValue<T = unknown>(
-  a: Optional<AbstractControl>,
-  value: T,
-  logger?: (err: unknown) => void,
-) {
-  if (!a) {
-    return;
-  }
-  try {
-    a.setValue(value);
-  } catch (error) {
-    if (logger) {
-      logger(error);
-    }
-  }
-}
-
+/** @internal */
 function isformgroup(x: AbstractControl): x is FormGroup {
   return x instanceof FormGroup;
 }
 
+/** @internal */
 function before(haystack: string, char: string) {
   const index = haystack.indexOf(char);
   return index === -1 ? '' : haystack.substring(0, index);
 }
 
+/** @internal */
 function after(haystack: string, char: string) {
   const index = haystack.indexOf(char);
   return index === -1 ? '' : haystack.substring(index + char.length);
 }
 
+/** @internal */
 function isinputgroup(input: InputConfigInterface): input is InputGroup {
-  return (
-    typeof input === 'object' &&
-    input !== null &&
-    ((input as InputGroup).children ?? []).length > 0
-  );
+  return (typeof input === 'object' && input !== null && ((input as InputGroup).children ?? []).length > 0);
 }
 
-function isoptionsinput(
-  config: InputConfigInterface,
-): config is Required<OptionsInput> {
+/** @internal */
+function isoptionsinput(config: InputConfigInterface): config is Required<OptionsInput> {
   return (
     'optionsConfig' in config &&
     typeof (config as OptionsInput).optionsConfig === 'object' &&
@@ -73,10 +55,12 @@ function isoptionsinput(
   );
 }
 
+/** @internal */
 function isrepeatablegroup(input: InputConfigInterface): input is InputGroup {
   return isinputgroup(input) && Boolean(input.isRepeatable) === true;
 }
 
+/** @internal */
 function isrepeatableinput(input: InputConfigInterface) {
   return (
     typeof input === 'object' &&
@@ -87,11 +71,7 @@ function isrepeatableinput(input: InputConfigInterface) {
 
 function getinputgroupinputs(input: InputGroup) {
   const { children } = input;
-  return Array.isArray(children)
-    ? children
-    : [children].filter(
-        (current) => typeof current !== 'undefined' && current !== null,
-      );
+  return Array.isArray(children) ? children : [children].filter((current) => typeof current !== 'undefined' && current !== null);
 }
 
 /** @internal */
@@ -143,63 +123,113 @@ export function setFormValue(
   inputs?: InputConfigInterface[] | InputConfigInterface,
 ) {
   for (const [key, value] of Object.entries(values)) {
-    const i = Array.isArray(inputs)
-      ? inputs?.find((config) => config.name === key)
-      : inputs;
-    if (typeof i === 'undefined' || i === null) {
+    const input = Array.isArray(inputs) ? inputs?.find((config) => config.name === key) : inputs;
+    if (typeof input === 'undefined' || input === null) {
       continue;
     }
-    createSetValue(builder)(formgroup, key, value, i);
+  
+    createSetValue(builder)(formgroup, key, value, input);
   }
+}
+
+/** @internal */
+function safeSetValue<T = unknown>(a: Optional<AbstractControl>, value: T, logger?: (err: unknown) => void) {
+  if (!a) {
+    return;
+  }
+  try {
+    a.setValue(value);
+  } catch (error) {
+    if (logger) {
+      logger(error);
+    }
+  }
+}
+
+/** @internal */
+export function setFormGroupValue(formgroup: FormGroup, values: { [index: string]: any }, inputs: InputConfigInterface[], builder: AngularReactiveFormBuilderBridge) {
+
+  const dictionnary = inputs.reduce((carry, current) => {
+    carry[current.name] = current;
+    return carry;
+  }, {} as { [k: string]: InputConfigInterface });
+
+  for (const [key, value] of Object.entries(values)) {
+    const result = formgroup.get(key);
+
+    if (result instanceof FormGroup) {
+      const config = dictionnary[key];
+      if (!config) {
+        continue;
+      }
+      if (typeof value !== 'object' || value === null) {
+        continue;
+      }
+      if (!isinputgroup(config)) {
+        continue;
+      }
+      setFormGroupValue(result, value, getinputgroupinputs(config), builder)
+      continue;
+    }
+
+    if (result instanceof FormArray) {
+      const config = dictionnary[key];
+      if (!config) {
+        continue;
+      }
+      setFormArrayValue(result, formgroup, key, config, value, builder);
+      continue;
+
+    }
+
+    safeSetValue(result, value, console.error);
+
+  }
+  formgroup.updateValueAndValidity();
+}
+
+
+/** @internal */
+function setFormArrayValue(array: Optional<FormArray>, parent: FormGroup, key: string, config: InputConfigInterface, value: unknown, builder: AngularReactiveFormBuilderBridge) {
+  const items = Array.isArray(value) ? value : [];
+  if (isrepeatablegroup(config)) {
+    const leaf = getinputgroupinputs(config);
+    const control = array ?? new FormArray<any>([]);
+    for (const current of items) {
+      const result = builder.group(leaf);
+      setFormGroupValue(result, current, leaf, builder);
+      control.push(result);
+    }
+    parent.setControl(key, control);
+  } else if (isrepeatableinput(config)) {
+    const control = array ?? new FormArray<any>([]);
+    for (const current of items) {
+      const result = builder.control(config);
+      safeSetValue(result, current, console.error);
+      control.push(result);
+    }
+    parent.setControl(key, control);
+  } else {
+    safeSetValue(array, items, console.error);
+  }
+
+  parent.updateValueAndValidity();
 }
 
 /** @description creates a factory function that set the  */
 export function createSetValue(builder: AngularReactiveFormBuilderBridge) {
-  return function setValue(
-    g: FormGroup<any>,
-    key: string,
-    value: any,
-    i: InputConfigInterface,
-  ) {
-    const ac = g.controls[key];
-    if (ac && value) {
-      if (ac instanceof FormGroup) {
-        setFormGroupValue(ac, value);
-      } else if (ac instanceof FormArray && isrepeatablegroup(i)) {
-        const leaf = getinputgroupinputs(i);
-        const items = Array.isArray(value) ? value : [];
-        const a = (g.get(key) as FormArray<any>) ?? new FormArray<any>([]);
-        for (const current of items) {
-          const t = builder.group(leaf);
-          setFormGroupValue(t, current);
-          a.push(t);
-        }
-        g.setControl(key, a);
-      } else if (ac instanceof FormArray && isrepeatableinput(i)) {
-        const items = Array.isArray(value) ? value : [];
-        const a = (g.get(key) as FormArray<any>) ?? new FormArray<any>([]);
-        for (const current of items) {
-          const t = builder.control(i);
-          safeSetValue(t, current, console.error);
-          a.push(t);
-        }
-        g.setControl(key, a);
+  return (formgroup: FormGroup<any>, key: string, value: any, config: InputConfigInterface) => {
+    const result = formgroup.get(key);
+    if (result && value) {
+      if (result instanceof FormGroup && isinputgroup(config)) {
+        setFormGroupValue(result, value, getinputgroupinputs(config), builder);
+      } else if (result instanceof FormArray) {
+        setFormArrayValue(result, formgroup, key, config, value, builder);
       } else {
-        safeSetValue(g.controls[key], value, console.error);
+        safeSetValue(result, value, console.error);
       }
     }
   };
-}
-
-/** @internal */
-export function setFormGroupValue(
-  formgroup: FormGroup,
-  values: { [index: string]: any },
-) {
-  for (const [key, value] of Object.entries(values)) {
-    safeSetValue(formgroup.controls[key], value, console.error)
-    formgroup.updateValueAndValidity();
-  }
 }
 
 /** @internal check if the input should matches any of the provided values or conditions */
@@ -226,8 +256,8 @@ function matchany(value: unknown, values: unknown[]) {
   value = isNaN(value as any) ? value : +(value as string);
   const _values = isNumber(value)
     ? values.map((value) =>
-        isNaN(value as number) ? value : +(value as string),
-      )
+      isNaN(value as number) ? value : +(value as string),
+    )
     : values || [];
 
   return _values.includes(value);

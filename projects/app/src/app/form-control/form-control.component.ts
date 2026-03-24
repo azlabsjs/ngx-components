@@ -7,6 +7,7 @@ import {
   DateInput,
   FileInput,
   NumberInput,
+  OptionsInput,
   OptionsInputConfigInterface,
   TextAreaInput,
   TextInput,
@@ -188,9 +189,29 @@ export class FormControlComponent implements OnInit, OnDestroy {
   };
   phoneInputControl = createFormControl(this.fb, this.phoneInput);
 
+  optionsInput: OptionsInput = {
+    label: 'Sexe',
+    name: 'sex',
+    type: 'select',
+    classes: 'clr-input',
+    placeholder: '...',
+    isRepeatable: false,
+    containerClass: 'clr-col-6',
+    options: [
+      { name: 'FEMININ', value: 'F' },
+      { name: 'MASCULIN', value: 'M' },
+      // { name: 'AUTRES', value: 'O' }, # uncomment this line to add other as sex
+    ],
+    constraints: {
+      required: true,
+      disabled: false,
+    },
+  };
+  optionsControl = createFormControl(this.fb, this.optionsInput);
+
   private subscriptions: Subscription[] = [];
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder) { }
 
   ngOnInit(): void {
     this.subscriptions = [

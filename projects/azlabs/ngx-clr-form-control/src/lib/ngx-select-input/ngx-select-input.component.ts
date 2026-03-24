@@ -171,6 +171,7 @@ export class NgxSelectInputComponent {
     const { autoselect, options: items } = config;
     if (items && autoselect && items.length === 1) {
       this.control.setValue(items[0].value);
+      this.control.disable();
     }
   }
 
