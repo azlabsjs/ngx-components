@@ -44,7 +44,7 @@ type StateType = {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxSelectInputComponent {
-  //#region component properties
+  //#region local properties
   _state: StateType = {
     performingAction: false,
     config: null,
@@ -56,7 +56,7 @@ export class NgxSelectInputComponent {
   private fetchOnFocus: boolean = false;
   //#endregion
 
-  //#region component inputs
+  //#region input properties
   @Input() control!: FormControl<any>;
   @Input() describe = true;
   @Input() disabled = false;
@@ -79,7 +79,7 @@ export class NgxSelectInputComponent {
   @Input() parent: string | null | undefined = '.ng-select-container';
   //#endregion
 
-  //#region component outputs
+  //#region output properties
   @Output() remove = new EventEmitter<any>();
   @Output() selected = new EventEmitter<InputEventArgs>();
   //#endregion
