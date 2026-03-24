@@ -75,7 +75,7 @@ export class NgxSelectInputComponent {
     }));
   }
   @Input({ alias: 'loading-text' }) loadingText!: string;
-  @Input() parent: string | null | undefined = '.ng-select-container';
+  @Input() parent: string | null | undefined = 'body';
   //#endregion
 
   //#region output properties
