@@ -1,5 +1,6 @@
 import {
   AsyncPipe,
+  CommonModule,
   CurrencyPipe,
   DecimalPipe,
   JsonPipe,
@@ -10,9 +11,11 @@ import {
 } from '@angular/common';
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   Inject,
   OnInit,
+  Optional,
   ViewChild,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
@@ -22,10 +25,10 @@ import { createSlide } from '@azlabsjs/ngx-slides';
 import {
   FormsClient,
   FORM_CLIENT,
-  ReactiveFormComponentInterface,
   uniqueValidator,
   HTTP_REQUEST_CLIENT,
   RequestClient,
+  existsValidator,
 } from '@azlabsjs/ngx-smart-form';
 import {
   FileInput,
@@ -33,6 +36,13 @@ import {
   InputTypes,
 } from '@azlabsjs/smart-form-core';
 import { BehaviorSubject, filter, Subject, takeUntil, tap } from 'rxjs';
+import { TestPipe, TRANSLATE_PIPES } from './pipes';
+import { FORM_CONTROL_DIRECTIVES } from '@azlabsjs/ngx-clr-form-control';
+import { DIRECTIVES as GRID_DIRECTIVES } from '@azlabsjs/ngx-clr-smart-grid';
+import { FormControlComponent } from './form-control/form-control.component';
+import { ClarityModule } from '@clr/angular';
+import { ReactiveFormDirectiveInterface } from 'projects/azlabs/ngx-smart-form/src/lib';
+import { ModalComponent } from '@azlabs/ngx-modal';
 
 const _values = {
   data: [
@@ -93,6 +103,7 @@ type ValuesType = typeof _values;
     ...COMMON_PIPES,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class AppComponent implements OnInit {
   formControl = new FormControl<string | undefined>(undefined);
@@ -114,8 +125,8 @@ export class AppComponent implements OnInit {
   _state$ = new BehaviorSubject<FormConfigInterface | undefined>(undefined);
   state$ = this._state$.asObservable();
   private _destroy$ = new Subject<void>();
-  @ViewChild('smartform', { static: false })
-  smartForm!: ReactiveFormComponentInterface;
+  @ViewChild('formRef', { static: false })
+  private smartForm!: ReactiveFormDirectiveInterface;
 
   // Columns configuration
   public columns: GridColumnType[] = [
@@ -143,6 +154,13 @@ export class AppComponent implements OnInit {
     {
       title: 'app.modules.persons.gender',
       property: 'sex',
+      style: {
+        class: (value) => {
+          return String(value) === 'F'
+            ? 'label label-success'
+            : 'label label-danger';
+        },
+      },
     },
     {
       title: 'app.modules.persons.nationality',
@@ -154,7 +172,7 @@ export class AppComponent implements OnInit {
       property: 'test',
       transform: 'testPipe',
       style: {
-        class: 'label label-success p-top-bottom-12',
+        // class: ,
       },
     },
   ];
@@ -166,7 +184,7 @@ export class AppComponent implements OnInit {
   gridConfig: Partial<GridConfigType> = {
     selectable: true,
     singleSelection: false,
-    transformColumnTitle: ['asyncText'],
+    // transformColumnTitle: ['asyncText'],
     capitalizeColumnTitle: true,
     useServerPagination: true,
     projectRowClass: (current: { id: number }) => {
@@ -182,6 +200,37 @@ export class AppComponent implements OnInit {
   ];
 
   fromState = {
+    document_id:
+      'https://storagev2.lik.tg/api/storage/object/download?name=17652725236937ebcb22e06493916050&signature=63a33124004cb0a0ca3450230f5204b09442f911409d178a8f5b2d3679238675',
+    fruits: ['2', '3', '4'],
+    category_id: 1,
+    lastname: 'AZOMEDOH',
+    firstname: 'KOMI SIDOINE',
+    // profession: 'INFORMATIQUE',
+    stakeholders: [
+      {
+        firstname: 'EKUE',
+        lastname: 'AYI',
+        profession: 'INFORMATIQUE',
+      },
+      {
+        firstname: 'RODRIGUE',
+        lastname: 'KOLANI',
+        profession: 'RESEARCH',
+        category_id: 2,
+      },
+    ],
+    phonenumber: ['22891969456', '22892384958'],
+    persons: {
+      firstname: 'MADELEINE',
+      lastname: 'DE LA COURT',
+      email: 'madeleined@example.com',
+    },
+  };
+
+    fromState2 = {
+    document_id:
+      'https://storagev2.lik.tg/api/storage/object/download?name=17652725236937ebcb22e06493916050&signature=63a33124004cb0a0ca3450230f5204b09442f911409d178a8f5b2d3679238675',
     fruits: ['2', '3', '4'],
     category_id: 1,
     lastname: 'AZOMEDOH',
@@ -211,27 +260,51 @@ export class AppComponent implements OnInit {
   required = false;
   control = new FormControl<string | undefined>(undefined);
   haserror = false;
+  formValue: { [k: string]: unknown } | null = null;
 
   public constructor(
     @Inject(FORM_CLIENT) private client: FormsClient,
     private lowercasePipe: LowerCasePipe,
-    @Inject(HTTP_REQUEST_CLIENT) private httpClient: RequestClient
+    @Inject(HTTP_REQUEST_CLIENT) private httpClient: RequestClient,
+    @Optional() private cdRef: ChangeDetectorRef | null,
   ) {
     this.client
       .get(220)
       .pipe(
         filter((state) => typeof state !== 'undefined' && state !== null),
-        tap((state) => console.log('Form: ', state)),
+        // tap((state) => console.log('Form: ', state)),
         tap((state) => this._state$.next(state)),
-        takeUntil(this._destroy$)
+        takeUntil(this._destroy$),
       )
       .subscribe();
   }
+
+  onOpenChange(_t28: ModalComponent) {
+    // console.log('modal: ', _t28);
+    _t28.open();
+  }
+
+  formModalStateChange() {
+    this.cdRef?.detectChanges();
+  }
+
   ngOnInit(): void {
     setTimeout(() => {
+      // console.log('Loaded values: ', _values)
       this._pageResult$.next(_values);
       this.placeholder = undefined;
+
+      console.log('Changing to fromState')
+      this.formValue = this.fromState;
+      this.cdRef?.detectChanges();
     }, 3000);
+
+
+    setTimeout(() => {
+      console.log('Changing to fromState2')
+      this.formValue = this.fromState2;
+      this.cdRef?.detectChanges();
+    }, 7000);
   }
 
   // Listen to datagrid refresh events
@@ -247,14 +320,15 @@ export class AppComponent implements OnInit {
   onFormReadyState(event: FormConfigInterface) {
     setTimeout(() => {
       this.smartForm?.addAsyncValidator(
-        uniqueValidator(this.httpClient, {
-          query: 'user_details__email',
-          fn: `http://127.0.0.1:3000/professions`,
+        existsValidator(this.httpClient, {
+          // query: 'user_details__email',
+          fn: `http://127.0.0.1:3000/categories`,
           conditions: (_: unknown) => {
             return false;
           },
+          // error: 'Adresse mail non existant!'
         }),
-        'email'
+        'category_id',
       );
     }, 1000);
 
@@ -265,13 +339,13 @@ export class AppComponent implements OnInit {
   }
 
   afterChanges() {
-    const timeout = setTimeout(() => {
-      this.smartForm
-        ?.controlValueChanges('profession')
-        .pipe(tap((state) => console.log('State changes:', state)))
-        .subscribe();
-      clearTimeout(timeout);
-    }, 300);
+    // const timeout = setTimeout(() => {
+    //   this.smartForm
+    //     ?.controlValueChanges('profession')
+    //     .pipe(tap((state) => console.log('State changes:', state)))
+    //     .subscribe();
+    //   clearTimeout(timeout);
+    // }, 300);
   }
 
   onBlur(event: FocusEvent) {

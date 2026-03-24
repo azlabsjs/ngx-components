@@ -25,3 +25,15 @@
 
 - Added support for compupte property in the form input configurations
 - Fixed issue with latest contraints.disabled not being applied to UI
+
+## [0.17.2x] [2025-07-04]
+
+- Migrated dependencies to add support for angular v17 to v19
+
+## [0.17.3] [2025-07-25]
+
+- Added form directive and form ui component (preview) to ngx-smart-form module 
+
+## [0.17.3] [2025-07-29]
+
+- fixed bug in ngx-radio-input component implementation using description field as label instead of name field

@@ -1,9 +1,10 @@
-export { BindingInterface } from './bindings';
+export { Condition, DetachedInputType } from './bindings';
 
 export {
   ControlsStateMap,
   FormComponentInterface,
   ReactiveFormComponentInterface,
+  ReactiveFormDirectiveInterface,
 } from './directives';
 
 export {

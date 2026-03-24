@@ -11,7 +11,7 @@ export type InterceptorFactory<T> = (injector: Injector) => Interceptor<T>;
 
 export interface RequestClient {
   /**
-   * Makes an HTTP Request to a server enpoint and returns
+   * makes an HTTP Request to a server enpoint and returns
    * an observable of response type
    *
    * @param path The path to API resource or full server url

@@ -1,23 +1,26 @@
 import { CommonModule } from '@angular/common';
 import {
-  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EmbeddedViewRef,
   EventEmitter,
   Input,
   OnDestroy,
+  Optional,
   Output,
   TemplateRef,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
 import { RefType, ViewRefFactory } from '../types';
-import { AbstractControl } from '@angular/forms';
+import { AbstractControl, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { BUTTON_DIRECTIVES } from '../buttons';
-import { PIPES } from '../../pipes';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
+import { ModalDirective } from '../modal';
+import { PIPES } from './pipes';
 
 /** @internal */
 type ContextType = {
@@ -34,35 +37,67 @@ type ContextType = {
   selector: 'ngx-table-form',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxTableForm
-  implements AfterViewInit, ViewRefFactory<EmbeddedViewRef<any>>, OnDestroy
+  implements ViewRefFactory<EmbeddedViewRef<any>>, OnDestroy
 {
-  //#region Component inputs
+  //#region component inputs
+  @Input() label!: TemplateRef<any> | null | undefined;
+  @Input({ alias: 'template' }) view!: TemplateRef<any>;
   @Input({ alias: 'inputs' }) configs: InputConfigInterface[] = [];
   @Input({ alias: 'auto-upload' }) autoupload: boolean = true;
-  @Input({ alias: 'template' }) view!: TemplateRef<any>;
-  //#endregion Component inputs
+  @Input({ required: true }) detached!: AbstractControl[];
+  @Input() title!: string;
+  @Input() modal!: ModalDirective;
+  @Input() name!: string;
+  //#endregion
 
-  //#region Component output
+  //#region component output
   @Output() removed = new EventEmitter<RefType<EmbeddedViewRef<any>>>();
-  //#endregion Component output
+  //#endregion
 
-  //#region Component properties
+  //#region component properties
   @ViewChild('container', { read: ViewContainerRef, static: false })
   containerRef!: ViewContainerRef;
   @ViewChild('template', { static: false }) templateRef!: TemplateRef<any>;
-  private destroy$ = new Subject<void>();
-  //#endregion Component properties
+  //#endregion
 
-  createView(index: number, input: AbstractControl) {
+  private subscriptions: Subscription[] = [];
+
+  constructor(@Optional() private cdRef: ChangeDetectorRef | null) {}
+
+  createView(
+    index: number,
+    formgroup: AbstractControl,
+    triggered: boolean = false
+  ) {
     const subject = new Subject<number>();
+    const inputs = [...this.configs];
+
+    // case a modal component is provided we open the modal and pass required input configuration to it
+    if (triggered && this.modal) {
+      this.modal.formgroup = formgroup as FormGroup;
+      this.modal.inputs = inputs;
+      this.modal.autoupload = this.autoupload;
+      this.modal.title = this.title;
+      this.modal.detached = this.detached;
+      this.modal.view = this.view;
+      this.modal.name = this.name;
+      if (this.label) {
+        this.modal.label = this.label;
+      }
+      
+      this.modal.stateChanged();
+      this.modal.open();
+    }
+
     const element = this.containerRef?.createEmbeddedView<ContextType>(
       this.templateRef,
       {
-        formgroup: input,
+        formgroup,
         autoupload: this.autoupload,
-        inputs: [...this.configs],
+        inputs,
         remove: (e: Event) => {
           e?.preventDefault();
           ref?.destroy();
@@ -77,9 +112,11 @@ export class NgxTableForm
       destroy: () => element.destroy(),
     };
 
-    element.context.destroy
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.removed.emit(ref));
+    const subscription = element.context.destroy.subscribe(() =>
+      this.removed.emit(ref)
+    );
+
+    this.subscriptions.push(subscription);
 
     return ref;
   }
@@ -88,9 +125,9 @@ export class NgxTableForm
     this.containerRef?.clear();
   }
 
-  ngAfterViewInit(): void {}
-
   ngOnDestroy(): void {
-    this.destroy$.next();
+    for (const subscription of this.subscriptions) {
+      subscription?.unsubscribe();
+    }
   }
 }

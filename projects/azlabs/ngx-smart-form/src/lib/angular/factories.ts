@@ -4,7 +4,7 @@ import { LoadFormsRequestHandler } from './types';
 import { FormsLoader } from './services';
 import { LocationStrategy, PlatformLocation } from '@angular/common';
 
-/** @internal Factory function for creating default form loader instance */
+/** @internal factory function for creating default form loader instance */
 export function useHTTPFormLoader(
   _location: LocationStrategy,
   _platform: PlatformLocation,

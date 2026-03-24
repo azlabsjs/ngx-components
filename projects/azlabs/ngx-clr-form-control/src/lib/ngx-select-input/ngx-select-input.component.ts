@@ -1,30 +1,32 @@
 import { DOCUMENT } from '@angular/common';
 import {
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   EventEmitter,
+  HostListener,
   Inject,
   Input,
   Output,
   ViewChild,
 } from '@angular/core';
 import { FormControl, FormsModule } from '@angular/forms';
-import {
-  InputOptions,
-  OptionsInputConfigInterface,
-} from '@azlabsjs/smart-form-core';
+import { InputOptions, OptionsInput } from '@azlabsjs/smart-form-core';
 import { InputEventArgs } from '../types';
 import {
   FetchOptionsDirective,
   OPTIONS_DIRECTIVES,
 } from '@azlabsjs/ngx-options-input';
 import { NgxCommonModule } from '../common';
-import { NgSelectModule } from '@ng-select/ng-select';
+import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select';
+
+// @internal
+type OptionalConfig = Omit<OptionsInput, 'options'> & { options?: OptionsInput['options'] };
 
 /** @internal */
 type StateType = {
   performingAction: boolean;
-  config: OptionsInputConfigInterface | null;
+  config: OptionalConfig | null;
   loaded: boolean;
 };
 
@@ -33,37 +35,16 @@ type StateType = {
   imports: [
     NgxCommonModule,
     FormsModule,
-    ...OPTIONS_DIRECTIVES,
     NgSelectModule,
+    ...OPTIONS_DIRECTIVES,
   ],
   selector: 'ngx-select-input',
   templateUrl: './ngx-select-input.component.html',
-  styles: [
-    `
-      .ng-select,
-      :host ::ng-deep .ng-select {
-        display: block;
-        max-width: 100% !important;
-        width: 100%;
-      }
-      .ng-select.flat {
-        border-radius: 0 !important;
-      }
-      .ng-select.flat .ng-select-container {
-        border-radius: 0 !important;
-      }
-      :host ::ng-deep .ng-select .ng-select-container,
-      :host ::ng-deep .ng-select.ng-select-single .ng-select-container {
-        min-height: 26px;
-      }
-      :host ::ng-deep .ng-select.ng-select-single .ng-select-container {
-        height: 26px;
-      }
-    `,
-  ],
+  styleUrls: ['./ngx-select-input.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxSelectInputComponent {
-  //#region Component properties
+  //#region component properties
   _state: StateType = {
     performingAction: false,
     config: null,
@@ -72,87 +53,125 @@ export class NgxSelectInputComponent {
   get state() {
     return this._state;
   }
-  private _handleFetchOnFocus: boolean = false;
-  //#endregion Component properties
+  private fetchOnFocus: boolean = false;
+  //#endregion
 
+  //#region component inputs
   @Input() control!: FormControl<any>;
   @Input() describe = true;
-  @Input({ alias: 'inputConfig' }) set setInputConfig(
-    inputConfig: OptionsInputConfigInterface
-  ) {
+  @Input() disabled = false;
+  @Input() set config(config: OptionsInput) {
+    if (!config) {
+      return;
+    }
+
+    let { options } = config;
+    this.autoSelect(config);
+
+    options = options ?? [];
     this.setState((state) => ({
       ...state,
-      config: inputConfig,
-      loaded: (inputConfig.options ?? [])?.length !== 0,
+      config,
+      loaded: options.length !== 0,
     }));
   }
+  @Input({ alias: 'loading-text' }) loadingText!: string;
+  @Input() parent: string | null | undefined = '.ng-select-container';
+  //#endregion
 
-  //#region Component outputs
+  //#region component outputs
   @Output() remove = new EventEmitter<any>();
   @Output() selected = new EventEmitter<InputEventArgs>();
-  //#endregion Component outputs
+  //#endregion
 
   @ViewChild('optionsRef', { static: false })
   options!: FetchOptionsDirective;
+
+  @ViewChild('ngselect', { static: false }) ngselect: NgSelectComponent | null | undefined;
+
+  @HostListener('window:scroll', [])
+  onScroll() {
+    if (this.ngselect && this.ngselect.isOpen) {
+      this.ngselect.close();
+    }
+  }
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private cdRef: ChangeDetectorRef
   ) {
-    const { defaultView } = this.document;
-    this._handleFetchOnFocus = !(
-      defaultView !== null &&
-      'IntersectionObserver' in defaultView &&
-      'IntersectionObserverEntry' in defaultView &&
-      'intersectionRatio' in defaultView.IntersectionObserverEntry.prototype
+    const { defaultView: view } = this.document;
+
+    if (!view) {
+      return;
+    }
+
+    const { IntersectionObserverEntry: entry } = view;
+    this.fetchOnFocus = !(
+      'IntersectionObserver' in view &&
+      'IntersectionObserverEntry' in view &&
+      'intersectionRatio' in entry.prototype
     );
   }
 
   onFocus(): void {
-    if (this._handleFetchOnFocus) {
+    if (this.fetchOnFocus) {
       this.options?.query();
     }
   }
 
-  onLoadedChange(loaded: boolean) {
+  loadedChange(loaded: boolean) {
     this.setState((v) => ({ ...v, loaded }));
   }
 
-  onOptionsChange(options: InputOptions) {
-    const { config } = this._state;
-    let _c = config ?? ({} as OptionsInputConfigInterface);
-    _c = {
-      ..._c,
+  optionsChange(options: InputOptions) {
+    let { config } = this._state;
+
+    if (!config) {
+      return;
+    }
+
+    config = {
+      ...config,
       options: options.map((state) => ({
         ...state,
-        // We convert the select values to uppercase
-        // for UI consistency
         name: state?.name?.toUpperCase(),
         description: state.description?.toUpperCase(),
       })),
     };
-    // const value = this._state$.getValue();
-    // this._state$.next({ ...value, state: this._inputConfig.options ?? [] });
-    this.setState((state) => ({
-      ...state,
-      performingAction: false,
-      config: _c,
-    }));
+
+    this.autoSelect(config);
+
+    this.setState((state) => ({ ...state, performingAction: false, config: config }));
   }
 
-  onModelChange(value: any) {
+  modelChange(value: any) {
     this.control.setValue(value);
     this.cdRef?.markForCheck();
   }
 
-  onLoadingChange(value: boolean) {
+  loadingChange(value: boolean) {
     this.setState((v) => ({ ...v, performingAction: value }));
   }
 
   setState(state: (state: StateType) => StateType) {
     this._state = state(this._state);
     this.cdRef?.markForCheck();
-    // TODO: Uncomment the code below to use latest API instead
-    // this.setState(state);
   }
+
+  removed(e: unknown, config: OptionalConfig) {
+    this.remove.emit({ name: config.name, event: e });
+  }
+
+  select(e: unknown, config: OptionalConfig) {
+    this.selected.emit({ name: config.name, value: e });
+  }
+
+  private autoSelect(config: OptionalConfig) {
+    const { autoselect, options: items } = config;
+    if (items && autoselect && items.length === 1) {
+      this.control.setValue(items[0].value);
+    }
+  }
+
 }

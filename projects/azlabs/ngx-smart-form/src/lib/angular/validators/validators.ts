@@ -37,21 +37,21 @@ export class CustomValidators {
     return null;
   }
 
-  static minDate(minDate: string | Date): ValidatorFn {
+  static minDate(min: string | Date): ValidatorFn {
     return (control: AbstractControl) => {
       if (control.validator) {
-        if (control.value && JSDate.isAfter(minDate, control.value)) {
-          return { minDate };
+        if (control.value && JSDate.isAfter(min, control.value)) {
+          return { min, actual: control.value };
         }
       }
       return null;
     };
   }
 
-  static maxDate(maxDate: string | Date): ValidatorFn {
+  static maxDate(max: string | Date): ValidatorFn {
     return (control: AbstractControl) => {
-      if (control.value && JSDate.isBefore(maxDate, control.value)) {
-        return { maxDate };
+      if (control.value && JSDate.isBefore(max, control.value)) {
+        return { max, actual: control.value };
       }
       return null;
     };

@@ -16,8 +16,7 @@ import {
         xmlns="http://www.w3.org/2000/svg"
         width="8px"
         height="8px"
-        viewBox="0 0 24 24"
-      >
+        viewBox="0 0 24 24">
         <path d="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z" />
       </svg>
     </a>
@@ -29,20 +28,19 @@ import {
       }
 
       .ngx__add__button {
-        margin: 16px 0 auto 0;
         cursor: pointer;
-        width: 32px;
-        height: 32px;
-        background: #0072a3;
+        width: var(--input-add-button-width, 32px);
+        height: var(--input-add-button-width, 32px);
+        background: var(--btn-primary-bg-color, #0072a3);
         box-shadow: 1px 1px 1px rgb(114, 110, 110);
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        border-radius: 50%;
+        border-radius: var(--input-add-button-border-radius, 50%);
       }
 
       .ngx__add__button:hover {
-        background: #004b6b;
+        background: var(--btn-primary-hover-bg-color,#004b6b);
         box-shadow: 1px 1px 1px rgb(68, 64, 64);
       }
 

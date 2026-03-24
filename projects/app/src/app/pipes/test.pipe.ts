@@ -1,7 +1,8 @@
 import { Injectable, Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'testPipe',
+    name: 'testPipe',
+    standalone: true
 })
 @Injectable({ providedIn: 'root' })
 export class TestPipe implements PipeTransform {

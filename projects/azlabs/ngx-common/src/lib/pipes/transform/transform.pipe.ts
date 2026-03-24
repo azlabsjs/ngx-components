@@ -7,7 +7,13 @@ import {
   SlicePipe,
   UpperCasePipe,
 } from '@angular/common';
-import { Inject, Injectable, Injector, Pipe, PipeTransform } from '@angular/core';
+import {
+  Inject,
+  Injectable,
+  Injector,
+  Pipe,
+  PipeTransform,
+} from '@angular/core';
 import { GetTimeAgo, JSDate, ParseMonth } from '@azlabsjs/js-datetime';
 import { PipeTransformTokenMapType, PipeTransformType } from './types';
 import { PIPE_TRANSFORMS } from './tokens';
@@ -18,7 +24,7 @@ import { createParams, substr } from './internal';
   standalone: true,
   name: 'transform',
 })
-@Injectable({providedIn: 'any'})
+@Injectable({ providedIn: 'any' })
 export class NgxTransformPipe implements PipeTransform {
   /** @description Creates an instance {@see NgxTransformPipe} pipe */
   constructor(
@@ -72,8 +78,11 @@ export class NgxTransformPipe implements PipeTransform {
       decimal: () => this.decimalPipe.transform(value, ...params),
       json: () => this.jsonPipe.transform(value),
       percent: () => this.percentPipe.transform(value, ...params),
-      slice: () =>
-        this.slicePipe.transform(value, +params[0], +params[1] ?? undefined),
+      slice: () => {
+        const p1 = params.length !== 0 ? +params[0] : 0;
+        const p2 = params.length > 1 ? +params[1] : undefined;
+        return this.slicePipe.transform(value, p1, p2);
+      },
     };
     return transforms[pipe]
       ? transforms[pipe]()

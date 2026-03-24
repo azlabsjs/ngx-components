@@ -7,11 +7,11 @@ export {
   OptionsQueryConfigType,
   InterceptorFactory,
 } from './types';
-export { optionsQueryClient } from './helpers';
-export { OptionsCache } from './cache.service';
 
-/** Exported library providers */
+export { optionsQueryClient } from './helpers';
+
+/** exported library providers */
 export { provideCacheConfig, provideQueryClient } from './providers';
 
-/** Exported directives */
+/** exported directives */
 export const OPTIONS_DIRECTIVES = [FetchOptionsDirective] as const;

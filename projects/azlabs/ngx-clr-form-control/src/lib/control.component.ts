@@ -19,9 +19,13 @@ import { NgxCommonModule } from './common';
 import { ClarityModule } from '@clr/angular';
 import { ClarityIcons, eyeHideIcon, eyeIcon } from '@cds/core/icon';
 import { DIRECTIVES } from './directives';
+import { PIPES } from './pipes';
 
 // Register clarity eye icons
 ClarityIcons.addIcons(eyeHideIcon, eyeIcon);
+
+/** @internal */
+type Optional<T> = T | null | undefined;
 
 @Component({
   standalone: true,
@@ -32,6 +36,7 @@ ClarityIcons.addIcons(eyeHideIcon, eyeIcon);
     ...DIRECTIVES,
     ...FILE_INPUT_DIRECTIVES,
     ClarityModule,
+    ...PIPES,
   ],
   selector: 'ngx-clr-form-control',
   templateUrl: './control.component.html',
@@ -39,9 +44,10 @@ ClarityIcons.addIcons(eyeHideIcon, eyeIcon);
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
-  //#region Component inputs
+  //#region component inputs
   @Input() inline = false;
   @Input() describe = true;
+  @Input() hidden: Optional<boolean> = false;
   @Input() countries!: string[];
   private _inputConfig!: InputConfigInterface;
   @Input() set config(value: InputConfigInterface) {
@@ -57,13 +63,14 @@ export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
   /** @deprecated */
   @Input({ alias: 'class' }) cssClass = 'clr-form-control';
   @Input({ alias: 'control' }) formControl!: FormControl<any>;
-  @Input() label!: TemplateRef<any>;
-  @Input() error!: TemplateRef<any>;
-  /** HTML/Text View template input */
-  @Input() textView!: TemplateRef<any>;
-  //#endregion Component inputs
+  @Input({ alias: 'tooltip-error' }) tooltiperror!: Optional<TemplateRef<any>>;
+  @Input({ alias: 'loading-text' }) loadingText!: string;
+  @Input() label!: Optional<TemplateRef<any>>;
+  @Input() error!: Optional<TemplateRef<any>>;
+  @Input() textview!: Optional<TemplateRef<any>>;
+  //#endregion
 
-  //#region Component outputs
+  //#region component outputs
   @Output() valueChange = new EventEmitter<InputEventArgs>();
   @Output('item-removed') remove = new EventEmitter<any>();
   @Output('item-selected') selected = new EventEmitter<InputEventArgs>();
@@ -74,12 +81,12 @@ export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
   @Output('keyup') keyup = new EventEmitter<InputEventArgs>();
   @Output('keypress') keypress = new EventEmitter<InputEventArgs>();
   @Output('blur') blur = new EventEmitter<InputEventArgs>();
-  //#endregion Component outputs
+  //#endregion
 
-  //#region Class properties
+  //#region class properties
   private subscriptions: Subscription[] = [];
   readonly inputTypes = InputTypes;
-  //#endregion Class properties
+  //#endregion
 
   /** @description Creates an instance of Form Control Component */
   constructor(private cdRef: ChangeDetectorRef) {}

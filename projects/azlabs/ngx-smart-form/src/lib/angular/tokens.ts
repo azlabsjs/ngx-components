@@ -11,7 +11,7 @@ export const FORMS_LOADER = new InjectionToken<FormsLoader>(
 );
 
 /**
- * @description Cache provider injection token
+ * @description cache provider injection token
  */
 export const CACHE_PROVIDER = new InjectionToken<CacheProvider>(
   'PROVIDES AN INSTANCE OF CacheProvider::Interface',

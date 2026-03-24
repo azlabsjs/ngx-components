@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { OptionsInputConfigInterface } from '@azlabsjs/smart-form-core';
 
 /** @ionternal */
 type ElementType = { value: unknown; checked: boolean };
@@ -16,8 +17,21 @@ function usePredicate(value: unknown) {
   name: 'isChecked',
 })
 export class IsCheckedPipe implements PipeTransform {
-  /** @description returns a boolean flag which indicates if value should be marked as checked not not */
   transform(value: unknown, selection: ElementType[]): boolean {
     return selection.findIndex(usePredicate(value)) !== -1;
   }
 }
+
+@Pipe({
+  name: 'hasoptions',
+  pure: true,
+  standalone: true,
+})
+export class HasOptionsPipe implements PipeTransform {
+  transform(config: OptionsInputConfigInterface) {
+    return config.options && config.options.length > 0;
+  }
+}
+
+// exported standalone pipes
+export const PIPES = [IsCheckedPipe, HasOptionsPipe] as const;

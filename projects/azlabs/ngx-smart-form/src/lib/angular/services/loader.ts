@@ -89,11 +89,15 @@ export function createInputConfig(
               : (input['exists'] as any)['conditions'],
         }
       : undefined,
-    // Add support for read property
+
+    // read property support
     read: input['read'],
 
-    // Add support for compute property
-    compute: input['compute']
+    // compute property support
+    compute: input['compute'],
+
+    // support for disabledIf
+    disabledIf: input['disabledIf'],
   } as ControlInterface;
 }
 

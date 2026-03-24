@@ -1,12 +1,12 @@
-/** @description Default template text to use when tranlating */
+/** @description default template text to use when tranlating */
 export const defaultStrings = {
   loadingText: 'Loading...',
   uploadFileLabel: 'to upload',
   dragFileLabel: 'Drag file(s) here or',
   clickUploadButtonLabel: 'Click',
-  fileUploadError: 'Error while uploading file to server',
-  fileSizeError: 'File size must be less than or equal to {{maxFilesize}}Mo.',
-  addButtonText: 'Click on the the button to add a new input element',
+  fileUploadError: 'error while uploading file to server',
+  fileSizeError: 'file size must be less than or equal to {{maxFilesize}}Mo.',
+  addButtonText: 'click on the the button to add a new input element',
   validation: {
     minlength:
       'input value must contain at least {{requiredLength}} characters',

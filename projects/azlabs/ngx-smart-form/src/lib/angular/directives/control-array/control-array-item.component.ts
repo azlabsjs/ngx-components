@@ -10,30 +10,34 @@ import {
 import { AbstractControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { BUTTON_DIRECTIVES } from '../buttons';
+import { PIPES } from '../../pipes';
+import { Optional } from './types';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ...BUTTON_DIRECTIVES],
+  imports: [CommonModule, ...BUTTON_DIRECTIVES, ...PIPES],
   selector: 'ngx-smart-form-control-array-item',
   templateUrl: './control-array-item.component.html',
   styleUrls: ['./control-array-item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxSmartFormControlArrayItemComponent {
-  //#region Component inputs
-  @Input() control!: AbstractControl;
-  @Input() inputConfig!: InputConfigInterface;
-  @Input() template!: TemplateRef<any>;
-  @Input() autoupload: boolean = false;
+export class NgxArrayItemComponent {
+  //#region input properties
   @Input() index!: number;
-  //#endregion Component inputs
+  @Input() control!: AbstractControl;
+  @Input() config!: InputConfigInterface;
+  @Input() template: Optional<TemplateRef<any>>;
+  @Input() autoupload = false;
+  @Input() detached: AbstractControl[] = [];
+  //#endregion
 
-  // #region Component outputs
-  @Output() componentDestroyer = new EventEmitter();
-  // #endregion Component outputs
+  // #region output properties
+  @Output() destroy = new EventEmitter();
+  // #endregion
 
-  onButtonClick(event: Event) {
-    this.componentDestroyer.emit();
+  clicked(event: Event) {
+    this.destroy.emit();
+
     event.preventDefault();
   }
 }

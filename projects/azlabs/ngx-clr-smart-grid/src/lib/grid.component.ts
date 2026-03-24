@@ -20,7 +20,7 @@ import {
 } from './core';
 import { CommonModule } from '@angular/common';
 import { NgxClrGridSelectDirective } from './directives';
-import { GridRowClassPipe } from './pipes';
+import { PIPES } from './pipes';
 import {
   AsyncPipe,
   CurrencyPipe,
@@ -31,7 +31,7 @@ import {
   SlicePipe,
   UpperCasePipe,
 } from '@angular/common';
-import { COMMON_PIPES, CommonTextPipe } from '@azlabsjs/ngx-common';
+import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 
 /** @internal */
 const GRID_CONFIG: Required<GridConfigType> = {
@@ -60,6 +60,9 @@ type StateType = {
   total: number;
 };
 
+/** @internal */
+type Optional<T> = T | null | undefined;
+
 @Component({
   standalone: true,
   imports: [
@@ -67,7 +70,7 @@ type StateType = {
     ClarityModule,
     ...COMMON_PIPES,
     NgxClrGridSelectDirective,
-    GridRowClassPipe,
+    ...PIPES,
   ],
   providers: [
     UpperCasePipe,
@@ -78,7 +81,7 @@ type StateType = {
     PercentPipe,
     SlicePipe,
     AsyncPipe,
-    ...COMMON_PIPES
+    ...COMMON_PIPES,
   ],
   selector: 'ngx-clr-smart-grid',
   templateUrl: './grid.component.html',
@@ -86,7 +89,7 @@ type StateType = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxClrSmartGridComponent {
-  //#region Component properties
+  //#region local properties
   public readonly defaultSort = ClrDatagridSortOrder.DESC;
   _state: StateType = {
     data: [] as { [index: string]: any }[],
@@ -96,9 +99,9 @@ export class NgxClrSmartGridComponent {
   get state() {
     return this._state;
   }
-  //#endregion Component properties
+  //#endregion
 
-  // #region Component inputs
+  // #region input properties
   @Input() set pageResult(result: PaginateResult<any> | undefined | null) {
     if (result) {
       this.setState((state) => ({
@@ -164,36 +167,38 @@ export class NgxClrSmartGridComponent {
   get columns() {
     return this._columns;
   }
-  //#endregion Component inputs
+  //#endregion
 
-  // Projected Templates
   @ContentChild('dgActionOverflow', { static: false })
-  dgActionOverflowRef!: TemplateRef<any>;
+  dgoverflow!: TemplateRef<any>;
   @ContentChild('dgRowDetail', { static: false })
-  dgRowDetailRef!: TemplateRef<any>;
-  @ContentChild('dgPlaceHolder', { static: false })
-  dgPlaceHolderRef!: TemplateRef<any>;
+  dgrowdetail!: TemplateRef<any>;
+  @ContentChild('dgPlaceholder', { static: false })
+  dgplaceholder!: TemplateRef<any>;
   @ContentChild('dgDetailBody', { static: false })
-  dgDetailBodyRef!: TemplateRef<any>;
+  dgdetail!: TemplateRef<any>;
   @ContentChild('dgActionBar', { static: false })
-  dgActionBarRef!: TemplateRef<any>;
+  dgactionbar!: TemplateRef<any>;
   @ContentChild('dgRow', { static: false })
-  dgRowRef!: TemplateRef<any>;
-  //! Projected Templates
+  dgrow!: Optional<TemplateRef<any>>;
 
-  // #region Component outputs
+  // title & cell customization templates
+  @ContentChild('title', { static: false }) title: Optional<TemplateRef<any>>;
+  @ContentChild('cell', { static: false }) cell: Optional<TemplateRef<any>>;
+
+  // #region output properties
   @Output() selectedChange = new EventEmitter<unknown[] | unknown>();
   @Output() dgRefresh = new EventEmitter<
     ProjectPaginateQueryParamType<unknown>
   >();
   @Output() detailChange = new EventEmitter<unknown>();
   @Output() dgItemClick = new EventEmitter<unknown>();
-  // #endregion Component outputs
+  // #endregion
 
   /** @description smart grid class constructor */
   constructor(private cdRef: ChangeDetectorRef) {}
 
-  // Listen to internal grid component select changes and notify parent component
+  // listen to internal grid component select changes and notify parent component
   onSelectedStateChanges(state: unknown[] | unknown) {
     this.selectedChange.emit(state);
   }
@@ -211,6 +216,7 @@ export class NgxClrSmartGridComponent {
   onClrDgRefresh(e: ProjectPaginateQueryParamType) {
     this.onDgRefresh(e);
   }
+
   /** @deprecated */
   onClrItemClick(e: Event, item: unknown) {
     this.onItemClick(e, item);

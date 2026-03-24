@@ -1,7 +1,11 @@
 import { inject, Injector, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import {
+  HttpClient,
+  provideHttpClient as ngProvideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DIRECTIVES } from '@azlabsjs/ngx-clr-smart-grid';
@@ -35,6 +39,7 @@ import {
 import { RouterModule } from '@angular/router';
 import { HTTPValuePipe, TRANSLATE_PIPES } from './pipes';
 import {
+  OPTIONS_DIRECTIVES,
   provideCacheConfig,
   provideQueryClient,
 } from '@azlabsjs/ngx-options-input';
@@ -47,6 +52,7 @@ import {
 } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { useTranslationsFactory } from './translations';
+import { MODAL_DIRECTIVES } from '@azlabs/ngx-modal';
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
@@ -55,13 +61,13 @@ export function createTranslateLoader() {
 }
 
 @NgModule({
-  declarations: [AppComponent, FormControlComponent],
+  bootstrap: [AppComponent],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule,
     RouterModule.forRoot([], { useHash: true }),
     TranslateModule.forRoot({
       defaultLanguage: 'fr',
@@ -78,6 +84,9 @@ export function createTranslateLoader() {
     ...TRANSLATE_PIPES,
     ...FORM_CONTROL_DIRECTIVES,
     ...FORM_DIRECTIVES,
+    ...OPTIONS_DIRECTIVES,
+    ...MODAL_DIRECTIVES,
+    FormControlComponent,
     NgxDropzoneModule.forRoot(),
   ],
   providers: [
@@ -89,7 +98,7 @@ export function createTranslateLoader() {
         text: CommonTextPipe,
         httpValue: HTTPValuePipe,
         translate: TranslatePipe,
-        asyncText: AsyncTextPipe
+        asyncText: AsyncTextPipe,
       },
     }),
     provideFormsLoader(),
@@ -154,19 +163,19 @@ export function createTranslateLoader() {
         email:
           'La valeur de ce champ doit être un adresse mail valid [example@email.com]',
         pattern: 'La valeur du champ est invalide',
-        min: 'La valeur minimal du champ est de {{value}}',
-        max: 'La valeur maximal du champ est de {{value}}',
+        min: 'La valeur minimal du champ est de {{min}}',
+        max: 'La valeur maximal du champ est de {{max}}',
         phone: 'Veuillez saisir un numéro de téléphone valid',
-        minDate: 'Veuillez saisir une date ultérieure à la date du {{date}}',
-        maxDate: 'Veuillez saisir une date antérieure à la date du {{date}}',
+        minDate: 'Veuillez saisir une date ultérieure à la date du {{min}}',
+        maxDate: 'Veuillez saisir une date antérieure à la date du {{max}}',
         exists:
           "La valeur du champ n'existe pas dans la dans la base de données",
         equals:
           'La valeur du champ {{value}} ne correspond pas à la valeur saisie',
       },
     }),
-    TranslatePipe
+    TranslatePipe,
+    ngProvideHttpClient(withInterceptorsFromDi()),
   ],
-  bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -32,7 +32,7 @@
         "readonly": false,
         "unique": false,
         "isRepeatable": false,
-        "dynamicControlContainerClass": "clr-col-6",
+        "dynamicControlContainerClass": "clr-col-4",
         "id": 1939,
         "label": "MOT DE PASSE",
         "placeholder": "Saisir...",
@@ -53,7 +53,7 @@
         "readonly": false,
         "unique": false,
         "isRepeatable": false,
-        "dynamicControlContainerClass": "clr-col-6",
+        "dynamicControlContainerClass": "clr-col-4",
         "id": 1940,
         "label": "MOT DE PASSE (CONFIRMATION)",
         "placeholder": "Saisir...",
@@ -65,6 +65,29 @@
         "options": [],
         "children": [],
         "equals": "password"
+      },
+      {
+        "formId": 220,
+        "controlName": "birthdate",
+        "required": true,
+        "disabled": false,
+        "readonly": false,
+        "unique": false,
+        "isRepeatable": false,
+        "dynamicControlContainerClass": "clr-col-4",
+        "id": 1940,
+        "label": "DATE DE NAISSANCE",
+        "placeholder": "Saisir...",
+        "type": "date",
+        "classes": "clr-input",
+        "description": "Veuillez saisir la date de naissance",
+        "minLength": 8,
+        "multiple": 0,
+        "options": [],
+        "children": [],
+        "min": "1900-01-01",
+        "minDate": "1900-01-01",
+        "maxDate": "2026-03-17"
       },
       {
         "formId": 220,
@@ -104,7 +127,7 @@
         "placeholder": "...",
         "type": "select",
         "classes": "clr-input",
-        "selectableModel": "http://127.0.0.1:3000/categories",
+        "selectableModel": "http://localhost:3000/categories",
         "multiple": 0,
         "children": [],
         "keyfield": "",
@@ -125,6 +148,7 @@
         "id": 1238,
         "label": "NOM(s)",
         "placeholder": "...",
+        "disabledIf": "country:__empty__",
         "type": "text",
         "classes": "clr-input",
         "maxLength": 100,
@@ -168,15 +192,80 @@
         "placeholder": "...",
         "type": "select",
         "classes": "clr-input",
-        "selectableModel": "http://127.0.0.1:3000/professions",
+        "selectableModel": "http://localhost:3000/professions",
         "maxLength": 145,
         "exists": {
-          "url": "http://127.0.0.1:3000/professions",
+          "url": "http://localhost:3000/professions",
           "conditions": []
         },
         "multiple": 0,
         "options": [],
         "children": []
+      },
+      {
+        "formId": 220,
+        "controlName": "country",
+        "controlIndex": 8,
+        "required": true,
+        "disabled": false,
+        "readonly": false,
+        "unique": false,
+        "isRepeatable": false,
+        "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-3",
+        "id": 1240,
+        "label": "PAYS",
+        "placeholder": "...",
+        "type": "select",
+        "classes": "clr-input",
+        "selectableModel": "http://localhost:3000/countries",
+        "exists": {
+          "url": "http://localhost:3000/countries",
+          "conditions": []
+        },
+        "keyfield": "id",
+        "valuefield": "name",
+        "groupfield": "id"
+      },
+      {
+        "formId": 220,
+        "controlName": "city",
+        "controlIndex": 8,
+        "required": true,
+        "disabled": false,
+        "readonly": false,
+        "unique": false,
+        "isRepeatable": false,
+        "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-3",
+        "id": 1240,
+        "label": "VILLE",
+        "placeholder": "...",
+        "type": "select",
+        "classes": "clr-input",
+        "disabledIf": "country:__empty__",
+        "selectableModel": {
+          "source": {
+            "resource": "http://localhost:3000/cities?disabled=false",
+            "raw": "http://localhost:3000/cities?disabled=false",
+            "params": {
+              "keyBy": "id",
+              "groupBy": "id",
+              "valueBy": "label"
+            }
+          },
+          "refetch": [
+            {
+              "trigger": "country",
+              "query": "country_id"
+            }
+          ]
+        },
+        "exists": {
+          "url": "http://localhost:3000/cities",
+          "conditions": []
+        },
+        "keyfield": "id",
+        "valuefield": "name",
+        "groupfield": "id"
       },
       {
         "formId": 220,
@@ -187,7 +276,9 @@
         "readonly": false,
         "unique": false,
         "isRepeatable": true,
+        "requiredIf": "category_id:1",
         "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-3",
+        "disabledIf": "country:__empty__",
         "id": 1249,
         "label": "No. Téléphone",
         "placeholder": "...",
@@ -213,7 +304,7 @@
         "placeholder": "...",
         "requiredIf": "category_id:1",
         "type": "control_group",
-        "classes": "controls-header table",
+        "classes": "controls-header",
         "multiple": 0,
         "options": [],
         "children": [
@@ -292,7 +383,7 @@
             "placeholder": "...",
             "type": "select",
             "classes": "clr-input",
-            "selectableModel": "http://127.0.0.1:3000/categories",
+            "selectableModel": "http://localhost:3000/categories",
             "multiple": 0,
             "children": [],
             "keyfield": "",
@@ -335,6 +426,7 @@
             "placeholder": "...",
             "type": "number",
             "classes": "clr-input",
+            "requiredIf": "stakeholders.*.category_id:1",
             "max": 100,
             "multiple": 0,
             "options": [],
@@ -405,6 +497,7 @@
         "placeholder": "...",
         "type": "control_group",
         "classes": "controls-header",
+        "requiredIf": "profession:3",
         "multiple": 0,
         "options": [],
         "children": [
@@ -421,11 +514,11 @@
             "id": 1279,
             "label": "NOM(s)",
             "placeholder": "...",
+            "requiredIf": "country:__empty__",
             "type": "text",
             "classes": "clr-input",
             "maxLength": 100,
             "multiple": 0,
-            "requiredIf": "category_id:1",
             "options": [],
             "children": []
           },

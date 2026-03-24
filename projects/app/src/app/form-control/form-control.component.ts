@@ -1,10 +1,13 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
+import { NgxFormControlComponent } from '@azlabsjs/ngx-clr-form-control';
 import { createFormControl } from '@azlabsjs/ngx-smart-form';
 import {
   DateInput,
   FileInput,
   NumberInput,
+  OptionsInputConfigInterface,
   TextAreaInput,
   TextInput,
   TimeInput,
@@ -12,15 +15,56 @@ import {
 import { Subscription, tap } from 'rxjs';
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, NgxFormControlComponent],
   selector: 'app-form-control',
+  styles: [
+    `
+      .tooltip-content.error {
+        background-color: #ff494f !important;
+      }
+      .tooltip-content.error::before {
+        border-left: 0.3rem solid #ff494f !important;
+        border-left-color: #ff494f !important;
+        border-top: 0.25rem solid #ff494f !important;
+        border-top-color: #ff494f !important;
+        border-right: 0.3rem solid transparent;
+        border-bottom: 0.25rem solid transparent;
+      }
+    `,
+  ],
   templateUrl: './form-control.component.html',
 })
 export class FormControlComponent implements OnInit, OnDestroy {
   //
   autoUploadFileControl = new FormControl();
+
+  radioInput = {
+    label: 'modules.kyc.policyholders.person.columns.sex',
+    name: 'pat_type_id',
+    type: 'radio',
+    classes: 'clr-input',
+    placeholder: '...',
+    value: null,
+    description: '', // TODO: Add input description
+    index: undefined,
+    isRepeatable: false,
+    containerClass: 'input-col-sm-12 input-col-md-6',
+    options: [
+      { name: 'FEMININ', value: 'F' },
+      { name: 'MASCULIN', value: 'M' },
+      { name: 'Autres', value: 'O' },
+    ],
+    constraints: {
+      required: true,
+      disabled: false,
+      min: 1,
+    },
+  } as OptionsInputConfigInterface;
+
   autoUploadFile: FileInput = {
-    uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
-    pattern: 'image/*',
+    // uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
+    pattern: 'image/*,application/pdf',
     multiple: false,
     maxFileSize: 12,
     autoupload: true,

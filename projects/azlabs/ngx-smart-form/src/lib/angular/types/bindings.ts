@@ -1,17 +1,17 @@
-import {
-  AbstractControl,
-  AsyncValidatorFn,
-  FormGroup,
-  ValidatorFn,
-} from '@angular/forms';
-import { InputRequireIfConfig } from '@azlabsjs/smart-form-core';
+import { AbstractControl, FormGroup } from '@angular/forms';
+
+// @internal
+export type DetachedInputType = [
+  (formgroup: FormGroup<any>, key: string) => void,
+  AbstractControl
+];
 
 /** @internal */
-export interface BindingInterface {
-  key: string;
-  abstractControl: AbstractControl;
-  setValueFactory?: () => (...args: [FormGroup<any>, string]) => void;
-  binding: InputRequireIfConfig | undefined;
-  validators: ValidatorFn | ValidatorFn[] | undefined | null;
-  asyncValidators: AsyncValidatorFn | AsyncValidatorFn[] | undefined | null;
+export interface Condition {
+  match: (name: string) => boolean;
+  dependencyChanged: (
+    formgroup: FormGroup,
+    dependency: string,
+    value: unknown
+  ) => [[string, AbstractControl][], [string, AbstractControl][]];
 }

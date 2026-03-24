@@ -1,7 +1,7 @@
 import { Injector } from '@angular/core';
 import { HTTPRequest, HTTPResponse, Interceptor } from '@azlabsjs/requests';
 import { InputOptions, OptionsConfig } from '@azlabsjs/smart-form-core';
-import { Observable } from 'rxjs';
+import { Observable, Observer } from 'rxjs';
 
 /** @description Type declaration of option query client */
 export type InputOptionsClient = {
@@ -40,3 +40,37 @@ export type OptionsQueryConfigType = {
   >;
   queries?: QueryConfigType;
 };
+
+// @internal
+export type Subscription = {
+  unsubscribe: () => void;
+};
+
+// @internal
+type NextFunction<T> = (value: T) => void;
+
+// @internal
+export type Subscribable<T> = {
+  subscribe(observer?: Partial<Observer<T>> | NextFunction<T>): Subscription;
+};
+
+// @internal
+export type ObservableOptionsConfig<
+  T = {
+    [k: string]: unknown;
+  }
+> = Omit<OptionsConfig, 'refetch'> & {
+  refetch: Subscribable<T>;
+};
+
+/** @interal */
+export type KeyType = Record<string, unknown>;
+
+/** @internal */
+export type QueryType = { page?: number; per_page?: number } & Record<
+  string,
+  unknown
+>;
+
+/** @internal */
+export type OptionsConfigType = OptionsConfig | ObservableOptionsConfig;

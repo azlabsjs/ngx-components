@@ -4,10 +4,7 @@ import {
 import { from, mergeMap, of, throwError } from 'rxjs';
 import { RequestOptionsType } from './types';
 
-/**
- * @internal
- * Basic URL validation logic
- */
+/** @internal basic URL validation logic */
 export function isValidURL(url: string) {
   try {
     const _url = new URL(url);
@@ -20,7 +17,7 @@ export function isValidURL(url: string) {
 /**
  * @internal
  *
- * Makes an http request using rxjs fetch wrapper
+ * makes an http request using rxjs fetch wrapper
  *
  * **Note**
  * If no Content-Type header is provided to the request client

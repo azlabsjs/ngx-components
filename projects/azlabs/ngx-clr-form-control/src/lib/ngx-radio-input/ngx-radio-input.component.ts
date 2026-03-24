@@ -9,16 +9,13 @@ import {
   TemplateRef,
 } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
-import {
-  InputOptions,
-  OptionsInputConfigInterface,
-} from '@azlabsjs/smart-form-core';
+import { InputOptions, OptionsInput } from '@azlabsjs/smart-form-core';
 import { NgxCommonModule } from '../common';
 import { OPTIONS_DIRECTIVES } from '@azlabsjs/ngx-options-input';
 
 /** @interal */
 type StateType = {
-  config: OptionsInputConfigInterface | null;
+  config: OptionsInput | null;
   loaded: boolean;
 };
 
@@ -30,28 +27,32 @@ type StateType = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxRadioInputComponent {
-  // #region Component input properties
-  // tslint:disable-next-line: variable-name
+  // #region component input properties
   @Input() control!: AbstractControl;
-  // tslint:disable-next-line: variable-name
-  @Input({ alias: 'inputConfig' }) set setInputConfig(
-    config: OptionsInputConfigInterface
-  ) {
+  @Input() set config(config: OptionsInput) {
+    if (!config) {
+      return;
+    }
+
+    let { options } = config;
+    this.autoSelect(config);
+
+    options = options ?? [];
     this.setState((state) => ({
       ...state,
       config,
-      loaded: (config?.options ?? []).length !== 0,
+      loaded: options.length !== 0,
     }));
   }
   @Input() describe = true;
-  // #endregion Component input properties
+  // #endregion
   @ContentChild('input') inputRef!: TemplateRef<any>;
 
-  //#region Component outputs
-  @Output() inputConfigChange = new EventEmitter<OptionsInputConfigInterface>();
-  //#endregion Component outputs
+  //#region component outputs
+  @Output() configChange = new EventEmitter<OptionsInput>();
+  //#endregion
 
-  // #region Component states
+  // #region component properties
   private _state: StateType = {
     config: null,
     loaded: false,
@@ -60,27 +61,37 @@ export class NgxRadioInputComponent {
   get state() {
     return this._state;
   }
-  // #endregion Component states
+  // #endregion
 
   /** @description radion input component class constructor */
   constructor(private cdRef: ChangeDetectorRef) {}
 
   onOptionsChange(options: InputOptions) {
-    const { config } = this._state;
-    let _config = config ?? ({} as OptionsInputConfigInterface);
-    _config = { ..._config, options };
+    let { config } = this._state;
+    if (!config) {
+      return;
+    }
+
+    config = { ...config, options };
+    this.autoSelect(config);
+
     this.setState((state) => ({
       ...state,
-      config: _config,
+      config: config,
       loaded: true,
     }));
-    this.inputConfigChange.emit(_config);
+    this.configChange.emit(config);
   }
 
   setState(state: (state: StateType) => StateType) {
     this._state = state(this._state);
     this.cdRef?.markForCheck();
-    // TODO: Uncomment the code below to use latest API instead
-    // this.state.update(state);
+  }
+
+  private autoSelect(config: OptionsInput) {
+    const { autoselect, options: items } = config;
+    if (autoselect && items.length === 1) {
+      this.control.setValue(items[0].value);
+    }
   }
 }

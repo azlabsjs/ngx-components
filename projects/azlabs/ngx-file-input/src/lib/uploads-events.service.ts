@@ -10,13 +10,13 @@ export type UploadEvent = {
 };
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NgxUploadsEventsService {
-  /** @description Cache of upload event entries to tracks uploads */
+  /** @description cache of upload event entries to tracks uploads */
   private _events$ = new BehaviorSubject<UploadEvent[]>([]);
 
-  /** @description Upload state event observables */
+  /** @description upload state event observables */
   public readonly events$ = this._events$.asObservable();
 
   /** @description notify an upload start event */

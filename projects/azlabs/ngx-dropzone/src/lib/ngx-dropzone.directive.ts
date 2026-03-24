@@ -1,18 +1,36 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
-  Directive, DoCheck, ElementRef, EventEmitter, Inject, Input, KeyValueDiffer,
-  KeyValueDiffers, NgZone, OnChanges, OnDestroy, OnInit, Optional, Output, PLATFORM_ID, Renderer2, SimpleChanges
+  Directive,
+  DoCheck,
+  ElementRef,
+  EventEmitter,
+  Inject,
+  Input,
+  KeyValueDiffer,
+  KeyValueDiffers,
+  NgZone,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Optional,
+  Output,
+  PLATFORM_ID,
+  Renderer2,
+  SimpleChanges,
 } from '@angular/core';
 
 import { autoDiscover, createDropzone, createDzConfig } from './helpers';
 import {
-  DropzoneConfig, DropzoneEvent,
-  DropzoneEvents, DROPZONE_CONFIG
+  DropzoneConfig,
+  DropzoneEvent,
+  DropzoneEvents,
+  DROPZONE_CONFIG,
 } from './types';
 
 @Directive({
   selector: '[dropzone]',
   exportAs: 'drewlabsDropzone',
+  standalone: true,
 })
 export class NgxDropzoneDirective
   implements OnInit, OnDestroy, DoCheck, OnChanges

@@ -1,13 +1,21 @@
 import {
   ArrayLengthPipe,
-  ArrayPipe,
   IsArrayPipe,
+  ArrayPipe,
   JoinPipe,
   LengthPipe,
+  ConcatPipe,
+  ContainsPipe,
+  IsarrayPipe,
+  InArrayPipe,
+  MergePipe,
+  ArrayFindPipe,
+  ArrayFirstPipe,
+  AsArrayPipe,
 } from './common/arrays.pipe';
 import { IsAsyncPipe, AsObservablePipe } from './common/async.pipe';
 import { ParseIntPipe } from './common/parse-int.pipe';
-import { ParseStrPipe, StrLengthPipe } from './common/str.pipe';
+import { ParseStrPipe, StrLengthPipe, FormatPipe, StrPipe } from './common/str.pipe';
 import { PipeResultPipe } from './common/pipe-result.pipe';
 import { PropertyValuePipe } from './common/property.pipe';
 import { NgxTransformPipe } from './transform';
@@ -20,7 +28,7 @@ import {
   NotEmptyPipe,
   EmptyPipe,
 } from './common/utils.pipe';
-import { AsyncTextPipe, CommonStringsPipe, CommonTextPipe } from './strings';
+import { CommonStringsPipe, AsyncTextPipe, CommonTextPipe } from './strings';
 
 export {
   AsAnyPipe,
@@ -34,7 +42,7 @@ export {
 export { IsAsyncPipe, AsObservablePipe } from './common/async.pipe';
 export { PipeResultPipe } from './common/pipe-result.pipe';
 export { ParseIntPipe } from './common/parse-int.pipe';
-export { ParseStrPipe, StrLengthPipe } from './common/str.pipe';
+export { ParseStrPipe, StrLengthPipe, FormatPipe, StrPipe } from './common/str.pipe';
 export { PropertyValuePipe } from './common/property.pipe';
 export {
   ArrayLengthPipe,
@@ -42,28 +50,37 @@ export {
   ArrayPipe,
   JoinPipe,
   LengthPipe,
+  ConcatPipe,
+  ContainsPipe,
+  IsarrayPipe,
+  InArrayPipe,
+  MergePipe,
+  ArrayFindPipe,
+  ArrayFirstPipe,
+  AsArrayPipe
 } from './common/arrays.pipe';
 
-/** Exported types & declarations from transform namespace */
+/** types & declarations from transform namespace */
 export * from './transform';
 
-/** Exported types & declarations from strings namespace */
+/** types & declarations from strings namespace */
 export * from './strings';
 
-/** @description Exported standalone pipes */
+/** @description standalone pipes */
 export const COMMON_PIPES = [
+  ArrayLengthPipe,
+  CommonStringsPipe,
+  IsArrayPipe,
   IsAsyncPipe,
   PipeResultPipe,
   ParseIntPipe,
   ParseStrPipe,
   PropertyValuePipe,
-  ArrayLengthPipe,
   LengthPipe,
-  IsArrayPipe,
   ArrayPipe,
   StrLengthPipe,
+  FormatPipe,
   NgxTransformPipe,
-  CommonStringsPipe,
   CommonTextPipe,
   AsyncTextPipe,
   JoinPipe,
@@ -75,4 +92,13 @@ export const COMMON_PIPES = [
   KeysPipe,
   EmptyPipe,
   NotEmptyPipe,
+  InArrayPipe,
+  MergePipe,
+  ArrayFindPipe,
+  ArrayFirstPipe,
+  ConcatPipe,
+  ContainsPipe,
+  IsarrayPipe,
+  StrPipe,
+  AsArrayPipe
 ] as const;

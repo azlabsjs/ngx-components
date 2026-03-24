@@ -24,7 +24,7 @@ type _RequestFunction = <T>(
 /**
  * @deprecated
  * 
- * This function is deprecated du to the fact that it does not serve
+ * this function is deprecated du to the fact that it does not serve
  * the general HTTP request purpose that it should serve. use the replacement `createRequestClient` instead
  * 
  * Creates an observable based Http request client
@@ -52,7 +52,7 @@ export function createSubmitHttpHandler(
       responseType?: HTTPResponseType;
     }
   ) {
-    // We construct the request submit handler to use the request path if
+    // we construct the request submit handler to use the request path if
     // it is a valid HTTP request path, else compose it with configured request host
     const url = isValidHttpUrl(path)
       ? path
@@ -60,7 +60,7 @@ export function createSubmitHttpHandler(
       ? `${host}/${path.startsWith('/') ? path.slice(1) : path}`
       : path;
 
-    // Provides at least HTTP request options if none provided
+    // provides at least HTTP request options if none provided
     // by the library user
     options = options || {
       headers: {
@@ -95,7 +95,7 @@ export function createSubmitHttpHandler(
 
 
 /**
- * Creates an observable based Http request client
+ * creates an observable based Http request client
  * for submitting form data
  *
  * ```js

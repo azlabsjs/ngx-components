@@ -9,18 +9,19 @@ export {
 } from './builders';
 
 export {
-  bindingsFactory,
-  setHiddenPropertyFactory,
-  setInputsProperties,
+  useCondition,
   setFormValue,
-  setPropertyFactory,
+  createSetValue as setPropertyFactory,
   getPropertyValue,
   createComputableDepencies,
   useSupportedAggregations,
-  pickAbstractControl,
-  pickInputConfig,
-  findAbstractControlParent,
-  collectErrors
+  pickcontrol,
+  pickconfig,
+  findparent,
+  collectErrors,
+  findcontrol,
+  withRefetchObservable,
+  flatteninputs,
 } from './core';
 
 export { useBearerTokenInterceptor } from './interceptors';

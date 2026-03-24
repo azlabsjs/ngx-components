@@ -18,6 +18,9 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { NgxSmartFormArrayItemComponent } from './array-item.component';
 import { BUTTON_DIRECTIVES } from '../buttons';
 
+// @internal
+type ComponentRefType = RefType<ComponentRef<NgxSmartFormArrayItemComponent>>;
+
 @Component({
   standalone: true,
   imports: [CommonModule, ...BUTTON_DIRECTIVES, ...PIPES],
@@ -30,39 +33,38 @@ export class NgxFormArrayOutletComponent
     OnDestroy,
     ViewRefFactory<ComponentRef<NgxSmartFormArrayItemComponent>>
 {
-  //#region Component inputs
+  //#region input properties
   @Input() inputs: InputConfigInterface[] = [];
   @Input({ alias: 'auto-upload' }) autoupload: boolean = true;
-  @Input({ alias: 'no-grid-layout' }) noGridLayout = true;
+  @Input({ alias: 'no-grid-layout' }) nogridlayout = true;
   @Input() template!: TemplateRef<any>;
-  //#endregion Component inputs
+  @Input({ required: true }) detached!: AbstractControl[];
+  //#endregion
 
-  //#region Component output
-  @Output() removed = new EventEmitter<
-    RefType<ComponentRef<NgxSmartFormArrayItemComponent>>
-  >();
-  //#endregion Component output
+  //#region output properties
+  @Output() removed = new EventEmitter<ComponentRefType>();
+  //#endregion
 
-  //#region Component properties
+  //#region local properties
   @ViewChild('container', { read: ViewContainerRef, static: false })
   containerRef!: ViewContainerRef;
   private destroy$ = new Subject<void>();
-  //#endregion Component properties
+  //#endregion
 
   createView(index: number, input: AbstractControl) {
     const element = this.containerRef?.createComponent(
-      NgxSmartFormArrayItemComponent
+      NgxSmartFormArrayItemComponent,
     );
-    // Initialize child component input properties
+
     element.instance.controls = [...this.inputs];
-    element.instance.formGroup = input as FormGroup;
+    element.instance.formgroup = input as FormGroup;
     element.instance.template = this.template;
     element.instance.autoupload = this.autoupload;
     element.instance.index = index;
-    element.instance.noGridLayout = this.noGridLayout;
-    // Ends child component properties initialization
+    element.instance.nogridlayout = this.nogridlayout;
+    element.instance.detached = this.detached;
 
-    const ref: RefType<ComponentRef<NgxSmartFormArrayItemComponent>> = {
+    const ref: ComponentRefType = {
       index: element.instance.index,
       element,
       destroy: () => element.destroy(),

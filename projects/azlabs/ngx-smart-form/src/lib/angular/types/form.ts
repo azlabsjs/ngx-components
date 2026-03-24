@@ -15,18 +15,16 @@ import {
 export type Builder = FormBuilder;
 
 export interface AngularReactiveFormBuilderBridge {
-  /**
-   * @var Builder
-   */
+  /** @var Builder */
   readonly builder: Builder;
 
-  /** @description Create an angular reactive form element from the configuration from dynamic form or list of dynamic inputs */
+  /** creates a reactive form element from the configuration from dynamic form or list of dynamic inputs */
   group(source: FormConfigInterface | InputConfigInterface[]): FormGroup;
 
-  /** @description Creates a form control instance from form configuration interface */
+  /** creates a form control instance from form configuration interface */
   control(state: InputConfigInterface): AbstractControl;
 
-  /** @description It creates a form array instance */
+  /** creates a form array instance */
   array(state: InputConfigInterface): FormArray;
 }
 
@@ -67,39 +65,24 @@ export interface FormsLoader {
 }
 
 /**
- * @description Forms cache provider. For form object query efficiency, object are loaded
+ * Forms cache provider. 
+ * For form object query efficiency, object are loaded
  * and managed by the cache provider
  */
 export interface CacheProvider {
-  /**
-   *
-   * @param id
-   */
+
   get(id: string | number): Observable<FormInterface>;
 
-  /**
-   *
-   * @param values
-   */
   getList(values: (string | number)[]): Observable<FormInterface[]>;
 
-  /**
-   * Provides predefined dynamic forms loader implementation
-   *
-   * @param endpoint
-   * @param options
-   */
+  /** provides predefined dynamic forms loader implementation */
   cache(
     endpoint: string,
     options?: { [index: string]: any }
   ): Observable<never> | Observable<FormInterface[]>;
 }
 
-/**
- * @internal
- *
- * Internal type definition for load form request handler function
- */
+/** @internal type definition for load form request handler function */
 export type LoadFormsRequestHandler = (
   path: string,
   options?: Record<string, unknown>
