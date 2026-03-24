@@ -4,7 +4,6 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
-  HostListener,
   Inject,
   Input,
   Output,
@@ -76,7 +75,7 @@ export class NgxSelectInputComponent {
     }));
   }
   @Input({ alias: 'loading-text' }) loadingText!: string;
-  @Input() parent: string | null | undefined = 'body';
+  @Input() parent: string | null | undefined = '.ng-select-container';
   //#endregion
 
   //#region output properties
@@ -88,13 +87,6 @@ export class NgxSelectInputComponent {
   options!: FetchOptionsDirective;
 
   @ViewChild('ngselect', { static: false }) ngselect: NgSelectComponent | null | undefined;
-
-  @HostListener('window:scroll', [])
-  onScroll() {
-    if (this.ngselect && this.ngselect.isOpen) {
-      this.ngselect.close();
-    }
-  }
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
