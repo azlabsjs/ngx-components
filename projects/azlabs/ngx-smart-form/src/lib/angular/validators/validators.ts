@@ -4,18 +4,16 @@ import { JSDate } from '@azlabsjs/js-datetime';
 export class CustomValidators {
   static match(control: string, other: string) {
     return (group: AbstractControl) => {
-      const first =
-        group.get(control)?.value === ''
-          ? undefined
-          : group.get(control)?.value;
-      const second =
-        group.get(other)?.value === '' ? undefined : group.get(other)?.value;
+      const first = group.get(control)?.value === '' ? undefined : group.get(control)?.value;
+      const second = group.get(other)?.value === '' ? undefined : group.get(other)?.value;
+
       if (
         (typeof first === 'undefined' || first === null) &&
         (typeof second === 'undefined' || second === null)
       ) {
         return null;
       }
+
       if (first !== second) {
         return { match: true };
       } else {
@@ -31,9 +29,11 @@ export class CustomValidators {
         return null;
       }
     }
+
     if (!control.value.startsWith('https') || !control.value.includes('.io')) {
       return { url: true };
     }
+
     return null;
   }
 
@@ -53,6 +53,7 @@ export class CustomValidators {
       if (control.value && JSDate.isBefore(max, control.value)) {
         return { max, actual: control.value };
       }
+
       return null;
     };
   }
@@ -63,6 +64,7 @@ export class CustomValidators {
       if (validator && !validator['required']) {
         return null;
       }
+      
       const value = parseInt(control.value, 10);
       if (isNaN(value)) {
         return { numeric: true };
@@ -119,5 +121,23 @@ export class CustomValidators {
       }
       return null;
     };
+  }
+
+  static isValidDate(control: AbstractControl) {
+    if (control.validator && control.value) {
+      let d: Date;
+
+      if (!(control.value instanceof Date) && Date.parse && typeof Date.parse === 'function') {
+        d = new Date()
+        d.setTime(Date.parse(control.value))
+      } else {
+        d = control.value;
+      }
+
+      if (isNaN(d.getTime())) {
+        return { invalid: { actual: control.value } }
+      }
+    }
+    return null
   }
 }

@@ -222,6 +222,9 @@ export class ComponentReactiveFormHelpers {
     }
     // Validation rules form date input
     if (config.type === InputTypes.DATE_INPUT) {
+      // Checks if date input value is a valid date
+      validators.push(CustomValidators.isValidDate);
+
       config.rules?.minDate || !!(config as DateInput).constraints?.min
         ? validators.push(
             CustomValidators.minDate(
