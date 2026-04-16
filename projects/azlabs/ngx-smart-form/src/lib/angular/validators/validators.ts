@@ -64,7 +64,7 @@ export class CustomValidators {
       if (validator && !validator['required']) {
         return null;
       }
-      
+
       const value = parseInt(control.value, 10);
       if (isNaN(value)) {
         return { numeric: true };
@@ -129,7 +129,12 @@ export class CustomValidators {
 
       if (!(control.value instanceof Date) && Date.parse && typeof Date.parse === 'function') {
         d = new Date()
+        // Date.parse() will try to convert the string format into a valid date
         d.setTime(Date.parse(control.value))
+        // case parsing date fails, we try to treat the date as DD/MM/YYYY or DD-MM-YYYY
+        // because javascript does not natively support these date format and will try to parse formats
+        // like MM/DD/YYYY or YYYY/MM/DD
+        d = isNaN(d.getTime()) ? JSDate.create(String(control.value).replace(/\//g, '-', ), 'DD-MM-YYYY') : d
       } else {
         d = control.value;
       }
