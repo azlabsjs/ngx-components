@@ -50,9 +50,7 @@ export class NgxFormDirective
   }
 
   private _value!: { [k: string]: unknown };
-  @Input({ alias: 'value' }) set value(
-    value: Optional<{ [k: string]: unknown }>,
-  ) {
+  @Input({ alias: 'value' }) set value(value: Optional<{ [k: string]: unknown }>) {
     if (typeof value !== 'undefined' && value !== null) {
       this._value = value;
     }
@@ -72,13 +70,8 @@ export class NgxFormDirective
   @Output() ready = new EventEmitter<void>();
   @Output() submitted = new EventEmitter<{ [k: string]: unknown }>();
 
-  public constructor(
-    private model: FormModel<FormConfigInterface>,
-    private cdRef: ChangeDetectorRef | null,
-  ) {
-    const subscription = this.model.detectChanges$.subscribe(() =>
-      this.cdRef?.detectChanges(),
-    );
+  public constructor(private model: FormModel<FormConfigInterface>, private cdRef: ChangeDetectorRef | null) {
+    const subscription = this.model.detectChanges$.subscribe(() => this.cdRef?.detectChanges());
     this.subscriptions.push(subscription);
   }
 

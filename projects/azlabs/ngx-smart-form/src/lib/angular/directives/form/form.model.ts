@@ -298,11 +298,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
         }
 
         // For properties that are visible recomputed the dependant value and listen for changes
-        const computations: [
-          string,
-          ComputedInputValueConfigType,
-          AbstractControl | null,
-        ][] = [];
+        const computations: [string, ComputedInputValueConfigType, AbstractControl | null ][] = [];
         for (const [prop] of visible) {
           for (const [key, config] of Object.entries(this.computed)) {
             // we add a startsWith to the equality check because
@@ -335,6 +331,8 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
     const { controlConfigs } = config;
     const inputs = withRefetchObservable(controlConfigs, formgroup);
     this._form = { ...form, controlConfigs: inputs };
+
+    this._formGroup?.valueChanges?.subscribe((value) => { console.log('[FormModel] formgroup value changes: ', value); })
     this._detectChanges$.next();
   }
 
