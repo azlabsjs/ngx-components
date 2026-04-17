@@ -907,10 +907,7 @@ export function withRefetchObservable(inputs: InputConfigInterface[], formgroup:
     }
 
     if (
-      isoptionsinput(input) &&
-      'refetch' in input.optionsConfig &&
-      Array.isArray(input.optionsConfig['refetch'])
-    ) {
+      isoptionsinput(input) && 'refetch' in input.optionsConfig && Array.isArray(input.optionsConfig['refetch'])) {
       const { refetch } = input.optionsConfig;
       input.optionsConfig.refetch = new Observable((subscriber) => {
         const subscriptions: Subscription[] = [];
