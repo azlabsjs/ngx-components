@@ -329,10 +329,8 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
     this._formGroup = formgroup;
     const form = this._form ? { ...this._form, ...config } : config;
     const { controlConfigs } = config;
-    const inputs = withRefetchObservable(controlConfigs, formgroup);
+    const inputs = withRefetchObservable(controlConfigs, this._formGroup);
     this._form = { ...form, controlConfigs: inputs };
-
-    this._formGroup?.valueChanges?.subscribe((value) => { console.log('[FormModel] formgroup value changes: ', value); })
     this._detectChanges$.next();
   }
 
