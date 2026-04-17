@@ -19,7 +19,7 @@ import {
   ComputedInputValueConfigType,
 } from '../types';
 import { cloneAbstractControl } from './clone';
-import { finalize, map, Observable, Subject, tap } from 'rxjs';
+import { finalize, map, Observable, Subject, Subscription, tap } from 'rxjs';
 
 /** @internal */
 type Optional<T> = T | null | undefined;
@@ -926,6 +926,7 @@ export function withRefetchObservable(
     ) {
       const { refetch } = input.optionsConfig;
       input.optionsConfig.refetch = new Observable((subscriber) => {
+        const subscriptions: Subscription[] = [];
         for (const item of refetch) {
           // TODO: figure out how to subscribe to blur event
           const { trigger, query } = item;
@@ -944,7 +945,8 @@ export function withRefetchObservable(
                 const c = str2.trim() !== '' && at instanceof FormGroup ? at.get(str2) : at;
 
                 if (c && query) {
-                  c.valueChanges.subscribe((value) => subscriber.next(value ? { [query]: value } : {}));
+                  const subscription = c.valueChanges.subscribe((value) => subscriber.next(value ? { [query]: value } : {}));
+                  subscriptions.push(subscription);
                 }
               }
             }
@@ -961,18 +963,20 @@ export function withRefetchObservable(
             // }
 
             if (c && q) {
-              c.valueChanges.pipe(tap(value => console.log('value changes: ', value)), finalize(() => console.log('valueChanges completed or errored'))).subscribe((value) => subscriber.next(value ? { [q]: value } : {}));
+              const subscription = c.valueChanges.pipe(tap(value => console.log('value changes: ', value)), finalize(() => console.log('valueChanges completed or errored'))).subscribe((value) => subscriber.next(value ? { [q]: value } : {}));
               console.log('with refetch observable [subscribing]...', c.valueChanges, name);
 
-              const t = setTimeout(() => {
-                console.log('control value: ', c.getRawValue(), c.value);
-              }, 1000 * 60 * 5);
+              const t = setTimeout(() => console.log('control value: ', c.getRawValue(), formgroup.getRawValue(), formgroup), 1000 * 60 * 3);
+
+              subscriptions.push(subscription);
             }
           }
         }
 
         return () => {
-          // TODO: unsubscribe from all observable when they complete
+          for (const subscription of subscriptions) {
+            subscription?.unsubscribe();
+          }
         };
       });
     }
