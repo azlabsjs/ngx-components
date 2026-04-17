@@ -1,6 +1,6 @@
 {
   "name": "@azlabsjs/ngx-intl-tel-input",
-  "version": "0.17.109",
+  "version": "0.17.110",
   "peerDependencies": {
     "@angular/common": ">=17.0.0 | <20.0.0",
     "@angular/core": ">=17.0.0 | <20.0.0",
