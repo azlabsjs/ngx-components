@@ -933,7 +933,6 @@ export function withRefetchObservable(
           const { input: name, event: _ } = typeof trigger === 'object' && trigger !== null ? trigger : { input: trigger, event: 'change' };
 
           if (name.indexOf('*') !== -1) {
-            console.log('with refetch observable: [list]', formgroup, query, name);
             // we must listen for changes on a formarray
             const str = before(name, '*');
             const str2 = after(name, '*').substring(1);
@@ -952,9 +951,9 @@ export function withRefetchObservable(
               }
             }
           } else {
-            console.log('with refetch observable: ', formgroup, query, name);
             const c = formgroup.get(name);
             const q = query ?? name;
+            console.log('with refetch observable: ', formgroup, c, name);
 
             // TODO: uncomment the code below use findcontrol implementation if angular FormGroup.get() does not provide
             // a safe implementation to lookup control with `.` separated character
