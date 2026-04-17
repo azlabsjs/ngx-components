@@ -291,6 +291,105 @@
       },
       {
         "formId": 220,
+        "controlName": "address",
+        "controlIndex": 11,
+        "required": true,
+        "disabled": false,
+        "readonly": false,
+        "unique": false,
+        "isRepeatable": false,
+        "dynamicControlContainerClass": "clr-col-12",
+        "id": 1277,
+        "label": "ADRESSE",
+        "placeholder": "...",
+        "type": "control_group",
+        "classes": "controls-header",
+        "multiple": 0,
+        "options": [],
+        "children": [
+          {
+            "formId": 220,
+            "controlName": "phonenumber",
+            "required": true,
+            "disabled": false,
+            "readonly": false,
+            "unique": false,
+            "isRepeatable": false,
+            "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-3",
+            "id": 1249,
+            "label": "No. Téléphone",
+            "placeholder": "...",
+            "type": "phone",
+            "classes": "clr-input",
+            "maxLength": 100,
+            "multiple": 0,
+            "options": [],
+            "children": []
+          },
+          {
+            "formId": 234,
+            "controlName": "country",
+            "required": true,
+            "disabled": false,
+            "readonly": false,
+            "unique": false,
+            "isRepeatable": false,
+            "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-4",
+            "label": "PAYS",
+            "placeholder": "...",
+            "type": "select",
+            "classes": "clr-input",
+            "selectableModel": "http://localhost:3000/countries",
+            "exists": {
+              "url": "http://localhost:3000/countries",
+              "conditions": []
+            },
+            "keyfield": "id",
+            "valuefield": "name",
+            "groupfield": "id"
+          },
+          {
+            "formId": 234,
+            "controlName": "city",
+            "required": true,
+            "disabled": false,
+            "readonly": false,
+            "unique": false,
+            "isRepeatable": false,
+            "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-4",
+            "label": "VILLE",
+            "placeholder": "...",
+            "type": "select",
+            "classes": "clr-input",
+            "selectableModel": {
+              "source": {
+                "resource": "http://localhost:3000/cities?disabled=false",
+                "raw": "http://localhost:3000/cities?disabled=false",
+                "params": {
+                  "keyBy": "id",
+                  "groupBy": "id",
+                  "valueBy": "label"
+                }
+              },
+              "refetch": [
+                {
+                  "trigger": "address.country",
+                  "query": "country_id"
+                }
+              ]
+            },
+            "exists": {
+              "url": "http://localhost:3000/cities",
+              "conditions": []
+            },
+            "keyfield": "id",
+            "valuefield": "name",
+            "groupfield": "id"
+          }
+        ]
+      },
+      {
+        "formId": 220,
         "controlName": "stakeholders",
         "controlIndex": 11,
         "required": true,
@@ -431,6 +530,71 @@
             "multiple": 0,
             "options": [],
             "children": []
+          },
+          {
+            "formId": 234,
+            "controlName": "country",
+            "controlIndex": 8,
+            "required": true,
+            "disabled": false,
+            "readonly": false,
+            "unique": false,
+            "isRepeatable": false,
+            "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-4",
+            "id": 1240,
+            "label": "PAYS",
+            "placeholder": "...",
+            "type": "select",
+            "classes": "clr-input",
+            "selectableModel": "http://localhost:3000/countries",
+            "exists": {
+              "url": "http://localhost:3000/countries",
+              "conditions": []
+            },
+            "keyfield": "id",
+            "valuefield": "name",
+            "groupfield": "id"
+          },
+          {
+            "formId": 234,
+            "controlName": "city",
+            "controlIndex": 8,
+            "required": true,
+            "disabled": false,
+            "readonly": false,
+            "unique": false,
+            "isRepeatable": false,
+            "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-4",
+            "id": 1240,
+            "label": "VILLE",
+            "placeholder": "...",
+            "type": "select",
+            "classes": "clr-input",
+            "disabledIf": "country:__empty__",
+            "selectableModel": {
+              "source": {
+                "resource": "http://localhost:3000/cities?disabled=false",
+                "raw": "http://localhost:3000/cities?disabled=false",
+                "params": {
+                  "keyBy": "id",
+                  "groupBy": "id",
+                  "valueBy": "label"
+                }
+              },
+              "refetch": [
+                {
+                  "trigger": "stakeholders.*.country",
+                  "query": "country_id"
+                }
+              ]
+            },
+            "exists": {
+              "url": "http://localhost:3000/cities",
+              "conditions": []
+            },
+            "keyfield": "id",
+            "valuefield": "name",
+            "groupfield": "id"
           }
         ]
       },
@@ -455,7 +619,9 @@
         "children": [],
         "compute": {
           "fn": "avg",
-          "args": ["[stakeholders.*.gpg]"]
+          "args": [
+            "[stakeholders.*.gpg]"
+          ]
         }
       },
       {
@@ -479,7 +645,9 @@
         "children": [],
         "compute": {
           "fn": "sum",
-          "args": ["[stakeholders.*.gpg]"]
+          "args": [
+            "[stakeholders.*.gpg]"
+          ]
         }
       },
       {
@@ -602,7 +770,10 @@
         "children": [],
         "compute": {
           "fn": "multiply",
-          "args": ["[persons.age]", 2]
+          "args": [
+            "[persons.age]",
+            2
+          ]
         }
       },
       {
@@ -626,7 +797,10 @@
         "children": [],
         "compute": {
           "fn": "multiply",
-          "args": ["[stakeholders_total_gpg]", 2]
+          "args": [
+            "[stakeholders_total_gpg]",
+            2
+          ]
         }
       }
     ],

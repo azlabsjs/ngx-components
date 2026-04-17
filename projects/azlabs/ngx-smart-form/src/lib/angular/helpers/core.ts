@@ -19,7 +19,7 @@ import {
   ComputedInputValueConfigType,
 } from '../types';
 import { cloneAbstractControl } from './clone';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { finalize, Observable, Subject, Subscription } from 'rxjs';
 
 /** @internal */
 type Optional<T> = T | null | undefined;
@@ -127,7 +127,7 @@ export function setFormValue(
     if (typeof input === 'undefined' || input === null) {
       continue;
     }
-  
+
     createSetValue(builder)(formgroup, key, value, input);
   }
 }
@@ -368,10 +368,7 @@ export function useCondition(
             property: string,
             value: unknown,
           ) => {
-            const output: [
-              [string, AbstractControl][],
-              [string, AbstractControl][],
-            ] = [[], []];
+            const output: [[string, AbstractControl][], [string, AbstractControl][] ] = [[], []];
             const params = condition.values ?? [];
             // case the selector key contains * and dependecy key starts with string before `*`
             // then the control is the control at the same index having the property after *
@@ -399,15 +396,9 @@ export function useCondition(
                 }
 
                 const prefix = `${str}.${index}`;
-                let name = isformgroup(item)
-                  ? `${prefix}.${input}`
-                  : `${prefix}`;
-                let control = isformgroup(item)
-                  ? findcontrol(item, input)
-                  : item;
-                let dependency = isformgroup(item)
-                  ? findcontrol(item, after(condition.name, `${str}.*.`).trim())
-                  : item;
+                let name = isformgroup(item) ? `${prefix}.${input}` : `${prefix}`;
+                let control = isformgroup(item) ? findcontrol(item, input) : item;
+                let dependency = isformgroup(item) ? findcontrol(item, after(condition.name, `${str}.*.`).trim()) : item;
 
                 // case the dependency cannot be located continue to next iteration
                 if (!dependency) {
@@ -939,46 +930,42 @@ export function withRefetchObservable(
         for (const item of refetch) {
           // TODO: figure out how to subscribe to blur event
           const { trigger, query } = item;
-          const { input: name, event: _ } =
-            typeof trigger === 'object' && trigger !== null
-              ? trigger
-              : { input: trigger, event: 'change' };
+          const { input: name, event: _ } = typeof trigger === 'object' && trigger !== null ? trigger : { input: trigger, event: 'change' };
 
           if (name.indexOf('*') !== -1) {
             // we must listen for changes on a formarray
             const str = before(name, '*');
             const str2 = after(name, '*').substring(1);
-            const array: FormArray | null = findcontrol(
-              formgroup,
-              str.substring(0, str.length - 1),
-            );
+            const array: FormArray | null = findcontrol(formgroup, str.substring(0, str.length - 1));
 
             if (array instanceof FormArray) {
               const len = array.length;
               for (let i = 0; i < len; i++) {
                 const at = array.at(i);
-                const c =
-                  str2.trim() !== '' && at instanceof FormGroup
-                    ? findcontrol(at, str2)
-                    : at;
+                const c = str2.trim() !== '' && at instanceof FormGroup ? at.get(str2) : at;
 
                 if (c && query) {
                   const subscription = c.valueChanges.subscribe((value) => {
                     subscriber.next(value ? { [query]: value } : {});
                   });
-
                   subscriptions.push(subscription);
                 }
               }
             }
           } else {
-            const c = findcontrol(formgroup, name);
+            const c = formgroup.get(name);
             const q = query ?? name;
-            if (c && query) {
-              const subscription = c.valueChanges.subscribe((value) => {
-                subscriber.next(value ? { [q]: value } : {});
-              });
 
+            // TODO: uncomment the code below use findcontrol implementation if angular FormGroup.get() does not provide
+            // a safe implementation to lookup control with `.` separated character
+            // if (name.indexOf('.') !== -1) {
+            //   const keys = name.split('.');
+            //   const parent = findcontrol(formgroup, name.substring(0, name.indexOf(`.${keys[keys.length - 1]}`)));
+            //   c = parent?.get(keys[keys.length - 1]);
+            // }
+
+            if (c && q) {
+              const subscription = c.valueChanges.subscribe((value) => subscriber.next(value ? { [q]: value } : {}));
               subscriptions.push(subscription);
             }
           }
