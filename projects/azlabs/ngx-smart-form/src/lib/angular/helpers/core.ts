@@ -19,7 +19,7 @@ import {
   ComputedInputValueConfigType,
 } from '../types';
 import { cloneAbstractControl } from './clone';
-import { finalize, map, Observable, Subject, Subscription, tap } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 
 /** @internal */
 type Optional<T> = T | null | undefined;
@@ -98,20 +98,14 @@ function findarray<T extends AbstractControl>(g: T, keys: string[]) {
 }
 
 /** @internal helper function to find the parent of a given abstract control specialy if using . separated property names */
-export function findparent<T extends FormGroup | null>(
-  g: FormGroup,
-  key: string,
-) {
+export function findparent<T extends FormGroup | null>(g: FormGroup, key: string,) {
   const keys = key.split('.');
   keys.pop();
   return findarray(g, keys) as T;
 }
 
 /** @description search for an abstract control using dot seperated property names  */
-export function findcontrol<T extends AbstractControl | null>(
-  g: FormGroup,
-  key: string,
-) {
+export function findcontrol<T extends AbstractControl | null>(g: FormGroup, key: string) {
   return findarray(g, key.split('.')) as T;
 }
 
@@ -343,12 +337,7 @@ function findconditions(
   return conditions;
 }
 
-export function useCondition(
-  prop: ConditionProperty,
-  then: ClauseFn,
-  _else: ClauseFn,
-  query?: (name: string) => AbstractControl | null,
-) {
+export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: ClauseFn, query?: (name: string) => AbstractControl | null) {
   return (inputs: InputConfigInterface[]) => {
     const items: Condition[] = [];
     if (Array.isArray(inputs) && inputs.length !== 0) {
@@ -910,10 +899,7 @@ export function flatteninputs(formgroup: FormGroup) {
 }
 
 /** @internal */
-export function withRefetchObservable(
-  inputs: InputConfigInterface[],
-  formgroup: FormGroup,
-): InputConfigInterface[] {
+export function withRefetchObservable(inputs: InputConfigInterface[], formgroup: FormGroup): InputConfigInterface[] {
   for (const input of inputs) {
     if (isinputgroup(input)) {
       input.children = withRefetchObservable(input.children, formgroup);
@@ -963,7 +949,7 @@ export function withRefetchObservable(
             // }
 
             if (c && q) {
-              const subscription = c.valueChanges.pipe(tap(value => console.log('value changes: ', value)), finalize(() => console.log('valueChanges completed or errored'))).subscribe((value) => subscriber.next(value ? { [q]: value } : {}));
+              const subscription = c.valueChanges.subscribe((value) => subscriber.next(value ? { [q]: value } : {}));
               console.log('with refetch observable [subscribing]...', c.valueChanges, name);
 
               const t = setTimeout(() => console.log('control value: ', c.getRawValue(), formgroup.getRawValue(), formgroup), 1000 * 60 * 3);

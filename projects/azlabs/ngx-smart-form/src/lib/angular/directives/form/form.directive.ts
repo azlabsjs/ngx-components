@@ -170,7 +170,7 @@ export class NgxFormDirective
     const value = formgroup ? formgroup.getRawValue() : null;
 
     // update model configuration
-    this.model.update(config);
+    this.model.update(config, formgroup);
 
     // if current directive model formgroup value is undefined, we drop from the execution context
     if (!this.formGroup) {
