@@ -138,9 +138,9 @@ export class NgxSelectInputComponent {
   }
 
   modelChange(value: any) {
-    this.control.setValue(value, {onlySelf: false, emitEvent: true, emitModelToViewChange: true, emitViewToModelChange: true});
+    this.control.setValue(value, { onlySelf: false, emitEvent: true, emitModelToViewChange: true, emitViewToModelChange: true });
     this.control.updateValueAndValidity();
-    this.cdRef?.markForCheck();
+    this.cdRef?.detectChanges();
   }
 
   loadingChange(value: boolean) {

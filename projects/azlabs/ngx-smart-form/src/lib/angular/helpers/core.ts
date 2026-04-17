@@ -945,7 +945,7 @@ export function withRefetchObservable(
                 const c = str2.trim() !== '' && at instanceof FormGroup ? at.get(str2) : at;
 
                 if (c && query) {
-                  const subscription = c.valueChanges.pipe(tap(value => console.log('value changes: [list] ', value))).subscribe((value) => subscriber.next(value ? { [query]: value } : {}));
+                  const subscription = c.valueChanges.subscribe((value) => subscriber.next(value ? { [query]: value } : {}));
                   subscriptions.push(subscription);
                 }
               }
@@ -953,7 +953,6 @@ export function withRefetchObservable(
           } else {
             const c = formgroup.get(name);
             const q = query ?? name;
-            console.log('with refetch observable: ', formgroup, c, name);
 
             // TODO: uncomment the code below use findcontrol implementation if angular FormGroup.get() does not provide
             // a safe implementation to lookup control with `.` separated character
@@ -964,6 +963,7 @@ export function withRefetchObservable(
             // }
 
             if (c && q) {
+            console.log('with refetch observable: ', c.valueChanges, name);
               const subscription = c.valueChanges.pipe(tap(value => console.log('value changes: ', value))).subscribe((value) => subscriber.next(value ? { [q]: value } : {}));
               subscriptions.push(subscription);
             }
