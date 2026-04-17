@@ -368,7 +368,7 @@ export function useCondition(
             property: string,
             value: unknown,
           ) => {
-            const output: [[string, AbstractControl][], [string, AbstractControl][] ] = [[], []];
+            const output: [[string, AbstractControl][], [string, AbstractControl][]] = [[], []];
             const params = condition.values ?? [];
             // case the selector key contains * and dependecy key starts with string before `*`
             // then the control is the control at the same index having the property after *
@@ -963,8 +963,8 @@ export function withRefetchObservable(
             // }
 
             if (c && q) {
-            console.log('with refetch observable: ', c.valueChanges, name);
-              const subscription = c.valueChanges.pipe(tap(value => console.log('value changes: ', value))).subscribe((value) => subscriber.next(value ? { [q]: value } : {}));
+              const subscription = c.valueChanges.pipe(tap(value => console.log('value changes: ', value)), finalize(() => console.log('valueChanges completed or errored'))).subscribe((value) => subscriber.next(value ? { [q]: value } : {}));
+              console.log('with refetch observable [subscribing]...', c.valueChanges, name);
               subscriptions.push(subscription);
             }
           }
