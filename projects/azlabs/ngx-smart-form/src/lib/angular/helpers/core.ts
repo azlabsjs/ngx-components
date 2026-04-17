@@ -19,7 +19,7 @@ import {
   ComputedInputValueConfigType,
 } from '../types';
 import { cloneAbstractControl } from './clone';
-import { finalize, Observable, Subject, Subscription } from 'rxjs';
+import { finalize, map, Observable, Subject, Subscription, tap } from 'rxjs';
 
 /** @internal */
 type Optional<T> = T | null | undefined;
@@ -933,6 +933,7 @@ export function withRefetchObservable(
           const { input: name, event: _ } = typeof trigger === 'object' && trigger !== null ? trigger : { input: trigger, event: 'change' };
 
           if (name.indexOf('*') !== -1) {
+            console.log('with refetch observable: [list]', formgroup, query, name);
             // we must listen for changes on a formarray
             const str = before(name, '*');
             const str2 = after(name, '*').substring(1);
@@ -945,14 +946,13 @@ export function withRefetchObservable(
                 const c = str2.trim() !== '' && at instanceof FormGroup ? at.get(str2) : at;
 
                 if (c && query) {
-                  const subscription = c.valueChanges.subscribe((value) => {
-                    subscriber.next(value ? { [query]: value } : {});
-                  });
+                  const subscription = c.valueChanges.pipe(tap(value => console.log('value changes: [list] ', value))).subscribe((value) => subscriber.next(value ? { [query]: value } : {}));
                   subscriptions.push(subscription);
                 }
               }
             }
           } else {
+            console.log('with refetch observable: ', formgroup, query, name);
             const c = formgroup.get(name);
             const q = query ?? name;
 
@@ -965,7 +965,7 @@ export function withRefetchObservable(
             // }
 
             if (c && q) {
-              const subscription = c.valueChanges.subscribe((value) => subscriber.next(value ? { [q]: value } : {}));
+              const subscription = c.valueChanges.pipe(tap(value => console.log('value changes: ', value))).subscribe((value) => subscriber.next(value ? { [q]: value } : {}));
               subscriptions.push(subscription);
             }
           }
