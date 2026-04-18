@@ -900,14 +900,14 @@ export function flatteninputs(formgroup: FormGroup) {
 
 /** @internal */
 export function withRefetchObservable(inputs: InputConfigInterface[], formgroup: FormGroup): InputConfigInterface[] {
-  console.log('calling with fetch observable...', inputs)
+
   for (const input of inputs) {
     if (isinputgroup(input)) {
       input.children = withRefetchObservable(input.children, formgroup);
     }
 
-    if (
-      isoptionsinput(input) && 'refetch' in input.optionsConfig && Array.isArray(input.optionsConfig['refetch'])) {
+    if (isoptionsinput(input) && 'refetch' in input.optionsConfig && Array.isArray(input.optionsConfig['refetch'])) {
+      console.log('[withRefetchObservable]: ', input, input.optionsConfig?.refetch);
       const { refetch } = input.optionsConfig;
       input.optionsConfig.refetch = new Observable((subscriber) => {
         const subscriptions: Subscription[] = [];
