@@ -942,12 +942,7 @@ function createRefetchObservable(formgroup: FormGroup, refetch: OptionsConfig['r
 
         if (c) {
           const q = query ?? name;
-          const subscription = c.valueChanges.subscribe((value) => subscriber.next(value ? { [q]: value } : {}));
-          console.log('with refetch observable [subscribing]...', c.valueChanges, name);
-
-          const t = setTimeout(() => console.log('control value: ', c.getRawValue(), formgroup.getRawValue(), formgroup), 1000 * 60 * 3);
-
-          subscriptions.push(subscription);
+          subscriptions.push(c.valueChanges.subscribe((value) => subscriber.next(value ? { [q]: value } : {})));
         }
       }
     }

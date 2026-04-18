@@ -327,7 +327,6 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
   private setFormState(config: T, formgroup: FormGroup) {
     const form = this._form ? { ...this._form, ...config } : config;
     const { controlConfigs } = config;
-    console.log('calling withRefetchObservable...')
     const inputs = withRefetchObservable(controlConfigs, formgroup);
     this._form = { ...form, controlConfigs: inputs };
     this._formGroup = formgroup;

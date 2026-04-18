@@ -16,7 +16,7 @@ import { FormModel } from './form.model';
 import { filter, first, Subscription } from 'rxjs';
 import { AsyncValidatorFn, ValidatorFn } from '@angular/forms';
 import { ReactiveFormDirectiveInterface } from '../../types';
-import { FormModelState, Optional } from './types';
+import { Optional } from './types';
 import { collectErrors } from '../../helpers';
 import { deepEqual } from '@azlabsjs/utilities';
 
@@ -68,14 +68,9 @@ export class NgxFormDirective
   @Output() valueChanges = new EventEmitter<unknown>();
   @Output() ready = new EventEmitter<void>();
   @Output() submitted = new EventEmitter<{ [k: string]: unknown }>();
-  @Output() stateChange = new EventEmitter<Required<FormModelState<FormConfigInterface>>>();
 
   public constructor(private model: FormModel<FormConfigInterface>, private cdRef: ChangeDetectorRef | null) {
-    const subscription = this.model.detectChanges$.subscribe(() => {
-      this.stateChange.emit(this.model.state);
-      this.cdRef?.detectChanges();
-    });
-    this.subscriptions.push(subscription);
+    this.subscriptions.push(this.model.detectChanges$.subscribe(() => this.cdRef?.detectChanges()));
   }
 
   ngOnInit(): void {
@@ -171,9 +166,6 @@ export class NgxFormDirective
   private updateModel(config: FormConfigInterface) {
     const formgroup = this.formGroup;
     const value = formgroup ? formgroup.getRawValue() : null;
-
-
-    console.log('updating for configuration...', config);
 
     // update model configuration
     this.model.update(config);

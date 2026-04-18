@@ -215,36 +215,10 @@ export class FormControlComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscriptions = [
-      this.fileControl.valueChanges
-        .pipe(
-          tap((state) => {
-            console.log('File value changes...', state);
-          })
-        )
-        .subscribe(),
-      this.timeInputControl.valueChanges
-        .pipe(
-          tap((state) => {
-            console.log('Time value changes...', state);
-          })
-        )
-        .subscribe(),
-
-      this.autoUploadFileControl.valueChanges
-        .pipe(
-          tap((state) => {
-            console.log('Auto upload control value changes...', state);
-          })
-        )
-        .subscribe(),
-
-      this.dateInputControl.valueChanges
-        .pipe(
-          tap(() => {
-            console.log(this.dateInputControl);
-          })
-        )
-        .subscribe(),
+      this.fileControl.valueChanges.subscribe(),
+      this.timeInputControl.valueChanges.subscribe(),
+      this.autoUploadFileControl.valueChanges.subscribe(),
+      this.dateInputControl.valueChanges.subscribe(),
     ];
   }
 

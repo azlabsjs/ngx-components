@@ -228,7 +228,7 @@ export class AppComponent implements OnInit {
     },
   };
 
-    fromState2 = {
+  fromState2 = {
     document_id:
       'https://storagev2.lik.tg/api/storage/object/download?name=17652725236937ebcb22e06493916050&signature=63a33124004cb0a0ca3450230f5204b09442f911409d178a8f5b2d3679238675',
     fruits: ['2', '3', '4'],
@@ -272,7 +272,6 @@ export class AppComponent implements OnInit {
       .get(220)
       .pipe(
         filter((state) => typeof state !== 'undefined' && state !== null),
-        // tap((state) => console.log('Form: ', state)),
         tap((state) => this._state$.next(state)),
         takeUntil(this._destroy$),
       )
@@ -280,7 +279,6 @@ export class AppComponent implements OnInit {
   }
 
   onOpenChange(_t28: ModalComponent) {
-    // console.log('modal: ', _t28);
     _t28.open();
   }
 
@@ -290,32 +288,24 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     setTimeout(() => {
-      // console.log('Loaded values: ', _values)
       this._pageResult$.next(_values);
       this.placeholder = undefined;
-
-      console.log('Changing to fromState')
       this.formValue = this.fromState;
       this.cdRef?.detectChanges();
     }, 3000);
 
 
     setTimeout(() => {
-      console.log('Changing to fromState2')
       this.formValue = this.fromState2;
       this.cdRef?.detectChanges();
     }, 7000);
   }
 
   // Listen to datagrid refresh events
-  onDgRefresh(_: unknown) {
-    // console.log(event);
-  }
+  onDgRefresh(_: unknown) { }
 
   // Listen to data grid selection changes events
-  onSelectedChanges(event: unknown | unknown[]) {
-    console.log(event);
-  }
+  onSelectedChanges(event: unknown | unknown[]) { }
 
   onFormReadyState(event: FormConfigInterface) {
     setTimeout(() => {
@@ -340,31 +330,18 @@ export class AppComponent implements OnInit {
 
   afterChanges() {
     // const timeout = setTimeout(() => {
-    //   this.smartForm
-    //     ?.controlValueChanges('profession')
-    //     .pipe(tap((state) => console.log('State changes:', state)))
-    //     .subscribe();
+    //   this.smartForm?.controlValueChanges('profession').subscribe();
     //   clearTimeout(timeout);
     // }, 300);
   }
 
-  onBlur(event: FocusEvent) {
-    console.log(event);
-  }
+  onBlur(event: FocusEvent) { }
 
-  onFocus(event: FocusEvent) {
-    console.log(event);
-  }
+  onFocus(event: FocusEvent) { }
 
-  onError(error: unknown) {
-    console.log('Submit error: ', error);
-  }
+  onError(error: unknown) { }
 
-  ngxFormSubmit(event: Record<string, any>) {
-    console.log(JSON.stringify(event));
-  }
+  ngxFormSubmit(event: Record<string, any>) { }
 
-  ondgItemClick(value: unknown) {
-    console.log('Item clicked:', value);
-  }
+  ondgItemClick(value: unknown) { }
 }
