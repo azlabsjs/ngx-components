@@ -11,6 +11,7 @@ import {
   OptionsInput,
   RequiredIfConstraint,
   DisabledIfConstraint,
+  OptionsConfig,
 } from '@azlabsjs/smart-form-core';
 import { isNumber } from '@azlabsjs/utilities';
 import {
@@ -899,72 +900,78 @@ export function flatteninputs(formgroup: FormGroup) {
 }
 
 /** @internal */
-export function withRefetchObservable(inputs: InputConfigInterface[], formgroup: FormGroup): InputConfigInterface[] {
-
-  for (const input of inputs) {
-    if (isinputgroup(input)) {
-      input.children = withRefetchObservable(input.children, formgroup);
+function createRefetchObservable(formgroup: FormGroup, refetch: OptionsConfig['refetch']) {
+  return new Observable<{ [k: string]: unknown }>((subscriber) => {
+    if (!refetch) {
+      return;
     }
 
-    if (isoptionsinput(input) && 'refetch' in input.optionsConfig && Array.isArray(input.optionsConfig['refetch'])) {
-      console.log('[withRefetchObservable]: ', input, input.optionsConfig?.refetch);
-      const { refetch } = input.optionsConfig;
-      input.optionsConfig.refetch = new Observable((subscriber) => {
-        const subscriptions: Subscription[] = [];
-        for (const item of refetch) {
-          // TODO: figure out how to subscribe to blur event
-          const { trigger, query } = item;
-          const { input: name, event: _ } = typeof trigger === 'object' && trigger !== null ? trigger : { input: trigger, event: 'change' };
+    const subscriptions: Subscription[] = [];
+    for (const item of refetch) {
+      const { trigger, query } = item;
+      const { input: name, event: _ } = typeof trigger === 'object' && trigger !== null ? trigger : { input: trigger, event: 'change' };
 
-          if (name.indexOf('*') !== -1) {
-            // we must listen for changes on a formarray
-            const str = before(name, '*');
-            const str2 = after(name, '*').substring(1);
-            const array: FormArray | null = findcontrol(formgroup, str.substring(0, str.length - 1));
+      if (name.indexOf('*') !== -1) {
+        // we must listen for changes on a formarray
+        const str = before(name, '*');
+        const str2 = after(name, '*').substring(1);
+        const array: FormArray | null = findcontrol(formgroup, str.substring(0, str.length - 1));
 
-            if (array instanceof FormArray) {
-              const len = array.length;
-              for (let i = 0; i < len; i++) {
-                const at = array.at(i);
-                const c = str2.trim() !== '' && at instanceof FormGroup ? at.get(str2) : at;
+        if (array instanceof FormArray) {
+          const len = array.length;
+          for (let i = 0; i < len; i++) {
+            const at = array.at(i);
+            const c = str2.trim() !== '' && at instanceof FormGroup ? at.get(str2) : at;
 
-                if (c && query) {
-                  const subscription = c.valueChanges.subscribe((value) => subscriber.next(value ? { [query]: value } : {}));
-                  subscriptions.push(subscription);
-                }
-              }
-            }
-          } else {
-            const c = formgroup.get(name);
-
-            // TODO: uncomment the code below use findcontrol implementation if angular FormGroup.get() does not provide
-            // a safe implementation to lookup control with `.` separated character
-            // if (name.indexOf('.') !== -1) {
-            //   const keys = name.split('.');
-            //   const parent = findcontrol(formgroup, name.substring(0, name.indexOf(`.${keys[keys.length - 1]}`)));
-            //   c = parent?.get(keys[keys.length - 1]);
-            // }
-
-            if (c) {
-              const q = query ?? name;
-              const subscription = c.valueChanges.subscribe((value) => subscriber.next(value ? { [q]: value } : {}));
-              console.log('with refetch observable [subscribing]...', c.valueChanges, name);
-
-              const t = setTimeout(() => console.log('control value: ', c.getRawValue(), formgroup.getRawValue(), formgroup), 1000 * 60 * 3);
-
+            if (c && query) {
+              const subscription = c.valueChanges.subscribe((value) => subscriber.next(value ? { [query]: value } : {}));
               subscriptions.push(subscription);
             }
           }
         }
+      } else {
+        const c = formgroup.get(name);
 
-        return () => {
-          for (const subscription of subscriptions) {
-            subscription?.unsubscribe();
-          }
-        };
-      });
+        // TODO: uncomment the code below use findcontrol implementation if angular FormGroup.get() does not provide
+        // a safe implementation to lookup control with `.` separated character
+        // if (name.indexOf('.') !== -1) {
+        //   const keys = name.split('.');
+        //   const parent = findcontrol(formgroup, name.substring(0, name.indexOf(`.${keys[keys.length - 1]}`)));
+        //   c = parent?.get(keys[keys.length - 1]);
+        // }
+
+        if (c) {
+          const q = query ?? name;
+          const subscription = c.valueChanges.subscribe((value) => subscriber.next(value ? { [q]: value } : {}));
+          console.log('with refetch observable [subscribing]...', c.valueChanges, name);
+
+          const t = setTimeout(() => console.log('control value: ', c.getRawValue(), formgroup.getRawValue(), formgroup), 1000 * 60 * 3);
+
+          subscriptions.push(subscription);
+        }
+      }
     }
-  }
 
-  return inputs;
+    return () => {
+      for (const subscription of subscriptions) {
+        subscription?.unsubscribe();
+      }
+    };
+  })
+}
+
+/** @internal */
+export function withRefetchObservable(inputs: InputConfigInterface[], formgroup: FormGroup): InputConfigInterface[] {
+  return inputs.map(item => {
+    if (isinputgroup(item)) {
+      return { ...item, children: withRefetchObservable(item.children, formgroup) } as InputGroup;
+    }
+
+    if (isoptionsinput(item) && 'refetch' in item.optionsConfig && Array.isArray(item.optionsConfig['refetch'])) {
+      const { optionsConfig: { refetch } } = item;
+      return { ...item, optionsConfig: { ...item.optionsConfig, refetch: createRefetchObservable(formgroup, refetch) } };
+    }
+
+    return item;
+  });
 }

@@ -79,12 +79,9 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
       formgroup = builder.group(controlConfigs);
     }
 
-
-    console.log('unsubscribing from observable...');
     // we unregister from previous event each time we set the form value
     this.unsubscribe();
 
-    console.log('setting form state...');
     this.setFormState(config, formgroup);
 
     const { controlConfigs: values } = this._form;
@@ -330,6 +327,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
   private setFormState(config: T, formgroup: FormGroup) {
     const form = this._form ? { ...this._form, ...config } : config;
     const { controlConfigs } = config;
+    console.log('calling withRefetchObservable...')
     const inputs = withRefetchObservable(controlConfigs, formgroup);
     this._form = { ...form, controlConfigs: inputs };
     this._formGroup = formgroup;
