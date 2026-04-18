@@ -79,9 +79,12 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
       formgroup = builder.group(controlConfigs);
     }
 
+
+    console.log('unsubscribing from observable...');
     // we unregister from previous event each time we set the form value
     this.unsubscribe();
 
+    console.log('setting form state...');
     this.setFormState(config, formgroup);
 
     const { controlConfigs: values } = this._form;
