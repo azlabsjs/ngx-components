@@ -172,6 +172,9 @@ export class NgxFormDirective
     const formgroup = this.formGroup;
     const value = formgroup ? formgroup.getRawValue() : null;
 
+
+    console.log('updating for configuration...', config);
+
     // update model configuration
     this.model.update(config);
 
