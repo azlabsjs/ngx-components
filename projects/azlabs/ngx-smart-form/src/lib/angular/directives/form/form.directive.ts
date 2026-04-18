@@ -16,7 +16,7 @@ import { FormModel } from './form.model';
 import { filter, first, Subscription } from 'rxjs';
 import { AsyncValidatorFn, ValidatorFn } from '@angular/forms';
 import { ReactiveFormDirectiveInterface } from '../../types';
-import { Optional } from './types';
+import { FormModelState, Optional } from './types';
 import { collectErrors } from '../../helpers';
 import { deepEqual } from '@azlabsjs/utilities';
 
@@ -28,12 +28,11 @@ import { deepEqual } from '@azlabsjs/utilities';
 })
 export class NgxFormDirective
   implements
-    ReactiveFormDirectiveInterface,
-    OnInit,
-    OnDestroy,
-    OnChanges,
-    AfterViewInit
-{
+  ReactiveFormDirectiveInterface,
+  OnInit,
+  OnDestroy,
+  OnChanges,
+  AfterViewInit {
   //#region local properties
   private subscriptions: Subscription[] = [];
   private changeSubscription: Subscription | null = null;
@@ -69,9 +68,13 @@ export class NgxFormDirective
   @Output() valueChanges = new EventEmitter<unknown>();
   @Output() ready = new EventEmitter<void>();
   @Output() submitted = new EventEmitter<{ [k: string]: unknown }>();
+  @Output() stateChange = new EventEmitter<Required<FormModelState<FormConfigInterface>>>();
 
   public constructor(private model: FormModel<FormConfigInterface>, private cdRef: ChangeDetectorRef | null) {
-    const subscription = this.model.detectChanges$.subscribe(() => this.cdRef?.detectChanges());
+    const subscription = this.model.detectChanges$.subscribe(() => {
+      this.stateChange.emit(this.model.state);
+      this.cdRef?.detectChanges();
+    });
     this.subscriptions.push(subscription);
   }
 

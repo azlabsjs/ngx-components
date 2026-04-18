@@ -19,7 +19,7 @@
 <div class="container">
   <h3>{{ "app.modules.users.title" | text }}</h3>
   <ng-container *ngIf="state$ | async as form">
-    <ngx-smart-form
+    <!-- <ngx-smart-form
       #formRef
       [no-grid-layout]="false"
       (ready)="onFormReadyState(form)"
@@ -67,10 +67,10 @@
         </button>
       </ng-template>
       <pre after>{{ formRef?.formGroup?.getRawValue() | json }}</pre>
-    </ngx-smart-form>
+    </ngx-smart-form> -->
 
 
-    <!-- <div #formRef="ngxform" [ngxform]="form" [value]="formValue">
+    <div #formRef="ngxform" [ngxform]="form" [value]="formValue">
       <ngx-form-ui #formui *ngIf="formRef.formGroup" [no-grid-layout]="false" [autoupload]="true" [template]="template" [label]="label" [state]="{ formGroup: formRef.formGroup, detached: formRef.state.detached }" [inputs]="formRef.form.controlConfigs">
           <ng-template #template let-config="value" let-control="control" let-describe="describe">
             <ngx-clr-form-control class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control" [inputConfig]="config" [describe]="describe ?? true" [error]="error" [label]="label">
@@ -100,7 +100,7 @@
             </button>
           </div>
       </ngx-form-ui>
-    </div> -->
+    </div>
   </ng-container>
 </div>
 <div class="container">

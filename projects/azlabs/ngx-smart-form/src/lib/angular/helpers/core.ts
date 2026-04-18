@@ -936,7 +936,6 @@ export function withRefetchObservable(inputs: InputConfigInterface[], formgroup:
             }
           } else {
             const c = formgroup.get(name);
-            const q = query ?? name;
 
             // TODO: uncomment the code below use findcontrol implementation if angular FormGroup.get() does not provide
             // a safe implementation to lookup control with `.` separated character
@@ -946,7 +945,8 @@ export function withRefetchObservable(inputs: InputConfigInterface[], formgroup:
             //   c = parent?.get(keys[keys.length - 1]);
             // }
 
-            if (c && q) {
+            if (c) {
+              const q = query ?? name;
               const subscription = c.valueChanges.subscribe((value) => subscriber.next(value ? { [q]: value } : {}));
               console.log('with refetch observable [subscribing]...', c.valueChanges, name);
 
