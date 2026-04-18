@@ -1,6 +1,6 @@
 {
   "name": "ngx-components",
-  "version": "0.17.115",
+  "version": "0.17.116",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port 8756",
