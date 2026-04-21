@@ -7,6 +7,7 @@ import {
   Inject,
   Input,
   Output,
+  TemplateRef,
   ViewChild,
 } from '@angular/core';
 import { FormControl, FormsModule } from '@angular/forms';
@@ -18,6 +19,7 @@ import {
 } from '@azlabsjs/ngx-options-input';
 import { NgxCommonModule } from '../common';
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select';
+import { Thunk } from './pipes';
 
 // @internal
 type OptionalConfig = Omit<OptionsInput, 'options'> & { options?: OptionsInput['options'] };
@@ -35,6 +37,7 @@ type StateType = {
     NgxCommonModule,
     FormsModule,
     NgSelectModule,
+    Thunk,
     ...OPTIONS_DIRECTIVES,
   ],
   selector: 'ngx-select-input',
@@ -76,12 +79,12 @@ export class NgxSelectInputComponent {
   }
   @Input({ alias: 'loading-text' }) loadingText!: string;
   @Input() parent: string | null | undefined = 'body';
+  @Input() input!: TemplateRef<any> | null | undefined;
   //#endregion
 
-  //#region output properties
   @Output() remove = new EventEmitter<any>();
   @Output() selected = new EventEmitter<InputEventArgs>();
-  //#endregion
+
 
   @ViewChild('optionsRef', { static: false })
   options!: FetchOptionsDirective;
@@ -152,11 +155,11 @@ export class NgxSelectInputComponent {
     this.cdRef?.markForCheck();
   }
 
-  removed(e: unknown, config: OptionalConfig) {
+  removed(config: OptionalConfig, e?: unknown) {
     this.remove.emit({ name: config.name, event: e });
   }
 
-  select(e: unknown, config: OptionalConfig) {
+  select(config: OptionalConfig, e?: unknown) {
     this.selected.emit({ name: config.name, value: e });
   }
 

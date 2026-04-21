@@ -1,4 +1,4 @@
-import { inject, Injector, NgModule } from '@angular/core';
+import { inject, Injector, LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import {
@@ -53,6 +53,10 @@ import {
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { useTranslationsFactory } from './translations';
 import { MODAL_DIRECTIVES } from '@azlabs/ngx-modal';
+import localeFr from '@angular/common/locales/fr';
+import { registerLocaleData } from '@angular/common';
+
+registerLocaleData(localeFr);
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
@@ -90,6 +94,7 @@ export function createTranslateLoader() {
     NgxDropzoneModule.forRoot(),
   ],
   providers: [
+    {provide: LOCALE_ID, useValue: 'fr-FR'},
     provideSupportedCountries(['tg', 'ci', 'gh']),
     providePreferredCountries(['ci']),
     providePipes({

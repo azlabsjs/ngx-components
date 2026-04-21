@@ -3,17 +3,22 @@
   <div class="ng-select-container" style="position: relative" *ngIf="state.config as config" #optionsRef fetchOptions
     [config]="config.optionsConfig" [loaded]="state.loaded" (optionsChange)="optionsChange($event)"
     (loadingChange)="loadingChange($event)" [name]="config.name">
-    <ng-select #ngselect [class]="config.multiple ? '' : 'not-multiple'" [virtualScroll]="true"
-      [items]="config.options || []" [bindLabel]="'name'" [bindValue]="'value'"
-      [loading]="(!!state.performingAction && (state.config.options ?? []).length === 0)" [loadingText]="loadingText"
-      [multiple]="config.multiple ?? false" [placeholder]="config.placeholder ?? ''" [groupBy]="'type'"
-      [ngModel]="control.value" [clearable]="true" [appendTo]="parent ?? 'body'"
-      [disabled]="disabled || control.disabled" (ngModelChange)="modelChange($event)" (focus)="onFocus()"
-      (remove)="removed($event, state.config)" (change)="select($event, state.config)">
-      <ng-template ng-option-tmp let-item="item">
-        <label class="form-check-label ml-2"> {{ item?.name }}</label>
-      </ng-template>
-    </ng-select>
+    <ng-container
+      *ngTemplateOutlet="input ?? _input; context: {options: config.options, config, pending: state.performingAction, loadingText, placeholder: config.placeholder, control, multiple: config.multiple ?? false, removed: removed.bind(this) | thunk: config, selected: select.bind(this) | thunk: config, bind: 'value', label: 'name', group: 'type', change: modelChange.bind(this), focus: onFocus.bind(this)}"></ng-container>
     <span *ngIf="describe" class="input__subtext" [innerHTML]="config.description || '' | trustHtml"></span>
   </div>
 </ng-container>
+
+<ng-template #_input let-change="change" let-focus="focus" let-bind="bind" let-label="label" let-group="group"
+  let-removed="removed" let-selected="selected" let-multiple="multiple" let-control="control"
+  let-placeholder="placeholder" let-options="options" let-pending="pending" let-loadingText="loadingText">
+  <ng-select #ngselect [class]="multiple ? '' : 'not-multiple'" [virtualScroll]="true" [items]="options || []"
+    [bindLabel]="label" [bindValue]="bind" [groupBy]="group" [loading]="(!!pending && (options ?? []).length === 0)"
+    [loadingText]="loadingText" [multiple]="multiple ?? false" [placeholder]="placeholder ?? ''"
+    [ngModel]="control.value" [clearable]="true" [appendTo]="parent ?? 'body'" [disabled]="disabled || control.disabled"
+    (ngModelChange)="change($event)" (focus)="focus($event)" (remove)="removed($event)" (change)="selected($event)">
+    <ng-template ng-option-tmp let-item="item">
+      <label class="form-check-label ml-2"> {{ item?.name }}</label>
+    </ng-template>
+  </ng-select>
+</ng-template>

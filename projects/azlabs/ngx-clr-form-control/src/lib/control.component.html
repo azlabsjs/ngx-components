@@ -44,6 +44,7 @@
     <!-- Select input -->
     <ng-container *ngSwitchCase="inputTypes.SELECT_INPUT">
       <ngx-select-input
+        [input]="select"
         [control]="formControl"
         [config]="inputConfig | selectInput"
         [describe]="describe"
@@ -86,13 +87,16 @@
     <ng-container *ngSwitchCase="inputTypes.DATE_INPUT">
       <ngx-date-input [control]="formControl" [config]="inputConfig | dateInput" [describe]="describe">
         <ng-template #input let-control="control" let-onBlur="onBlur" let-config="config">
-          <clr-date-container>
-            <label class="clr-control-label" *ngIf="describe" [for]="config.name">
-              <ng-container *ngTemplateOutlet="label ?? _label; context: { $implicit: config!.label, config }"></ng-container>
-              <span class="required-text" *ngIf="config.rules?.isRequired ?? (config | required)">(*)</span>
-            </label>
-            <input noAutoComplete type="date" [attr.title]="config!.label" (blur)="onBlur($event)" [formControl]="control" [value]="control.value" [min]="config!.minDate ?? config.constraints?.min" [max]="config.maxDate ?? config.constraints?.max" clrDate />
-          </clr-date-container>
+          <ng-container *ngTemplateOutlet="date ?? _date; context: { $implicit: config, config, onBlur, control, describe, label: _label ?? label }" ></ng-container >
+          <ng-template #_date let-control="control" let-onBlur="onBlur" let-config="config" let-describe="describe" let-label="label">
+            <clr-date-container>
+              <label class="clr-control-label" *ngIf="describe" [for]="config.name">
+                <ng-container *ngTemplateOutlet="label; context: { $implicit: config!.label, config }"></ng-container>
+                <span class="required-text" *ngIf="config.rules?.isRequired ?? (config | required)">(*)</span>
+              </label>
+              <input noAutoComplete type="date" [attr.title]="config!.label" (blur)="onBlur($event)" [formControl]="control" [value]="control.value" [min]="config!.minDate ?? config.constraints?.min" [max]="config.maxDate ?? config.constraints?.max" clrDate />
+            </clr-date-container>
+          </ng-template>
         </ng-template>
       </ngx-date-input>
       <!-- error -->

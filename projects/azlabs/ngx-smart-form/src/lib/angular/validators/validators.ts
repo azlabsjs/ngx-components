@@ -126,15 +126,15 @@ export class CustomValidators {
   static isValidDate(control: AbstractControl) {
     if (control.validator && control.value) {
       let d: Date;
-
       if (!(control.value instanceof Date) && Date.parse && typeof Date.parse === 'function') {
+        // Here we try to parse date string in the format YYYY-MM-DD, YYYY/MM/DD, DD/MM/YYYY, DD-MM-YYYY, MM/DD/YYYY or MM-DD-YYY
         d = new Date()
         // Date.parse() will try to convert the string format into a valid date
         d.setTime(Date.parse(control.value))
-        // case parsing date fails, we try to treat the date as DD/MM/YYYY or DD-MM-YYYY
-        // because javascript does not natively support these date format and will try to parse formats
-        // like MM/DD/YYYY or YYYY/MM/DD
-        d = isNaN(d.getTime()) ? JSDate.create(String(control.value).replace(/\//g, '-', ), 'DD-MM-YYYY') : d
+        if (isNaN(d.getTime())) {
+          let date = String(control.value).replace(/\//g, '-');
+          d = date.trim().charAt(4) === '-' ? JSDate.create(date, 'YYYY-MM-DD') : JSDate.create(date, 'DD-MM-YYYY');
+        }
       } else {
         d = control.value;
       }
@@ -142,6 +142,7 @@ export class CustomValidators {
       if (isNaN(d.getTime())) {
         return { invalid: { actual: control.value } }
       }
+
     }
     return null
   }
