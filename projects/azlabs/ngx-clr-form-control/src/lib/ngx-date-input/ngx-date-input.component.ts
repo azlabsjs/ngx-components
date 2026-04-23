@@ -1,6 +1,5 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   ContentChild,
   EventEmitter,
@@ -8,14 +7,14 @@ import {
   Input,
   LOCALE_ID,
   OnDestroy,
-  Optional,
   Output,
-  TemplateRef,
+  TemplateRef
 } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import { DateInput } from '@azlabsjs/smart-form-core';
 import { NgxCommonModule } from '../common';
 import { distinctUntilChanged, Subscription } from 'rxjs';
+import { JSDate } from '@azlabsjs/js-datetime';
 
 @Component({
   standalone: true,
@@ -27,10 +26,15 @@ import { distinctUntilChanged, Subscription } from 'rxjs';
 export class NgxDateInputComponent implements OnDestroy {
   private subscriptions: Subscription[] = [];
   private _control!: AbstractControl<any, any>;
-  @Input() set control(value: AbstractControl) {
-    if (value) {
-      this._control = value
-      this.model = new FormControl(value.value, value.validator, value.asyncValidator);
+  @Input() set control(control: AbstractControl) {
+    if (control) {
+      this._control = control;
+      this.model = new FormControl(null, control.validator, control.asyncValidator);
+      if (control.value && String(control.value).trim() !== '') {
+        const formatted = this.format(control.value);
+        this.model.setValue(formatted);
+      }
+
       const subscription = this.model.statusChanges.subscribe(status => {
         if (this.model.touched) {
           this._control.markAsTouched({ emitEvent: true });
@@ -104,29 +108,28 @@ export class NgxDateInputComponent implements OnDestroy {
 
       const subscription3 = this._control.valueChanges.pipe(distinctUntilChanged()).subscribe(value => {
         if (value && String(value) !== String(this.model.value)) {
-          this.model.setValue(value);
+          const existing = String(this.model.value);
+          const isIsoFormat = /^\d{4}-\d{2}-\d{2}$/.test(existing);
+          this.model.setValue(isIsoFormat ? this.formatToISO(value) : value);
         }
       });
 
       this.subscriptions.push(subscription, subscription2, subscription3);
     }
   }
-  get control() {
-    return this._control;
-  }
   @Input() describe = true;
   @Input() config!: DateInput;
 
   @Output() blur = new EventEmitter<Event>();
 
-  @ContentChild('input') inputRef!: TemplateRef<any>;
+  @ContentChild('input') input!: TemplateRef<any>;
 
 
   /** @internal */
   model!: AbstractControl;
 
   /** @description creates an instance of date input */
-  constructor(@Inject(LOCALE_ID) private locale: string, @Optional() private cdref: ChangeDetectorRef | null) { }
+  constructor(@Inject(LOCALE_ID) private locale: string) { }
 
 
   ngOnDestroy(): void {
@@ -137,5 +140,33 @@ export class NgxDateInputComponent implements OnDestroy {
 
   onBlur(e?: Event) {
     this.blur.emit(e);
+  }
+
+  private format(value: Date | string) {
+    const format = this.locale.match(/fr/) ? 'DD/MM/YYYY' : 'MM/DD/YYYY';
+    if (value instanceof Date) {
+      return JSDate.format(value, format);
+    }
+
+    let date = new Date()
+    date.setTime(Date.parse(value))
+    if (isNaN(date.getTime())) {
+      return value;
+    }
+
+    return JSDate.format(date, 'DD/MM/YYYY');
+  }
+
+  private formatToISO(value: string): string {
+    if (!value || !value.includes('/')) {
+      return value;
+    }
+
+    const [day, month, year] = value.split('/');
+    if (day && month && year) {
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+
+    return value;
   }
 }
