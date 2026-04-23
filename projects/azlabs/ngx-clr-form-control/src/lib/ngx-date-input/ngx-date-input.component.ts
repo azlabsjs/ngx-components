@@ -136,49 +136,6 @@ export class NgxDateInputComponent implements OnDestroy {
   }
 
   onBlur(e?: Event) {
-    // const { locale, model } = this;
-    // if (!model.value) {
-    //   model.setValue(null, { emitEvent: true, emitModelToViewChange: true, emitViewToModelChange: true });
-    //   return;
-    // }
-
-    // const value = String(model.value);
-    // if (value === '' || (value && value.length === 0)) {
-    //   model.setValue(null, { emitEvent: true, emitModelToViewChange: true, emitViewToModelChange: true });
-    //   this.blur.emit();
-    //   return;
-    // }
-
-    // // here we are dealing with native date input which returns date in YYYY-MM-DD
-    // let components: string[] = [];
-    // if (value.charAt(4) === '-') {
-    //   const units = value.split('-');
-    //   components = units.length === 3 ? [units[2], units[1], units[0]] : components;
-    // } else if (value.charAt(4) === '/') {
-    //   const units = value.split('/');
-    //   components = units.length === 3 ? [units[2], units[1], units[0]] : components;
-    // } else {
-    //   if (locale.match(/fr/)) {
-    //     const match = value.match(/(?<day>0[1-9]|[12][0-9]|3[01])\/(?<month>0[1-9]|1[0-2])\/(?<year>\d{4})/);
-    //     components = match ? [match[1], match[2], match[3]] : [];
-    //   } else {
-    //     const match = value.match(/(?<month>0[1-9]|1[0-2])\/(?<day>0[1-9]|[12][0-9]|3[01])\/(?<year>\d{4})/);
-    //     components = match ? [match[2], match[1], match[3]] : [];
-    //   }
-    // }
-
-    // if (components.length === 0) {
-    //   this.blur.emit();
-    //   return;
-    // }
-
-    // // we output a date in the format DD/MM/YYYY
-    // // TODO: in futur release output ISO8601 YYYY-MM-DD format instead
-    // this._control.setValue(components.length > 0 ? components.join('/') : value, { emitEvent: true, emitModelToViewChange: true, emitViewToModelChange: true });
-    // this._control.setErrors(this.model.errors, { emitEvent: true });
-    // this._control.markAsTouched({ emitEvent: true });
-    // this._control.markAsDirty({ emitEvent: true });
-    // this._control.markAsPristine({ emitEvent: true });
     this.blur.emit(e);
   }
 }
