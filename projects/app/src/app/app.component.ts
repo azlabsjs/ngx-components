@@ -200,6 +200,7 @@ export class AppComponent implements OnInit {
   ];
 
   fromState = {
+    birthdate: '2027-10-10',
     document_id:
       'https://storagev2.lik.tg/api/storage/object/download?name=17652725236937ebcb22e06493916050&signature=63a33124004cb0a0ca3450230f5204b09442f911409d178a8f5b2d3679238675',
     fruits: ['2', '3', '4'],

@@ -226,28 +226,12 @@ export class ComponentReactiveFormHelpers {
       validators.push(CustomValidators.isValidDate);
 
       config.rules?.minDate || !!(config as DateInput).constraints?.min
-        ? validators.push(
-            CustomValidators.minDate(
-              JSDate.format(
-                nullIfEmpty((config as DateInput).minDate) ??
-                  nullIfEmpty((config as DateInput).constraints?.min),
-                'YYYY-MM-DD'
-              )
-            )
-          )
+        ? validators.push(CustomValidators.minDate(JSDate.format(nullIfEmpty((config as DateInput).minDate) ?? nullIfEmpty((config as DateInput).constraints?.min), 'YYYY-MM-DD')))
         : // tslint:disable-next-line:no-unused-expression
           null;
       // Checks if maxlength rule is set to true and apply the rule to the input
       config.rules?.maxDate || !!(config as DateInput).constraints?.max
-        ? validators.push(
-            CustomValidators.maxDate(
-              JSDate.format(
-                nullIfEmpty((config as DateInput).maxDate) ??
-                  nullIfEmpty((config as DateInput).constraints?.max),
-                'YYYY-MM-DD'
-              )
-            )
-          )
+        ? validators.push(CustomValidators.maxDate(JSDate.format(nullIfEmpty((config as DateInput).maxDate) ?? nullIfEmpty((config as DateInput).constraints?.max), 'YYYY-MM-DD')))
         : // tslint:disable-next-line:no-unused-expression
           null;
     }

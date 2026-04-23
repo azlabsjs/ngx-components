@@ -85,7 +85,7 @@
 
     <!-- Date input -->
     <ng-container *ngSwitchCase="inputTypes.DATE_INPUT">
-      <ngx-date-input [control]="formControl" [config]="inputConfig | dateInput" [describe]="describe">
+      <ngx-date-input (blur)="onBlur($event, inputConfig!.name)" [control]="formControl" [config]="inputConfig | dateInput" [describe]="describe">
         <ng-template #input let-control="control" let-onBlur="onBlur" let-config="config">
           <ng-container *ngTemplateOutlet="date ?? _date; context: { $implicit: config, config, onBlur, control, describe, label: label ?? _label }" ></ng-container >
           <ng-template #_date let-control="control" let-onBlur="onBlur" let-config="config" let-describe="describe" let-label="label">

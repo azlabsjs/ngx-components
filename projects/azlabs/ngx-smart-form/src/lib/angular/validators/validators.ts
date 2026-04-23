@@ -1,7 +1,24 @@
 import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { JSDate } from '@azlabsjs/js-datetime';
 
+
+
 export class CustomValidators {
+
+  private static parseDate(value: Date | string) {
+    if (value instanceof Date) {
+      return value;
+    }
+
+    let date = new Date()
+    date.setTime(Date.parse(value))
+    if (isNaN(date.getTime())) {
+      let result = String(value).replace(/\//g, '-');
+      date = result.trim().charAt(4) === '-' ? JSDate.create(result, 'YYYY-MM-DD') : JSDate.create(result, 'DD-MM-YYYY');
+    }
+
+    return date;
+  }
   static match(control: string, other: string) {
     return (group: AbstractControl) => {
       const first = group.get(control)?.value === '' ? undefined : group.get(control)?.value;
@@ -40,8 +57,8 @@ export class CustomValidators {
   static minDate(min: string | Date): ValidatorFn {
     return (control: AbstractControl) => {
       if (control.validator) {
-        if (control.value && JSDate.isAfter(min, control.value)) {
-          return { min, actual: control.value };
+        if (control.value && JSDate.isAfter(min, CustomValidators.parseDate(control.value))) {
+          return { min: { min, actual: control.value } };
         }
       }
       return null;
@@ -50,10 +67,9 @@ export class CustomValidators {
 
   static maxDate(max: string | Date): ValidatorFn {
     return (control: AbstractControl) => {
-      if (control.value && JSDate.isBefore(max, control.value)) {
-        return { max, actual: control.value };
+      if (control.value && JSDate.isBefore(max, CustomValidators.parseDate(control.value))) {
+        return { max: { max, actual: control.value } };
       }
-
       return null;
     };
   }
@@ -98,10 +114,11 @@ export class CustomValidators {
         if (validator && !validator['required']) {
           return null;
         }
+
         if (+control.value >= min) {
           return null;
         }
-        return { min };
+        return { min: { min, actual: control.value } };
       }
       return null;
     };
@@ -117,7 +134,7 @@ export class CustomValidators {
         if (+control.value <= max) {
           return null;
         }
-        return { max };
+        return { max: { max, actual: control.value } };
       }
       return null;
     };
@@ -125,21 +142,14 @@ export class CustomValidators {
 
   static isValidDate(control: AbstractControl) {
     if (control.validator && control.value) {
-      let d: Date;
+      let date: Date;
       if (!(control.value instanceof Date) && Date.parse && typeof Date.parse === 'function') {
-        // Here we try to parse date string in the format YYYY-MM-DD, YYYY/MM/DD, DD/MM/YYYY, DD-MM-YYYY, MM/DD/YYYY or MM-DD-YYY
-        d = new Date()
-        // Date.parse() will try to convert the string format into a valid date
-        d.setTime(Date.parse(control.value))
-        if (isNaN(d.getTime())) {
-          let date = String(control.value).replace(/\//g, '-');
-          d = date.trim().charAt(4) === '-' ? JSDate.create(date, 'YYYY-MM-DD') : JSDate.create(date, 'DD-MM-YYYY');
-        }
+        date = CustomValidators.parseDate(control.value);
       } else {
-        d = control.value;
+        date = control.value;
       }
 
-      if (isNaN(d.getTime())) {
+      if (isNaN(date.getTime())) {
         return { invalid: { actual: control.value } }
       }
 

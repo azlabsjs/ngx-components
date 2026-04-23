@@ -64,6 +64,13 @@ export function createTranslateLoader() {
   return new TranslateHttpLoader(inject(HttpClient), './assets/i18n/', '.json');
 }
 
+export const createTranslate = useTranslationsFactory();
+export const createAppTranslator = createTranslate((values) => {
+  const result = { ...(values['app'] ?? {}), auth: values['auth'] ?? {} };
+  return result;
+});
+
+
 @NgModule({
   bootstrap: [AppComponent],
   declarations: [AppComponent],
@@ -94,7 +101,7 @@ export function createTranslateLoader() {
     NgxDropzoneModule.forRoot(),
   ],
   providers: [
-    {provide: LOCALE_ID, useValue: 'fr-FR'},
+    { provide: LOCALE_ID, useValue: 'fr-FR' },
     provideSupportedCountries(['tg', 'ci', 'gh']),
     providePreferredCountries(['ci']),
     providePipes({
@@ -154,33 +161,30 @@ export function createTranslateLoader() {
         return next(request);
       };
     }),
-    provideTranslations(useTranslationsFactory()),
     provideInputTranslations({
       loadingText: 'Chargement en cours...',
       validation: {
-        minlength: 'La longueur minimal du champ est de {{requiredLength}}',
-        maxlength: 'La longueur maximale du champ est de {{requiredLength}}',
-        maxLength: 'La longueur maximale du champ est de {{value}}',
-        minLength: 'La longueur minimal du champ est de {{value}}',
-        invalid: 'La valeur du champ est invalide',
-        required: 'Le champ est requis',
-        unique: 'La valeur de ce champ est déja existante',
-        email:
-          'La valeur de ce champ doit être un adresse mail valid [example@email.com]',
-        pattern: 'La valeur du champ est invalide',
-        min: 'La valeur minimal du champ est de {{min}}',
-        max: 'La valeur maximal du champ est de {{max}}',
-        phone: 'Veuillez saisir un numéro de téléphone valid',
-        minDate: 'Veuillez saisir une date ultérieure à la date du {{min}}',
-        maxDate: 'Veuillez saisir une date antérieure à la date du {{max}}',
-        exists:
-          "La valeur du champ n'existe pas dans la dans la base de données",
-        equals:
-          'La valeur du champ {{value}} ne correspond pas à la valeur saisie',
+        "minlength": "La longueur minimal du champ est de [requiredLength]",
+        "maxlength": "La longueur maximale du champ est de [requiredLength]",
+        "maxLength": "La longueur maximale du champ est de [requiredLength]",
+        "minLength": "La longueur minimal du champ est de [requiredLength]",
+        "invalid": "La valeur du champ est invalide",
+        "required": "Le champ est requis",
+        "unique": "La valeur de ce champ est déja existante",
+        "email": "La valeur de ce champ doit être un adresse mail valid [example@email.com]",
+        "pattern": "La valeur du champ est invalide",
+        "min": "La valeur minimal du champ est de [min]",
+        "max": "La valeur maximal du champ est de [max]",
+        "phone": "Veuillez saisir un numéro de téléphone valid",
+        "minDate": "Veuillez saisir une date ultérieure à la date du [min]",
+        "maxDate": "Veuillez saisir une date antérieure à la date du [max]",
+        "exists": "La valeur du champ n'existe pas dans la dans la base de données",
+        "equals": "La valeur du champ [value] ne correspond pas à la valeur saisie"
       },
     }),
     TranslatePipe,
     ngProvideHttpClient(withInterceptorsFromDi()),
+    provideTranslations(createAppTranslator),
   ],
 })
-export class AppModule {}
+export class AppModule { }
