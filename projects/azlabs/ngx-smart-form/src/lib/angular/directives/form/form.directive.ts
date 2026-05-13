@@ -87,12 +87,9 @@ export class NgxFormDirective
       return;
     }
 
-    setTimeout(() => {
-      this.model.setValue(state);
-
-      // notify ui for value changes
-      this.cdRef?.markForCheck();
-    }, 700);
+    this.model.setValue(state);
+    // notify ui for value changes
+    this.cdRef?.markForCheck();
   }
 
   addAsyncValidator(validator: AsyncValidatorFn, control?: string): void {

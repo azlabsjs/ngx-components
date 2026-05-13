@@ -126,13 +126,9 @@ export class NgxSmartFormComponent
   }
 
   setValue(state: { [k: string]: unknown }): void {
-    setTimeout(() => {
-      // set or update the form state of the current component
-      this.model.setValue(state);
-
-      // notify ui for value changes
-      this.cdRef?.markForCheck();
-    }, 700);
+    this.model.setValue(state);
+    // notify ui for value changes
+    this.cdRef?.markForCheck();
   }
 
   ngAfterViewInit(): void {
