@@ -52,8 +52,7 @@ const AUTO_SUBMIT_ERROR_MESSAGE =
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFormComponent
-  implements ReactiveFormComponentInterface, AfterViewInit, OnDestroy, OnChanges
-{
+  implements ReactiveFormComponentInterface, AfterViewInit, OnDestroy, OnChanges {
   get formGroup() {
     return this.model.state.formGroup;
   }
@@ -118,10 +117,7 @@ export class NgxSmartFormComponent
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (
-      'state' in changes &&
-      changes['state'].currentValue !== changes['state'].previousValue
-    ) {
+    if ('state' in changes && changes['state'].currentValue !== changes['state'].previousValue) {
       const { currentValue: state } = changes['state'];
       if (this.form && this.formGroup && state) {
         this.setValue(state);
@@ -130,11 +126,13 @@ export class NgxSmartFormComponent
   }
 
   setValue(state: { [k: string]: unknown }): void {
-    // set or update the form state of the current component
-    this.model.setValue(state);
+    setTimeout(() => {
+      // set or update the form state of the current component
+      this.model.setValue(state);
 
-    // notify ui for value changes
-    this.cdRef?.markForCheck();
+      // notify ui for value changes
+      this.cdRef?.markForCheck();
+    }, 700);
   }
 
   ngAfterViewInit(): void {
@@ -156,7 +154,7 @@ export class NgxSmartFormComponent
   }
 
   setControlValue(control: string, value: any): void {
-    this.formGroup.get(control)?.setValue(value);
+    this.formGroup.get(control)?.setValue(value, { emitEvent: true });
   }
 
   disableControls(controls: ControlsStateMap): void {

@@ -7,7 +7,7 @@ import {
   Inject,
   Input,
   OnDestroy,
-  Optional,
+  Optional as NgOptional,
   Output,
 } from '@angular/core';
 import {
@@ -28,10 +28,12 @@ import {
   Subscribable,
   KeyType as _KeyType,
   Subscription,
+  Optional,
 } from './types';
 import { INPUT_OPTIONS_CLIENT, OPTIONS_CACHE } from './tokens';
 import { CacheType } from './cache';
 import { deepEqual } from '@azlabsjs/utilities';
+import { isEmpty } from './utils';
 
 /** @internal */
 type ObservationOptions = {
@@ -41,10 +43,7 @@ type ObservationOptions = {
 };
 
 /** @description Creates a browser intersection observer instance */
-export function createIntersectionObserver(
-  callback: IntersectionObserverCallback,
-  options?: ObservationOptions | undefined
-) {
+export function createIntersectionObserver(callback: IntersectionObserverCallback, options?: ObservationOptions | undefined) {
   return new IntersectionObserver(callback, options);
 }
 
@@ -84,12 +83,10 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   @Input({ alias: 'query' }) search: string = 'label';
   @Input({ alias: 'limit' }) limit!: number;
   private _options!: OptionsConfigType | undefined;
-  @Input({ alias: 'config' }) set options(
-    value: OptionsConfigType | undefined
-  ) {
+  @Input({ alias: 'config' }) set options(value: OptionsConfigType | undefined) {
     this._options = value;
-    if (value && isobservable(value)) {
-      this.observable = value.refetch;
+    if (this._options && isobservable(this._options)) {
+      this.observable = this._options.refetch;
     }
   }
   get options() {
@@ -108,6 +105,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   private observable!: Subscribable<{ [k: string]: unknown }>;
   private key!: _KeyType;
+  private lastQuery: Optional<{ [prop: string]: unknown }> = null;
 
   // directive constructor
   constructor(
@@ -115,7 +113,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     @Inject(INPUT_OPTIONS_CLIENT) private client: InputOptionsClient,
     @Inject(DOCUMENT) private document: Document,
     @Inject(OPTIONS_CACHE)
-    @Optional()
+    @NgOptional()
     private cache: CacheType<Record<string, unknown>, InputOptions>
   ) {
     this.subscriptions.push(
@@ -149,54 +147,64 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
         !('IntersectionObserver' in view) &&
         !('IntersectionObserverEntry' in view) &&
         !('intersectionRatio' in view.IntersectionObserverEntry.prototype)
-        ? this.query()
+        ? this.query(this.lastQuery)
         : this.observeView();
     }
 
     // subscribe to observable
     if (this.observable) {
-      const subscription = this.observable.subscribe((value) => {
-        this.fetch(undefined, value);
+      const subscription = this.observable.subscribe((query) => {
+        this.fetch(undefined, query);
       });
 
       this.subscriptions.push(subscription);
     }
   }
 
-  query() {
+  query(params?: Optional<{ [prop: string]: unknown }>) {
     const { loaded, options } = this;
     if (loaded || typeof options === 'undefined' || options === null) {
       return Promise.resolve();
     }
 
     this.loadingChange.emit(true);
-    const { source } = options;
-    return isresource(source) ? this.fetchAsync(options) : this.fetchSync(options);
+    return isresource(options.source) ? this.fetchAsync(options, params ?? {}) : this.fetchSync(options);
   }
 
   fetch(value?: string, query?: { [k: string]: unknown }) {
     const { options, search } = this;
-    if (typeof options !== 'undefined' && options !== null) {
-
-      this.loadingChange.emit(true);
-      let searchquery = query ?? {};
-      if (value) {
-        searchquery[search] = value;
-      }
-
-      this.fetchAsync(options, searchquery);
+    if (typeof options === 'undefined' || options === null) {
+      return;
     }
+
+    query = query ?? {};
+    if (value) {
+      query[search] = value;
+    }
+
+    // set the last query property to equal to the current query in order to
+    // preserve the state of the input on next intersection
+    this.lastQuery = query;
+    this.loadingChange.emit(true);
+    this.fetchAsync(options, this.lastQuery);
   }
 
   private observeView() {
     if (this.observer) {
       this.observer.disconnect();
     }
-    this.observer = createIntersectionObserver((entries, _) => {
+
+    this.observer = createIntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          this.query();
+        if (!entry.isIntersecting) {
+          return;
         }
+
+        if (isEmpty(this.lastQuery) && this.loaded) {
+          return
+        }
+
+        this.query(this.lastQuery);
       });
     });
 
@@ -214,10 +222,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   }
 
   /** @interal */
-  private async fetchAsync(
-    options: OptionsConfigType,
-    params: Record<string, unknown> = {}
-  ) {
+  private async fetchAsync(options: OptionsConfigType, params: Record<string, unknown> = {}) {
     const query = typeof this.limit !== 'undefined' && this.limit !== null ? { page: 1, per_page: this.limit, ...params } : { ...params };
     const { refetch, ...rest } = options;
     const key = { ...rest, ...params };
@@ -227,7 +232,6 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     }
 
     this.key = key;
-
     this.search$.next([key, rest, query]);
   }
 

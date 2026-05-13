@@ -28,16 +28,12 @@ type QueryConfigType = {
 };
 
 /** @description Options query request interceptor type definition */
-export type InterceptorFactory<T, R = unknown> = (
-  injector: Injector
-) => Interceptor<T, R>;
+export type InterceptorFactory<T, R = unknown> = (injector: Injector) => Interceptor<T, R>;
 
-/** @description Options query configuration type definition */
+
+/** @description options query configuration type definition */
 export type OptionsQueryConfigType = {
-  interceptorFactory?: InterceptorFactory<
-    HTTPRequest,
-    Promise<HTTPResponse> | HTTPResponse | Promise<unknown> | unknown
-  >;
+  interceptorFactory?: InterceptorFactory<HTTPRequest, Promise<HTTPResponse> | HTTPResponse | Promise<unknown> | unknown>;
   queries?: QueryConfigType;
 };
 
@@ -55,11 +51,7 @@ export type Subscribable<T> = {
 };
 
 // @internal
-export type ObservableOptionsConfig<
-  T = {
-    [k: string]: unknown;
-  }
-> = Omit<OptionsConfig, 'refetch'> & {
+export type ObservableOptionsConfig<T = { [k: string]: unknown; }> = Omit<OptionsConfig, 'refetch'> & {
   refetch: Subscribable<T>;
 };
 
@@ -67,10 +59,11 @@ export type ObservableOptionsConfig<
 export type KeyType = Record<string, unknown>;
 
 /** @internal */
-export type QueryType = { page?: number; per_page?: number } & Record<
-  string,
-  unknown
->;
+export type QueryType = { page?: number; per_page?: number } & Record<string, unknown>;
 
 /** @internal */
 export type OptionsConfigType = OptionsConfig | ObservableOptionsConfig;
+
+
+// @internal
+export type Optional<T> = T | null | undefined;

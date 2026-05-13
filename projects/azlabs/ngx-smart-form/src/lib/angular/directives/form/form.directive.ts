@@ -83,12 +83,16 @@ export class NgxFormDirective
     }
 
     // set or update the form state of the current component
-    if (state) {
-      this.model.setValue(state);
+    if (!state) {
+      return;
     }
 
-    // notify ui for value changes
-    this.cdRef?.markForCheck();
+    setTimeout(() => {
+      this.model.setValue(state);
+
+      // notify ui for value changes
+      this.cdRef?.markForCheck();
+    }, 700);
   }
 
   addAsyncValidator(validator: AsyncValidatorFn, control?: string): void {
@@ -117,10 +121,7 @@ export class NgxFormDirective
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (
-      'state' in changes ||
-      ('value' in changes && this.valueHasChanged(changes['value']))
-    ) {
+    if ('state' in changes || ('value' in changes && this.valueHasChanged(changes['value']))) {
       this.setValue(this._value);
     }
   }

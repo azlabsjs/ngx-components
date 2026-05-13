@@ -133,7 +133,7 @@ function safeSetValue<T = unknown>(a: Optional<AbstractControl>, value: T, logge
     return;
   }
   try {
-    a.setValue(value);
+    a.setValue(value, { emitEvent: true });
   } catch (error) {
     if (logger) {
       logger(error);

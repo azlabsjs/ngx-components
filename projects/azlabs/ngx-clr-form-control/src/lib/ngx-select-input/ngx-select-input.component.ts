@@ -71,11 +71,7 @@ export class NgxSelectInputComponent {
     this.autoSelect(config);
 
     options = options ?? [];
-    this.setState((state) => ({
-      ...state,
-      config,
-      loaded: options.length !== 0,
-    }));
+    this.setState((state) => ({...state, config, loaded: options.length !== 0 }));
   }
   @Input({ alias: 'loading-text' }) loadingText!: string;
   @Input() parent: string | null | undefined = 'body';
@@ -128,15 +124,10 @@ export class NgxSelectInputComponent {
 
     config = {
       ...config,
-      options: options.map((state) => ({
-        ...state,
-        name: state?.name?.toUpperCase(),
-        description: state.description?.toUpperCase(),
-      })),
+      options: options.map((state) => ({...state, name: state?.name?.toUpperCase(), description: state.description?.toUpperCase()})),
     };
 
     this.autoSelect(config);
-
     this.setState((state) => ({ ...state, performingAction: false, config: config }));
   }
 
@@ -147,7 +138,7 @@ export class NgxSelectInputComponent {
   }
 
   loadingChange(value: boolean) {
-    this.setState((v) => ({ ...v, performingAction: value }));
+    this.setState((v) => ({ ...v, performingAction: value, loaded: !value }));
   }
 
   setState(state: (state: StateType) => StateType) {
