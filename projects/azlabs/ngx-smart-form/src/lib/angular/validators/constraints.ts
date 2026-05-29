@@ -1,14 +1,5 @@
-import {
-  AbstractControl,
-  AsyncValidatorFn,
-  ValidationErrors,
-} from '@angular/forms';
-import {
-  createEqualsConstraint,
-  createExistsConstraint,
-  createPatternConstraint,
-  createUniqueConstraint,
-} from '@azlabsjs/smart-form-core';
+import { AbstractControl, AsyncValidatorFn, ValidationErrors } from '@angular/forms';
+import { AsyncConstraint, createEqualsConstraint, createExistsConstraint, createPatternConstraint, createUniqueConstraint } from '@azlabsjs/smart-form-core';
 import { from, lastValueFrom } from 'rxjs';
 import { RequestClient } from '../../http';
 
@@ -17,38 +8,23 @@ function isDefined(value: unknown): value is AbstractControl {
   return !!value;
 }
 
+// /** @description async constraint type declaration */
+export type _AsyncConstraint<T = boolean> = Omit<AsyncConstraint<T>, 'conditions'> & {
+  /** provides the list of conditions applied on properties of the return value of the  `fn` function. */
+  conditions?: string[] | ((result: unknown, source: unknown) => boolean);
+};
+
 /** @internal */
-function createError(constraint: AsyncConstraint, def: string, value: unknown) {
+function createError(constraint: _AsyncConstraint, def: string, value: unknown) {
   if ('error' in constraint && constraint.error) {
     return { [`custom_${def}`]: { message: constraint.error, params: { value } } };
   }
   return { [def]: value };
 }
 
-/** @description async constraint type declaration */
-export type AsyncConstraint<T = boolean> = {
-  query?: string;
-
-  /** provides an implementation which transform the value or interact with the value before request being send to remote service */
-  pipe?: (value: unknown) => unknown;
-
-  /** constraint handler function */
-  fn: string | ((control: string, value: unknown) => T | Promise<T>);
-
-  /** provides the list of conditions applied on properties of the return value of the  `fn` function. */
-  conditions?: string[] | ((result: unknown, source: unknown) => boolean);
-
-  /** error message to be displayed to user whenever validation fails */
-  error?: string;
-};
 
 /** @internal */
-function restQueryFactory(
-  client: RequestClient,
-  url: string,
-  value: unknown,
-  query?: string
-) {
+function restQueryFactory(client: RequestClient, url: string, value: unknown, query?: string) {
   return async () => {
     return await lastValueFrom(
       query
@@ -63,7 +39,7 @@ function restQueryFactory(
 }
 
 /** creates an existance validation function */
-export function existsValidator(client: RequestClient, constraint: AsyncConstraint<boolean>): AsyncValidatorFn {
+export function existsValidator(client: RequestClient, constraint: _AsyncConstraint<boolean>): AsyncValidatorFn {
   return async (control: AbstractControl) => {
     try {
       const { fn, conditions, query, pipe } = constraint;
@@ -80,10 +56,7 @@ export function existsValidator(client: RequestClient, constraint: AsyncConstrai
 }
 
 /** creates a unique validation function */
-export function uniqueValidator(
-  requestClient: RequestClient,
-  constraint: AsyncConstraint<boolean>
-): AsyncValidatorFn {
+export function uniqueValidator(requestClient: RequestClient, constraint: _AsyncConstraint<boolean>): AsyncValidatorFn {
   return async (control: AbstractControl) => {
     try {
       const { fn, conditions, query, pipe } = constraint;
