@@ -12,15 +12,15 @@ import {
 import { from, lastValueFrom } from 'rxjs';
 import { RequestClient } from '../../http';
 
+/** @internal */
 function isDefined(value: unknown): value is AbstractControl {
   return !!value;
 }
 
+/** @internal */
 function createError(constraint: AsyncConstraint, def: string, value: unknown) {
   if ('error' in constraint && constraint.error) {
-    return {
-      [`custom_${def}`]: { message: constraint.error, params: { value } },
-    };
+    return { [`custom_${def}`]: { message: constraint.error, params: { value } } };
   }
   return { [def]: value };
 }
@@ -28,14 +28,14 @@ function createError(constraint: AsyncConstraint, def: string, value: unknown) {
 /** @description async constraint type declaration */
 export type AsyncConstraint<T = boolean> = {
   query?: string;
-  /**
-   * constraint handler function
-   */
+
+  /** provides an implementation which transform the value or interact with the value before request being send to remote service */
+  pipe?: (value: unknown) => unknown;
+
+  /** constraint handler function */
   fn: string | ((control: string, value: unknown) => T | Promise<T>);
-  /**
-   * provides the list of conditions applied on properties of the return value of the
-   * `fn` function.
-   */
+
+  /** provides the list of conditions applied on properties of the return value of the  `fn` function. */
   conditions?: string[] | ((result: unknown, source: unknown) => boolean);
 
   /** error message to be displayed to user whenever validation fails */
@@ -53,36 +53,26 @@ function restQueryFactory(
     return await lastValueFrom(
       query
         ? from(
-            client.request(url, 'GET', null, {
-              query: { [query]: value },
-            })
-          )
+          client.request(url, 'GET', null, {
+            query: { [query]: value },
+          })
+        )
         : from(client.request(`${url}/${value}`, 'GET', null))
     );
   };
 }
 
 /** creates an existance validation function */
-export function existsValidator(
-  client: RequestClient,
-  constraint: AsyncConstraint<boolean>
-): AsyncValidatorFn {
+export function existsValidator(client: RequestClient, constraint: AsyncConstraint<boolean>): AsyncValidatorFn {
   return async (control: AbstractControl) => {
     try {
-      const value = control.value;
-      const { fn, conditions, query } = constraint;
-      const _fn =
-        typeof fn === 'string'
-          ? restQueryFactory(client, fn, value, query)
-          : fn;
-      const y =
-        typeof conditions === 'function'
-          ? (x: unknown) => conditions(x, value)
-          : (conditions as string[]);
+      const { fn, conditions, query, pipe } = constraint;
+      const value = pipe ? pipe(control.value) : control.value;
+      const func = typeof fn === 'string' ? restQueryFactory(client, fn, value, query) : fn;
+      const y = typeof conditions === 'function' ? (x: unknown) => conditions(x, value) : (conditions as string[]);
+      const result = await createExistsConstraint(y)(func);
 
-      const result = await createExistsConstraint(y)(_fn);
-
-      return result ? null : createError(constraint, 'exists', value);
+      return result ? null : createError(constraint, 'exists', control.value);
     } catch (_) {
       return createError(constraint, 'exists', control.value);
     }
@@ -96,20 +86,14 @@ export function uniqueValidator(
 ): AsyncValidatorFn {
   return async (control: AbstractControl) => {
     try {
-      const value = control.value;
-      const { fn, conditions, query } = constraint;
-      const _fn =
-        typeof fn === 'string'
-          ? restQueryFactory(requestClient, fn, value, query)
-          : fn;
-      const y =
-        typeof conditions === 'function'
-          ? (x: unknown) => conditions(x, value)
-          : (conditions as string[]);
+      const { fn, conditions, query, pipe } = constraint;
+      const value = pipe ? pipe(control.value) : control.value;
+      const func = typeof fn === 'string' ? restQueryFactory(requestClient, fn, value, query) : fn;
+      const y = typeof conditions === 'function' ? (x: unknown) => conditions(x, value) : (conditions as string[]);
+      const result = await createUniqueConstraint(y ?? [])(func);
 
-      const result = await createUniqueConstraint(y ?? [])(_fn);
+      return result ? null : createError(constraint, 'unique', control.value);
 
-      return result ? null : createError(constraint, 'unique', value);
     } catch (_) {
       return null;
     }
