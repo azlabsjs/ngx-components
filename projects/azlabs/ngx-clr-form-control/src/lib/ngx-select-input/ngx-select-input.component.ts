@@ -1,4 +1,4 @@
-import { DOCUMENT } from '@angular/common';
+
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -9,6 +9,7 @@ import {
   Input,
   Output,
   ViewChild,
+  DOCUMENT
 } from '@angular/core';
 import { FormControl, FormsModule } from '@angular/forms';
 import { InputOptions, OptionsInput } from '@azlabsjs/smart-form-core';

@@ -1,4 +1,4 @@
-import { DOCUMENT } from '@angular/common';
+
 import {
   AfterViewInit,
   Directive,
@@ -9,6 +9,7 @@ import {
   OnDestroy,
   Optional,
   Output,
+  DOCUMENT
 } from '@angular/core';
 import {
   InputOptions,

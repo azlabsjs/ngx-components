@@ -1,4 +1,4 @@
-import { DOCUMENT } from '@angular/common';
+
 import {
   AfterContentInit,
   Directive,
@@ -8,6 +8,7 @@ import {
   Input,
   OnDestroy,
   Output,
+  DOCUMENT
 } from '@angular/core';
 import { EventType } from './types';
 
