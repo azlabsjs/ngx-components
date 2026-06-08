@@ -1,4 +1,6 @@
 <ng-container *ngTemplateOutlet="inputRef;context: { control, onBlur: onBlur.bind(this), config }"></ng-container>
 
 <!-- Control description -->
-<span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="config.description || '' | trustHtml"></span>
+@if (describe) {
+  <span [class]="'input__subtext'" [innerHTML]="config.description || '' | trustHtml"></span>
+}

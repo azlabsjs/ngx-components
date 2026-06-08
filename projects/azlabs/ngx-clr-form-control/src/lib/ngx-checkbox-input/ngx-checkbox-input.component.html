@@ -4,26 +4,28 @@
   [loaded]="state.loaded"
   [config]="state.config.optionsConfig"
   [name]="state.config.name"
->
-  <ng-container *ngIf="state.config | hasoptions">
+  >
+  @if (state.config | hasoptions) {
     <div class="clr-form-control">
       <ng-content select="[label]"></ng-content>
       <div class="clr-control-container clr-control-inline">
-        <ngx-checkbox
-          *ngFor="let item of state.config.options"
-          [checked]="item.value | isChecked : state.selection"
-          [text]="item.description ?? item.name"
-          (change)="onChange({ value: item.value, checked: $event })"
-          [disabled]="disabled"
-        >
-        </ngx-checkbox>
+        @for (item of state.config.options; track item) {
+          <ngx-checkbox
+            [checked]="item.value | isChecked : state.selection"
+            [text]="item.description ?? item.name"
+            (change)="onChange({ value: item.value, checked: $event })"
+            [disabled]="disabled"
+            >
+          </ngx-checkbox>
+        }
       </div>
     </div>
-    <span
-      [class]="'input__subtext'"
-      *ngIf="describe"
-      [innerHTML]="state.config.description || '' | trustHtml"
-    ></span>
+    @if (describe) {
+      <span
+        [class]="'input__subtext'"
+        [innerHTML]="state.config.description || '' | trustHtml"
+      ></span>
+    }
     <ng-content></ng-content>
-  </ng-container>
+  }
 </div>

@@ -12,57 +12,38 @@ import {
 } from '@angular/core';
 import { interval, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { SLIDES, Slide } from './types';
+import { Optional, SLIDES, Slide, StateType } from './types';
 import { CommonModule } from '@angular/common';
-
-/** @internal */
-type StateType = {
-  timer: number;
-  slides: Slide[];
-  direction: 'left' | 'right';
-  current: number;
-};
 
 @Component({
   standalone: true,
   imports: [CommonModule],
   selector: 'ngx-slides',
   template: `
-    <div class="carousel" *ngIf="state">
-      <ng-container *ngFor="let slide of state.slides; let i = index">
-        <ng-container *ngIf="i === state.current">
-          <div class="slide" [@slideIn]="state.direction">
-            <ng-container
-              *ngTemplateOutlet="templateRef; context: { $implicit: slide }"
-            ></ng-container>
-          </div>
-        </ng-container>
-      </ng-container>
-
-      <ng-container
-        *ngTemplateOutlet="
-          previousRef ?? prevButton;
-          context: { $implicit: previous.bind(this) }
-        "
-      ></ng-container>
-      <ng-container
-        *ngTemplateOutlet="
-          nextRef ?? nextButton;
-          context: { $implicit: next.bind(this) }
-        "
-      ></ng-container>
-      <ng-template #prevButton let-click>
-        <button class="control prev" (click)="click()">
-          <span class="arrow left"></span>
-        </button>
-      </ng-template>
-      <ng-template #nextButton let-click>
-        <button class="control next" (click)="click()">
-          <span class="arrow right"></span>
-        </button>
-      </ng-template>
-    </div>
-  `,
+    @if (state) {
+      <div class="carousel">
+        @for (slide of state.slides; track slide; let i = $index) {
+          @if (i === state.current) {
+            <div class="slide" [@slideIn]="state.direction">
+              <ng-container *ngTemplateOutlet="templateRef; context: { $implicit: slide }"></ng-container>
+            </div>
+          }
+        }
+        <ng-container *ngTemplateOutlet="prevButton ?? _prev; context: { $implicit: previous.bind(this) }"></ng-container>
+        <ng-container *ngTemplateOutlet="nextButton ?? _next; context: { $implicit: next.bind(this) }"></ng-container>
+        <ng-template #_prev let-click>
+          <button class="control prev" (click)="click()">
+            <span class="arrow left"></span>
+          </button>
+        </ng-template>
+        <ng-template #_next let-click>
+          <button class="control next" (click)="click()">
+            <span class="arrow right"></span>
+          </button>
+        </ng-template>
+      </div>
+    }
+    `,
   styleUrls: ['./ngx-slides.component.scss'],
   animations: [
     trigger('slideIn', [
@@ -101,17 +82,11 @@ type StateType = {
 export class NgxSlidesComponent implements OnInit, OnDestroy {
   //#region Component properties
   private _destroy$ = new Subject<void>();
-  _state: StateType = {
-    timer: 0,
-    slides: [],
-    current: 0,
-    direction: 'right',
-  };
-
+  _state: StateType = { timer: 0, slides: [], current: 0, direction: 'right' };
   get state() {
     return this._state;
   }
-  //#endregion Component properties
+  //#endregion
 
   //#region Component inputs
   @Input({ alias: 'timer' }) timer: number = 1000;
@@ -122,10 +97,10 @@ export class NgxSlidesComponent implements OnInit, OnDestroy {
     this.setState((state) => ({ ...state, current: value }));
   }
   @Input() autostart = false;
-  @ContentChild('ngxSlide') templateRef!: TemplateRef<any>;
-  @ContentChild('next') nextRef!: TemplateRef<any>;
-  @ContentChild('previous') previousRef!: TemplateRef<any>;
-  //#endregion Component inputs
+  @ContentChild('ngxSlide') templateRef!: Optional<TemplateRef<any>>;
+  @ContentChild('next') nextButton: Optional<TemplateRef<any>>;
+  @ContentChild('previous') prevButton: Optional<TemplateRef<any>>;
+  //#endregion
 
   /** @description slides component class constructor */
   constructor(private cdRef: ChangeDetectorRef) {
@@ -159,22 +134,14 @@ export class NgxSlidesComponent implements OnInit, OnDestroy {
   previous() {
     const { slides, current } = this._state;
     const previous = current - 1;
-    this.setState((state) => ({
-      ...state,
-      direction: 'left',
-      current: previous < 0 ? slides.length - 1 : previous,
-    }));
+    this.setState((state) => ({ ...state, direction: 'left', current: previous < 0 ? slides.length - 1 : previous }));
     this.restartLoop();
   }
 
   next() {
     const { slides, current } = this._state;
     const next = current + 1;
-    this.setState((state) => ({
-      ...state,
-      direction: 'right',
-      current: next === slides.length ? 0 : next,
-    }));
+    this.setState((state) => ({ ...state, direction: 'right', current: next === slides.length ? 0 : next }));
     this.restartLoop();
   }
 

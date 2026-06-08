@@ -13,7 +13,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { computeCssClass, computeMenuClass } from './helpers';
-import { Animation, Orientation } from './types';
+import { Animation, Optional, Orientation } from './types';
 
 // @internal
 type StateType = {
@@ -56,7 +56,7 @@ export class DropdownComponent implements OnChanges {
   header!: ElementRef<HTMLElement>;
   @ViewChild('dropdownMenu', { static: false })
   menu!: ElementRef<HTMLElement>;
-  @ContentChild('dropdownToggle') toggle!: TemplateRef<any>;
+  @ContentChild('dropdownToggle') toggle: Optional<TemplateRef<any>>;
   // #endregion
 
   @HostListener('window:click', ['$event'])

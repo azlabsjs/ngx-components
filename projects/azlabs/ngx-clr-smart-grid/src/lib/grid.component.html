@@ -6,10 +6,10 @@
   <ng-container *ngFor="let column of columns">
     <clr-dg-column [ngClass]="config.columnHeadersClass" [clrDgColType]="column.type" [clrDgField]="column.field" [clrDgSortBy]="column.sort || ''">
       <ng-container *ngIf="column.title | transform : (column.transformTitle || config.transformColumnTitle) | pipeResult as result">
-        <ng-container *ngIf="result.value | isAsync; else noAsyncRef">
+        <ng-container *ngIf="result.value | isAsync; else async1">
           <ng-container *ngTemplateOutlet="title ?? _title; context: {$implicit: result.value | async, value: result.value | async, capitalize: config.capitalizeColumnTitle}"></ng-container>
         </ng-container>
-        <ng-template #noAsyncRef>
+        <ng-template #async1>
           <ng-container *ngTemplateOutlet="title ?? _title; context: {$implicit: result.value, value: result.value, capitalize: config.capitalizeColumnTitle}"></ng-container>
         </ng-template>
         <ng-template #_title let-value let-capitalize="capitalize">{{ capitalize ? (value | uppercase) : value }}</ng-template>
@@ -38,10 +38,10 @@
       <ng-container *ngFor="let column of columns">
         <clr-dg-cell (click)="onItemClick($event, current)">
             <ng-container *ngIf="current|propValue:column.property | transform: column.transform | pipeResult as result">
-                <ng-container *ngIf="result.value | isAsync; else noAsyncRef">
+                <ng-container *ngIf="result.value | isAsync; else async2">
                   <ng-container *ngTemplateOutlet="cell ?? _cell; context: {$implicit: result.value | async, column, item: current}"></ng-container>
                 </ng-container>
-                <ng-template #noAsyncRef>
+                <ng-template #async2>
                   <ng-container *ngTemplateOutlet="cell ?? _cell; context: {$implicit: result.value, column, item: current}"></ng-container>
                 </ng-template>
 

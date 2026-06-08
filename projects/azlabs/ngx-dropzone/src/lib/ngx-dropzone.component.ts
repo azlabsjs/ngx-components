@@ -28,7 +28,7 @@ import {
   selector: 'ngx-dropzone',
   imports: [CommonModule, NgxDropzoneDirective],
   template: `
-    <ng-container *ngIf="defaults$ | async as defaults">
+    @if (defaults$ | async; as defaults) {
       <div
         class="dropzone-wrapper"
         [class.disabled]="disabled"
@@ -37,12 +37,12 @@ import {
         [dropzone]="defaults"
         [disabled]="disabled"
         (init)="DZ_INIT.emit($event)"
-      >
+        >
         <div
           class="dz-message"
           [class.disabled]="disabled"
           [class.dz-placeholder]="placeholder"
-        >
+          >
           <div class="text-center dz-upload-btn">
             <ng-container *ngTemplateOutlet="dzuploadbuttonRef"></ng-container>
           </div>
@@ -53,16 +53,17 @@ import {
             }}</a>
           </span>
           <span> {{ uploadFileText || defaults.dictDrag2 }}</span>
-          <div
-            *ngIf="placeholder"
-            class="dz-image"
-            [style.background-image]="getPlaceholder()"
-          ></div>
+          @if (placeholder) {
+            <div
+              class="dz-image"
+              [style.background-image]="getPlaceholder()"
+            ></div>
+          }
         </div>
         <ng-content></ng-content>
       </div>
-    </ng-container>
-  `,
+    }
+    `,
   styleUrls: ['./ngx-dropzone.component.scss'],
   standalone: true,
 })

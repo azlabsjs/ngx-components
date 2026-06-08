@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import {
   Component,
   ComponentRef,
@@ -21,7 +21,7 @@ import { Optional } from './types';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ...BUTTON_DIRECTIVES, ...PIPES],
+  imports: [...BUTTON_DIRECTIVES, ...PIPES],
   selector: 'ngx-form-control-array-outlet',
   templateUrl: './control-array-outlet.component.html',
   styleUrls: ['./control-array-outlet.component.scss'],

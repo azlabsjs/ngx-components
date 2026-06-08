@@ -1,14 +1,4 @@
-import {
-  AsyncPipe,
-  CommonModule,
-  CurrencyPipe,
-  DecimalPipe,
-  JsonPipe,
-  LowerCasePipe,
-  PercentPipe,
-  SlicePipe,
-  UpperCasePipe,
-} from '@angular/common';
+import { AsyncPipe, CommonModule, CurrencyPipe, DecimalPipe, JsonPipe, LowerCasePipe, PercentPipe, SlicePipe, UpperCasePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,

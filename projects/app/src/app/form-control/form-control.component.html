@@ -14,7 +14,7 @@
     [control]="fileControl"
     [inputConfig]="fileInput"
     [tooltip-error]="tooltipError"
-  >
+    >
   </ngx-clr-form-control>
 
   <ngx-clr-form-control
@@ -77,14 +77,20 @@
   ></ngx-clr-form-control>
 
   <ng-template #tooltipError let-error="error" let-data="data">
-    <span *ngIf="error === 'size'" class="tooltip-content error">
-      file(s) too large
-    </span>
-    <span *ngIf="error === 'accept'" class="tooltip-content error">
-      file(s) format not supported
-    </span>
-    <span *ngIf="error === 'upload'" class="tooltip-content error">
-      error uploading file(s)
-    </span>
+    @if (error === 'size') {
+      <span class="tooltip-content error">
+        file(s) too large
+      </span>
+    }
+    @if (error === 'accept') {
+      <span class="tooltip-content error">
+        file(s) format not supported
+      </span>
+    }
+    @if (error === 'upload') {
+      <span class="tooltip-content error">
+        error uploading file(s)
+      </span>
+    }
   </ng-template>
 </div>

@@ -1,28 +1,26 @@
 
-<ng-container *ngIf="template">
-  <ng-container *ngIf="errors">
-    <ng-container *ngFor="let error of errors | supportederrors">
-      <ng-container *ngIf="errors[error] | defined">
+@if (template) {
+  @if (errors) {
+    @for (error of errors | supportederrors; track error) {
+      @if (errors[error] | defined) {
         <ng-container *ngTemplateOutlet="(errors[error] | isObject) ? _object : ref; context: { $implicit: errors[error], error }">
         </ng-container>
-      </ng-container>
-    </ng-container>
-  </ng-container>
-
-  <ng-container *ngIf="errors | customerrors as err">
-    <ng-container *ngIf="err && err.length > 0">
-      <ng-container *ngFor="let error of err">
-        <ng-container *ngIf="error | defined">
+      }
+    }
+  }
+  @if (errors | customerrors; as err) {
+    @if (err && err.length > 0) {
+      @for (error of err; track error) {
+        @if (error | defined) {
           <ng-container *ngTemplateOutlet="template; context: { $implicit: error['message'], error, params: error['params'] }"></ng-container>
-        </ng-container>
-      </ng-container>
-    </ng-container>
-  </ng-container>
-
+        }
+      }
+    }
+  }
   <ng-template #_object let-value let-error="error">
     <ng-container *ngTemplateOutlet="template; context: { $implicit: error, error, params: value }"></ng-container>
   </ng-template>
   <ng-template #ref let-value let-error="error">
     <ng-container *ngTemplateOutlet=" template; context: { $implicit: error, error, params: { value } }"></ng-container>
   </ng-template>
-</ng-container>
+}

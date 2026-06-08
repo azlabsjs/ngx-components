@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import {
   Component,
   ComponentRef,
@@ -23,7 +23,7 @@ type ComponentRefType = RefType<ComponentRef<NgxSmartFormArrayItemComponent>>;
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ...BUTTON_DIRECTIVES, ...PIPES],
+  imports: [...BUTTON_DIRECTIVES, ...PIPES],
   selector: 'ngx-form-array-outlet',
   templateUrl: './array-outlet.component.html',
   styleUrls: ['./array-outlet.component.scss'],

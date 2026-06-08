@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { NgxFormControlComponent } from '@azlabsjs/ngx-clr-form-control';
@@ -16,7 +16,7 @@ import { Subscription, tap } from 'rxjs';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, NgxFormControlComponent],
+  imports: [NgxFormControlComponent],
   selector: 'app-form-control',
   styles: [
     `

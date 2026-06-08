@@ -6,7 +6,6 @@ export interface SlideContentDataLoader {
   /** @description Load the slides in cache */
   load(assets?: string): Promise<boolean> | Promise<void>;
 
-  /** @var SlidesContents */
   contents: SlidesContents;
 }
 
@@ -29,14 +28,10 @@ export type SlidesContents = {
 };
 
 /** @deprecated Query slides injection token */
-export const SLIDES_REQUEST_CLIENT = new InjectionToken<SlidesRequestClient>(
-  'Query for slides'
-);
+export const SLIDES_REQUEST_CLIENT = new InjectionToken<SlidesRequestClient>('query for slides');
 
 /** @description Default slides content provider */
-export const SLIDES = new InjectionToken<
-  Observable<{ timer: number; slides: Slide[] }>
->('Default slides content provider');
+export const SLIDES = new InjectionToken<Observable<{ timer: number; slides: Slide[] }>>('Default slides content provider');
 
 /** @description Slide object type declaration */
 export type Slide = {
@@ -44,4 +39,17 @@ export type Slide = {
   src: string;
   alt?: string;
   title?: string;
+};
+
+
+/** @internal */
+export type Optional<T> = T | null | undefined;
+
+
+/** @internal */
+export type StateType = {
+  timer: number;
+  slides: Slide[];
+  direction: 'left' | 'right';
+  current: number;
 };
