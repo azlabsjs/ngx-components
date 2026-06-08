@@ -9,6 +9,7 @@ import {
   TemplateRef,
   ViewChild,
   ViewContainerRef,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { PIPES } from '../../pipes';
 import { RefType, ViewRefFactory } from '../types';
@@ -24,6 +25,7 @@ import { Optional } from './types';
   imports: [...BUTTON_DIRECTIVES, ...PIPES],
   selector: 'ngx-form-control-array-outlet',
   templateUrl: './control-array-outlet.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./control-array-outlet.component.scss'],
 })
 export class NgxFormControlArrayOutletComponent

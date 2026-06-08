@@ -25,7 +25,7 @@
 <ng-template #template let-formgroup="formgroup" let-autoupload="autoupload" let-inputs="inputs" let-remove="remove">
   <tr>
     @for (input of inputs; track input) {
-      <td class="bottom" [ngClass]="{error: formgroup.get(input.name)?.touched && formgroup.get(input.name)?.errors && (formgroup.get(input.name)?.errors | keys).length > 0}">
+      <td class="bottom" [ngClass]="{error: formgroup.get(input.name)?.touched && formgroup.get(input.name)?.errors && ($safeNavigationMigration(formgroup.get(input.name)?.errors) | keys).length > 0}">
         @if (formgroup.get(input.name); as control) {
           <ng-container
           *ngTemplateOutlet="

@@ -1,5 +1,5 @@
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { NgxFormControlComponent } from '@azlabsjs/ngx-clr-form-control';
 import { createFormControl } from '@azlabsjs/ngx-smart-form';
@@ -33,6 +33,7 @@ import { Subscription, tap } from 'rxjs';
       }
     `,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './form-control.component.html',
 })
 export class FormControlComponent implements OnInit, OnDestroy {

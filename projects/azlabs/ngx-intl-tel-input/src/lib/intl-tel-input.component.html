@@ -2,7 +2,7 @@
   @if (state) {
     <div class="intl-tel-input__layout">
       <ngx-azl-dropdown [disabled]="state.disabled || false" class="intl-tel-input__dropdown" orientation="left"
-        [text]="'+' + state.selected?.dialCode + '  '" [no-hover]="true" [animation]="'scaleY'">
+        [text]="'+' + $safeNavigationMigration(state.selected?.dialCode) + '  '" [no-hover]="true" [animation]="'scaleY'">
         <div class="select-countries-view-port">
           <div class="ngx-dropdown-search-container">
             <ngx-azl-dropdown-search (valueChange)="onSearchChange($event)"></ngx-azl-dropdown-search>

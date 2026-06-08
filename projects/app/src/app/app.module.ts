@@ -5,6 +5,7 @@ import {
   HttpClient,
   provideHttpClient as ngProvideHttpClient,
   withInterceptorsFromDi,
+  withXhr
 } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -134,7 +135,7 @@ export function createTranslateLoader() {
     }),
     provideFormsInitialization('/assets/forms.json'),
     /* injector: Injector */
-    provideHttpClient('http://localhost:4000', () => {
+    provideHttpClient(withXhr(), 'http://localhost:4000', () => {
       // Replace the interceptor function by using the injector
       return (request, next) => {
         request = request.clone({

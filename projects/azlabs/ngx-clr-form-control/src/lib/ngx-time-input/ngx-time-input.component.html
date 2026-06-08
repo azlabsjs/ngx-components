@@ -1,4 +1,4 @@
-<ng-container *ngTemplateOutlet=" inputRef; context: { max: config.constraints?.max, min: config.constraints?.min, config: config, control }"></ng-container>
+<ng-container *ngTemplateOutlet=" inputRef; context: { max: $safeNavigationMigration(config.constraints?.max), min: $safeNavigationMigration(config.constraints?.min), config: config, control }"></ng-container>
 @if (describe) {
   <span [class]="'input__subtext'" [innerHTML]="config.description || '' | trustHtml"></span>
 }

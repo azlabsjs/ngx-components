@@ -72,7 +72,7 @@
           SOUMETTRE
         </button>
       </ng-template>
-      <pre after>{{ formRef?.formGroup?.getRawValue() | json }}</pre>
+      <pre after>{{ $safeNavigationMigration(formRef?.formGroup?.getRawValue()) | json }}</pre>
     </ngx-smart-form>
     <!-- <div #formRef="ngxform" [ngxform]="form" [value]="formValue">
     <ngx-form-ui #formui *ngIf="formRef.formGroup" [no-grid-layout]="false" [autoupload]="true" [template]="template" [label]="label" [state]="{ formGroup: formRef.formGroup, detached: formRef.state.detached }" [inputs]="formRef.form.controlConfigs">

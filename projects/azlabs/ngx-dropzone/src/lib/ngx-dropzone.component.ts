@@ -12,6 +12,7 @@ import {
   PLATFORM_ID,
   TemplateRef,
   ViewChild,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { createDefaultPreviewTemplate, mergeDzAcceptFiles } from './helpers';
@@ -65,6 +66,7 @@ import {
     }
     `,
   styleUrls: ['./ngx-dropzone.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
 })
 export class NgxDropzoneComponent

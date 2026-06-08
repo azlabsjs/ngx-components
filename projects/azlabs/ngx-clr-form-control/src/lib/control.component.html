@@ -204,7 +204,7 @@
                 type="radio"
                 required
                 [checked]="control.value == option.value"
-                [value]="config!.name + '_' + option?.value"
+                [value]="config!.name + '_' + $safeNavigationMigration(option?.value)"
                 (change)="control!.setValue(option.value)" />
               <label>{{ option.description ?? option.name }}</label>
             </clr-radio-wrapper>
