@@ -117,7 +117,8 @@ export class FormControlComponent implements OnInit, OnDestroy {
     containerClass: 'clr-col-6',
     constraints: {
       required: true,
-      max: new Date(),
+      min: '1950-01-01',
+      max: new Date().toISOString().split('T')[0],
     },
   };
   dateInputControl = createFormControl(this.fb, this.dateInput);
@@ -211,7 +212,7 @@ export class FormControlComponent implements OnInit, OnDestroy {
 
   private subscriptions: Subscription[] = [];
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
     this.subscriptions = [
