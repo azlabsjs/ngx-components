@@ -87,6 +87,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
     const { controlConfigs: values } = this._form;
     this.required = useCondition(
       'requiredIf',
+
       // case condition evaluates to true, add the control to it parent
       (control, name, parent, path) => {
         if (parent && !parent.get(name) && control) {
@@ -98,6 +99,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
           this._detached.delete(path);
         }
       },
+
       // else remove the control from and add it to the list of detached controls
       (control, name, parent, path) => {
         if (parent && !!parent.get(name)) {
@@ -113,6 +115,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
 
     this.disabled = useCondition(
       'disabledIf',
+      
       // case condition evaluates to true, we mark control as disabled
       (control, name) => {
         if (control instanceof FormArray) {
@@ -126,6 +129,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
           control.disable({ onlySelf: true, emitEvent: true });
         }
       },
+
       // else mark control as enabled
       (control) => {
         if (control instanceof FormArray) {

@@ -1,57 +1,39 @@
-<div>
-  <ngx-clr-form-control [class]="'ngx-smart-form-control ' + radioInput.containerClass" [hidden]="radioInput.hidden"
-    [control]="fileControl" [inputConfig]="radioInput"></ngx-clr-form-control>
+<div #formRef="ngxform" [ngxform]="form" [value]="{}">
+      <ngx-form-ui #formui *ngIf="formRef.formGroup" [no-grid-layout]="false" [autoupload]="true" [template]="template" [label]="label" [state]="{ formGroup: formRef.formGroup, detached: formRef.state.detached }" [inputs]="formRef.form.controlConfigs">
+          <ng-template #template let-config="value" let-control="control" let-describe="describe">
+            <ngx-clr-form-control [date]="date" class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control" [inputConfig]="config" [describe]="describe ?? true" [error]="error" [label]="label">
+              <ng-template #label let-label>
+                <span>{{ label }}</span>
+              </ng-template>
+              <ng-template #error let-touched="touched" let-errors>
+                <ngx-input-error *ngIf="touched" [errors]="errors" [template]="template">
+                  <ng-template #template let-value let-params="params">
+                    <span [class]="config.type + '-input'">{{ "validation.[value]" | parseStr : { value } | text | parseStr : params }}</span>
+                  </ng-template>
+                </ngx-input-error>
+              </ng-template>
 
-  <h3>File Controls</h3>
-  <br />
-  <ngx-clr-form-control [class]="'ngx-smart-form-control ' + fileInput.containerClass" [hidden]="fileInput.hidden"
-    [control]="fileControl" [inputConfig]="fileInput" [tooltip-error]="tooltipError">
-  </ngx-clr-form-control>
+              <ng-template #date let-control="control" let-onBlur="onBlur" let-config="config" let-describe="describe" let-label="label">
+                <label class="clr-control-label" *ngIf="describe" [for]="config.name">
+                  <ng-container *ngTemplateOutlet="label; context: { $implicit: config!.label, config }"></ng-container>
+                  <span class="required-text" *ngIf="config.rules?.isRequired">(*)</span>
+                </label>
+                <input class="clr-input" type="date" [attr.title]="config!.label" [id]="config.name" [formControl]="control" (blur)="onBlur($event)" [value]="control.value" [min]="config!.minDate ?? config.constraints?.min" [max]="config.maxDate ?? config.constraints?.max" />
+              </ng-template>
+            </ngx-clr-form-control>
+          </ng-template>
 
-  <ngx-clr-form-control [class]="'ngx-smart-form-control ' + autoUploadFile.containerClass"
-    [hidden]="autoUploadFile.hidden" [tooltip-error]="tooltipError" [control]="autoUploadFileControl"
-    [inputConfig]="autoUploadFile"></ngx-clr-form-control>
-  <h3>Date Control</h3>
-  <br />
-  <ngx-clr-form-control [class]="'ngx-smart-form-control ' + dateInput.containerClass" [hidden]="dateInput.hidden"
-    [control]="dateInputControl" [inputConfig]="dateInput"></ngx-clr-form-control>
+          <ng-template #label let-label>
+              <ng-container *ngIf="label | text | uppercase | safeHtml as content">
+                  <div *ngIf="content | notEmpty" class="control__group__header" [innerHTML]="content"></div>
+              </ng-container>
+          </ng-template>
 
-  <h3>Number Control</h3>
-  <br />
-  <ngx-clr-form-control [class]="'ngx-smart-form-control ' + numberInput.containerClass" [hidden]="numberInput.hidden"
-    [control]="numberInputControl" [inputConfig]="numberInput"></ngx-clr-form-control>
-
-  <h3>Text Control</h3>
-  <br />
-  <ngx-clr-form-control [class]="'ngx-smart-form-control ' + textInput.containerClass" [hidden]="textInput.hidden"
-    [control]="textInputControl" [inputConfig]="textInput"></ngx-clr-form-control>
-  <h3>Text Area Control</h3>
-  <br />
-  <ngx-clr-form-control [class]="'ngx-smart-form-control ' + textAreaInput.containerClass"
-    [hidden]="textAreaInput.hidden" [control]="textAreaInputControl"
-    [inputConfig]="textAreaInput"></ngx-clr-form-control>
-  <h3>Time Control</h3>
-  <br />
-  <ngx-clr-form-control [class]="'ngx-smart-form-control ' + timeInput.containerClass" [hidden]="timeInput.hidden"
-    [control]="timeInputControl" [inputConfig]="timeInput"></ngx-clr-form-control>
-  <h3>Phone Control</h3>
-  <br />
-  <ngx-clr-form-control [countries]="['tg', 'gh']" [class]="'ngx-smart-form-control ' + phoneInput.containerClass"
-    [hidden]="timeInput.hidden" [control]="phoneInputControl" [inputConfig]="phoneInput"></ngx-clr-form-control>
-
-  <br />
-  <ngx-clr-form-control [class]="'ngx-smart-form-control ' + optionsInput.containerClass" [hidden]="optionsInput.hidden"
-    [control]="optionsControl" [inputConfig]="optionsInput"></ngx-clr-form-control>
-
-  <ng-template #tooltipError let-error="error" let-data="data">
-    <span *ngIf="error === 'size'" class="tooltip-content error">
-      file(s) too large
-    </span>
-    <span *ngIf="error === 'accept'" class="tooltip-content error">
-      file(s) format not supported
-    </span>
-    <span *ngIf="error === 'upload'" class="tooltip-content error">
-      error uploading file(s)
-    </span>
-  </ng-template>
-</div>
+          <div class="flex justify-between mt-10" submit>
+            <button class="btn btn-primary" (click)="formRef.submit.bind(formRef)()">
+              <cds-icon shape="circle-arrow" dir="up"></cds-icon>
+              SOUMETTRE
+            </button>
+          </div>
+      </ngx-form-ui>
+    </div>

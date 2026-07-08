@@ -7,10 +7,10 @@ import {
 import {
   InputConfigInterface,
   InputGroup,
-  Conditional,
+  Conditional as _Conditional,
   OptionsInput,
-  RequiredIfConstraint,
-  DisabledIfConstraint,
+  RequiredIfConstraint as _RequiredIfConstraint,
+  DisabledIfConstraint as _DisabledIfConstraint,
   OptionsConfig,
 } from '@azlabsjs/smart-form-core';
 import { isNumber } from '@azlabsjs/utilities';
@@ -21,6 +21,34 @@ import {
 } from '../types';
 import { cloneAbstractControl } from './clone';
 import { Observable, Subject, Subscription } from 'rxjs';
+import { ClauseFn, CONDITION_PROPERTIES, ConditionProperty } from './types';
+
+/** @internal */
+type Conditional<T = unknown> = Omit<_Conditional, 'values'> & {
+  /** @deprecated property name will be replaced with `fn` in future release instead of `values` */
+  values:
+    | T[]
+    | T
+    | (<
+        TValue = unknown,
+        TParent extends { get: (n: string) => unknown } = {
+          get: (n: string) => unknown;
+        },
+      >(
+        value: TValue,
+        name: string,
+        formgroup: TParent
+      ) => boolean);
+}
+
+
+/** @internal */
+type RequiredIfConstraint = Omit<_RequiredIfConstraint, 'requiredIf'> & {
+  requiredIf: _Conditional
+}
+type DisabledIfConstraint = Omit<_DisabledIfConstraint, 'requiredIf'> & {
+  requiredIf: _Conditional
+}
 
 /** @internal */
 type Optional<T> = T | null | undefined;
@@ -227,36 +255,6 @@ export function createSetValue(builder: AngularReactiveFormBuilderBridge) {
   };
 }
 
-/** @internal check if the input should matches any of the provided values or conditions */
-function matchany(value: unknown, values: unknown[]) {
-  if (values.includes('*')) {
-    return (
-      typeof value !== 'undefined' &&
-      value !== null &&
-      String(value).trim() !== ''
-    );
-  }
-
-  if (
-    values.includes('__null__') ||
-    values.includes('__undefined__') ||
-    values.includes('__empty__')
-  ) {
-    return (
-      typeof value === 'undefined' ||
-      value === null ||
-      String(value).trim() === ''
-    );
-  }
-  value = isNaN(value as any) ? value : +(value as string);
-  const _values = isNumber(value)
-    ? values.map((value) =>
-      isNaN(value as number) ? value : +(value as string),
-    )
-    : values || [];
-
-  return _values.includes(value);
-}
 
 function hasleaf(input: InputConfigInterface): input is InputGroup {
   const x = input as InputGroup;
@@ -270,15 +268,6 @@ function hasleaf(input: InputConfigInterface): input is InputGroup {
 }
 
 // @internal conditial properties
-const CONDITION_PROPERTIES = ['requiredIf', 'disabledIf'] as const;
-type ConditionProperty = (typeof CONDITION_PROPERTIES)[number];
-type Nullable<T> = T | undefined | null;
-type ClauseFn = (
-  control: AbstractControl,
-  name: string,
-  parent: FormGroup | null,
-  path: string,
-) => void;
 
 function findconditions(
   inputs: InputConfigInterface[],
@@ -338,7 +327,70 @@ function findconditions(
   return conditions;
 }
 
+
+/** @internal check if the input should matches any of the provided values or conditions */
+function matchany(value: unknown, values: unknown) {
+  if (!Array.isArray(values)) {
+    return String(value) === String(values);
+  }
+
+  if (values.includes('*')) {
+    return (
+      typeof value !== 'undefined' &&
+      value !== null &&
+      String(value).trim() !== ''
+    );
+  }
+
+  if (
+    values.includes('__null__') ||
+    values.includes('__undefined__') ||
+    values.includes('__empty__')
+  ) {
+    return (
+      typeof value === 'undefined' ||
+      value === null ||
+      String(value).trim() === ''
+    );
+  }
+  value = isNaN(value as any) ? value : +(value as string);
+  const _values = isNumber(value)
+    ? values.map((value) =>
+      isNaN(value as number) ? value : +(value as string),
+    )
+    : values || [];
+
+  return _values.includes(value);
+}
+
+/** create a query object that alter input ui metadata based on it dependencies changes */
 export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: ClauseFn, query?: (name: string) => AbstractControl | null) {
+
+  // TODO: parse the string value for operator and value parts
+  function createPredicate(operator: string, to: unknown) {
+    return function(value: unknown) {
+      switch(operator.toLocaleLowerCase()) {
+      case 'eq':
+        return value && String(value) === String(to);
+
+      case 'lt':
+        return Number(value) < Number(to);
+
+      case 'lte':
+        return Number(value) <= Number(to);
+
+      case 'gt':
+        return Number(value) > Number(to);
+
+      case 'gte':
+        return Number(value) >= Number(to);
+
+      default:
+        return true;
+    }
+    }
+  }
+
   return (inputs: InputConfigInterface[]) => {
     const items: Condition[] = [];
     if (Array.isArray(inputs) && inputs.length !== 0) {
@@ -407,7 +459,7 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
                   continue;
                 }
 
-                const truthy = matchany(dependency.value, params);
+                const truthy = typeof params === 'function' ? params(dependency.value, name, formgroup) : matchany(dependency.value, params);
                 const found = findparent(formgroup, name);
                 const paths = name.split('.');
                 const path = paths[paths.length - 1];
@@ -431,7 +483,7 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
 
             // case we are not handling form array)
             let control = findcontrol(formgroup, name);
-            const truthy = matchany(value, params);
+            const truthy = typeof params === 'function' ? params(value, name, formgroup) : matchany(value, params);
 
             // case we cannot select from the formgroup, we try to locate it using the query function
             if (!control && !!query) {
@@ -543,6 +595,7 @@ export function getPropertyValue<TReturn = any>(
   return model.get(key)?.getRawValue();
 }
 
+/** returns the corresponding value of an input element */
 export function getInputValue<TReturn = any>(
   v: any,
   key: string,
@@ -872,7 +925,6 @@ export function collectErrors(control: AbstractControl) {
 
   getErrors(control);
 
-  // Return the list of error from the control element
   return errors;
 }
 

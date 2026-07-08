@@ -25,10 +25,10 @@ import { createSlide } from '@azlabsjs/ngx-slides';
 import {
   FormsClient,
   FORM_CLIENT,
-  uniqueValidator,
   HTTP_REQUEST_CLIENT,
   RequestClient,
   existsValidator,
+  ReactiveFormDirectiveInterface,
 } from '@azlabsjs/ngx-smart-form';
 import {
   FileInput,
@@ -36,12 +36,6 @@ import {
   InputTypes,
 } from '@azlabsjs/smart-form-core';
 import { BehaviorSubject, filter, Subject, takeUntil, tap } from 'rxjs';
-import { TestPipe, TRANSLATE_PIPES } from './pipes';
-import { FORM_CONTROL_DIRECTIVES } from '@azlabsjs/ngx-clr-form-control';
-import { DIRECTIVES as GRID_DIRECTIVES } from '@azlabsjs/ngx-clr-smart-grid';
-import { FormControlComponent } from './form-control/form-control.component';
-import { ClarityModule } from '@clr/angular';
-import { ReactiveFormDirectiveInterface } from 'projects/azlabs/ngx-smart-form/src/lib';
 import { ModalComponent } from '@azlabs/ngx-modal';
 
 const _values = {
