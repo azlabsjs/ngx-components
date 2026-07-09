@@ -7,10 +7,10 @@ import {
 import {
   InputConfigInterface,
   InputGroup,
-  Conditional as _Conditional,
+  Conditional,
   OptionsInput,
-  RequiredIfConstraint as _RequiredIfConstraint,
-  DisabledIfConstraint as _DisabledIfConstraint,
+  RequiredIfConstraint,
+  DisabledIfConstraint,
   OptionsConfig,
 } from '@azlabsjs/smart-form-core';
 import { isNumber } from '@azlabsjs/utilities';
@@ -23,33 +23,6 @@ import { cloneAbstractControl } from './clone';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { ClauseFn, CONDITION_PROPERTIES, ConditionProperty } from './types';
 import { JSDate } from '@azlabsjs/js-datetime';
-
-/** @internal */
-type Conditional<T = unknown> = Omit<_Conditional, 'values'> & {
-  /** @deprecated property name will be replaced with `fn` in future release instead of `values` */
-  values:
-    | T[]
-    | T
-    | (<
-        TValue = unknown,
-        TParent extends { get: (n: string) => unknown } = {
-          get: (n: string) => unknown;
-        },
-      >(
-        value: TValue,
-        name: string,
-        formgroup: TParent
-      ) => boolean);
-}
-
-
-/** @internal */
-type RequiredIfConstraint = Omit<_RequiredIfConstraint, 'requiredIf'> & {
-  requiredIf: _Conditional
-}
-type DisabledIfConstraint = Omit<_DisabledIfConstraint, 'requiredIf'> & {
-  requiredIf: _Conditional
-}
 
 /** @internal */
 type Optional<T> = T | null | undefined;

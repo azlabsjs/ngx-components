@@ -104,10 +104,10 @@ export class FormControlComponent {
               name: 'tax',
               values: 'gt:18',
             },
-            // {
-            //   name: 'date',
-            //   values: 'yeardiff_gte:18',
-            // },
+            {
+              name: 'date',
+              values: 'yeardiff_gte:18',
+            },
           ],
           max: 50,
         },
