@@ -22,6 +22,7 @@ import {
 import { cloneAbstractControl } from './clone';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { ClauseFn, CONDITION_PROPERTIES, ConditionProperty } from './types';
+import { JSDate } from '@azlabsjs/js-datetime';
 
 /** @internal */
 type Conditional<T = unknown> = Omit<_Conditional, 'values'> & {
@@ -267,13 +268,9 @@ function hasleaf(input: InputConfigInterface): input is InputGroup {
   );
 }
 
-// @internal conditial properties
-
-function findconditions(
-  inputs: InputConfigInterface[],
-  prop: ConditionProperty,
-) {
-  const conditions: [string, Conditional][] = [];
+// @internal
+function findconditions(inputs: InputConfigInterface[], prop: ConditionProperty) {
+  const items: [string, Conditional[]][] = [];
   function isconditional(
     property: ConditionProperty,
     constraint: InputConfigInterface['constraints'],
@@ -281,9 +278,7 @@ function findconditions(
     if (!constraint) {
       return false;
     }
-    return (
-      CONDITION_PROPERTIES.indexOf(property) !== -1 && property in constraint
-    );
+    return CONDITION_PROPERTIES.indexOf(property) !== -1 && property in constraint;
   }
 
   function search(
@@ -298,13 +293,10 @@ function findconditions(
         search(property, v.children, label, v.isRepeatable ?? false);
       }
 
-      let cond: Conditional | undefined | null;
+      let cond: Conditional | Conditional[] | undefined | null;
       if (v.constraints) {
         const { constraints } = v;
-
-        cond = isconditional(property, constraints)
-          ? (constraints[property] as Conditional)
-          : undefined;
+        cond = isconditional(property, constraints) ? (constraints[property] as Conditional) : undefined;
       }
 
       if (!cond) {
@@ -317,14 +309,15 @@ function findconditions(
         if (parent) {
           name = `${parent}${repeatable ? '.*' : ''}.${v.name}`;
         }
-        conditions.push([name, cond]);
+
+        items.push([name, Array.isArray(cond) ? cond : [cond]]);
       }
     }
   }
 
   search(prop, inputs);
 
-  return conditions;
+  return items;
 }
 
 
@@ -366,30 +359,132 @@ function matchany(value: unknown, values: unknown) {
 /** create a query object that alter input ui metadata based on it dependencies changes */
 export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: ClauseFn, query?: (name: string) => AbstractControl | null) {
 
-  // TODO: parse the string value for operator and value parts
-  function createPredicate(operator: string, to: unknown) {
-    return function(value: unknown) {
-      switch(operator.toLocaleLowerCase()) {
-      case 'eq':
-        return value && String(value) === String(to);
+    function createPredicate(config: unknown) {
+      function parseDate(value: unknown) {
+        if (value instanceof Date) {
+          return value;
+        }
 
-      case 'lt':
-        return Number(value) < Number(to);
+        if (isNumber(value)) {
+          return new Date(value);
+        }
 
-      case 'lte':
-        return Number(value) <= Number(to);
+        let result = String(value).replace(/\//g, '-');
+        let date = result.trim().charAt(4) === '-' ? JSDate.create(result, 'YYYY-MM-DD') : JSDate.create(result, 'DD-MM-YYYY');
+        if (!isNaN(date.getTime())) {
+          return date;
+        }
 
-      case 'gt':
-        return Number(value) > Number(to);
+        date = new Date();
+        date.setTime(Date.parse(String(value)));
+      
+        return date;
+      }
+      
+      function yeardiff(d2: Date, d1: Date) {
+          let diff = d2.getFullYear() - d1.getFullYear();
+          const mdiff = d2.getMonth() - d1.getMonth();
+          const ddiff = d2.getDate() - d1.getDate();
+          
+          if (mdiff < 0 || (mdiff === 0 && ddiff < 0)) {
+              diff--;
+          }
+          
+          return diff;
+      }
 
-      case 'gte':
-        return Number(value) >= Number(to);
+      function daydiff(d2: Date, d1: Date) {
+          const diff = d2.getDate() - d1.getDate();
+          return diff;
+      }
 
-      default:
-        return true;
+      function udaydiff(d2: Date, d1: Date) {
+        return d2.getTime() - d1.getTime() < 0 ? daydiff(d1, d2) : daydiff(d2, d1);
+      }
+
+      function uyeardiff(d2: Date, d1: Date) {
+        return d2.getTime() - d1.getTime() < 0 ? yeardiff(d1, d2) : yeardiff(d2, d1);
+      }
+
+      function parseConfig(y: string) {
+        const index = y.indexOf(':');
+        const toIsNaN = isNaN(Number(y));
+        if (index === -1 && toIsNaN) {
+          throw new Error('bad configuration yeardiff parameter must be a valid integer or in form of <date>:<year>')
+        }
+
+        const date = toIsNaN ? new Date(y.substring(0, index)) : new Date();
+        const years = toIsNaN ? parseInt(y.substring(index + 1)) : parseInt(y);
+
+        return [date, years] as [Date, number];
+      }
+
+
+      function evaluateDate(fn: (d1: Date, d2: Date) => number, c: string, date1: unknown, predicate: (n1: number, n2: number) => boolean) {
+        const d1 = parseDate(date1 as Date|string);
+        const [d2, n] = parseConfig(c);
+        return predicate(fn(d2, d1), n);
+      }
+
+      return function(value: unknown) {
+        if (Array.isArray(config)) {
+          return matchany(value, config);
+        }
+
+        // case provided value evaluate to a default, evaluation does not treat the case
+        if (!value || String(value).trim() === '') {
+          return false;
+        }
+        
+        let strConfig =  String(config).trim() as string;
+        const index = strConfig.indexOf(':');
+        if (index === -1) {
+          return String(value) === strConfig;
+        }
+
+        const operator = strConfig.substring(0, index).trim();
+        const to = strConfig.substring(index + 1).trim();
+        switch(operator.toLocaleLowerCase()) {
+          case 'eq':
+            return value && String(value) === String(to);
+          case 'lt':
+            return Number(value) < Number(to);
+          case 'lte':
+            return Number(value) <= Number(to);
+          case 'gt':
+            return Number(value) > Number(to);
+          case 'gte':
+            return Number(value) >= Number(to);
+          case 'yeardiff':
+            return evaluateDate(yeardiff, to, value, (n1, n2) => n1 === n2);
+          case 'uyeardiff':
+            return evaluateDate(uyeardiff, to, value, (n1, n2) => n1 === n2);
+          case 'yeardiff_lt':
+            return evaluateDate(uyeardiff, to, value, (n1, n2) => n1 < n2);
+          case 'yeardiff_lte':
+            return evaluateDate(uyeardiff, to, value, (n1, n2) => n1 <= n2);
+          case 'yeardiff_gt':
+            return evaluateDate(uyeardiff, to, value, (n1, n2) => n1 > n2);
+          case 'yeardiff_gte':
+            return evaluateDate(uyeardiff, to, value, (n1, n2) => n1 >= n2);
+          case 'daydiff':
+            return evaluateDate(daydiff, to, value, (n1, n2) => n1 === n2);
+          case 'udaydiff':
+            return evaluateDate(udaydiff, to, value, (n1, n2) => n1 === n2);
+          case 'daydiff_lt':
+            return evaluateDate(udaydiff, to, value, (n1, n2) => n1 < n2);
+          case 'daydiff_lte':
+            return evaluateDate(udaydiff, to, value, (n1, n2) => n1 <= n2);
+          case 'daydiff_gt':
+            return evaluateDate(udaydiff, to, value, (n1, n2) => n1 > n2);
+          case 'daydiff_gte':
+            return evaluateDate(udaydiff, to, value, (n1, n2) => n1 >= n2);
+
+          default:
+            throw new Error('unsupported operator, lt, lte, gt, gte are the only supported operators.');
+        }
+      }
     }
-    }
-  }
 
   return (inputs: InputConfigInterface[]) => {
     const items: Condition[] = [];
@@ -397,26 +492,31 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
       const conditions = findconditions(inputs, prop);
       for (const [name, condition] of conditions) {
         const position = name.indexOf('*');
+        const currentCondition = [...condition];
         items.push({
           match: (p) => {
-            if (position !== -1) {
-              const str = before(condition.name, '*');
-              return p.trim().startsWith(str.substring(0, str.length - 1));
+            let result = false;
+            for (const item of currentCondition) {
+              if (position !== -1) {
+                const str = before(item.name, '*');
+                result = str.trim() !== '' ? p.trim().startsWith(str.substring(0, str.length - 1)) : result;
+              } else {
+                result =  String(p) === String(item.name);
+              }
+
+              if (result === true) {
+                break;
+              }
             }
-            return String(p) === String(condition.name);
+            return result;
           },
-          dependencyChanged: (
-            formgroup: FormGroup,
-            property: string,
-            value: unknown,
-          ) => {
+          dependencyChanged: (formgroup: FormGroup,property: string,value: unknown) => {
             const output: [[string, AbstractControl][], [string, AbstractControl][]] = [[], []];
-            const params = condition.values ?? [];
             // case the selector key contains * and dependecy key starts with string before `*`
             // then the control is the control at the same index having the property after *
             let str = before(name, '*');
             str = str.trim().substring(0, str.length - 1); // remove the trailing `.` at the end of `str`
-            if (position !== -1 && property.trim().startsWith(str)) {
+            if (position !== -1 && str.trim() !== '' && property.trim().startsWith(str)) {
               const parent = findcontrol(formgroup, str) as FormArray;
               if (!parent) {
                 return output;
@@ -440,10 +540,10 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
                 const prefix = `${str}.${index}`;
                 let name = isformgroup(item) ? `${prefix}.${input}` : `${prefix}`;
                 let control = isformgroup(item) ? findcontrol(item, input) : item;
-                let dependency = isformgroup(item) ? findcontrol(item, after(condition.name, `${str}.*.`).trim()) : item;
+                const dependencies = currentCondition.map(i => ({input: isformgroup(item) ? findcontrol(item, after(i.name, `${str}.*.`).trim()) : item, fn: i.values ?? [], name: i.name})).filter(i => !!i.input);
 
                 // case the dependency cannot be located continue to next iteration
-                if (!dependency) {
+                if (dependencies.length === 0) {
                   continue;
                 }
 
@@ -459,7 +559,20 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
                   continue;
                 }
 
-                const truthy = typeof params === 'function' ? params(dependency.value, name, formgroup) : matchany(dependency.value, params);
+                let truthy = false;
+                for (const dependency of dependencies) {
+                  if (!dependency.input) {
+                    continue;
+                  }
+
+                  truthy = typeof dependency.fn === 'function' ? dependency.fn(dependency.input.value, name, formgroup) : createPredicate(dependency.fn)(dependency.input.value);
+                  // case truthy evaluates to false after computing predicate, we break from the loop
+                  if (truthy === false) {
+                    break;
+                  }
+                  
+                }
+
                 const found = findparent(formgroup, name);
                 const paths = name.split('.');
                 const path = paths[paths.length - 1];
@@ -483,7 +596,21 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
 
             // case we are not handling form array)
             let control = findcontrol(formgroup, name);
-            const truthy = typeof params === 'function' ? params(value, name, formgroup) : matchany(value, params);
+            let truthy = false;
+            for (const c of currentCondition) {
+              let inputvalue = value;
+              if (c.name !== property) {
+                const selected = findcontrol(formgroup, c.name);
+                inputvalue = selected ? selected.value : value;
+              }
+              const params = c.values ?? [];
+              truthy = typeof params === 'function' ? params(inputvalue, name, formgroup) : createPredicate(params)(inputvalue);
+              // case thruthy evaluates to false after computing predicate, we break from the loop
+              if (truthy === false) {
+                break;
+              }
+              
+            }
 
             // case we cannot select from the formgroup, we try to locate it using the query function
             if (!control && !!query) {

@@ -19,6 +19,7 @@ import {
 } from '@azlabsjs/ngx-smart-form';
 import {
   FormConfigInterface,
+  InputConfigInterface,
   OptionsInput,
   OptionsInputConfigInterface,
 } from '@azlabsjs/smart-form-core';
@@ -98,16 +99,19 @@ export class FormControlComponent {
         isRepeatable: false,
         containerClass: 'clr-col-6',
         constraints: {
-          requiredIf: {
-            name: 'tax',
-            values: (value: unknown, name: string, formgroup: FormGroup) => {
-              console.log('Changes: ', value, name, formgroup);
-              return String(value) === '1';
-            }
-          },
+          requiredIf: [
+            {
+              name: 'tax',
+              values: 'gt:18',
+            },
+            // {
+            //   name: 'date',
+            //   values: 'yeardiff_gte:18',
+            // },
+          ],
           max: 50,
         },
-      },
+      } as InputConfigInterface,
       {
         cols: 0,
         rows: 0,
