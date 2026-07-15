@@ -106,7 +106,7 @@ export class FormControlComponent {
             },
             {
               name: 'date',
-              values: 'yeardiff_gte:18',
+              values: 'daydiff_lte:30',
             },
           ],
           max: 50,
@@ -143,6 +143,12 @@ export class FormControlComponent {
         classes: 'clr-input',
         isRepeatable: false,
         containerClass: 'clr-col-12',
+        constraints: {
+          requiredIf: {
+            name: 'name',
+            values: 'len_lt:10'
+          }
+        }
       },
       {
         label: 'Sexe',

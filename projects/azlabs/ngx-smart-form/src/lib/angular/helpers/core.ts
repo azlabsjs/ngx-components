@@ -366,17 +366,27 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
           return diff;
       }
 
+      function uyeardiff(d2: Date, d1: Date) {
+        return d2.getTime() - d1.getTime() < 0 ? yeardiff(d1, d2) : yeardiff(d2, d1);
+      }
+
       function daydiff(d2: Date, d1: Date) {
-          const diff = d2.getDate() - d1.getDate();
-          return diff;
+          const diff = Math.abs(d2.getTime() - d1.getTime());
+          return Math.floor(diff / (1000 * 60 * 60 * 24));
       }
 
       function udaydiff(d2: Date, d1: Date) {
         return d2.getTime() - d1.getTime() < 0 ? daydiff(d1, d2) : daydiff(d2, d1);
       }
 
-      function uyeardiff(d2: Date, d1: Date) {
-        return d2.getTime() - d1.getTime() < 0 ? yeardiff(d1, d2) : yeardiff(d2, d1);
+      function monthdiff(d2: Date, d1: Date) {
+        const yearDiff = d2.getFullYear() - d1.getFullYear();
+        const monthDiff = d2.getMonth() - d1.getMonth();
+        return Math.abs((yearDiff * 12) + monthDiff);
+      }
+
+      function umonthdiff(d2: Date, d1: Date) {
+        return d2.getTime() - d1.getTime() < 0 ? monthdiff(d1, d2) : monthdiff(d2, d1);
       }
 
       function parseConfig(y: string) {
@@ -418,8 +428,10 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
         const operator = strConfig.substring(0, index).trim();
         const to = strConfig.substring(index + 1).trim();
         switch(operator.toLocaleLowerCase()) {
-          case 'eq':
-            return value && String(value) === String(to);
+          case 'num_eq':
+            return value && Number(value) === Number(to);
+          case 'num_neq':
+            return value && Number(value) !== Number(to);
           case 'lt':
             return Number(value) < Number(to);
           case 'lte':
@@ -428,6 +440,18 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
             return Number(value) > Number(to);
           case 'gte':
             return Number(value) >= Number(to);
+          case 'eq':
+            return value && String(value) === String(to);
+          case 'neq':
+            return value && String(value) !== String(to);
+          case 'len_lt':
+            return String(value).length < Number(to);
+          case 'len_lte':
+            return String(value).length <= Number(to);
+          case 'len_gt':
+            return String(value).length > Number(to);
+          case 'len_gte':
+            return String(value).length >= Number(to);
           case 'yeardiff':
             return evaluateDate(yeardiff, to, value, (n1, n2) => n1 === n2);
           case 'uyeardiff':
@@ -452,9 +476,20 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
             return evaluateDate(udaydiff, to, value, (n1, n2) => n1 > n2);
           case 'daydiff_gte':
             return evaluateDate(udaydiff, to, value, (n1, n2) => n1 >= n2);
-
+          case 'monthdiff':
+            return evaluateDate(monthdiff, to, value, (n1, n2) => n1 === n2);
+          case 'umonthdiff':
+            return evaluateDate(umonthdiff, to, value, (n1, n2) => n1 === n2);
+          case 'monthdiff_lt':
+            return evaluateDate(umonthdiff, to, value, (n1, n2) => n1 < n2);
+          case 'monthdiff_lte':
+            return evaluateDate(umonthdiff, to, value, (n1, n2) => n1 <= n2);
+          case 'monthdiff_gt':
+            return evaluateDate(umonthdiff, to, value, (n1, n2) => n1 > n2);
+          case 'monthdiff_gte':
+            return evaluateDate(umonthdiff, to, value, (n1, n2) => n1 >= n2);
           default:
-            throw new Error('unsupported operator, lt, lte, gt, gte are the only supported operators.');
+            throw new Error('unsupported operator (eq, neq, lt, lte, gt, gte, yeardiff, uyeardiff, yeardiff_lt, yeardiff_lte, yeardiff_gt, yeardiff_gte, daydiff, udaydiff, daydiff_lt, daydiff_lte, daydiff_gt, daydiff_gte, monthdiff, umonthdiff, monthdiff_lt, monthdiff_lte, monthdiff_gt, monthdiff_gte) are the only supported operators.');
         }
       }
     }
