@@ -39,32 +39,32 @@
 }
 
 .modal .modal-content {
-  min-height: var(--search-modal-min-height, 220px) !important;
-  max-height: calc(100vh - 8px);
+  min-height: var(--ngx-modal-min-height, 220px) !important;
+  max-height: var(--ngx-modal-max-height, calc(100vh - 50px));
 }
 
 .modal.sm .modal-content {
   width: 14.4rem;
-  min-height: var(--search-modal-min-height, 220px) !important;
-  max-height: calc(100vh - 8px);
+  min-height: var(--ngx-modal-min-height, 220px) !important;
+  max-height: var(--ngx-modal-max-height, calc(100vh - 50px));
 }
 
 .modal.md .modal-content {
   width: 36.4rem;
-  min-height: var(--search-modal-min-height, 220px) !important;
-  max-height: calc(100vh - 8px);
+  min-height: var(--ngx-modal-min-height, 220px) !important;
+  max-height: var(--ngx-modal-max-height, calc(100vh - 50px));
 }
 
 .modal.lg .modal-content {
   width: 43.2rem;
-  min-height: var(--search-modal-min-height, 220px) !important;
-  max-height: calc(100vh - 8px);
+  min-height: var(--ngx-modal-min-height, 220px) !important;
+  max-height: var(--ngx-modal-max-height, calc(100vh - 50px));
 }
 
 .modal.xl .modal-content {
   width: 80%;
   height: auto;
-  max-height: calc(100vh - 8px);
+  max-height: var(--ngx-modal-max-height, calc(100vh - 50px));
 }
 
 .modal.full .modal-content {
@@ -121,11 +121,11 @@
   overflow-y: scroll;
   scrollbar-width: thin;
   padding: 0.5rem 2rem;
-  margin: var(--search-modal-margin, 0) !important;
+  margin: var(--ngx-modal-margin, 0) !important;
 }
 
 .modal.full :host ::ng-deep .ngx-modal-body {
-  margin: var(--search-modal-margin, 0) !important;
+  margin: var(--ngx-modal-margin, 0) !important;
 }
 /*! modal body !*/
 

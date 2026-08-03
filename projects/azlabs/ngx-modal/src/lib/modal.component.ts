@@ -101,17 +101,12 @@ type StateType = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModalComponent implements OnChanges {
-  // #region component internal properties
-  private _state: StateType = {
-    opened: false,
-    size: 'lg',
-  };
+
+  private _state: StateType = { opened: false, size: 'lg' };
   get state() {
     return this._state;
   }
-  // #region
 
-  // #region input properties
   @Input() opened: boolean = false;
   private _size!: SizeType;
   @Input() set size(value: SizeType) {
@@ -125,13 +120,10 @@ export class ModalComponent implements OnChanges {
   @Input() outlet!: OutletConfig | null | undefined;
   @Input() cssClass!: string | string[];
   @Input() actions!: TemplateRef<any>;
-  // #endregion
 
-  // #region output properties
   @Output() openedChange = new EventEmitter<boolean>();
-  // #region
 
-  @ContentChild('template') templateRef!: Optional<TemplateRef<unknown>>;
+  @ContentChild('template') template!: Optional<TemplateRef<unknown>>;
 
   @HostListener('document:keydown.escape', ['$event'])
   onEscapeKeyPress(event: Event) {
