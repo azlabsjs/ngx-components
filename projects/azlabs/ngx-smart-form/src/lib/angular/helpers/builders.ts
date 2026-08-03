@@ -238,7 +238,7 @@ export class ComponentReactiveFormHelpers {
       let format: string|((value: unknown) => string) = 'DD/MM/YYYY';
       if ('constraints' in config) {
         const constraint = config.constraints ?? {};
-        format = 'format' in constraint ? (constraint.format ?? 'DD/MM/YYYY') : format;
+        format = 'format' in constraint ? String(constraint.format ?? 'DD/MM/YYYY') : format;
       }
 
       validators.push(CustomValidators.isValidDate);
@@ -283,12 +283,7 @@ export class ComponentReactiveFormHelpers {
         updateOn:
           // Case the control is an email or the control is a date input or the control has equals constraint
           // or the control has async validators, we update only on blur else, we update on submit
-          asyncValidators.length > 0 ||
-          config.type === InputTypes.DATE_INPUT ||
-          hasEqualsConstraint ||
-          hasEmailConstraint
-            ? 'blur'
-            : 'change',
+          asyncValidators.length > 0 || config.type === InputTypes.DATE_INPUT || hasEqualsConstraint || hasEmailConstraint ? 'blur' : 'change',
         asyncValidators,
       }
     );

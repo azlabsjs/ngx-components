@@ -89,7 +89,6 @@ export const createAppTranslator = createTranslate((values) => {
     }),
     HTTPValuePipe,
     ClarityModule,
-    // CdsModule,
     ...DIRECTIVES,
     ...COMMON_PIPES,
     ...TRANSLATE_PIPES,

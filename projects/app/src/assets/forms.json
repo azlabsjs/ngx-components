@@ -403,7 +403,7 @@
         "placeholder": "...",
         "requiredIf": "category_id:1",
         "type": "control_group",
-        "classes": "controls-header",
+        "classes": "controls-header table",
         "multiple": 0,
         "options": [],
         "children": [
@@ -458,7 +458,7 @@
             "isRepeatable": false,
             "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-4",
             "id": 1284,
-            "label": "PROFESSION (AYANT DROIT)",
+            "label": "PROFESSION DE TEXTES CONCERNANT LES (AYANT DROIT)",
             "placeholder": "...",
             "type": "text",
             "classes": "clr-input",

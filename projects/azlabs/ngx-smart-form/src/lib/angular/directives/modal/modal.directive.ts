@@ -18,7 +18,6 @@ export type SizeType = 'sm' | 'md' | 'lg' | 'xl' | 'full';
   exportAs: 'formmodal',
 })
 export class ModalDirective {
-  //#region directive inputs
   @Input() formgroup!: FormGroup;
   @Input() inputs!: InputConfigInterface[];
   @Input() autoupload!: boolean;
@@ -27,14 +26,11 @@ export class ModalDirective {
   @Input() name!: string;
   @Input() view!: TemplateRef<any>;
   @Input() label!: TemplateRef<any>;
-  //#endregion
 
-  //#region directive outputs
   @Output() stateChange = new EventEmitter<void>();
   @Output() closeChange = new EventEmitter<void>();
   @Output() openChange = new EventEmitter<void>();
   @Output() sizeChange = new EventEmitter<SizeType>();
-  //#endregion
 
   close() {
     this.closeChange.emit();

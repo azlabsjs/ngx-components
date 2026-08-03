@@ -40,9 +40,7 @@ type ContextType = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxTableForm
-  implements ViewRefFactory<EmbeddedViewRef<any>>, OnDestroy
-{
-  //#region component inputs
+  implements ViewRefFactory<EmbeddedViewRef<any>>, OnDestroy {
   @Input() label!: TemplateRef<any> | null | undefined;
   @Input({ alias: 'template' }) view!: TemplateRef<any>;
   @Input({ alias: 'inputs' }) configs: InputConfigInterface[] = [];
@@ -51,45 +49,23 @@ export class NgxTableForm
   @Input() title!: string;
   @Input() modal!: ModalDirective;
   @Input() name!: string;
-  //#endregion
 
-  //#region component output
   @Output() removed = new EventEmitter<RefType<EmbeddedViewRef<any>>>();
-  //#endregion
 
-  //#region component properties
-  @ViewChild('container', { read: ViewContainerRef, static: false })
-  containerRef!: ViewContainerRef;
+  @ViewChild('container', { read: ViewContainerRef, static: false }) containerRef!: ViewContainerRef;
   @ViewChild('template', { static: false }) templateRef!: TemplateRef<any>;
-  //#endregion
 
   private subscriptions: Subscription[] = [];
 
-  constructor(@Optional() private cdRef: ChangeDetectorRef | null) {}
+  constructor(@Optional() private cdRef: ChangeDetectorRef | null) { }
 
-  createView(
-    index: number,
-    formgroup: AbstractControl,
-    triggered: boolean = false
-  ) {
+  createView(index: number, formgroup: AbstractControl, triggered: boolean = false) {
     const subject = new Subject<number>();
     const inputs = [...this.configs];
 
     // case a modal component is provided we open the modal and pass required input configuration to it
     if (triggered && this.modal) {
-      this.modal.formgroup = formgroup as FormGroup;
-      this.modal.inputs = inputs;
-      this.modal.autoupload = this.autoupload;
-      this.modal.title = this.title;
-      this.modal.detached = this.detached;
-      this.modal.view = this.view;
-      this.modal.name = this.name;
-      if (this.label) {
-        this.modal.label = this.label;
-      }
-      
-      this.modal.stateChanged();
-      this.modal.open();
+      this.showModalView(inputs, formgroup);
     }
 
     const element = this.containerRef?.createEmbeddedView<ContextType>(
@@ -106,15 +82,10 @@ export class NgxTableForm
         destroy: subject.asObservable(),
       }
     );
-    const ref: RefType<EmbeddedViewRef<any>> = {
-      index,
-      element,
-      destroy: () => element.destroy(),
-    };
 
-    const subscription = element.context.destroy.subscribe(() =>
-      this.removed.emit(ref)
-    );
+    const ref: RefType<EmbeddedViewRef<any>> = { index, element, destroy: () => element.destroy() };
+
+    const subscription = element.context.destroy.subscribe(() => this.removed.emit(ref));
 
     this.subscriptions.push(subscription);
 
@@ -123,6 +94,24 @@ export class NgxTableForm
 
   clear(): void {
     this.containerRef?.clear();
+  }
+
+  showModalView(inputs: InputConfigInterface[], formgroup: AbstractControl) {
+    if (this.modal) {
+      this.modal.formgroup = formgroup as FormGroup;
+      this.modal.inputs = inputs;
+      this.modal.autoupload = this.autoupload;
+      this.modal.title = this.title;
+      this.modal.detached = this.detached;
+      this.modal.view = this.view;
+      this.modal.name = this.name;
+      if (this.label) {
+        this.modal.label = this.label;
+      }
+
+      this.modal.stateChanged();
+      this.modal.open();
+    }
   }
 
   ngOnDestroy(): void {

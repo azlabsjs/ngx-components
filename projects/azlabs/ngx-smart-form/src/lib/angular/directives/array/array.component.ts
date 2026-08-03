@@ -46,10 +46,7 @@ type Optional<T> = T | null | undefined;
   styleUrls: ['./array.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxSmartFormArrayComponent
-  implements AfterContentInit, OnDestroy, AfterViewInit
-{
-  //#region inputs properties
+export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy, AfterViewInit {
   @Input() autoupload = true;
   @Input() modal!: ModalDirective;
   @Input() detached!: AbstractControl[];
@@ -67,30 +64,17 @@ export class NgxSmartFormArrayComponent
     transform: (value: string | string[]) => {
       const classes = typeof value === 'string' ? [value] : value;
       return classes
-        .map((v) =>
-          v
-            .split(' ')
-            .map((i) => i.split(','))
-            .flat()
-            .map((v) => v.trim()),
-        )
+        .map((v) => v.split(' ').map((i) => i.split(',')).flat().map((v) => v.trim()))
         .flat();
     },
   })
   cssClass!: string | string[];
   @Input() hidden: boolean = false;
-  //#endregion
 
-  //#region output properties
   @Output() listChange = new EventEmitter<number>();
-  //#endregion
 
-  // #region view children
-  @ViewChild('container', { static: false })
-  viewFactory!: ViewRefFactory<any>;
-  // #endregion
+  @ViewChild('container', { static: false }) viewFactory!: ViewRefFactory<any>;
 
-  // #region local properties
   _ref = 0;
   get refCount() {
     return this._ref;
@@ -98,14 +82,8 @@ export class NgxSmartFormArrayComponent
   private refs: RefType<unknown>[] = [];
   private destroy$ = new Subject<void>();
   private triggered = false;
-  // #endregion
 
-  // component instance initializer
-  constructor(
-    private cdRef: ChangeDetectorRef | null,
-    @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
-    private builder: AngularReactiveFormBuilderBridge,
-  ) {}
+  constructor(private cdRef: ChangeDetectorRef | null, @Inject(ANGULAR_REACTIVE_FORM_BRIDGE) private builder: AngularReactiveFormBuilderBridge) { }
 
   ngAfterViewInit(): void {
     this.update.bind(this).call(null);
@@ -149,11 +127,7 @@ export class NgxSmartFormArrayComponent
       for (let i = 0; i < count; i++) {
         const index = this._ref + i;
         const { viewFactory: factory } = this;
-        const view = factory.createView(
-          index,
-          this.array.at(index),
-          this.triggered,
-        );
+        const view = factory.createView(index, this.array.at(index), this.triggered);
         this.refs.push(view);
       }
       this.setRefCount(this._ref + count);

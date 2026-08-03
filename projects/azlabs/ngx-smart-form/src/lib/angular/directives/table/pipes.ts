@@ -18,5 +18,16 @@ export class WithConfigValuePipe implements PipeTransform {
   }
 }
 
+@Pipe({
+  name: 'appendcss',
+  standalone: true,
+  pure: true,
+})
+export class AppendCssClass implements PipeTransform {
+  transform(value: InputConfigInterface, cssClass: string) {
+    return { ...value, classes: value.classes ? `${value.classes} ${cssClass}` : `${cssClass}` } as InputConfigInterface;
+  }
+}
+
 // exported standalone pipes
-export const PIPES = [WithConfigValuePipe, ..._PIPES] as const;
+export const PIPES = [WithConfigValuePipe, AppendCssClass, ..._PIPES] as const;

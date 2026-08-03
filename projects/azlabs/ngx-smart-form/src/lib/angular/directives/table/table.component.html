@@ -2,11 +2,11 @@
   <table class="table table-compact">
     <thead>
       <tr>
-        <th *ngFor="let item of configs" class="left">
-          <span>{{ item.label | text }}</span>
+        <th *ngFor="let item of configs" class="left text-ellipsis fit">
+          <span class="text-ellipsis">{{ item.label | text }}</span>
           <small class="required" *ngIf="item.rules?.isRequired ?? (item | required)">(*)</small>
         </th>
-        <th></th>
+        <th colspan="2">Actions</th>
       </tr>
     </thead>
     <tbody #container></tbody>
@@ -20,21 +20,25 @@
 <!-- table layout component -->
 <ng-template #template let-formgroup="formgroup" let-autoupload="autoupload" let-inputs="inputs" let-remove="remove">
   <tr>
-    <td *ngFor="let input of inputs" class="bottom" [ngClass]="{error: formgroup.get(input.name)?.touched && formgroup.get(input.name)?.errors && (formgroup.get(input.name)?.errors | keys).length > 0}">
+    <td *ngFor="let input of inputs" class="bottom text-ellipsis"
+      [ngClass]="{error: formgroup.get(input.name)?.touched && formgroup.get(input.name)?.errors && (formgroup.get(input.name)?.errors | keys).length > 0}">
       <ng-container *ngIf="formgroup.get(input.name) as control">
-        <ng-container
-          *ngTemplateOutlet="
+        <ng-container *ngTemplateOutlet="
             view;
             context: {
               control,
-              value: input,
+              value: input | appendcss : 'border-0',
               autoupload,
               describe: false,
-              hidden:
-                (input | isHidden) ||
-                (control | inarray : detached : input.name)
-            }"></ng-container>
+              hidden: (input | isHidden) || (control | inarray : detached : input.name) }"></ng-container>
       </ng-container>
+    </td>
+    <td class="middle center">
+      <svg (click)="showModalView(inputs, formgroup)" class="cursor-pointer" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+      </svg>
     </td>
     <td class="middle center">
       <ngx-close-button (click)="remove($event)"></ngx-close-button>
