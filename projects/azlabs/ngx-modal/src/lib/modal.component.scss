@@ -1,28 +1,24 @@
 /* modal (background) */
 .modal {
   display: none;
-  /* hidden by default */
   position: fixed;
-  /* stay in place */
   z-index: var(--ngx-modal-z-index, 1050);
-  
-  /* sit on top */
-  /* location of the box */
   left: 0;
   top: 0;
   width: 100vw;
-
-  /* full width */
   height: 100vh;
-
-  /* full height */
   overflow: auto;
-
-  /* enable scroll if needed */
   background-color: rgb(0, 0, 0);
-
-  /* fallback color */
   background-color: rgba(0, 0, 0, 0.5);
+}
+
+.inset-0 {
+  inset: 0px;
+}
+
+.backdrop-blur-sm {
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
 }
 
 /* modal opened state */
@@ -95,9 +91,9 @@
 .modal.full .modal-content {
   border: 1px solid var(--ngx-modal-content-border-color, #888);
   border-radius: var(--ngx-modal-content-border-radius, 0.15rem);
-  box-shadow: 0 0.05rem 0rem 0rem
-    var(--ngx-modal-content-box-shadow-color, rgba(0, 0, 0, 0.1));
+  box-shadow: 0 0.05rem 0rem 0rem var(--ngx-modal-content-box-shadow-color, rgba(0, 0, 0, 0.1));
 }
+
 /* modal content*/
 
 /* modal title */
@@ -127,6 +123,7 @@
 .modal.full :host ::ng-deep .ngx-modal-body {
   margin: var(--ngx-modal-margin, 0) !important;
 }
+
 /*! modal body !*/
 
 /* modal footer */
@@ -194,15 +191,18 @@
   0% {
     transform: scale(0);
   }
+
   100% {
     transform: scale(1);
   }
 }
+
 @keyframes scaleDown {
   0% {
     transform: scale(1);
     opacity: 1;
   }
+
   100% {
     transform: scale(0);
     opacity: 0;
@@ -214,10 +214,12 @@
     transform: scale(1);
     opacity: 1;
   }
+
   99.9% {
     transform: scale(2);
     opacity: 0;
   }
+
   100% {
     transform: scale(0);
   }
@@ -228,9 +230,11 @@
     transform: scale(2);
     opacity: 0;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
   }
 }
+
 /*! Animation styles */

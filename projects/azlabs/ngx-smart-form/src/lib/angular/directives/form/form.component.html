@@ -6,6 +6,7 @@
   [no-grid-layout]="noGridLayout"
   [state]="model.state"
   [modal]="formmodal ?? modal"
+  [table-description]="tabledescription"
   [inputs]="model.state.form.controlConfigs || []">
   <section before><ng-content select="[before]"></ng-content></section>
   <section after><ng-content select="[after]"></ng-content></section>

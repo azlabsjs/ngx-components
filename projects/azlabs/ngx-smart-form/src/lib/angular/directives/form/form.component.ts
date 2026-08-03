@@ -10,7 +10,7 @@ import {
   Input,
   OnChanges,
   OnDestroy,
-  Optional,
+  Optional as ngOptional,
   Output,
   SimpleChanges,
   TemplateRef,
@@ -37,6 +37,7 @@ import { PIPES } from '../../pipes';
 import { FormModel } from './form.model';
 import { NgxFormComponent } from './form-ui.component';
 import { ModalDirective } from '../modal';
+import { Optional } from './types';
 
 /** @internal */
 const AUTO_SUBMIT_ERROR_MESSAGE =
@@ -78,7 +79,7 @@ export class NgxSmartFormComponent
   @Input() action: HTTPRequestMethods = 'POST';
   @Input('no-grid-layout') noGridLayout = false;
   @Input() modal!: ModalDirective;
-  //#endregion
+  @Input({ alias: 'table-description' }) tabledescription!: Optional<TemplateRef<any>>;
 
   //#region output properties
   @Output() submit = new EventEmitter<{ [index: string]: any }>();
@@ -108,7 +109,7 @@ export class NgxSmartFormComponent
   public constructor(
     protected readonly model: FormModel<FormConfigInterface>,
     private cdRef: ChangeDetectorRef | null,
-    @Inject(HTTP_REQUEST_CLIENT) @Optional() private client?: RequestClient,
+    @Inject(HTTP_REQUEST_CLIENT) @ngOptional() private client?: RequestClient,
   ) {
     const subscription = this.model.detectChanges$.subscribe(() =>
       this.cdRef?.detectChanges(),

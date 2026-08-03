@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { PIPES as _PIPES } from '../../pipes';
-import { InputConfigInterface } from '@azlabsjs/smart-form-core';
+import { InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
 import { JSObject } from '@azlabsjs/js-object';
 
 @Pipe({
@@ -29,5 +29,18 @@ export class AppendCssClass implements PipeTransform {
   }
 }
 
+@Pipe({
+  name: 'excludeinput',
+  standalone: true,
+  pure: true,
+})
+export class ExcludeInput implements PipeTransform {
+  
+  transform(value: InputConfigInterface[], name: string | string[]) {
+    const names = Array.isArray(name) ? name : [name];
+    return [...value].filter(x => names.indexOf(x.type) === -1);
+  }
+}
+
 // exported standalone pipes
-export const PIPES = [WithConfigValuePipe, AppendCssClass, ..._PIPES] as const;
+export const PIPES = [WithConfigValuePipe, AppendCssClass, ExcludeInput, ..._PIPES] as const;

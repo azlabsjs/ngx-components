@@ -41,6 +41,7 @@ export class NgxFormComponent {
   @Input({ required: true }) state!: FormGroupState & { [k: string]: unknown };
   @Input({ required: true }) inputs!: InputConfigInterface[];
   @Input({ alias: 'add-template' }) addref!: Optional<TemplateRef<any>>;
+  @Input({ alias: 'table-description' }) tabledescription!: Optional<TemplateRef<any>>;
   @ContentChild(ModalDirective) formmodal!: ModalDirective | null;
 
   public validate() {

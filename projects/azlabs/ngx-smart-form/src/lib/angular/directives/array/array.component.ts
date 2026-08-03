@@ -27,9 +27,7 @@ import { NgxFormArrayOutletComponent } from './array-outlet.component';
 import { RefType, ViewRefFactory } from '../types';
 import { ModalDirective } from '../modal';
 import { PIPES } from './pipes';
-
-// @internal
-type Optional<T> = T | null | undefined;
+import { Optional } from './types';
 
 @Component({
   standalone: true,
@@ -70,6 +68,7 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy, 
   })
   cssClass!: string | string[];
   @Input() hidden: boolean = false;
+  @Input({ alias: 'table-description' }) tabledescription!: Optional<TemplateRef<any>>;
 
   @Output() listChange = new EventEmitter<number>();
 

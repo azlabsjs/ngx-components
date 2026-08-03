@@ -41,7 +41,6 @@ import { Optional } from './types';
 export class NgxSmartFormControlArrayComponent
   implements AfterContentInit, OnDestroy, AfterViewInit
 {
-  //#region input properties
   @Input({ alias: 'formArray' }) array!: FormArray;
   @Input('no-grid-layout') nogridlayout = false;
   @Input('add-button') addButtonRef: Optional<TemplateRef<any>>;
@@ -50,23 +49,17 @@ export class NgxSmartFormControlArrayComponent
   @Input() autoupload = true;
   @Input() config!: InputConfigInterface;
   @Input({ required: true }) detached!: AbstractControl[];
-  //#endregion
-
-  //#region output properties
+  
   @Output() listChange = new EventEmitter<number>();
-  //#endregion
 
-  @ViewChild('container', { static: false })
-  viewFactory!: ViewRefFactory<any>;
+  @ViewChild('container', { static: false }) viewFactory!: ViewRefFactory<any>;
 
-  // #region local properties
   _refCount = 0;
   get refCount() {
     return this._refCount;
   }
   private refs: RefType<unknown>[] = [];
   private destroy$ = new Subject<void>();
-  // #endregion
 
   constructor(
     private cdRef: ChangeDetectorRef | null,

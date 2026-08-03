@@ -1,8 +1,11 @@
 <div class="table-wrapper">
+  <ng-container *ngIf="tabledescription">
+    <ng-container *ngTemplateOutlet="tabledescription"></ng-container>
+  </ng-container>
   <table class="table table-compact">
     <thead>
       <tr>
-        <th *ngFor="let item of configs" class="left text-ellipsis fit">
+        <th *ngFor="let item of configs | excludeinput: ['html', 'control_group', 'hidden']" class="left text-ellipsis fit">
           <span class="text-ellipsis">{{ item.label | text }}</span>
           <small class="required" *ngIf="item.rules?.isRequired ?? (item | required)">(*)</small>
         </th>
@@ -11,16 +14,13 @@
     </thead>
     <tbody #container></tbody>
   </table>
-</div>
-
-<div class="table-footer">
   <ng-content></ng-content>
 </div>
 
 <!-- table layout component -->
 <ng-template #template let-formgroup="formgroup" let-autoupload="autoupload" let-inputs="inputs" let-remove="remove">
   <tr>
-    <td *ngFor="let input of inputs" class="bottom text-ellipsis"
+    <td *ngFor="let input of inputs | excludeinput: ['html', 'control_group', 'hidden']" class="bottom text-ellipsis"
       [ngClass]="{error: formgroup.get(input.name)?.touched && formgroup.get(input.name)?.errors && (formgroup.get(input.name)?.errors | keys).length > 0}">
       <ng-container *ngIf="formgroup.get(input.name) as control">
         <ng-container *ngTemplateOutlet="
@@ -30,7 +30,7 @@
               value: input | appendcss : 'border-0',
               autoupload,
               describe: false,
-              hidden: (input | isHidden) || (control | inarray : detached : input.name) }"></ng-container>
+              hidden: (input | ishidden) || (control | inarray : detached : input.name) }"></ng-container>
       </ng-container>
     </td>
     <td class="middle center">

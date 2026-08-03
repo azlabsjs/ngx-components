@@ -15,7 +15,7 @@ import { AbstractControl } from '@angular/forms';
  *          run the change dectector of the current pipe on each cycle
  */
 @Pipe({
-  name: 'isHidden',
+  name: 'ishidden',
   pure: false,
   standalone: true,
 })

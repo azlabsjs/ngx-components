@@ -4,20 +4,16 @@
   flex-flow: column nowrap;
   align-items: flex-start;
   justify-content: flex-start;
-  padding: var(
-      --ngx-array-placeholder-padding-top,
-      calc(24 * calc((1rem / 20) * 1))
-    )
-    0 var(--ngx-array-placeholder-padding-bottom, 4px) 0;
-  font-size: var(
-    --ngx-array-placeholder-font-size,
-    calc(20 * calc((1rem / 24) * 1))
-  );
+  padding: var(--ngx-array-placeholder-padding-top,
+      calc(24 * calc((1rem / 20) * 1))) 0 var(--ngx-array-placeholder-padding-bottom, 4px) 0;
+  font-size: var(--ngx-array-placeholder-font-size,
+      calc(20 * calc((1rem / 24) * 1)));
   font-weight: var(--ngx-array-placeholder-font-weight, 400);
   line-height: var(--ngx-array-placeholder-line-height, 1.2rem);
   letter-spacing: var(--ngx-array-placeholder-letter-spacing, -0.01rem);
   color: var(--ngx-array-placeholder-color, inherit);
 }
+
 .no-control-content {
   display: flex;
   align-items: center;
@@ -25,6 +21,7 @@
   width: 100%;
   margin: var(--smart-form-array-add-button-margin, 0.5rem) 0;
 }
+
 .no-control-text {
   display: block;
   margin-top: var(--smart-form-array-add-text-margin-top, 1.05rem);
@@ -34,4 +31,11 @@
 
 .margin-top {
   margin-top: 0.25rem;
+}
+
+.add-button {
+  display: inline-block;
+  margin: var(--table-margin, 0);
+  margin-top: var(--table-footer-v-margin, 16px);
+  margin-bottom: var(--table-footer-v-margin, 16px);
 }

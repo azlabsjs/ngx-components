@@ -7,7 +7,7 @@ import {
   EventEmitter,
   Input,
   OnDestroy,
-  Optional,
+  Optional as ngOptional,
   Output,
   TemplateRef,
   ViewChild,
@@ -21,6 +21,8 @@ import { BUTTON_DIRECTIVES } from '../buttons';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 import { ModalDirective } from '../modal';
 import { PIPES } from './pipes';
+import { Optional } from './types';
+import { CdkDragPlaceholder } from "@angular/cdk/drag-drop";
 
 /** @internal */
 type ContextType = {
@@ -33,7 +35,7 @@ type ContextType = {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ...COMMON_PIPES, ...BUTTON_DIRECTIVES, ...PIPES],
+  imports: [CommonModule, ...COMMON_PIPES, ...BUTTON_DIRECTIVES, ...PIPES, CdkDragPlaceholder],
   selector: 'ngx-table-form',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
@@ -42,6 +44,7 @@ type ContextType = {
 export class NgxTableForm
   implements ViewRefFactory<EmbeddedViewRef<any>>, OnDestroy {
   @Input() label!: TemplateRef<any> | null | undefined;
+  @Input({ alias: 'table-description' }) tabledescription!: Optional<TemplateRef<any>>;
   @Input({ alias: 'template' }) view!: TemplateRef<any>;
   @Input({ alias: 'inputs' }) configs: InputConfigInterface[] = [];
   @Input({ alias: 'auto-upload' }) autoupload: boolean = true;
@@ -57,7 +60,7 @@ export class NgxTableForm
 
   private subscriptions: Subscription[] = [];
 
-  constructor(@Optional() private cdRef: ChangeDetectorRef | null) { }
+  constructor(@ngOptional() private cdRef: ChangeDetectorRef | null) { }
 
   createView(index: number, formgroup: AbstractControl, triggered: boolean = false) {
     const subject = new Subject<number>();

@@ -1,4 +1,4 @@
-<div class="modal" [class]="cssClass | appendcss : state.size | join" [ngClass]="{ opened: state.opened }">
+<div class="modal inset-0 backdrop-blur-sm" [class]="cssClass | appendcss : state.size | join" [ngClass]="{ opened: state.opened }">
   <ng-container *ngIf="animation === 'fade'">
     <div class="modal-content" [@fadeInOutSlideBottom]="state.opened ? 'open' : 'close'">
       <ng-container *ngTemplateOutlet="_actions"></ng-container>
