@@ -22,7 +22,6 @@ import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 import { ModalDirective } from '../modal';
 import { PIPES } from './pipes';
 import { Optional } from './types';
-import { CdkDragPlaceholder } from "@angular/cdk/drag-drop";
 
 /** @internal */
 type ContextType = {
@@ -35,7 +34,7 @@ type ContextType = {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ...COMMON_PIPES, ...BUTTON_DIRECTIVES, ...PIPES, CdkDragPlaceholder],
+  imports: [CommonModule, ...COMMON_PIPES, ...BUTTON_DIRECTIVES, ...PIPES],
   selector: 'ngx-table-form',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],

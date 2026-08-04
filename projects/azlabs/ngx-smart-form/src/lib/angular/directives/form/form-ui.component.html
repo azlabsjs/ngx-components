@@ -48,7 +48,7 @@
             <ngx-smart-form-array [class.hidden]="(value | ishidden) || (local | inarray : state.detached)"
               [detached]="state.detached" [class]="value.classes" [no-grid-layout]="nogridlayout" [formArray]="local"
               [controls]="(value | asInputGroup).children || [] | inputConfigArray" [template]="template"
-              [add-button]="addref" [name]="value.name" [title]="value.label" [placeholder]="value.placeholder"
+              [add-button]="addgroup" [name]="value.name" [title]="value.label" [placeholder]="value.placeholder"
               [autoupload]="autoupload" [hidden]="(value | ishidden) || (local | inarray : state.detached)"
               [modal]="formmodal ?? modal" [table-description]="tabledescription"
               [label]="label"></ngx-smart-form-array>
@@ -75,7 +75,7 @@
 <ng-template #_template let-control="control" let-value="value">
   <ng-container *ngIf="value | repeatable; else notRepeatableRef">
     <ngx-smart-form-control-array [class.hidden]="(value | ishidden) || (control | inarray : state.detached)"
-      [formArray]="control" [config]="value" [template]="template" [add-button]="addref" [name]="value.name"
+      [formArray]="control" [config]="value" [template]="template" [add-button]="add" [name]="value.name"
       [autoupload]="autoupload" [hidden]="(value | ishidden) || (control | inarray : state.detached)"
       [detached]="state.detached"></ngx-smart-form-control-array>
   </ng-container>

@@ -36,11 +36,20 @@ import { Optional } from './types';
   ],
   selector: 'ngx-smart-form-control-array',
   templateUrl: './control-array.component.html',
+  styles: [
+    `
+    .add-button {
+      display: inline-block;
+      margin: 0;
+      margin-top: var(--table-footer-v-margin, 16px);
+      margin-bottom: var(--table-footer-v-margin, 16px);
+    }
+`
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFormControlArrayComponent
-  implements AfterContentInit, OnDestroy, AfterViewInit
-{
+  implements AfterContentInit, OnDestroy, AfterViewInit {
   @Input({ alias: 'formArray' }) array!: FormArray;
   @Input('no-grid-layout') nogridlayout = false;
   @Input('add-button') addButtonRef: Optional<TemplateRef<any>>;
@@ -49,7 +58,7 @@ export class NgxSmartFormControlArrayComponent
   @Input() autoupload = true;
   @Input() config!: InputConfigInterface;
   @Input({ required: true }) detached!: AbstractControl[];
-  
+
   @Output() listChange = new EventEmitter<number>();
 
   @ViewChild('container', { static: false }) viewFactory!: ViewRefFactory<any>;
@@ -65,7 +74,7 @@ export class NgxSmartFormControlArrayComponent
     private cdRef: ChangeDetectorRef | null,
     @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
     private builder: AngularReactiveFormBuilderBridge
-  ) {}
+  ) { }
 
   ngAfterViewInit(): void {
     this.update.bind(this).call(null);

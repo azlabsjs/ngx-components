@@ -1,11 +1,11 @@
 div.control__group__header,
 :host ::ng-deep div.control__group__header {
-  font-size: 1rem;
+  font-size: var(--ngx-input-group-header-font-size, 1rem);
   letter-spacing: normal;
-  line-height: 1.2rem;
-  margin-top: 1.2rem;
+  line-height: var(--ngx-input-group-header-line-height, normal);
+  margin-top: var(--ngx-input-group-header-margin-top, 1rem);
   margin-bottom: 0;
-  font-weight: var(--input-header-font-weight, 200);
+  font-weight: var(--ngx-input-group-header-font-weight, 200);
 }
 :host ::ng-deep .required-text,
 :host ::ng-deep .field-has-error {
@@ -50,7 +50,7 @@ div.control__group__header,
 :host ::ng-deep .ngx-table-form .clr-input-wrapper,
 :host ::ng-deep ngx-table-form .ng-select-container,
 :host ::ng-deep .ngx-table-form .ng-select-container {
-  min-width: 100px;
+  min-width: var(--input-min-width, 100px);
 }
 
 :host ::ng-deep ngx-table-form .clr-input-group,

@@ -21,10 +21,23 @@
   <ng-container *ngIf="state$ | async as form">
     <ngx-smart-form #formRef [no-grid-layout]="false" (ready)="onFormReadyState(form)" (changes)="afterChanges()"
       (error)="onError($event)" [submitable]="true" [autoupload]="true" (submit)="ngxFormSubmit($event)" [form]="form"
-      [autoSubmit]="true" [path]="'http://localhost:3000/customers'" [template]="controlTemplate" [table-description]="description">
+      [autoSubmit]="true" [path]="'http://localhost:3000/customers'" [template]="controlTemplate" [table-description]="description" [add-group]="add">
 
       <ng-template #description>
-        <p>Je suis une description</p>
+        <p cds-text>Je suis une description</p>
+      </ng-template>
+
+      <ng-template #add let-handler>
+        <div class="flex items-center justify-between border-t border-slate-100 bg-slate-50/50 p-2">
+            <span class="text-slate-400">Le tableau se met à jour instantanément</span>
+            <button (click)="handler($event)" class="inline-flex items-center space-x-1.5 border-0 text-indigo-600 hover:text-indigo-800 transition-colors">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <span>Ajouter une nouvelle ligne</span>
+            </button>
+        </div>
+
       </ng-template>
 
       <ngx-modal #modal (openChange)="onOpenChange(modal)" (stateChange)="formModalStateChange()" ngxformmodal

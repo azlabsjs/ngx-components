@@ -62,9 +62,7 @@ export class NgxSmartFormComponent
     return this.model.state.form;
   }
 
-  //#region input properties
   @Input() template!: TemplateRef<any>;
-  @Input() addTemplate!: TemplateRef<any>;
   @Input() label!: TemplateRef<any>;
   @Input() performingAction = false;
   @Input() disabled = false;
@@ -79,9 +77,13 @@ export class NgxSmartFormComponent
   @Input() action: HTTPRequestMethods = 'POST';
   @Input('no-grid-layout') noGridLayout = false;
   @Input() modal!: ModalDirective;
+  
+  /** @deprecated */
+  @Input() addTemplate!: TemplateRef<any>;
+  @Input({ alias: 'add' }) add!: TemplateRef<any>;
+  @Input({ alias: 'add-group' }) addgroup!: TemplateRef<any>;
   @Input({ alias: 'table-description' }) tabledescription!: Optional<TemplateRef<any>>;
 
-  //#region output properties
   @Output() submit = new EventEmitter<{ [index: string]: any }>();
   @Output() ready = new EventEmitter();
   @Output() changes = new EventEmitter();
@@ -89,7 +91,6 @@ export class NgxSmartFormComponent
   @Output() complete = new EventEmitter<unknown>();
   @Output() error = new EventEmitter<unknown>();
   @Output() performingRequest = new EventEmitter<boolean>();
-  //#endregion
 
   @HostListener('keyup.enter', ['$event'])
   onEnterButtonCliked(event: Event) {
@@ -98,10 +99,8 @@ export class NgxSmartFormComponent
     }
   }
 
-  //#region
   @ContentChild('submitButton') submitRef!: TemplateRef<Node>;
   @ContentChild(ModalDirective) formmodal!: ModalDirective | null;
-  //#endregion
 
   private subscriptions: Subscription[] = [];
   private changeSubscription: Subscription | null = null;

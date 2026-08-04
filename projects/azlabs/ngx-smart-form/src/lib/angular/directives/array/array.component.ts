@@ -74,7 +74,7 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy, 
 
   @ViewChild('container', { static: false }) viewFactory!: ViewRefFactory<any>;
 
-  _ref = 0;
+  _ref: number = 0;
   get refCount() {
     return this._ref;
   }
@@ -103,9 +103,7 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy, 
 
   removed<T>(ref: RefType<T>) {
     if (this._ref >= 0) {
-      const index = this.refs.findIndex((c) => {
-        return c.index === ref.index;
-      });
+      const index = this.refs.findIndex((c) => c.index === ref.index);
       if (index === -1) {
         return;
       }

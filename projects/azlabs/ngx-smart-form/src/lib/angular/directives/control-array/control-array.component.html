@@ -1,3 +1,7 @@
 <ngx-form-control-array-outlet #container (removed)="removed($event)" [config]="config" [auto-upload]="autoupload" [template]="template" [detached]="detached" [hidden]="(config | ishidden) || (array | inarray : detached)"></ngx-form-control-array-outlet>
 <ng-container *ngTemplateOutlet="addButtonRef ? addButtonRef : _add; context: { $implicit: add.bind(this) }"></ng-container>
-<ng-template #_add let-handler><ngx-add-button (click)="handler($event)"></ngx-add-button></ng-template>
+<ng-template #_add let-handler>
+    <div class="margin-top add-button">
+        <ngx-add-button (click)="handler($event)"></ngx-add-button>
+    </div>
+</ng-template>

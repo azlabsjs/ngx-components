@@ -40,9 +40,14 @@ export class NgxFormComponent {
   @Input({ alias: 'no-grid-layout' }) nogridlayout = false;
   @Input({ required: true }) state!: FormGroupState & { [k: string]: unknown };
   @Input({ required: true }) inputs!: InputConfigInterface[];
-  @Input({ alias: 'add-template' }) addref!: Optional<TemplateRef<any>>;
+
   @Input({ alias: 'table-description' }) tabledescription!: Optional<TemplateRef<any>>;
   @ContentChild(ModalDirective) formmodal!: ModalDirective | null;
+
+  /** @deprecated */
+  @Input({ alias: 'add-template' }) addref!: Optional<TemplateRef<any>>;
+  @Input({ alias: 'add' }) add!: TemplateRef<any>;
+  @Input({ alias: 'add-group' }) addgroup!: TemplateRef<any>;
 
   public validate() {
     ComponentReactiveFormHelpers.validateFormGroupFields(this.state.formGroup);

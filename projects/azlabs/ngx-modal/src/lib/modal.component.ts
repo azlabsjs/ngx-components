@@ -5,7 +5,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -13,9 +13,11 @@ import {
   ContentChild,
   EventEmitter,
   HostListener,
+  Inject,
   Input,
   OnChanges,
   Output,
+  Renderer2,
   SimpleChange,
   SimpleChanges,
   TemplateRef,
@@ -134,7 +136,7 @@ export class ModalComponent implements OnChanges {
   }
 
   // class constructor
-  constructor(private _ref?: ChangeDetectorRef) {}
+  constructor(private renderer: Renderer2, private _ref: ChangeDetectorRef | null, @Inject(DOCUMENT) private document: Document | null) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     const state = (Object.keys(this._state) as (keyof StateType)[]).reduce(
@@ -165,10 +167,16 @@ export class ModalComponent implements OnChanges {
 
   close() {
     this.onClose();
+    if (this.document && this.document.body) {
+      this.renderer.removeStyle(this.document.body, 'overflow');
+    }
   }
 
   open() {
     this.setState({ opened: true });
+    if (this.document && this.document.body) {
+      this.renderer.setStyle(this.document.body, 'overflow', 'hidden');
+    }
   }
 
   onClose(event?: Event) {
