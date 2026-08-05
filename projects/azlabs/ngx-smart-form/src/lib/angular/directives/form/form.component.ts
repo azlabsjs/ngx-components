@@ -150,7 +150,7 @@ export class NgxSmartFormComponent
   }
 
   setControlValue(control: string, value: any): void {
-    this.formGroup.get(control)?.setValue(value, { emitEvent: true });
+    this.model.get(control)?.setValue(value, { emitEvent: true });
   }
 
   disableControls(controls: ControlsStateMap): void {
@@ -215,13 +215,12 @@ export class NgxSmartFormComponent
     // have error, we are adding a check that verifies if all controls has error before
     // breaking out of the function
     const errors = collectErrors(this.formGroup);
-    if (!this.formGroup.valid && errors.length > 0) {
+    if (!this.model.isValid() && errors.length > 0) {
       return;
     }
 
     const path = this.path ?? this.form?.endpointURL;
-    const clientDefined =
-      typeof this.client !== 'undefined' && this.client !== null;
+    const clientDefined = typeof this.client !== 'undefined' && this.client !== null;
     const pathDefined = path !== null && path !== 'undefined';
     const shouldSubmit = this.autoSubmit && clientDefined;
 
@@ -231,15 +230,13 @@ export class NgxSmartFormComponent
       await this.sendRequest(path || 'http://localhost');
       return;
     }
-    const configError =
-      (this.autoSubmit && !clientDefined) || (this.autoSubmit && !pathDefined);
+    const configError = (this.autoSubmit && !clientDefined) || (this.autoSubmit && !pathDefined);
 
-    // case there is no configuration error, emit a submit event
     if (!configError) {
       this.submit.emit(this.model.getValue());
       return;
     }
-    // We throw an error if developper misconfigured the smart form component
+
     throw new Error(AUTO_SUBMIT_ERROR_MESSAGE);
   }
 
@@ -321,7 +318,7 @@ export class NgxSmartFormComponent
       if (this.changeSubscription) {
         this.changeSubscription.unsubscribe();
       }
-      const subscription = this.formGroup.valueChanges.subscribe((value) =>
+      const subscription = this.model.valueChanges().subscribe((value) =>
         this.formGroupChange.emit(value),
       );
       this.changeSubscription = subscription;

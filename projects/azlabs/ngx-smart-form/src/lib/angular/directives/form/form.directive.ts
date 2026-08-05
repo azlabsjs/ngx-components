@@ -93,7 +93,7 @@ export class NgxFormDirective
   }
 
   addAsyncValidator(validator: AsyncValidatorFn, control?: string): void {
-    const c = control ? this.formGroup.get(control) : this.formGroup;
+    const c = this.model.get(control);
     if (c) {
       c.addAsyncValidators(validator);
     }
@@ -107,7 +107,7 @@ export class NgxFormDirective
   }
 
   addValidator(validator: ValidatorFn, control?: string): void {
-    const c = control ? this.formGroup.get(control) : this.formGroup;
+    const c = this.model.get(control);
     if (c) {
       c.addValidators(validator);
     }
@@ -126,7 +126,7 @@ export class NgxFormDirective
   validate() {
     this.model.validate();
 
-    const subscription = this.formGroup.statusChanges
+    const subscription = this.model.statusChanges()
       .pipe(
         filter((status) => ['PENDING', 'DISABLED'].indexOf(status) === -1),
         first(),
@@ -142,13 +142,12 @@ export class NgxFormDirective
     }
 
     this.validate();
-
     const errors = collectErrors(this.formGroup);
-    if (!this.formGroup.valid && errors.length > 0) {
+    if (!this.model.isValid() && errors.length > 0) {
       return;
     }
 
-    this.submitted.emit(this.formGroup.getRawValue());
+    this.submitted.emit(this.model.getValue());
   }
 
   ngOnDestroy(): void {
@@ -180,9 +179,7 @@ export class NgxFormDirective
       }
 
       // subscribe to new formgroup changes
-      this.changeSubscription = this.formGroup.valueChanges.subscribe((value) =>
-        this.valueChanges.emit(value),
-      );
+      this.changeSubscription = this.model.valueChanges().subscribe((value) => this.valueChanges.emit(value));
     }
 
     // we maintain the state of the directive by setting

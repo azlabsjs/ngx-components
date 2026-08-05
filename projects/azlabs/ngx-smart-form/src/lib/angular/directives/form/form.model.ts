@@ -25,6 +25,7 @@ import {
 } from 'rxjs';
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
 import { FormConfigType, FormModelState } from './types';
+import { InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
 
 /** @internal */
 const memoizedComputeProperties = memoize(createComputableDepencies);
@@ -37,35 +38,23 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
   _detectChanges$ = new Subject<void>();
   readonly detectChanges$ = this._detectChanges$.asObservable();
 
-  //#region local properties
-  private computed: {
-    [prop: string]: ComputedInputValueConfigType<any>;
-  } | null = null;
+  private computed: {[prop: string]: ComputedInputValueConfigType<any>; } | null = null;
   private trackedDependencies: string[] | null = [];
   private subscriptions: Subscription[] = [];
   private value!: { [k: string]: unknown };
 
   // obselete inputs
-  private readonly _detached = new Map<string, AbstractControl>();
   // @internal
-  private _formGroup!: FormGroup;
-  private _form!: T;
-  get state(): Required<FormModelState<T>> {
-    return {
-      formGroup: this._formGroup,
-      detached: Array.from(this._detached.values()),
-      form: this._form,
-    };
-  }
+  private readonly _detached = new Map<string, AbstractControl>();
   private required: Condition[] = [];
   private disabled: Condition[] = [];
-  //#endregion
+  private group!: FormGroup;
+  private form!: T;
+  get state(): Required<FormModelState<T>> {
+    return { formGroup: this.group, detached: Array.from(this._detached.values()), form: this.form};
+  }
 
-  // form component model class constructor
-  constructor(
-    @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
-    private builder: AngularReactiveFormBuilderBridge,
-  ) { }
+  constructor(@Inject(ANGULAR_REACTIVE_FORM_BRIDGE) private builder: AngularReactiveFormBuilderBridge) { }
 
   update(config: T, formgroup?: FormGroup) {
     // each type form configuration changes, we set the list of computed properties
@@ -84,7 +73,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
 
     this.setFormState(config, formgroup);
 
-    const { controlConfigs: values } = this._form;
+    const { controlConfigs: values } = this.form;
     this.required = useCondition(
       'requiredIf',
 
@@ -115,7 +104,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
 
     this.disabled = useCondition(
       'disabledIf',
-      
+
       // case condition evaluates to true, we mark control as disabled
       (control, name) => {
         if (control instanceof FormArray) {
@@ -152,7 +141,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
       this.setValue(this.value);
     }
 
-    const items = flatteninputs(this._formGroup);
+    const items = flatteninputs(this.group);
     this.addConditionHook(items, this.disabled, (control, name, conditions) => {
       if (conditions.length !== 0) {
         const subscription = control.valueChanges
@@ -160,7 +149,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
             distinctUntilChanged(),
             tap((value) => {
               for (const item of conditions) {
-                item.dependencyChanged(this._formGroup, name, value);
+                item.dependencyChanged(this.group, name, value);
               }
             }),
           )
@@ -191,30 +180,47 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
 
   setValue(value: { [k: string]: unknown }): void {
     // set or update the form value
-    const { controlConfigs } = this._form;
-    setFormValue(this.builder, this._formGroup, value, controlConfigs ?? []);
-    const items = flatteninputs(this._formGroup);
+    const { controlConfigs } = this.form;
+    setFormValue(this.builder, this.group, value, controlConfigs ?? []);
+    const items = flatteninputs(this.group);
     this.addConditions(items);
   }
 
   getValue(): { [k: string]: unknown } {
-    if (!this._formGroup) {
+    const { controlConfigs: inputs } = this.form;
+    if (!this.group) {
       return {};
     }
-    return this._formGroup.getRawValue();
+    return this.scrubHtmlProperties(inputs, this.group.getRawValue());
+  }
+
+  statusChanges() {
+    return this.group.statusChanges;
+  }
+
+  valueChanges() {
+    return this.group.valueChanges;
+  }
+
+  isValid() {
+    return this.group.valid;
   }
 
   validate() {
-    ComponentReactiveFormHelpers.validateFormGroupFields(this._formGroup);
+    ComponentReactiveFormHelpers.validateFormGroupFields(this.group);
   }
 
   reset() {
-    this._formGroup.reset();
-    let { controlConfigs: inputs } = this._form;
+    this.group.reset();
+    let { controlConfigs: inputs } = this.form;
     inputs ??= [];
     for (const control of inputs) {
-      this._formGroup.get(control.name)?.setValue(control.value);
+      this.group.get(control.name)?.setValue(control.value);
     }
+  }
+
+  get(name?: string) {
+    return name ? this.group.get(name) : this.group;
   }
 
   destroy() {
@@ -229,7 +235,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
   private addConditions(items: [string, AbstractControl<any, any>][]) {
     this.addConditionHook(items, this.disabled, (control, name, conditions) => {
       for (const item of conditions) {
-        item.dependencyChanged(this._formGroup, name, control.value);
+        item.dependencyChanged(this.group, name, control.value);
       }
     });
     this.addConditionHook(items, this.required, (control, name, conditions) => {
@@ -261,7 +267,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
       if (this.trackedDependencies?.includes(name)) {
         continue;
       }
-      const control = pickcontrol(this._formGroup, name);
+      const control = pickcontrol(this.group, name);
       if (!control) {
         this.cancelComputationSubscription(config, name);
         continue;
@@ -273,7 +279,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
         .pipe(
           tap((state) => {
             for (const value of config.values) {
-              const input = pickcontrol(this._formGroup, value.name);
+              const input = pickcontrol(this.group, value.name);
               input?.setValue(value.fn(state));
             }
           }),
@@ -284,7 +290,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
   }
 
   private onValueChange(name: string, value: unknown, conditions: Condition[]) {
-    const { _formGroup: fg } = this;
+    const { group: fg } = this;
     for (const item of conditions) {
       const [visible, invisible] = item.dependencyChanged(fg, name, value);
       // case a given input changes
@@ -294,9 +300,9 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
             // we add a startsWith to the equality check because
             // computed properties uses entire form array instead of each individual component
             if (key === prop || prop.startsWith(key)) {
-              const dependency = pickcontrol(this._formGroup, prop);
+              const dependency = pickcontrol(this.group, prop);
               for (const element of config.values) {
-                pickcontrol(this._formGroup, element.name)?.setValue(element.fn(dependency?.value));
+                pickcontrol(this.group, element.name)?.setValue(element.fn(dependency?.value));
               }
             }
           }
@@ -309,7 +315,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
             // we add a startsWith to the equality check because
             // computed properties uses entire form array instead of each individual component
             if (key === prop || prop.startsWith(key)) {
-              const dependency = pickcontrol(this._formGroup, prop);
+              const dependency = pickcontrol(this.group, prop);
               // cancel the ongoing listener
               this.cancelComputationSubscription(config, key);
               // push the config on top of the computations
@@ -320,7 +326,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
 
         for (const [_, config, dependency] of computations) {
           for (const element of config.values) {
-            pickcontrol(this._formGroup, element.name)?.setValue(element.fn(dependency?.value));
+            pickcontrol(this.group, element.name)?.setValue(element.fn(dependency?.value));
           }
         }
         this.compute(computations);
@@ -329,11 +335,11 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
   }
 
   private setFormState(config: T, formgroup: FormGroup) {
-    const form = this._form ? { ...this._form, ...config } : config;
+    const form = this.form ? { ...this.form, ...config } : config;
     const { controlConfigs } = config;
     const inputs = withRefetchObservable(controlConfigs, formgroup);
-    this._form = { ...form, controlConfigs: inputs };
-    this._formGroup = formgroup;
+    this.form = { ...form, controlConfigs: inputs };
+    this.group = formgroup;
     this._detectChanges$.next();
   }
 
@@ -358,5 +364,28 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
       }
     }
     this.subscriptions = [];
+  }
+
+
+  /**
+  * Removes property values from a record if the corresponding Input config has type 'html'.
+  * Mutates or cleans the record recursively through nested structures.
+  */
+  private scrubHtmlProperties(items: InputConfigInterface[], value: { [prop: string]: unknown }): { [prop: string]: unknown } {
+    if (!value || typeof value !== 'object') {
+      return value;
+    }
+
+    for (const item of items) {
+      if (item.type === InputTypes.HTML_INPUT) {
+        delete value[item.name];
+      } else if ('children' in item && Array.isArray(item.children) && item.children.length > 0) {
+        const nested = value[item.name];
+        if (nested && typeof nested === 'object') {
+          this.scrubHtmlProperties(item.children, nested as { [prop: string]: unknown });
+        }
+      }
+    }
+    return value;
   }
 }
