@@ -26,13 +26,9 @@ type ErrorsType = { [prop: string]: any };
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxInputErrorComponent {
-  //#region component class attributes
   @HostBinding('class.input__subtext') subText = true;
   @HostBinding('class.input__error_text') errorText = true;
-  //#endregion
 
-  //#region component inputs
   @Input({ alias: 'errors' }) errors!: ErrorsType | null;
   @Input() template!: TemplateRef<any>;
-  //#endregion
 }

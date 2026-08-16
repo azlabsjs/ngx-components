@@ -34,7 +34,7 @@ type StateType = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
-  //#region component inputs
+  @Input() error!: TemplateRef<unknown>;
   @Input() control!: AbstractControl;
   @Input() describe = true;
   @Input() config!: InputConfigInterface;
@@ -45,14 +45,10 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
     const { _state: state } = this;
     this._state = { ...state, disabled: value };
   }
-  //#endregion
-
-  //#region component event emitter
+  
   @Output() focus = new EventEmitter<FocusEvent>();
   @Output() blur = new EventEmitter<FocusEvent>();
-  //#endregion
 
-  // #region component state
   _state: StateType = {
     disabled: false,
     value: undefined as string | undefined,
@@ -60,11 +56,8 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
   get state() {
     return this._state;
   }
-  // #endregion
 
-  //#region class properties
   private subscriptions: Subscription[] = [];
-  //#endregion
 
   /** phone input component class constructor */
   constructor(private cdRef: ChangeDetectorRef) {}
@@ -82,32 +75,14 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.subscriptions.push(
       this.control.valueChanges
-        .pipe(
-          distinctUntilChanged(),
-          tap((value: string | undefined) =>
-            this.setState((state) => ({ ...state, value }))
-          )
-        )
-        .subscribe(),
+        .pipe(distinctUntilChanged(),tap((value: string | undefined) => this.setState((state) => ({ ...state, value })))).subscribe(),
 
       this.control.statusChanges
-        .pipe(
-          tap((status) => {
-            this.setState((state) => ({
-              ...state,
-              disabled: status.toLowerCase() === 'disabled',
-            }));
-          })
-        )
-        .subscribe()
+        .pipe(tap((status) => {this.setState((state) => ({ ...state, disabled: status.toLowerCase() === 'disabled' }))})).subscribe()
     );
 
     // set the current state based on the control value
-    this.setState((state) => ({
-      ...state,
-      disabled: this.control.status.toLocaleLowerCase() === 'disabled',
-      value: this.control.value,
-    }));
+    this.setState((state) => ({...state, disabled: this.control.status.toLocaleLowerCase() === 'disabled', value: this.control.value }));
   }
 
   onError(_: boolean, value: unknown) {

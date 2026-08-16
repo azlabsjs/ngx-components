@@ -68,13 +68,14 @@
             <ng-container *ngTemplateOutlet="label ?? _label;context: { $implicit: inputConfig!.label, config: inputConfig }"></ng-container>
             <span class="required-text" *ngIf="inputConfig.rules?.isRequired ?? (inputConfig | required)">(*)</span>
           </label>
-          <ngx-phone-input [control]="formControl" [config]="inputConfig" [describe]="describe" [class]="'clr-input'" [countries]="countries">
+          <ngx-phone-input [control]="formControl" [config]="inputConfig" [describe]="describe" [class]="'clr-input'" [countries]="countries" [error]="err">
             <ng-template #input let-config="config" let-onBlur="onBlur" let-onFocus="onFocus" let-keypress="keypress" let-selected="selected" let-change="change" let-required="required" let-disabled="disabled" let-value="value">
               <input noAutoComplete [value]="value" [required]="required" [class]="'effect-24 ' + config!.classes" (blur)="onBlur($event)" (focus)="onFocus($event)" (keypress)="keypress($event)" (change)="change($event)" (input)="change($event)" [disabled]="disabled" placeholder="{{ selected?.placeHolder }}" autocomplete="off" type="tel" />
-              <!-- error -->
-              <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
             </ng-template>
           </ngx-phone-input>
+          <ng-template #err let-control>
+            <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: control.touched, $implicit: control.errors, errors: control.errors }"></ng-container>
+          </ng-template>
         </div>
       </div>
     </ng-container>

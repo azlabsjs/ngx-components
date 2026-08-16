@@ -10,15 +10,15 @@
 :host ::ng-deep .input__error_text {
   line-height: 0.6rem;
   left: 0;
-  /* background: #ff494f; */
   border-radius: 5px;
-  color: #ff494f; /** Previous value : #fff */
-  /* padding: 2px 10px; */
+  color: #ff494f;
   font-size: 0.55rem;
 }
+
 :host ::ng-deep .clr-validate-icon.ng-star-inserted {
   display: none;
 }
+
 :host ::ng-deep .clr-date-container .clr-input-wrapper {
   width: 100% !important;
   max-width: 100% !important;
@@ -54,6 +54,7 @@
 .password-wrapper {
   position: relative !important;
 }
+
 :host ::ng-deep .password-trigger,
 .password-trigger {
   position: absolute !important;
@@ -64,4 +65,8 @@
 .clr-control-container textarea,
 :host ::ng-deep .clr-control-container textarea {
   min-width: 100% !important;
+}
+
+.block {
+  display: block;
 }
