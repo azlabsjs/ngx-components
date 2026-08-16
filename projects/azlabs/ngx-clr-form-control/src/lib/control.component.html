@@ -26,7 +26,6 @@
           </label>
         </ngx-file-input>
       </ng-container>
-  
       <!-- error -->
       <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
     </ng-container>
@@ -56,7 +55,6 @@
           <small class="required-text" *ngIf="inputConfig.rules?.isRequired ?? (inputConfig | required)">(*)</small>
         </label>
       </ngx-select-input>
-
       <!-- error -->
       <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
     </ng-container>
@@ -73,13 +71,12 @@
           <ngx-phone-input [control]="formControl" [config]="inputConfig" [describe]="describe" [class]="'clr-input'" [countries]="countries">
             <ng-template #input let-config="config" let-onBlur="onBlur" let-onFocus="onFocus" let-keypress="keypress" let-selected="selected" let-change="change" let-required="required" let-disabled="disabled" let-value="value">
               <input noAutoComplete [value]="value" [required]="required" [class]="'effect-24 ' + config!.classes" (blur)="onBlur($event)" (focus)="onFocus($event)" (keypress)="keypress($event)" (change)="change($event)" (input)="change($event)" [disabled]="disabled" placeholder="{{ selected?.placeHolder }}" autocomplete="off" type="tel" />
+              <!-- error -->
+              <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
             </ng-template>
           </ngx-phone-input>
         </div>
       </div>
-
-      <!-- error -->
-      <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
     </ng-container>
     <!--\ Phone input -->
 
@@ -95,12 +92,12 @@
                 <span class="required-text" *ngIf="config.rules?.isRequired ?? (config | required)">(*)</span>
               </label>
               <input noAutoComplete type="date" [attr.title]="config!.label" (blur)="onBlur($event)" [formControl]="control" [value]="control.value" [min]="config!.minDate ?? config.constraints?.min" [max]="config.maxDate ?? config.constraints?.max" clrDate />
+              <!-- error -->
+              <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
             </clr-date-container>
           </ng-template>
         </ng-template>
       </ngx-date-input>
-      <!-- error -->
-      <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
     </ng-container>
     <!--\ Date input -->
 
@@ -115,13 +112,12 @@
                 <span class="required-text" *ngIf="config.rules?.isRequired ?? (config | required)">(*)</span>
               </label>
               <input noAutoComplete (keyup)="onKeyUp($event, config!.name)" (keydown)="onKeyDown($event, config!.name)" (keypress)="onKeyPress($event, config!.name)" (blur)="onBlur($event, config!.name)" type="time" [max]="config!.max || max" [min]="config!.min ? config!.min : 0" [class]="config!.classes" [formControl]="control" placeholder="{{config!.placeholder ? config!.placeholder : ''}}" [value]="control.value" />
+              <!-- error -->
+              <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
             </div>
           </div>
         </ng-template>
       </ngx-time-input>
-
-      <!-- error -->
-      <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
     </ng-container>
     <!--\ Time input -->
 
@@ -147,13 +143,12 @@
                     placeholder="{{config!.placeholder ? config!.placeholder : ''}}" [rows]="config!.rows"></textarea>
                   <cds-icon class="clr-validate-icon"shape="exclamation-circle"></cds-icon>
                 </div>
+                <!-- error -->
+                <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
               </div>
             </div>
           </ng-template>
         </ngx-textarea-input>
-
-        <!-- error -->
-        <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
       </ng-container>
     </ng-container>
     <!--\ Textarea input -->
@@ -181,13 +176,12 @@
                 [formControl]="control"
                 [value]="control.value"
                 placeholder="{{config!.placeholder ? config!.placeholder : ''}}" />
+                <!-- error -->
+                <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
             </div>
           </div>
         </ng-template>
       </ngx-number-input>
-
-      <!-- error -->
-      <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
     </ng-container>
     <!--\ Number input -->
 
@@ -215,7 +209,6 @@
           </clr-radio-container>
         </ng-template>
       </ngx-radio-input>
-
       <!-- error -->
       <ng-container *ngTemplateOutlet=" error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
     </ng-container>
@@ -229,7 +222,6 @@
           <small class="required-text" *ngIf="inputConfig.rules?.isRequired ?? (inputConfig | required)">(*)</small>
         </label>
       </ngx-checkbox-input>
-
       <!-- error -->
       <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
     </ng-container>
@@ -260,15 +252,14 @@
                 [class]="config!.classes + ' password-input'"
                 [formControl]="control"
                 placeholder="{{ config!.placeholder ? config!.placeholder : '' }}" />
-              <cds-icon shape="eye" (click)="toggle($event)" *ngIf="state.showPassword" class="password-trigger"></cds-icon>
-              <cds-icon shape="eye-hide" (click)="toggle($event)" *ngIf="!state.showPassword" class="password-trigger"></cds-icon>
+                <cds-icon shape="eye" (click)="toggle($event)" *ngIf="state.showPassword" class="password-trigger"></cds-icon>
+                <cds-icon shape="eye-hide" (click)="toggle($event)" *ngIf="!state.showPassword" class="password-trigger"></cds-icon>
             </div>
+            <!-- error -->
+            <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
           </div>
         </ng-template>
       </ngx-password-input>
-
-      <!-- error -->
-      <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
     </ng-container>
     <!--\ Password input -->
 
@@ -302,13 +293,12 @@
             [formControl]="control"
             [value]="control.value"
             placeholder="{{ config!.placeholder ? config!.placeholder : '' }}" />
+            <!-- error -->
+            <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
         </div>
       </div>
     </ng-template>
   </ngx-text-input>
-  
-  <!-- error -->
-  <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
 </ng-template>
 <!--\ Text input -->
 
