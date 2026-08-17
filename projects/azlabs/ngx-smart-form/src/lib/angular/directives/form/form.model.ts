@@ -38,7 +38,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
   _detectChanges$ = new Subject<void>();
   readonly detectChanges$ = this._detectChanges$.asObservable();
 
-  private computed: {[prop: string]: ComputedInputValueConfigType<any>; } | null = null;
+  private computed: { [prop: string]: ComputedInputValueConfigType<any>; } | null = null;
   private trackedDependencies: string[] | null = [];
   private subscriptions: Subscription[] = [];
   private value!: { [k: string]: unknown };
@@ -51,7 +51,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
   private group!: FormGroup;
   private form!: T;
   get state(): Required<FormModelState<T>> {
-    return { formGroup: this.group, detached: Array.from(this._detached.values()), form: this.form};
+    return { formGroup: this.group, detached: Array.from(this._detached.values()), form: this.form };
   }
 
   constructor(@Inject(ANGULAR_REACTIVE_FORM_BRIDGE) private builder: AngularReactiveFormBuilderBridge) { }
@@ -238,20 +238,13 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
         item.dependencyChanged(this.group, name, control.value);
       }
     });
+
     this.addConditionHook(items, this.required, (control, name, conditions) => {
       this.onValueChange.bind(this).call(null, name, control.value, conditions);
     });
   }
 
-  private addConditionHook(
-    controls: [string, AbstractControl][],
-    values: Condition[],
-    callback: (
-      control: AbstractControl,
-      name: string,
-      conditions: Condition[],
-    ) => void,
-  ) {
+  private addConditionHook(controls: [string, AbstractControl][], values: Condition[], callback: (control: AbstractControl, name: string, conditions: Condition[]) => void) {
     for (const [name, control] of controls) {
       const conditions = values.filter((item) => item.match(name));
       if (conditions.length !== 0) {
@@ -263,10 +256,11 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
   private compute(deps: [string, ComputedInputValueConfigType, ...any][]) {
     for (const dep of deps) {
       const [name, config] = dep;
-      // case we are already tracking the dependency we continue to the next iteration
+  
       if (this.trackedDependencies?.includes(name)) {
         continue;
       }
+
       const control = pickcontrol(this.group, name);
       if (!control) {
         this.cancelComputationSubscription(config, name);
@@ -293,12 +287,9 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
     const { group: fg } = this;
     for (const item of conditions) {
       const [visible, invisible] = item.dependencyChanged(fg, name, value);
-      // case a given input changes
       if (this.computed) {
         for (const [prop] of invisible) {
           for (const [key, config] of Object.entries(this.computed)) {
-            // we add a startsWith to the equality check because
-            // computed properties uses entire form array instead of each individual component
             if (key === prop || prop.startsWith(key)) {
               const dependency = pickcontrol(this.group, prop);
               for (const element of config.values) {
@@ -308,17 +299,12 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
           }
         }
 
-        // For properties that are visible recomputed the dependant value and listen for changes
         const computations: [string, ComputedInputValueConfigType, AbstractControl | null][] = [];
         for (const [prop] of visible) {
           for (const [key, config] of Object.entries(this.computed)) {
-            // we add a startsWith to the equality check because
-            // computed properties uses entire form array instead of each individual component
             if (key === prop || prop.startsWith(key)) {
               const dependency = pickcontrol(this.group, prop);
-              // cancel the ongoing listener
               this.cancelComputationSubscription(config, key);
-              // push the config on top of the computations
               computations.push([key, config, dependency]);
             }
           }
@@ -343,14 +329,9 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
     this._detectChanges$.next();
   }
 
-  private cancelComputationSubscription(
-    config: ComputedInputValueConfigType,
-    name: string,
-  ) {
-    // case the control cannot be found, we unsuscribe from any previous subscription on the control
+  private cancelComputationSubscription(config: ComputedInputValueConfigType, name: string) {
     config.cancel.next();
 
-    // after we unsubscribe from the control, we make sure to remove dependency the dependency subscription tracker
     if (this.trackedDependencies) {
       const index = this.trackedDependencies.indexOf(name);
       this.trackedDependencies.splice(index, 1);
@@ -368,8 +349,8 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
 
 
   /**
-  * Removes property values from a record if the corresponding Input config has type 'html'.
-  * Mutates or cleans the record recursively through nested structures.
+  * removes property values from a record if the corresponding Input config has type 'html'.
+  * mutates or cleans the record recursively through nested structures.
   */
   private scrubHtmlProperties(items: InputConfigInterface[], value: { [prop: string]: unknown }): { [prop: string]: unknown } {
     if (!value || typeof value !== 'object') {

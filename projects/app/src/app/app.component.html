@@ -19,7 +19,7 @@
 <div class="container">
   <h3>{{ "app.modules.users.title" | text }}</h3>
   <ng-container *ngIf="state$ | async as form">
-    <ngx-smart-form #formRef [no-grid-layout]="false" (ready)="onFormReadyState(form)" (changes)="afterChanges()"
+    <!-- <ngx-smart-form #formRef [no-grid-layout]="false" (ready)="onFormReadyState(form)" (changes)="afterChanges()"
       (error)="onError($event)" [submitable]="true" [autoupload]="true" (submit)="ngxFormSubmit($event)" [form]="form"
       [autoSubmit]="true" [path]="'http://localhost:3000/customers'" [template]="controlTemplate" [table-description]="description" [add-group]="add">
 
@@ -82,10 +82,10 @@
         </button>
       </ng-template>
       <pre after>{{ formRef?.formGroup?.getRawValue() | json }}</pre>
-    </ngx-smart-form>
+    </ngx-smart-form> -->
 
 
-    <!-- <div #formRef="ngxform" [ngxform]="form" [value]="formValue">
+    <div #formRef="ngxform" [ngxform]="form" [value]="formValue">
       <ngx-form-ui #formui *ngIf="formRef.formGroup" [no-grid-layout]="false" [autoupload]="true" [template]="template" [label]="label" [state]="{ formGroup: formRef.formGroup, detached: formRef.state.detached }" [inputs]="formRef.form.controlConfigs">
           <ng-template #template let-config="value" let-control="control" let-describe="describe">
             <ngx-clr-form-control [date]="date" class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control" [inputConfig]="config" [describe]="describe ?? true" [error]="error" [label]="label">
@@ -116,6 +116,30 @@
               </ng-container>
           </ng-template>
 
+          <ngx-modal #modal #formmodal="formmodal" [size]="'md'" [animation]="'scale'"
+            [cssClass]="'no-padding'" [closeable]="false" (closeChange)="modal.close()"
+            (openChange)="modal.open()" (stateChange)="modalStateChange()" ngxformmodal>
+            <div *ngIf="formmodal.name === 'values'"
+              class="flex justify-between items-center border-b p-4 bg-gray-50" style="border-bottom-left-radius: var(--ngx-modal-content-border-radius,5px); border-top-right-radius: var(--ngx-modal-content-border-radius, 5px);">
+              <div>
+                <p cds-text>
+                  <strong class="inline-block text-2" [innerHTML]="'modules.kyc.policyholders.rightholders.title' | text | safeHtml"></strong>
+                </p>
+                <p cds-text class="" [innerHTML]="'modules.kyc.policyholders.rightholders.description' | text | safeHtml"></p>
+              </div>
+            </div>
+            <div class="p-4">
+              <ngx-form-ui *ngIf="formmodal.formgroup" [no-grid-layout]="false" [autoupload]="true"
+                [template]="formmodal.view" [label]="formmodal.label" [state]="{
+                  formGroup: formmodal.formgroup,
+                  detached: formmodal.detached,
+                }" [inputs]="formmodal.inputs"></ngx-form-ui>
+            </div>
+            <div class="flex justify-end p-2 border-t bg-gray-50" style="border-bottom-left-radius: var(--ngx-modal-content-border-radius, 5px); border-bottom-right-radius: var(--ngx-modal-content-border-radius, 5px);">
+              <button (click)="modalSubmit(formmodal, $event)" class="btn btn-primary" [innerHTML]="'actions.save' | text"></button>
+            </div>
+          </ngx-modal>
+
           <div class="flex justify-between mt-10" submit>
             <button class="btn btn-primary" (click)="formRef.submit.bind(formRef)()">
               <cds-icon shape="circle-arrow" dir="up"></cds-icon>
@@ -123,7 +147,7 @@
             </button>
           </div>
       </ngx-form-ui>
-    </div> -->
+    </div>
   </ng-container>
 </div>
 <div class="container">

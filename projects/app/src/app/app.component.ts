@@ -29,6 +29,7 @@ import {
   RequestClient,
   existsValidator,
   ReactiveFormDirectiveInterface,
+  ModalDirective,
 } from '@azlabsjs/ngx-smart-form';
 import {
   FileInput,
@@ -277,8 +278,19 @@ export class AppComponent implements OnInit {
     _t28.open();
   }
 
-  formModalStateChange() {
+  modalStateChange() {
     this.cdRef?.detectChanges();
+  }
+
+  modalSubmit(modal: ModalDirective, e: MouseEvent) {
+    if (e.detail === 0) {
+      return;
+    }
+
+    modal.validate();
+    if (modal.formgroup.valid) {
+      modal.close();
+    }
   }
 
   ngOnInit(): void {
