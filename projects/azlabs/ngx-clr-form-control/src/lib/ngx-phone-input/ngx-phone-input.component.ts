@@ -3,7 +3,6 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ContentChild,
   EventEmitter,
   Input,
   OnDestroy,
@@ -35,12 +34,12 @@ type StateType = {
 })
 export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
   @Input() error!: TemplateRef<unknown>;
+  @Input() input!: TemplateRef<any>;
   @Input() control!: AbstractControl;
   @Input() describe = true;
   @Input() config!: InputConfigInterface;
   @Input('class') cssClass!: string;
   @Input('countries') preferredCountries!: string[];
-  @ContentChild('input') inputRef!: TemplateRef<any>;
   @Input() set disabled(value: boolean) {
     const { _state: state } = this;
     this._state = { ...state, disabled: value };

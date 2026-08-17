@@ -16,7 +16,7 @@
               <ng-template #date let-control="control" let-onBlur="onBlur" let-config="config" let-describe="describe" let-label="label">
                 <label class="clr-control-label" *ngIf="describe" [for]="config.name">
                   <ng-container *ngTemplateOutlet="label; context: { $implicit: config!.label, config }"></ng-container>
-                  <span class="required-text" *ngIf="config.rules?.isRequired">(*)</span>
+                  <span class="required-text" *ngIf="config | required">(*)</span>
                 </label>
                 <input class="clr-input" type="date" [attr.title]="config!.label" [id]="config.name" [formControl]="control" (blur)="onBlur($event)" [value]="control.value" [min]="config!.minDate ?? config.constraints?.min" [max]="config.maxDate ?? config.constraints?.max" />
               </ng-template>

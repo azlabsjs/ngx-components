@@ -3,9 +3,8 @@
   <div class="ng-select-container" style="position: relative" *ngIf="state.config as config" #optionsRef fetchOptions
     [config]="config.optionsConfig" [loaded]="state.loaded" (optionsChange)="optionsChange($event)"
     (loadingChange)="loadingChange($event)" [name]="config.name">
-    <ng-container
-      *ngTemplateOutlet="input ?? _input; context: {options: config.options, config, pending: state.performingAction, loadingText, placeholder: config.placeholder, control, multiple: config.multiple ?? false, removed: removed.bind(this) | thunk: config, selected: select.bind(this) | thunk: config, bind: 'value', label: 'name', group: 'type', change: modelChange.bind(this), focus: onFocus.bind(this)}"></ng-container>
-    <span *ngIf="describe" class="input__subtext" [innerHTML]="config.description || '' | trustHtml"></span>
+    <ng-container *ngTemplateOutlet="input ?? _input; context: {options: config.options, config, pending: state.performingAction, loadingText, placeholder: config.placeholder, control, multiple: config.multiple ?? false, removed: removed.bind(this) | thunk: config, selected: select.bind(this) | thunk: config, bind: 'value', label: 'name', group: 'type', change: modelChange.bind(this), focus: onFocus.bind(this)}"></ng-container>
+    <ng-content></ng-content>
   </div>
 </ng-container>
 

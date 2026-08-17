@@ -22,7 +22,6 @@ import {
 } from '@azlabsjs/ngx-smart-form';
 import { ClarityIcons, uploadCloudIcon } from '@cds/core/icon';
 import { AppComponent } from './app.component';
-import { TestPipe } from './pipes/test.pipe';
 import {
   FORM_CONTROL_DIRECTIVES,
   useOptionsInterceptor,
@@ -37,7 +36,7 @@ import {
   AsyncTextPipe,
 } from '@azlabsjs/ngx-common';
 import { RouterModule } from '@angular/router';
-import { HTTPValuePipe, TRANSLATE_PIPES } from './pipes';
+import { HTTPValuePipe, AsyncTranslatePipe, RequiredPipe, TestPipe } from './pipes';
 import {
   OPTIONS_DIRECTIVES,
   provideCacheConfig,
@@ -91,13 +90,14 @@ export const createAppTranslator = createTranslate((values) => {
     ClarityModule,
     ...DIRECTIVES,
     ...COMMON_PIPES,
-    ...TRANSLATE_PIPES,
     ...FORM_CONTROL_DIRECTIVES,
     ...FORM_DIRECTIVES,
     ...OPTIONS_DIRECTIVES,
     ...MODAL_DIRECTIVES,
     FormControlComponent,
     NgxDropzoneModule.forRoot(),
+    RequiredPipe,
+    AsyncTranslatePipe,
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'fr-FR' },

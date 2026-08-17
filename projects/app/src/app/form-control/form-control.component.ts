@@ -1,21 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {
   FormBuilder,
-  FormControl,
-  FormGroup,
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
 import {
   CLR_FORM_CONTROL_DIRECTIVES,
-  NgxFormControlComponent,
   NgxInputErrorComponent,
 } from '@azlabsjs/ngx-clr-form-control';
 import {
-  createFormControl,
   FORM_DIRECTIVES,
-  NgxFormComponent,
 } from '@azlabsjs/ngx-smart-form';
 import {
   FormConfigInterface,
@@ -23,9 +18,9 @@ import {
   OptionsInput,
   OptionsInputConfigInterface,
 } from '@azlabsjs/smart-form-core';
-import { Subscription, tap } from 'rxjs';
 import { ClrIconModule } from '@clr/angular';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
+import { RequiredPipe } from '../pipes';
 
 @Component({
   standalone: true,
@@ -33,10 +28,11 @@ import { COMMON_PIPES } from '@azlabsjs/ngx-common';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    CLR_FORM_CONTROL_DIRECTIVES,
-    ...FORM_DIRECTIVES,
     NgxInputErrorComponent,
     ClrIconModule,
+    RequiredPipe,
+    CLR_FORM_CONTROL_DIRECTIVES,
+    ...FORM_DIRECTIVES,
     ...COMMON_PIPES,
   ],
   selector: 'app-form-control',
@@ -77,6 +73,7 @@ export class FormControlComponent {
           min: '1950-01-01',
           max: new Date().toISOString().split('T')[0],
         },
+        description: 'description du champ date'
       },
       {
         min: 0,
@@ -90,6 +87,7 @@ export class FormControlComponent {
           required: true,
           max: 10,
         },
+        description: 'description du champ tax'
       },
       {
         label: 'Firstname',
@@ -111,6 +109,7 @@ export class FormControlComponent {
           ],
           max: 50,
         },
+        description: 'description du champ firstname'
       } as InputConfigInterface,
       {
         cols: 0,
@@ -122,6 +121,7 @@ export class FormControlComponent {
         classes: 'clr-textarea',
         isRepeatable: false,
         containerClass: 'clr-col-12',
+        description: 'description du champ description'
       },
       {
         label: 'Phone number',
@@ -134,6 +134,7 @@ export class FormControlComponent {
           required: true,
           max: 20,
         },
+        description: 'description du champ phone number'
       },
       {
         min: '',
@@ -148,7 +149,8 @@ export class FormControlComponent {
             name: 'name',
             values: 'len_lt:10'
           }
-        }
+        },
+        description: 'description du champ time'
       },
       {
         label: 'Sexe',
@@ -167,6 +169,7 @@ export class FormControlComponent {
           required: true,
           disabled: false,
         },
+        description: 'description du champ sex'
       } as OptionsInput,
       {
         uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
@@ -185,6 +188,7 @@ export class FormControlComponent {
         constraints: {
           required: true,
         },
+        description: 'description du champ no upload'
       },
       {
         // uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
@@ -214,7 +218,6 @@ export class FormControlComponent {
         classes: 'clr-input',
         placeholder: '...',
         value: null,
-        description: '', // TODO: Add input description
         index: undefined,
         isRepeatable: false,
         containerClass: 'input-col-sm-12 input-col-md-6',
@@ -228,9 +231,10 @@ export class FormControlComponent {
           disabled: false,
           min: 1,
         },
+        description: 'description du champ select sex'
       } as OptionsInputConfigInterface,
     ],
   } as FormConfigInterface;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder) { }
 }

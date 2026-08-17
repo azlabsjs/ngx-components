@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ContentChild,
   EventEmitter,
   Input,
   OnChanges,
@@ -15,10 +14,10 @@ import { CommonModule } from '@angular/common';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { DROPDOWN_DIRECTIVES } from '@azlabsjs/ngx-dropdown';
 
-/** Set state parameter type definition */
+/** set state parameter type definition */
 type SetStateParam<T> = (state: T) => T;
 
-/** @internal Component state type declaration */
+/** @internal component state type declaration */
 type StateType = {
   disabled: boolean;
   required: boolean;
@@ -38,7 +37,6 @@ type StateType = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxIntlTelInputComponent implements OnChanges {
-  // #region Component Inputs
   @Input() required = false;
   @Input() country!: string;
   @Input() class!: string;
@@ -47,18 +45,14 @@ export class NgxIntlTelInputComponent implements OnChanges {
   @Input() value!: string;
   @Input() disabled = false;
   @Input() name!: string;
-  // #endregion Component Inputs
 
-  // #region Child content selectors
-  @ContentChild('input') inputTemplateRef!: TemplateRef<any>;
-  // #endregion Child content selectors
+  @Input('input') inputref!: TemplateRef<any>;
+  @Input() description!: TemplateRef<unknown>;
 
-  // #region Component outputs
   @Output() valueChange = new EventEmitter<string>();
   @Output() error = new EventEmitter<boolean>();
   @Output() focus = new EventEmitter<FocusEvent>();
   @Output() blur = new EventEmitter<FocusEvent>();
-  // #endregion Component outputs
 
   private _countries = this.service.fetchCountries() ?? [];
   _state: StateType = {
@@ -75,10 +69,7 @@ export class NgxIntlTelInputComponent implements OnChanges {
   }
 
   /** @description Intl tel input component class constructor */
-  constructor(
-    private service: IntlTelInput,
-    private cdRef: ChangeDetectorRef
-  ) {}
+  constructor(private service: IntlTelInput, private cdRef: ChangeDetectorRef) { }
 
   ngOnChanges(changes: SimpleChanges) {
     let stateChanges = false;
@@ -89,26 +80,15 @@ export class NgxIntlTelInputComponent implements OnChanges {
       stateChanges = true;
     }
 
-    // Case the state changes
-    const {
-      selected: _selected,
-      preferredCountries,
-      countries,
-      value,
-    } = this._state;
+    const { selected: _selected, preferredCountries, countries, value } = this._state;
     if (stateChanges) {
-      let selected = this.value
-        ? this.getValueSelectedCountry(this.value)
-        : undefined;
+      let selected = this.value ? this.getValueSelectedCountry(this.value) : undefined;
       if (!selected) {
         selected = _selected;
       }
 
       if (!selected) {
-        selected =
-          preferredCountries.length !== 0
-            ? preferredCountries[0]
-            : countries[0];
+        selected = preferredCountries.length !== 0 ? preferredCountries[0] : countries[0];
       }
 
       // get country code from value property
@@ -117,10 +97,7 @@ export class NgxIntlTelInputComponent implements OnChanges {
       // set the current component state
       this.setState((state) => ({
         ...state,
-        value:
-          typeof countryCode !== 'undefined' && countryCode !== null
-            ? this.value.substring(countryCode.toString().length)
-            : value,
+        value: typeof countryCode !== 'undefined' && countryCode !== null ? this.value.substring(countryCode.toString().length) : value,
         disabled: this.disabled,
         required: this.required,
         preferredCountries: this.getPreferredCountries(),
@@ -129,14 +106,11 @@ export class NgxIntlTelInputComponent implements OnChanges {
     }
   }
 
-  //
   onCountrySelect(country: Country): void {
     this.setState((state) => ({ ...state, selected: country }));
     this.dispatchValueChange();
-    // Dispatch a selectionChange event
   }
 
-  //
   onKeyPress(event: any): void {
     const pattern = /[0-9\+\-\ ]/;
     const inputChar = String.fromCharCode(event.charCode);
@@ -154,10 +128,7 @@ export class NgxIntlTelInputComponent implements OnChanges {
   }
 
   onInputChange(event?: Event) {
-    this.setState((state) => ({
-      ...state,
-      value: (event?.target as HTMLInputElement).value.trim(),
-    }));
+    this.setState((state) => ({ ...state, value: (event?.target as HTMLInputElement).value.trim() }));
     this.dispatchValueChange();
     event?.stopPropagation();
   }
@@ -168,39 +139,18 @@ export class NgxIntlTelInputComponent implements OnChanges {
     const { selected, value } = this._state;
 
     if (selected?.iso2) {
-      this.error.emit(
-        value &&
-          selected &&
-          !this.service.isSafeValidPhoneNumber(
-            this.getPhonenumber(selected, value),
-            selected.iso2
-          )
-          ? true
-          : false
-      );
+      this.error.emit(value && selected && !this.service.isSafeValidPhoneNumber(this.getPhonenumber(selected, value), selected.iso2) ? true : false);
     }
   }
 
   onSearchChange(event: string) {
     const preferredCountries = [] as Country[];
     if (event.trim() === '') {
-      return this.setState((state) => ({
-        ...state,
-        countries: this._countries,
-        preferredCountries: this.getPreferredCountries(),
-      }));
+      return this.setState((state) => ({ ...state, countries: this._countries, preferredCountries: this.getPreferredCountries() }));
     }
-    const countries = this._countries.filter((state) => {
-      return (
-        true ===
-        new RegExp(`${event}`, 'g').test(`${state.dialCode} ${state.name}`)
-      );
-    });
-    return this.setState((state) => ({
-      ...state,
-      countries,
-      preferredCountries,
-    }));
+
+    const countries = this._countries.filter((state) => true === new RegExp(`${event}`, 'g').test(`${state.dialCode} ${state.name}`));
+    return this.setState((state) => ({ ...state, countries, preferredCountries }));
   }
 
   private dispatchValueChange() {
@@ -218,45 +168,21 @@ export class NgxIntlTelInputComponent implements OnChanges {
   private getValueSelectedCountry(value: string) {
     const { countries } = this._state;
     const tmpCode = this.getCountryCode(value);
-    return tmpCode
-      ? countries.find((c: Country) => c.dialCode === tmpCode.toString())
-      : undefined;
+    return tmpCode ? countries.find((c: Country) => c.dialCode === tmpCode.toString()) : undefined;
   }
 
-  private getPhonenumber(
-    selected: Country | undefined,
-    value: string | undefined
-  ) {
-    return `${selected?.dialCode ?? ''}${
-      value?.replace(/[\s\t\/\+\-]/g, '') ?? ''
-    }`;
+  private getPhonenumber(selected: Country | undefined, value: string | undefined) {
+    return `${selected?.dialCode ?? ''}${value?.replace(/[\s\t\/\+\-]/g, '') ?? ''}`;
   }
 
   private getCountryCode(value: string) {
     return this.service.getCountryCode(value);
   }
 
-  /**
-   * Returns the list of preferred countries
-   */
-  private getPreferredCountries(
-    callback?: (v: string[]) => Country[]
-  ): Country[] {
-    const values =
-      this.preferredCountries ??
-      this.service
-        .fetchPreferredCountries()
-        .filter((v) => typeof v !== 'undefined' && v !== null) ??
-      [];
-    callback =
-      callback ??
-      ((v) => {
-        return v
-          .map((iso2) => this._countries.find((c) => c.iso2 === iso2))
-          .filter(
-            (current) => typeof current !== 'undefined' && current !== null
-          ) as Country[];
-      });
+  /** returns the list of preferred countries */
+  private getPreferredCountries(callback?: (v: string[]) => Country[]): Country[] {
+    const values = this.preferredCountries ?? this.service.fetchPreferredCountries().filter((v) => typeof v !== 'undefined' && v !== null) ?? [];
+    callback = callback ?? ((v) => v.map((iso2) => this._countries.find((c) => c.iso2 === iso2)).filter((current) => typeof current !== 'undefined' && current !== null) as Country[]);
     return callback(values);
   }
 }

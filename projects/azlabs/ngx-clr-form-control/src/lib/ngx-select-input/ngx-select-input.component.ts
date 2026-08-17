@@ -46,7 +46,6 @@ type StateType = {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxSelectInputComponent {
-  //#region local properties
   _state: StateType = {
     performingAction: false,
     config: null,
@@ -56,9 +55,7 @@ export class NgxSelectInputComponent {
     return this._state;
   }
   private fetchOnFocus: boolean = false;
-  //#endregion
 
-  //#region input properties
   @Input() control!: FormControl<any>;
   @Input() describe = true;
   @Input() disabled = false;
@@ -76,7 +73,6 @@ export class NgxSelectInputComponent {
   @Input({ alias: 'loading-text' }) loadingText!: string;
   @Input() parent: string | null | undefined = 'body';
   @Input() input!: TemplateRef<any> | null | undefined;
-  //#endregion
 
   @Output() remove = new EventEmitter<any>();
   @Output() selected = new EventEmitter<InputEventArgs>();
@@ -87,10 +83,7 @@ export class NgxSelectInputComponent {
 
   @ViewChild('ngselect', { static: false }) ngselect: NgSelectComponent | null | undefined;
 
-  constructor(
-    @Inject(DOCUMENT) private document: Document,
-    private cdRef: ChangeDetectorRef
-  ) {
+  constructor(@Inject(DOCUMENT) private document: Document, private cdRef: ChangeDetectorRef) {
     const { defaultView: view } = this.document;
 
     if (!view) {
@@ -98,11 +91,7 @@ export class NgxSelectInputComponent {
     }
 
     const { IntersectionObserverEntry: entry } = view;
-    this.fetchOnFocus = !(
-      'IntersectionObserver' in view &&
-      'IntersectionObserverEntry' in view &&
-      'intersectionRatio' in entry.prototype
-    );
+    this.fetchOnFocus = !('IntersectionObserver' in view && 'IntersectionObserverEntry' in view && 'intersectionRatio' in entry.prototype);
   }
 
   onFocus(): void {

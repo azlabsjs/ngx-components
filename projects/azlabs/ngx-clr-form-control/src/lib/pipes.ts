@@ -24,11 +24,7 @@ export class AcceptFilePipe implements PipeTransform {
 })
 export class RequiredPipe implements PipeTransform {
   transform(value: InputConfigInterface) {
-    return (
-      !!value.constraints &&
-      'required' in value.constraints &&
-      !!value.constraints.required
-    );
+    return !!value.constraints && 'required' in value.constraints && !!value.constraints.required;
   }
 }
 
