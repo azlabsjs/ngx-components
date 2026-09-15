@@ -1,7 +1,5 @@
 <div class="table-wrapper">
-  <ng-container *ngIf="tabledescription">
-    <ng-container *ngTemplateOutlet="tabledescription"></ng-container>
-  </ng-container>
+  <ng-content select="[description]"></ng-content>
   <table class="table table-compact">
     <thead>
       <tr>

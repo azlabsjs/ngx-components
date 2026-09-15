@@ -105,8 +105,8 @@ export class NgxSmartFormComponent implements ReactiveFormComponentInterface, Af
   private subscriptions: Subscription[] = [];
   private changeSubscription: Subscription | null = null;
 
-  public constructor(protected readonly model: FormModel<FormConfigInterface>, private cdRef: ChangeDetectorRef | null, @Inject(HTTP_REQUEST_CLIENT) @ngOptional() private client?: RequestClient ) {
-    const subscription = this.model.detectChanges$.subscribe(() => this.cdRef?.detectChanges() );
+  public constructor(protected readonly model: FormModel<FormConfigInterface>, private cdRef: ChangeDetectorRef | null, @Inject(HTTP_REQUEST_CLIENT) @ngOptional() private client?: RequestClient) {
+    const subscription = this.model.detectChanges$.subscribe(() => this.cdRef?.detectChanges());
     this.subscriptions.push(subscription);
   }
 
@@ -276,6 +276,11 @@ export class NgxSmartFormComponent implements ReactiveFormComponentInterface, Af
     this.changeSubscription = null;
   }
 
+
+  protected onRemoved(event: { name: string, control: AbstractControl }) {
+    this.removed.emit(event);
+  }
+
   private async sendRequest(path: string) {
     try {
       this.performingRequest.emit(true);
@@ -301,8 +306,8 @@ export class NgxSmartFormComponent implements ReactiveFormComponentInterface, Af
       if (this.changeSubscription) {
         this.changeSubscription.unsubscribe();
       }
-      const subscription = this.model.valueChanges().subscribe((value) =>this.formGroupChange.emit(value));
-      
+      const subscription = this.model.valueChanges().subscribe((value) => this.formGroupChange.emit(value));
+
       this.changeSubscription = subscription;
     }
   }

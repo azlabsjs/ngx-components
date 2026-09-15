@@ -40,10 +40,8 @@ type ContextType = {
   styleUrls: ['./table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxTableForm
-  implements ViewRefFactory<EmbeddedViewRef<any>>, OnDestroy {
+export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDestroy {
   @Input() label!: TemplateRef<any> | null | undefined;
-  @Input({ alias: 'table-description' }) tabledescription!: Optional<TemplateRef<any>>;
   @Input({ alias: 'template' }) view!: TemplateRef<any>;
   @Input({ alias: 'inputs' }) configs: InputConfigInterface[] = [];
   @Input({ alias: 'auto-upload' }) autoupload: boolean = true;

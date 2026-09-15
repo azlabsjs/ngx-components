@@ -49,7 +49,7 @@
               <ngx-smart-form-array [class.hidden]="(value | ishidden) || (local | inarray : state.detached)"
                 [detached]="state.detached" [class]="value.classes" [no-grid-layout]="nogridlayout" [formArray]="local"
                 [controls]="(value | asInputGroup).children || [] | inputConfigArray" [template]="template"
-                [add-button]="addgroup" [name]="value.name" [title]="value.label" [placeholder]="value.placeholder"
+                [add-button]="addgroup" [name]="value.name" [title]="value.label"
                 [autoupload]="autoupload" [hidden]="(value | ishidden) || (local | inarray : state.detached)"
                 [modal]="formmodal ?? modal" [table-description]="tabledescription"
                 (item-removed)="onRemoved($event, name)"

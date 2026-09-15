@@ -61,12 +61,11 @@ export class NgxFormComponent {
 
 
   onRemoved(event: { index: number, control: AbstractControl }, parent: string) {
-
     if (!event) {
       return;
     }
 
-    if (!event.index || !event.control) {
+    if (typeof event.index === 'undefined' || event.index === null || !event.control) {
       return;
     }
 

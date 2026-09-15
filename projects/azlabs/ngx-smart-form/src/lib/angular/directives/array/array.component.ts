@@ -52,6 +52,7 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy, 
   @Input() label!: Optional<TemplateRef<any>>;
   @Input() name!: string;
   @Input() title!: string;
+  /** @deprecated */
   @Input() placeholder!: Optional<string>;
   @Input({ alias: 'add-button' }) addref!: Optional<TemplateRef<Node>>;
   @Input({ alias: 'controls' }) inputs!: InputConfigInterface[];
