@@ -78,9 +78,6 @@ function getinputgroupinputs(input: InputGroup) {
 }
 
 /** @internal */
-// type ChangedInputStateType = { name: string; value: boolean }[];
-
-/** @internal */
 function findarray<T extends AbstractControl>(g: T, keys: string[]) {
   let c: AbstractControl | null = g;
   for (const k of keys) {
@@ -91,9 +88,6 @@ function findarray<T extends AbstractControl>(g: T, keys: string[]) {
     if (c && (c instanceof FormGroup || c instanceof FormArray)) {
       c = c.get(k) as FormGroup;
     } else {
-      // Case c is not a form group instance, that means we do not search
-      // further for a control as simply set c to null to stop the iteration
-      // and return null
       c = null;
     }
   }
@@ -414,7 +408,6 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
         return matchany(value, config);
       }
 
-      // case provided value evaluate to a default, evaluation does not treat the case
       if (!value || String(value).trim() === '') {
         return false;
       }
@@ -520,10 +513,8 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
           },
           dependencyChanged: (formgroup: FormGroup,property: string,value: unknown) => {
             const output: [[string, AbstractControl][], [string, AbstractControl][]] = [[], []];
-            // case the selector key contains * and dependecy key starts with string before `*`
-            // then the control is the control at the same index having the property after *
             let str = before(name, '*');
-            str = str.trim().substring(0, str.length - 1); // remove the trailing `.` at the end of `str`
+            str = str.trim().substring(0, str.length - 1);
             if (position !== -1 && str.trim() !== '' && property.trim().startsWith(str)) {
               const parent = findcontrol(formgroup, str) as FormArray;
               if (!parent) {
@@ -550,19 +541,14 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
                 let control = isformgroup(item) ? findcontrol(item, input) : item;
                 const dependencies = currentCondition.map(i => ({input: isformgroup(item) ? findcontrol(item, after(i.name, `${str}.*.`).trim()) : item, fn: i.values ?? [], name: i.name})).filter(i => !!i.input);
 
-                // case the dependency cannot be located continue to next iteration
                 if (dependencies.length === 0) {
                   continue;
                 }
 
-                // case we cannot select from the formgroup,
-                // we try to locate it from using the query function
                 if (!control && !!query) {
                   control = query(name);
                 }
 
-                // case the control value is not defined, we continue with the next iteration
-                // as we don't need to handle missing inputs
                 if (!control) {
                   continue;
                 }
@@ -574,7 +560,6 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
                   }
 
                   truthy = typeof dependency.fn === 'function' ? dependency.fn(dependency.input.value, name, formgroup) : createPredicate(dependency.fn)(dependency.input.value);
-                  // case truthy evaluates to false after computing predicate, we break from the loop
                   if (truthy === false) {
                     break;
                   }
@@ -598,11 +583,9 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
                 }
               }
 
-              // drop out of the condition block and exit from the function
               return output;
             }
 
-            // case we are not handling form array)
             let control = findcontrol(formgroup, name);
             let truthy = false;
             for (const c of currentCondition) {
@@ -613,19 +596,16 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
               }
               const params = c.values ?? [];
               truthy = typeof params === 'function' ? params(inputvalue, name, formgroup) : createPredicate(params)(inputvalue);
-              // case thruthy evaluates to false after computing predicate, we break from the loop
               if (truthy === false) {
                 break;
               }
               
             }
 
-            // case we cannot select from the formgroup, we try to locate it using the query function
             if (!control && !!query) {
               control = query(name);
             }
 
-            // case the control value is not defined, we do not proceed any further
             if (!control) {
               return output;
             }
@@ -687,7 +667,7 @@ export function pickconfig(
   return result;
 }
 
-/** @description Query for the value located at a given leaf of the tree of control in an abstract control */
+/** @description query for the value located at a given leaf of the tree of control in an abstract control */
 export function getPropertyValue<TReturn = any>(
   model: AbstractControl | null,
   key: string,
@@ -815,6 +795,10 @@ export function pickcontrol(
 /** @internal */
 export function useSupportedAggregations() {
   function avg(...args: unknown[]) {
+    if (args.length === 0) {
+      return 0;
+    }
+
     return sum(...args) / args.length;
   }
 
@@ -866,7 +850,12 @@ export function useSupportedAggregations() {
       .map((v) => Number(v))
       .map((v) => (!isNaN(v) ? v : 1))
       .reduce((carry, curr) => {
+        if (curr === 0) {
+          return carry;
+        }
+
         carry /= curr;
+
         return carry;
       }, Number(args[0]));
   }
@@ -905,8 +894,7 @@ export function useSupportedAggregations() {
 type ArgsBuilderType = (model: any, params: unknown[]) => void;
 
 /**
- * computes a dependencies trees of input that has their value that needs to be computed
- * based on other input value or provided raw values
+ * computes a dependencies trees of input that has their value that needs to be computed based on other input value or provided raw values
  */
 export function createComputableDepencies(
   items: InputConfigInterface[],
@@ -931,17 +919,10 @@ export function createComputableDepencies(
           const argbuilders: ArgsBuilderType[] = [];
           const deps: string[] = [];
           for (const arg of args) {
-            // case the argument value starts with [ and ends with ], the argument is considered a dependency
             if (String(arg).startsWith('[') && arg.endsWith(']')) {
               const name = arg.slice(1, arg.length - 1);
-              // case we are in presence of a form array value selection
-              // the dependency is the form array itself
               const star_index = name.indexOf('*');
 
-              // due to issue not being able to listen for formgroup control valueChanges event
-              // current implementation will listen for entire inner formgroup changes
-              // if any is request, and we will use `getObjectProperty` to query for
-              // the value of the requested control
               const dot_index = name.indexOf('.');
               const after_dot = name.slice(dot_index + 1);
               const depName =
@@ -951,9 +932,7 @@ export function createComputableDepencies(
                     ? name.slice(0, dot_index)
                     : name;
 
-              // push the property on top of dependencies array
               deps.push(depName);
-              // create control property value resolver and push it on top of arguments builder
               let builder: ArgsBuilderType;
 
               if (star_index !== -1) {
@@ -1029,10 +1008,8 @@ export function createComputableDepencies(
     }
   };
 
-  // call the decorated function on the provided inputs
   decorated(inputs);
 
-  // return the builded dependencies
   return dependencies;
 }
 
@@ -1099,7 +1076,6 @@ function createRefetchObservable(formgroup: FormGroup, refetch: OptionsConfig['r
       const { input: name, event: _ } = typeof trigger === 'object' && trigger !== null ? trigger : { input: trigger, event: 'change' };
 
       if (name.indexOf('*') !== -1) {
-        // we must listen for changes on a formarray
         const str = before(name, '*');
         const str2 = after(name, '*').substring(1);
         const array: FormArray | null = findcontrol(formgroup, str.substring(0, str.length - 1));
