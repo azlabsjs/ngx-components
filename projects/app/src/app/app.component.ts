@@ -18,7 +18,7 @@ import {
   Optional,
   ViewChild,
 } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { AbstractControl, FormControl } from '@angular/forms';
 import { GridColumnType, GridConfigType } from '@azlabsjs/ngx-clr-smart-grid';
 import { COMMON_PIPES, createPipeTransform } from '@azlabsjs/ngx-common';
 import { createSlide } from '@azlabsjs/ngx-slides';
@@ -351,4 +351,9 @@ export class AppComponent implements OnInit {
   ngxFormSubmit(event: Record<string, any>) { }
 
   ondgItemClick(value: unknown) { }
+
+
+  onRemoved(event: {name: string, control: AbstractControl}) {
+    console.log('removed: ', event);
+  }
 }

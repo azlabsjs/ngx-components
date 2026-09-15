@@ -60,6 +60,7 @@ export class NgxSmartFormControlArrayComponent
   @Input({ required: true }) detached!: AbstractControl[];
 
   @Output() listChange = new EventEmitter<number>();
+  @Output('item-removed') _removed = new EventEmitter<{ index: number, control: AbstractControl }>();
 
   @ViewChild('container', { static: false }) viewFactory!: ViewRefFactory<any>;
 
@@ -100,6 +101,12 @@ export class NgxSmartFormControlArrayComponent
       if (index === -1) {
         return;
       }
+
+      const control = this.array.at(index);
+      if (control) {
+        this._removed.emit({ index, control });
+      }
+
       this.refs.splice(index, 1);
       this.array.removeAt(index, { emitEvent: true });
       this.array.updateValueAndValidity();

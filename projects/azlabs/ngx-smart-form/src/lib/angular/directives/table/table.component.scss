@@ -98,3 +98,47 @@
   width: fit-content;
   white-space: nowrap;
 }
+
+.flex {
+  display: flex;
+}
+.flex-row {
+  flex-direction: row;
+}
+.justify-between {
+  justify-content: space-between;
+} 
+
+.justify-arround {
+  justify-content: space-around;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.sticky {
+  position: sticky;
+}
+
+.right-0 {
+  right: 0;
+}
+
+.bg-light {
+  background-color: var(--light-bg-color, #ffffff) !important;
+  background: var(--light-bg-color, #ffffff) !important;
+}
+
+.bg-light-50 {
+  background-color: var(--light-bg-color, #ffffff) !important;
+  background: var(--light-bg-color, #ffffff) !important;
+}
+
+.z-2 {
+  z-index: 2;
+}
+
+.z-3 {
+  z-index: 3;
+}

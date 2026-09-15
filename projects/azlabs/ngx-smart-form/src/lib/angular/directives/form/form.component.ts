@@ -52,8 +52,7 @@ const AUTO_SUBMIT_ERROR_MESSAGE =
   providers: [FormModel],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxSmartFormComponent
-  implements ReactiveFormComponentInterface, AfterViewInit, OnDestroy, OnChanges {
+export class NgxSmartFormComponent implements ReactiveFormComponentInterface, AfterViewInit, OnDestroy, OnChanges {
   get formGroup() {
     return this.model.state.formGroup;
   }
@@ -77,7 +76,7 @@ export class NgxSmartFormComponent
   @Input() action: HTTPRequestMethods = 'POST';
   @Input('no-grid-layout') noGridLayout = false;
   @Input() modal!: ModalDirective;
-  
+
   /** @deprecated */
   @Input() addTemplate!: TemplateRef<any>;
   @Input({ alias: 'add' }) add!: TemplateRef<any>;
@@ -91,6 +90,7 @@ export class NgxSmartFormComponent
   @Output() complete = new EventEmitter<unknown>();
   @Output() error = new EventEmitter<unknown>();
   @Output() performingRequest = new EventEmitter<boolean>();
+  @Output('item-removed') removed = new EventEmitter<{ name: string, control: AbstractControl }>();
 
   @HostListener('keyup.enter', ['$event'])
   onEnterButtonCliked(event: Event) {
@@ -105,14 +105,8 @@ export class NgxSmartFormComponent
   private subscriptions: Subscription[] = [];
   private changeSubscription: Subscription | null = null;
 
-  public constructor(
-    protected readonly model: FormModel<FormConfigInterface>,
-    private cdRef: ChangeDetectorRef | null,
-    @Inject(HTTP_REQUEST_CLIENT) @ngOptional() private client?: RequestClient,
-  ) {
-    const subscription = this.model.detectChanges$.subscribe(() =>
-      this.cdRef?.detectChanges(),
-    );
+  public constructor(protected readonly model: FormModel<FormConfigInterface>, private cdRef: ChangeDetectorRef | null, @Inject(HTTP_REQUEST_CLIENT) @ngOptional() private client?: RequestClient ) {
+    const subscription = this.model.detectChanges$.subscribe(() => this.cdRef?.detectChanges() );
     this.subscriptions.push(subscription);
   }
 
@@ -139,7 +133,6 @@ export class NgxSmartFormComponent
     }, 700);
   }
 
-  //#region component interface method definitions
   controlValueChanges(name: string): Observable<unknown> {
     return this.formGroup?.get(name)?.valueChanges ?? EMPTY;
   }
@@ -197,11 +190,8 @@ export class NgxSmartFormComponent
       return;
     }
 
-    // validate the formgroup object to ensure it passes validation before submitting
     this.model.validate();
 
-    // wait the for status changes of the formgroup
-    // to make sure ui update error message
     const subscription = this.formGroup?.statusChanges
       .pipe(filter((status) => ['PENDING', 'DISABLED'].indexOf(status) === -1))
       .subscribe(() => this.cdRef?.detectChanges());
@@ -210,27 +200,21 @@ export class NgxSmartFormComponent
       this.subscriptions.push(subscription);
     }
 
-    // We simply return without performing any further action if the validation fails
-    // Due to some issue with form group being invalid while all controls does not
-    // have error, we are adding a check that verifies if all controls has error before
-    // breaking out of the function
     const errors = collectErrors(this.formGroup);
     if (!this.model.isValid() && errors.length > 0) {
       return;
     }
 
     const path = this.path ?? this.form?.endpointURL;
-    const clientDefined = typeof this.client !== 'undefined' && this.client !== null;
-    const pathDefined = path !== null && path !== 'undefined';
-    const shouldSubmit = this.autoSubmit && clientDefined;
+    const hasReqClient = typeof this.client !== 'undefined' && this.client !== null;
+    const hasPath = path !== null && path !== 'undefined';
+    const canSubmit = this.autoSubmit && hasReqClient;
 
-    // case component is configured to auto submit form values, we send
-    // request using the configured client object
-    if (shouldSubmit && pathDefined) {
-      await this.sendRequest(path || 'http://localhost');
+    if (canSubmit && hasPath) {
+      await this.sendRequest(path);
       return;
     }
-    const configError = (this.autoSubmit && !clientDefined) || (this.autoSubmit && !pathDefined);
+    const configError = (this.autoSubmit && !hasReqClient) || (this.autoSubmit && !hasPath);
 
     if (!configError) {
       this.submit.emit(this.model.getValue());
@@ -242,12 +226,12 @@ export class NgxSmartFormComponent
 
   setComponentForm(value: FormConfigInterface): void {
     if (value) {
-      // we set the controls container class
       const controls = (value.controlConfigs ?? []).map((current) => ({
         ...current,
         containerClass: current.containerClass ?? 'input-col-md-12',
         isRepeatable: current.isRepeatable ?? false,
       }));
+
       const form = { ...value, controlConfigs: controls };
       this.updateModel(form, this.formGroup);
     }
@@ -261,7 +245,6 @@ export class NgxSmartFormComponent
   reset(): void {
     this.model.reset();
   }
-  //#endregion
 
   setControlConfig(config?: InputConfigInterface, name?: string) {
     if (!this.form) {
@@ -318,9 +301,8 @@ export class NgxSmartFormComponent
       if (this.changeSubscription) {
         this.changeSubscription.unsubscribe();
       }
-      const subscription = this.model.valueChanges().subscribe((value) =>
-        this.formGroupChange.emit(value),
-      );
+      const subscription = this.model.valueChanges().subscribe((value) =>this.formGroupChange.emit(value));
+      
       this.changeSubscription = subscription;
     }
   }

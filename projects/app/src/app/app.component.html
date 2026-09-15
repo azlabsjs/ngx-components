@@ -86,7 +86,7 @@
 
 
     <div #formRef="ngxform" [ngxform]="form" [value]="formValue">
-      <ngx-form-ui #formui *ngIf="formRef.formGroup" [no-grid-layout]="false" [autoupload]="true" [template]="template" [label]="label" [state]="{ formGroup: formRef.formGroup, detached: formRef.state.detached }" [inputs]="formRef.form.controlConfigs">
+      <ngx-form-ui #formui *ngIf="formRef.formGroup" [no-grid-layout]="false" [autoupload]="true" [template]="template" [label]="label" [state]="{ formGroup: formRef.formGroup, detached: formRef.state.detached }" [inputs]="formRef.form.controlConfigs" (item-removed)="onRemoved($event)">
           <ng-template #template let-config="value" let-control="control" let-describe="describe">
             <ngx-clr-form-control [date]="date" class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control" [inputConfig]="config" [describe]="describe ?? true" [error]="error" [label]="label">
               <ng-template #label let-label>

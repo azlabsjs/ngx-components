@@ -54,8 +54,8 @@ export class NgxTableForm
 
   @Output() removed = new EventEmitter<RefType<EmbeddedViewRef<any>>>();
 
-  @ViewChild('container', { read: ViewContainerRef, static: false }) containerRef!: ViewContainerRef;
-  @ViewChild('template', { static: false }) templateRef!: TemplateRef<any>;
+  @ViewChild('container', { read: ViewContainerRef, static: false }) _container!: ViewContainerRef;
+  @ViewChild('template', { static: false }) _template!: TemplateRef<any>;
 
   private subscriptions: Subscription[] = [];
 
@@ -70,8 +70,8 @@ export class NgxTableForm
       this.showModalView(inputs, formgroup);
     }
 
-    const element = this.containerRef?.createEmbeddedView<ContextType>(
-      this.templateRef,
+    const element = this._container?.createEmbeddedView<ContextType>(
+      this._template,
       {
         formgroup,
         autoupload: this.autoupload,
@@ -95,7 +95,7 @@ export class NgxTableForm
   }
 
   clear(): void {
-    this.containerRef?.clear();
+    this._container?.clear();
   }
 
   showModalView(inputs: InputConfigInterface[], formgroup: AbstractControl) {

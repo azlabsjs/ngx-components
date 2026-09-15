@@ -8,7 +8,8 @@
   [state]="model.state"
   [modal]="formmodal ?? modal"
   [table-description]="tabledescription"
-  [inputs]="model.state.form.controlConfigs || []">
+  [inputs]="model.state.form.controlConfigs || []"
+  (item-removed)="removed.emit($event)">
   <section before><ng-content select="[before]"></ng-content></section>
   <section after><ng-content select="[after]"></ng-content></section>
   <ng-content></ng-content>

@@ -3,7 +3,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   ContentChild,
+  EventEmitter,
   Input,
+  Output,
   TemplateRef,
 } from '@angular/core';
 import { NgxSmartFormArrayComponent } from '../array';
@@ -15,6 +17,7 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { ModalDirective } from '../modal';
 import { FORM_PIPES } from './pipes';
 import { ComponentReactiveFormHelpers } from '../../helpers';
+import { AbstractControl } from '@angular/forms';
 
 @Component({
   selector: 'ngx-form-ui',
@@ -49,7 +52,25 @@ export class NgxFormComponent {
   @Input({ alias: 'add' }) add!: TemplateRef<any>;
   @Input({ alias: 'add-group' }) addgroup!: TemplateRef<any>;
 
+  @Output('item-removed') removed = new EventEmitter<{ name: string, control: AbstractControl }>();
+
+
   public validate() {
     ComponentReactiveFormHelpers.validateFormGroupFields(this.state.formGroup);
+  }
+
+
+  onRemoved(event: { index: number, control: AbstractControl }, parent: string) {
+
+    if (!event) {
+      return;
+    }
+
+    if (!event.index || !event.control) {
+      return;
+    }
+
+    const name = `${parent}.${event.index}`;
+    this.removed.emit({ name, control: event.control });
   }
 }

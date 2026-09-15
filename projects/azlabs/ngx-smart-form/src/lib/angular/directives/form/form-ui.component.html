@@ -5,8 +5,7 @@
   <!--\ before-->
 
   <!-- inputs -->
-  <ng-container
-    *ngTemplateOutlet=" _recursive; context: { group: state.formGroup, controls: inputs, autoupload }"></ng-container>
+  <ng-container *ngTemplateOutlet=" _recursive; context: { group: state.formGroup, controls: inputs, autoupload }"></ng-container>
   <!--\ inputs -->
 
   <!-- after-->
@@ -23,7 +22,7 @@
 </ng-container>
 <!--\ main -->
 
-<ng-template #_recursive let-controls="controls" let-group="group" let-autoupload="autoupload">
+<ng-template #_recursive let-controls="controls" let-group="group" let-autoupload="autoupload" let-parent="parent">
   <div class="input-row" *ngIf="!nogridlayout">
     <ng-container *ngTemplateOutlet="_layout; context: { controls, group, autoupload }"></ng-container>
   </div>
@@ -45,18 +44,22 @@
           </ng-template>
 
           <ng-container *ngIf="value | repeatable; else _norepeat">
-            <ngx-smart-form-array [class.hidden]="(value | ishidden) || (local | inarray : state.detached)"
-              [detached]="state.detached" [class]="value.classes" [no-grid-layout]="nogridlayout" [formArray]="local"
-              [controls]="(value | asInputGroup).children || [] | inputConfigArray" [template]="template"
-              [add-button]="addgroup" [name]="value.name" [title]="value.label" [placeholder]="value.placeholder"
-              [autoupload]="autoupload" [hidden]="(value | ishidden) || (local | inarray : state.detached)"
-              [modal]="formmodal ?? modal" [table-description]="tabledescription"
-              [label]="label"></ngx-smart-form-array>
+            <ng-container *ngTemplateOutlet="formarray; context: {name: '.' | join : parent : value.name}"></ng-container>
+            <ng-template #formarray let-name="name">
+              <ngx-smart-form-array [class.hidden]="(value | ishidden) || (local | inarray : state.detached)"
+                [detached]="state.detached" [class]="value.classes" [no-grid-layout]="nogridlayout" [formArray]="local"
+                [controls]="(value | asInputGroup).children || [] | inputConfigArray" [template]="template"
+                [add-button]="addgroup" [name]="value.name" [title]="value.label" [placeholder]="value.placeholder"
+                [autoupload]="autoupload" [hidden]="(value | ishidden) || (local | inarray : state.detached)"
+                [modal]="formmodal ?? modal" [table-description]="tabledescription"
+                (item-removed)="onRemoved($event, name)"
+                [label]="label"></ngx-smart-form-array>
+            </ng-template>
           </ng-container>
 
           <ng-template #_norepeat>
             <ng-container
-              *ngTemplateOutlet="_recursive; context: {controls: (value | asInputGroup)!.children || [], group: local, autoupload}"></ng-container>
+              *ngTemplateOutlet="_recursive; context: {controls: (value | asInputGroup)!.children || [], group: local, autoupload, parent: '.' | join : parent : value.name }"></ng-container>
           </ng-template>
         </div>
       </ng-container>
@@ -65,19 +68,22 @@
         <div *ngIf="group?.get(value.name) as local"
           [class]="nogridlayout | containercssclass : value.containerClass | csshidden : (value | ishidden) || (local | inarray : state.detached)"
           [hidden]="(value | ishidden) || (local | inarray : state.detached)">
-          <ng-container *ngTemplateOutlet="_template; context: {value, control: local, autoupload}"></ng-container>
+          <ng-container *ngTemplateOutlet="_template; context: {value, control: local, autoupload, parent}"></ng-container>
         </div>
       </ng-template>
     </ng-container>
   </ng-template>
 </ng-template>
 
-<ng-template #_template let-control="control" let-value="value">
+<ng-template #_template let-control="control" let-value="value" let-parent="parent">
   <ng-container *ngIf="value | repeatable; else notRepeatableRef">
-    <ngx-smart-form-control-array [class.hidden]="(value | ishidden) || (control | inarray : state.detached)"
-      [formArray]="control" [config]="value" [template]="template" [add-button]="add" [name]="value.name"
-      [autoupload]="autoupload" [hidden]="(value | ishidden) || (control | inarray : state.detached)"
-      [detached]="state.detached"></ngx-smart-form-control-array>
+    <ng-container *ngTemplateOutlet="array; context: {name: '.' | join : parent : value.name}"></ng-container>
+    <ng-template #array let-name="name">
+      <ngx-smart-form-control-array [class.hidden]="(value | ishidden) || (control | inarray : state.detached)"
+        [formArray]="control" [config]="value" [template]="template" [add-button]="add" [name]="value.name"
+        [autoupload]="autoupload" [hidden]="(value | ishidden) || (control | inarray : state.detached)"
+        [detached]="state.detached" (item-removed)="onRemoved($event, name)"></ngx-smart-form-control-array>
+      </ng-template>
   </ng-container>
 
   <ng-template #notRepeatableRef>

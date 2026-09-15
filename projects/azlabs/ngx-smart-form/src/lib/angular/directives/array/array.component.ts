@@ -57,20 +57,13 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy, 
   @Input({ alias: 'controls' }) inputs!: InputConfigInterface[];
   @Input({ alias: 'formArray' }) array!: FormArray;
   @Input({ alias: 'no-grid-layout' }) noGridLayout = false;
-  @Input({
-    alias: 'class',
-    transform: (value: string | string[]) => {
-      const classes = typeof value === 'string' ? [value] : value;
-      return classes
-        .map((v) => v.split(' ').map((i) => i.split(',')).flat().map((v) => v.trim()))
-        .flat();
-    },
-  })
+  @Input({ alias: 'class', transform: (value: string | string[]) => (typeof value === 'string' ? [value] : value).map((v) => v.split(' ').map((i) => i.split(',')).flat().map((v) => v.trim())).flat() })
   cssClass!: string | string[];
   @Input() hidden: boolean = false;
   @Input({ alias: 'table-description' }) tabledescription!: Optional<TemplateRef<any>>;
 
   @Output() listChange = new EventEmitter<number>();
+  @Output('item-removed') _removed = new EventEmitter<{ index: number, control: AbstractControl }>();
 
   @ViewChild('container', { static: false }) viewFactory!: ViewRefFactory<any>;
 
@@ -107,6 +100,12 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy, 
       if (index === -1) {
         return;
       }
+
+      const control = this.array.at(index);
+      if (control) {
+        this._removed.emit({ index, control });
+      }
+
       this.refs.splice(index, 1);
       this.array.removeAt(index, { emitEvent: true });
       this.array.updateValueAndValidity();
