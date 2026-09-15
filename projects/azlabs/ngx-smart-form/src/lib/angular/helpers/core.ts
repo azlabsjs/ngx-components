@@ -332,167 +332,167 @@ function matchany(value: unknown, values: unknown) {
 /** create a query object that alter input ui metadata based on it dependencies changes */
 export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: ClauseFn, query?: (name: string) => AbstractControl | null) {
 
-    function createPredicate(config: unknown) {
-      function parseDate(value: unknown) {
-        if (value instanceof Date) {
-          return value;
-        }
+  function createPredicate(config: unknown) {
+    function parseDate(value: unknown) {
+      if (value instanceof Date) {
+        return value;
+      }
 
-        if (isNumber(value)) {
-          return new Date(value);
-        }
+      if (isNumber(value)) {
+        return new Date(value);
+      }
 
-        let result = String(value).replace(/\//g, '-');
-        let date = result.trim().charAt(4) === '-' ? JSDate.create(result, 'YYYY-MM-DD') : JSDate.create(result, 'DD-MM-YYYY');
-        if (!isNaN(date.getTime())) {
-          return date;
-        }
-
-        date = new Date();
-        date.setTime(Date.parse(String(value)));
-      
+      let result = String(value).replace(/\//g, '-');
+      let date = result.trim().charAt(4) === '-' ? JSDate.create(result, 'YYYY-MM-DD') : JSDate.create(result, 'DD-MM-YYYY');
+      if (!isNaN(date.getTime())) {
         return date;
       }
-      
-      function yeardiff(d2: Date, d1: Date) {
-          let diff = d2.getFullYear() - d1.getFullYear();
-          const mdiff = d2.getMonth() - d1.getMonth();
-          const ddiff = d2.getDate() - d1.getDate();
-          
-          if (mdiff < 0 || (mdiff === 0 && ddiff < 0)) {
-              diff--;
-          }
-          
-          return diff;
-      }
 
-      function uyeardiff(d2: Date, d1: Date) {
-        return d2.getTime() - d1.getTime() < 0 ? yeardiff(d1, d2) : yeardiff(d2, d1);
-      }
-
-      function daydiff(d2: Date, d1: Date) {
-          const diff = Math.abs(d2.getTime() - d1.getTime());
-          return Math.floor(diff / (1000 * 60 * 60 * 24));
-      }
-
-      function udaydiff(d2: Date, d1: Date) {
-        return d2.getTime() - d1.getTime() < 0 ? daydiff(d1, d2) : daydiff(d2, d1);
-      }
-
-      function monthdiff(d2: Date, d1: Date) {
-        const yearDiff = d2.getFullYear() - d1.getFullYear();
-        const monthDiff = d2.getMonth() - d1.getMonth();
-        return Math.abs((yearDiff * 12) + monthDiff);
-      }
-
-      function umonthdiff(d2: Date, d1: Date) {
-        return d2.getTime() - d1.getTime() < 0 ? monthdiff(d1, d2) : monthdiff(d2, d1);
-      }
-
-      function parseConfig(y: string) {
-        const index = y.indexOf(':');
-        const toIsNaN = isNaN(Number(y));
-        if (index === -1 && toIsNaN) {
-          throw new Error('bad configuration yeardiff parameter must be a valid integer or in form of <date>:<year>')
-        }
-
-        const date = toIsNaN ? new Date(y.substring(0, index)) : new Date();
-        const years = toIsNaN ? parseInt(y.substring(index + 1)) : parseInt(y);
-
-        return [date, years] as [Date, number];
-      }
-
-
-      function evaluateDate(fn: (d1: Date, d2: Date) => number, c: string, date1: unknown, predicate: (n1: number, n2: number) => boolean) {
-        const d1 = parseDate(date1 as Date|string);
-        const [d2, n] = parseConfig(c);
-        return predicate(fn(d2, d1), n);
-      }
-
-      return function(value: unknown) {
-        if (Array.isArray(config)) {
-          return matchany(value, config);
-        }
-
-        // case provided value evaluate to a default, evaluation does not treat the case
-        if (!value || String(value).trim() === '') {
-          return false;
+      date = new Date();
+      date.setTime(Date.parse(String(value)));
+    
+      return date;
+    }
+    
+    function yeardiff(d2: Date, d1: Date) {
+        let diff = d2.getFullYear() - d1.getFullYear();
+        const mdiff = d2.getMonth() - d1.getMonth();
+        const ddiff = d2.getDate() - d1.getDate();
+        
+        if (mdiff < 0 || (mdiff === 0 && ddiff < 0)) {
+            diff--;
         }
         
-        let strConfig =  String(config).trim() as string;
-        const index = strConfig.indexOf(':');
-        if (index === -1) {
-          return String(value) === strConfig;
-        }
+        return diff;
+    }
 
-        const operator = strConfig.substring(0, index).trim();
-        const to = strConfig.substring(index + 1).trim();
-        switch(operator.toLocaleLowerCase()) {
-          case 'num_eq':
-            return value && Number(value) === Number(to);
-          case 'num_neq':
-            return value && Number(value) !== Number(to);
-          case 'lt':
-            return Number(value) < Number(to);
-          case 'lte':
-            return Number(value) <= Number(to);
-          case 'gt':
-            return Number(value) > Number(to);
-          case 'gte':
-            return Number(value) >= Number(to);
-          case 'eq':
-            return value && String(value) === String(to);
-          case 'neq':
-            return value && String(value) !== String(to);
-          case 'len_lt':
-            return String(value).length < Number(to);
-          case 'len_lte':
-            return String(value).length <= Number(to);
-          case 'len_gt':
-            return String(value).length > Number(to);
-          case 'len_gte':
-            return String(value).length >= Number(to);
-          case 'yeardiff':
-            return evaluateDate(yeardiff, to, value, (n1, n2) => n1 === n2);
-          case 'uyeardiff':
-            return evaluateDate(uyeardiff, to, value, (n1, n2) => n1 === n2);
-          case 'yeardiff_lt':
-            return evaluateDate(uyeardiff, to, value, (n1, n2) => n1 < n2);
-          case 'yeardiff_lte':
-            return evaluateDate(uyeardiff, to, value, (n1, n2) => n1 <= n2);
-          case 'yeardiff_gt':
-            return evaluateDate(uyeardiff, to, value, (n1, n2) => n1 > n2);
-          case 'yeardiff_gte':
-            return evaluateDate(uyeardiff, to, value, (n1, n2) => n1 >= n2);
-          case 'daydiff':
-            return evaluateDate(daydiff, to, value, (n1, n2) => n1 === n2);
-          case 'udaydiff':
-            return evaluateDate(udaydiff, to, value, (n1, n2) => n1 === n2);
-          case 'daydiff_lt':
-            return evaluateDate(udaydiff, to, value, (n1, n2) => n1 < n2);
-          case 'daydiff_lte':
-            return evaluateDate(udaydiff, to, value, (n1, n2) => n1 <= n2);
-          case 'daydiff_gt':
-            return evaluateDate(udaydiff, to, value, (n1, n2) => n1 > n2);
-          case 'daydiff_gte':
-            return evaluateDate(udaydiff, to, value, (n1, n2) => n1 >= n2);
-          case 'monthdiff':
-            return evaluateDate(monthdiff, to, value, (n1, n2) => n1 === n2);
-          case 'umonthdiff':
-            return evaluateDate(umonthdiff, to, value, (n1, n2) => n1 === n2);
-          case 'monthdiff_lt':
-            return evaluateDate(umonthdiff, to, value, (n1, n2) => n1 < n2);
-          case 'monthdiff_lte':
-            return evaluateDate(umonthdiff, to, value, (n1, n2) => n1 <= n2);
-          case 'monthdiff_gt':
-            return evaluateDate(umonthdiff, to, value, (n1, n2) => n1 > n2);
-          case 'monthdiff_gte':
-            return evaluateDate(umonthdiff, to, value, (n1, n2) => n1 >= n2);
-          default:
-            throw new Error('unsupported operator (eq, neq, lt, lte, gt, gte, yeardiff, uyeardiff, yeardiff_lt, yeardiff_lte, yeardiff_gt, yeardiff_gte, daydiff, udaydiff, daydiff_lt, daydiff_lte, daydiff_gt, daydiff_gte, monthdiff, umonthdiff, monthdiff_lt, monthdiff_lte, monthdiff_gt, monthdiff_gte) are the only supported operators.');
-        }
+    function uyeardiff(d2: Date, d1: Date) {
+      return d2.getTime() - d1.getTime() < 0 ? yeardiff(d1, d2) : yeardiff(d2, d1);
+    }
+
+    function daydiff(d2: Date, d1: Date) {
+        const diff = Math.abs(d2.getTime() - d1.getTime());
+        return Math.floor(diff / (1000 * 60 * 60 * 24));
+    }
+
+    function udaydiff(d2: Date, d1: Date) {
+      return d2.getTime() - d1.getTime() < 0 ? daydiff(d1, d2) : daydiff(d2, d1);
+    }
+
+    function monthdiff(d2: Date, d1: Date) {
+      const yearDiff = d2.getFullYear() - d1.getFullYear();
+      const monthDiff = d2.getMonth() - d1.getMonth();
+      return Math.abs((yearDiff * 12) + monthDiff);
+    }
+
+    function umonthdiff(d2: Date, d1: Date) {
+      return d2.getTime() - d1.getTime() < 0 ? monthdiff(d1, d2) : monthdiff(d2, d1);
+    }
+
+    function parseConfig(y: string) {
+      const index = y.indexOf(':');
+      const toIsNaN = isNaN(Number(y));
+      if (index === -1 && toIsNaN) {
+        throw new Error('bad configuration yeardiff parameter must be a valid integer or in form of <date>:<year>')
+      }
+
+      const date = toIsNaN ? new Date(y.substring(0, index)) : new Date();
+      const years = toIsNaN ? parseInt(y.substring(index + 1)) : parseInt(y);
+
+      return [date, years] as [Date, number];
+    }
+
+
+    function evaluateDate(fn: (d1: Date, d2: Date) => number, c: string, date1: unknown, predicate: (n1: number, n2: number) => boolean) {
+      const d1 = parseDate(date1 as Date|string);
+      const [d2, n] = parseConfig(c);
+      return predicate(fn(d2, d1), n);
+    }
+
+    return function(value: unknown) {
+      if (Array.isArray(config)) {
+        return matchany(value, config);
+      }
+
+      // case provided value evaluate to a default, evaluation does not treat the case
+      if (!value || String(value).trim() === '') {
+        return false;
+      }
+      
+      let strConfig =  String(config).trim() as string;
+      const index = strConfig.indexOf(':');
+      if (index === -1) {
+        return String(value) === strConfig;
+      }
+
+      const operator = strConfig.substring(0, index).trim();
+      const to = strConfig.substring(index + 1).trim();
+      switch(operator.toLocaleLowerCase()) {
+        case 'num_eq':
+          return value && Number(value) === Number(to);
+        case 'num_neq':
+          return value && Number(value) !== Number(to);
+        case 'lt':
+          return Number(value) < Number(to);
+        case 'lte':
+          return Number(value) <= Number(to);
+        case 'gt':
+          return Number(value) > Number(to);
+        case 'gte':
+          return Number(value) >= Number(to);
+        case 'eq':
+          return value && String(value) === String(to);
+        case 'neq':
+          return value && String(value) !== String(to);
+        case 'len_lt':
+          return String(value).length < Number(to);
+        case 'len_lte':
+          return String(value).length <= Number(to);
+        case 'len_gt':
+          return String(value).length > Number(to);
+        case 'len_gte':
+          return String(value).length >= Number(to);
+        case 'yeardiff':
+          return evaluateDate(yeardiff, to, value, (n1, n2) => n1 === n2);
+        case 'uyeardiff':
+          return evaluateDate(uyeardiff, to, value, (n1, n2) => n1 === n2);
+        case 'yeardiff_lt':
+          return evaluateDate(uyeardiff, to, value, (n1, n2) => n1 < n2);
+        case 'yeardiff_lte':
+          return evaluateDate(uyeardiff, to, value, (n1, n2) => n1 <= n2);
+        case 'yeardiff_gt':
+          return evaluateDate(uyeardiff, to, value, (n1, n2) => n1 > n2);
+        case 'yeardiff_gte':
+          return evaluateDate(uyeardiff, to, value, (n1, n2) => n1 >= n2);
+        case 'daydiff':
+          return evaluateDate(daydiff, to, value, (n1, n2) => n1 === n2);
+        case 'udaydiff':
+          return evaluateDate(udaydiff, to, value, (n1, n2) => n1 === n2);
+        case 'daydiff_lt':
+          return evaluateDate(udaydiff, to, value, (n1, n2) => n1 < n2);
+        case 'daydiff_lte':
+          return evaluateDate(udaydiff, to, value, (n1, n2) => n1 <= n2);
+        case 'daydiff_gt':
+          return evaluateDate(udaydiff, to, value, (n1, n2) => n1 > n2);
+        case 'daydiff_gte':
+          return evaluateDate(udaydiff, to, value, (n1, n2) => n1 >= n2);
+        case 'monthdiff':
+          return evaluateDate(monthdiff, to, value, (n1, n2) => n1 === n2);
+        case 'umonthdiff':
+          return evaluateDate(umonthdiff, to, value, (n1, n2) => n1 === n2);
+        case 'monthdiff_lt':
+          return evaluateDate(umonthdiff, to, value, (n1, n2) => n1 < n2);
+        case 'monthdiff_lte':
+          return evaluateDate(umonthdiff, to, value, (n1, n2) => n1 <= n2);
+        case 'monthdiff_gt':
+          return evaluateDate(umonthdiff, to, value, (n1, n2) => n1 > n2);
+        case 'monthdiff_gte':
+          return evaluateDate(umonthdiff, to, value, (n1, n2) => n1 >= n2);
+        default:
+          throw new Error('unsupported operator (eq, neq, lt, lte, gt, gte, yeardiff, uyeardiff, yeardiff_lt, yeardiff_lte, yeardiff_gt, yeardiff_gte, daydiff, udaydiff, daydiff_lt, daydiff_lte, daydiff_gt, daydiff_gte, monthdiff, umonthdiff, monthdiff_lt, monthdiff_lte, monthdiff_gt, monthdiff_gte) are the only supported operators.');
       }
     }
+  }
 
   return (inputs: InputConfigInterface[]) => {
     const items: Condition[] = [];
@@ -1029,10 +1029,10 @@ export function createComputableDepencies(
     }
   };
 
-  // Call the decorated function on the provided inputs
+  // call the decorated function on the provided inputs
   decorated(inputs);
 
-  // Return the builded dependencies
+  // return the builded dependencies
   return dependencies;
 }
 
