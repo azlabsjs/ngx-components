@@ -53,7 +53,7 @@
                 [autoupload]="autoupload" [hidden]="(value | ishidden) || (local | inarray : state.detached)"
                 [modal]="formmodal ?? modal" [table-description]="tabledescription"
                 (item-removed)="onRemoved($event, name)"
-                [label]="label"></ngx-smart-form-array>
+                [label]="label" [description]="value.description"></ngx-smart-form-array>
             </ng-template>
           </ng-container>
 

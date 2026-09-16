@@ -2,7 +2,7 @@
   [template]="template" [no-grid-layout]="noGridLayout" [detached]="detached" *ngIf="!(cssClass | istable)" #container>
   <section description>
     <ng-container *ngIf="tabledescription">
-      <ng-container *ngTemplateOutlet="tabledescription; context: {$implicit: name, name}"></ng-container>
+      <ng-container *ngTemplateOutlet="tabledescription; context: {$implicit: name, name, description}"></ng-container>
     </ng-container>
   </section>
   <ng-container *ngIf="refCount === 0">
@@ -11,16 +11,13 @@
   <ng-container *ngIf="refCount !== 0">
     <ng-container *ngTemplateOutlet="addref ? addref : _add; context: { $implicit: add.bind(this) }"></ng-container>
   </ng-container>
-
 </ngx-form-array-outlet>
 
 <!-- table layout -->
-<ngx-table-form [class.hidden]="hidden" (removed)="removed($event)" [inputs]="inputs" [auto-upload]="autoupload"
-  [template]="template" [label]="label" [detached]="detached" [title]="title" [modal]="modal" [name]="name"
-  *ngIf="cssClass.includes('table')" #container>
+<ngx-table-form [class.hidden]="hidden" (removed)="removed($event)" [inputs]="inputs" [auto-upload]="autoupload" [template]="template" [label]="label" [detached]="detached" [title]="title" [modal]="modal" [name]="name" *ngIf="cssClass.includes('table')" #container>
   <section description>
     <ng-container *ngIf="tabledescription">
-      <ng-container *ngTemplateOutlet="tabledescription; context: {$implicit: name, name}"></ng-container>
+      <ng-container *ngTemplateOutlet="tabledescription; context: {$implicit: name, name, description}"></ng-container>
     </ng-container>
   </section>
   <ng-container *ngTemplateOutlet="addref ? addref : _add; context: { $implicit: add.bind(this) }"></ng-container>

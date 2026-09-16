@@ -50,6 +50,7 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy, 
   @Input() detached!: AbstractControl[];
   @Input() template!: TemplateRef<any>;
   @Input() label!: Optional<TemplateRef<any>>;
+  @Input() description!: Optional<string>;
   @Input() name!: string;
   @Input() title!: string;
   /** @deprecated */
@@ -102,14 +103,14 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy, 
         return;
       }
 
+      this.refs.splice(index, 1);
+      this.array.removeAt(index, { emitEvent: true });
+      this.array.updateValueAndValidity();
+
       const control = this.array.at(index);
       if (control) {
         this._removed.emit({ index, control });
       }
-
-      this.refs.splice(index, 1);
-      this.array.removeAt(index, { emitEvent: true });
-      this.array.updateValueAndValidity();
     }
   }
 

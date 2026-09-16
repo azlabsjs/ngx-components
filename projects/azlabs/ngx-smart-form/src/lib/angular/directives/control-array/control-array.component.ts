@@ -95,21 +95,19 @@ export class NgxSmartFormControlArrayComponent
 
   removed<T>(ref: RefType<T>) {
     if (this._refCount >= 0) {
-      const index = this.refs.findIndex((c) => {
-        return c.index === ref.index;
-      });
+      const index = this.refs.findIndex((c) => c.index === ref.index);
       if (index === -1) {
         return;
-      }
-
-      const control = this.array.at(index);
-      if (control) {
-        this._removed.emit({ index, control });
       }
 
       this.refs.splice(index, 1);
       this.array.removeAt(index, { emitEvent: true });
       this.array.updateValueAndValidity();
+
+      const control = this.array.at(index);
+      if (control) {
+        this._removed.emit({ index, control });
+      }
     }
   }
 
