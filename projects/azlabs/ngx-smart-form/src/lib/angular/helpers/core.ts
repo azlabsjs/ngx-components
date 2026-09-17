@@ -191,10 +191,12 @@ function setFormArrayValue(a: Optional<FormArray>, parent: FormGroup, key: strin
 
     array.controls = items.map(current => {
       const group = builder.group(inputs);
+      group.setParent(array);
       setFormGroupValue(group, current, inputs, builder);
       return group;
     });
 
+    console.log('After setting array....');
     parent.setControl(key, array);
     array.updateValueAndValidity();
 
@@ -203,6 +205,7 @@ function setFormArrayValue(a: Optional<FormArray>, parent: FormGroup, key: strin
 
     array.controls = items.map(current => {
       const c = builder.control(config);
+      c.setParent(array);
       safeSetValue(c, current);
       return c;
     });
@@ -1025,27 +1028,35 @@ export function createComputableDepencies(
 /** @internal recursively get errors from an angular reactive control (eg: FormGroup, FormControl, FormArray) */
 export function collectErrors(control: AbstractControl) {
   const errors: ValidationErrors[] = [];
-  const getErrors = (c: AbstractControl, _name?: string) => {
+  const errorDict: {[prop: string]: unknown} = {};
+  const getErrors = (c: AbstractControl, _name: string = '') => {
     if (c instanceof FormGroup) {
       for (const name of Object.keys(c.controls)) {
         const current = c.get(name);
         if (current) {
-          getErrors(current, name);
+          getErrors(current, `${_name}.${name}`);
         }
       }
     } else if (c instanceof FormArray) {
-      for (const _c of c.controls) {
-        getErrors(_c);
-      }
+      // for (const _c of c.controls) {
+      //   getErrors(_c, `${_name}.${name}`);
+      // }
+
+      c.controls.forEach((c, index) => getErrors(c, `${_name}.${index}`))
     } else {
-      if (c.invalid && c.errors) {
+      if (!c.valid && c.errors) {
         errors.push(c.errors);
+      }
+
+      if (_name && !c.valid && c.errors) {
+        errorDict[_name] = {errors: c.errors, value: c.value};
       }
     }
   };
 
   getErrors(control);
 
+  console.log(errorDict);
   return errors;
 }
 

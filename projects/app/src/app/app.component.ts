@@ -208,18 +208,27 @@ export class AppComponent implements OnInit {
         firstname: 'EKUE',
         lastname: 'AYI',
         profession: 'INFORMATIQUE',
+        phone: '22891952345',
+        country: 1,
+        gpg: 10
       },
       {
         firstname: 'RODRIGUE',
         lastname: 'KOLANI',
         profession: 'RESEARCH',
         category_id: 2,
+        phone: '22891952345',
+        country: 2,
+        gpg: 10
       },
       {
         firstname: 'CASSEY',
         lastname: 'MURASTORI',
         profession: 'RESEARCH',
         category_id: 2,
+        phone: '22891952345',
+        country: 1,
+        gpg: 10
       },
     ],
     phonenumber: ['22891969456', '22892384958'],
@@ -227,6 +236,7 @@ export class AppComponent implements OnInit {
       firstname: 'MADELEINE',
       lastname: 'DE LA COURT',
       email: 'madeleined@example.com',
+      phonenumber: '22891952345'
     },
   };
 
@@ -243,18 +253,27 @@ export class AppComponent implements OnInit {
         firstname: 'EKUE',
         lastname: 'AYI',
         profession: 'INFORMATIQUE',
+        phone: '22891952345',
+        country: 1,
+        gpg: 10
       },
       {
         firstname: 'RODRIGUE',
         lastname: 'KOLANI',
         profession: 'RESEARCH',
         category_id: 2,
+        phone: '22891952345',
+        country: 2,
+        gpg: 10
       },
       {
         firstname: 'CASSEY',
         lastname: 'MURASTORI',
         profession: 'RESEARCH',
         category_id: 2,
+        phone: '22891952345',
+        country: 1,
+        gpg: 10
       },
     ],
     phonenumber: ['22891969456', '22892384958'],
@@ -314,10 +333,10 @@ export class AppComponent implements OnInit {
     }, 3000);
 
 
-    setTimeout(() => {
-      this.formValue = this.fromState2;
-      this.cdRef?.detectChanges();
-    }, 7000);
+    // setTimeout(() => {
+    //   this.formValue = this.fromState2;
+    //   this.cdRef?.detectChanges();
+    // }, 7000);
   }
 
   // Listen to datagrid refresh events
@@ -360,7 +379,9 @@ export class AppComponent implements OnInit {
 
   onError(error: unknown) { }
 
-  ngxFormSubmit(event: Record<string, any>) { }
+  ngxFormSubmit(event: Record<string, any>, formgroup: FormGroup) {
+    console.log(formgroup.valid, formgroup.getRawValue())
+  }
 
   ondgItemClick(value: unknown) { }
 
@@ -391,6 +412,7 @@ export class AppComponent implements OnInit {
   }
 
   private moveData(input: AbstractControl, name: string, value: { [prop: string]: unknown }, state: { [prop: string]: unknown }) {
+    console.log('Moving data...');
 
     if ('firstname' in value && value['firstname']) {
       let items = input.getRawValue();
@@ -411,7 +433,7 @@ export class AppComponent implements OnInit {
       }
 
       if (!found) {
-        items = items.concat([{ firstname: value['firstname'] }]);
+        items = items.concat([{ ...value }]);
       }
 
       this.formValue = { ...state, [name]: items };

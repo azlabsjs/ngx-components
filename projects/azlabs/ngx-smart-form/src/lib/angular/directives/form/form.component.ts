@@ -201,6 +201,9 @@ export class NgxSmartFormComponent implements ReactiveFormComponentInterface, Af
     }
 
     const errors = collectErrors(this.formGroup);
+    
+    console.log('Errors: ', this.formGroup.getRawValue());
+
     if (!this.model.isValid() && errors.length > 0) {
       return;
     }

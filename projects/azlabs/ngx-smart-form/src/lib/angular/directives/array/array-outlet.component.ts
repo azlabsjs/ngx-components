@@ -3,6 +3,7 @@ import {
   Component,
   ComponentRef,
   EventEmitter,
+  Injector,
   Input,
   OnDestroy,
   Output,
@@ -28,8 +29,7 @@ type ComponentRefType = RefType<ComponentRef<NgxSmartFormArrayItemComponent>>;
   templateUrl: './array-outlet.component.html',
   styleUrls: ['./array-outlet.component.scss'],
 })
-export class NgxFormArrayOutletComponent implements OnDestroy,ViewRefFactory<ComponentRef<NgxSmartFormArrayItemComponent>>
-{
+export class NgxFormArrayOutletComponent implements OnDestroy, ViewRefFactory<ComponentRef<NgxSmartFormArrayItemComponent>> {
   @Input() inputs: InputConfigInterface[] = [];
   @Input({ alias: 'auto-upload' }) autoupload: boolean = true;
   @Input({ alias: 'no-grid-layout' }) nogridlayout = true;
@@ -41,10 +41,11 @@ export class NgxFormArrayOutletComponent implements OnDestroy,ViewRefFactory<Com
   @ViewChild('container', { read: ViewContainerRef, static: false }) _container!: ViewContainerRef;
   private destroy$ = new Subject<void>();
 
+
+  constructor(private injector: Injector) { }
+
   createView(index: number, input: AbstractControl) {
-    const element = this._container?.createComponent(
-      NgxSmartFormArrayItemComponent,
-    );
+    const element = this._container?.createComponent(NgxSmartFormArrayItemComponent, { index, injector: this.injector });
 
     element.instance.controls = [...this.inputs];
     element.instance.formgroup = input as FormGroup;
@@ -54,11 +55,7 @@ export class NgxFormArrayOutletComponent implements OnDestroy,ViewRefFactory<Com
     element.instance.nogridlayout = this.nogridlayout;
     element.instance.detached = this.detached;
 
-    const ref: ComponentRefType = {
-      index: element.instance.index,
-      element,
-      destroy: () => element.destroy(),
-    };
+    const ref: ComponentRefType = { index, element, destroy: () => element.destroy() };
 
     element.instance.componentDestroyer
       .pipe(takeUntil(this.destroy$))

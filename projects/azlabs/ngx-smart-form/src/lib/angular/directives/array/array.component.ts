@@ -15,7 +15,7 @@ import {
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
-import { takeUntil, tap } from 'rxjs/operators';
+import { distinctUntilChanged, filter, takeUntil, tap } from 'rxjs/operators';
 import { cloneAbstractControl } from '../../helpers';
 import { AngularReactiveFormBuilderBridge } from '../../types';
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
@@ -57,6 +57,8 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy, 
   @Input() placeholder!: Optional<string>;
   @Input({ alias: 'add-button' }) addref!: Optional<TemplateRef<Node>>;
   @Input({ alias: 'controls' }) inputs!: InputConfigInterface[];
+
+  private _length = 0;
   @Input({ alias: 'formArray' }) array!: FormArray;
   @Input({ alias: 'no-grid-layout' }) noGridLayout = false;
   @Input({ alias: 'class', transform: (value: string | string[]) => (typeof value === 'string' ? [value] : value).map((v) => v.split(' ').map((i) => i.split(',')).flat().map((v) => v.trim())).flat() })
@@ -80,14 +82,16 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy, 
   constructor(private cdRef: ChangeDetectorRef | null, @Inject(ANGULAR_REACTIVE_FORM_BRIDGE) private builder: AngularReactiveFormBuilderBridge) { }
 
   ngAfterViewInit(): void {
-    this.update.bind(this).call(null);
+    // this.update(this.array.length);
+
+    if (this.array) {
+      this.array.valueChanges.pipe(takeUntil(this.destroy$), filter((items: any[]) => items.length !== 0 && items.length !== this._length), distinctUntilChanged(), tap((value: any[]) => this._length === value.length ), tap(value => console.log('ngAfterViewInit -> valueChanges', value))).subscribe();
+    } else {
+      console.log('No array');
+    }
   }
 
-  ngAfterContentInit(): void {
-    this.array.valueChanges
-      .pipe(takeUntil(this.destroy$), tap(this.update.bind(this)))
-      .subscribe();
-  }
+  ngAfterContentInit(): void { }
 
   add(_: Event) {
     const g = this.builder.group(this.inputs);
@@ -110,8 +114,14 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy, 
       this.array.updateValueAndValidity();
 
       if (control) {
+        control.clearAsyncValidators();
+        control.clearValidators();
+        control.updateValueAndValidity();
+        // control.setParent(null); // we set current control parent to null to remove it from validation
         this._removed.emit({ index, control });
       }
+
+      console.log(this.array, this.array.getRawValue());
     }
   }
 
@@ -119,8 +129,7 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy, 
     this.destroy$.next();
   }
 
-  private update() {
-    const length = this.array.controls.length;
+  private update(length: number) {
     const count = length - this._ref;
     if (count > 0) {
       for (let i = 0; i < count; i++) {

@@ -12,6 +12,7 @@ import {
   TemplateRef,
   ViewChild,
   ViewContainerRef,
+  Injector,
 } from '@angular/core';
 import { RefType, ViewRefFactory } from '../types';
 import { AbstractControl, FormGroup } from '@angular/forms';
@@ -21,7 +22,6 @@ import { BUTTON_DIRECTIVES } from '../buttons';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 import { ModalDirective } from '../modal';
 import { PIPES } from './pipes';
-import { Optional } from './types';
 
 /** @internal */
 type ContextType = {
@@ -57,7 +57,7 @@ export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDes
 
   private subscriptions: Subscription[] = [];
 
-  constructor(@ngOptional() private cdRef: ChangeDetectorRef | null) { }
+  constructor(private injector: Injector) { }
 
   createView(index: number, formgroup: AbstractControl, triggered: boolean = false) {
     const subject = new Subject<number>();
@@ -68,20 +68,21 @@ export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDes
       this.showModalView(inputs, formgroup);
     }
 
-    const element = this._container?.createEmbeddedView<ContextType>(
-      this._template,
-      {
-        formgroup,
-        autoupload: this.autoupload,
-        inputs,
-        remove: (e: Event) => {
-          e?.preventDefault();
-          ref?.destroy();
-          subject.next(ref.index);
-        },
-        destroy: subject.asObservable(),
-      }
-    );
+    const element = this._container?.createEmbeddedView<ContextType>(this._template, {
+      formgroup,
+      autoupload: this.autoupload,
+      inputs,
+      remove: (e: Event) => {
+        console.log('Destroying...', e);
+        e?.preventDefault();
+        ref?.destroy();
+        subject.next(ref.index);
+      },
+      destroy: subject.asObservable(),
+    }, {
+      index,
+      injector: this.injector
+    });
 
     const ref: RefType<EmbeddedViewRef<any>> = { index, element, destroy: () => element.destroy() };
 
