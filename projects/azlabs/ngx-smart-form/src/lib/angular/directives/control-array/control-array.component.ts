@@ -100,11 +100,11 @@ export class NgxSmartFormControlArrayComponent
         return;
       }
 
+      const control = this.array.at(index);
       this.refs.splice(index, 1);
       this.array.removeAt(index, { emitEvent: true });
       this.array.updateValueAndValidity();
 
-      const control = this.array.at(index);
       if (control) {
         this._removed.emit({ index, control });
       }

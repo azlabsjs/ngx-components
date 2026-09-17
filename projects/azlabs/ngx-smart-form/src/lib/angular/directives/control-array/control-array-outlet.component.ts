@@ -26,27 +26,17 @@ import { Optional } from './types';
   templateUrl: './control-array-outlet.component.html',
   styleUrls: ['./control-array-outlet.component.scss'],
 })
-export class NgxFormControlArrayOutletComponent
-  implements OnDestroy, ViewRefFactory<ComponentRef<NgxArrayItemComponent>>
+export class NgxFormControlArrayOutletComponent implements OnDestroy, ViewRefFactory<ComponentRef<NgxArrayItemComponent>>
 {
-  //#region input properties
   @Input({ required: true }) config!: InputConfigInterface;
   @Input({ alias: 'auto-upload' }) autoupload = true;
   @Input({ required: true }) template: Optional<TemplateRef<any>>;
   @Input({ required: true }) detached!: AbstractControl[];
-  //#endregion
+  
+  @Output() removed = new EventEmitter<RefType<ComponentRef<NgxArrayItemComponent>>>();
 
-  //#region output properties
-  @Output() removed = new EventEmitter<
-    RefType<ComponentRef<NgxArrayItemComponent>>
-  >();
-  //#endregion
-
-  //#region local properties
-  @ViewChild('container', { read: ViewContainerRef, static: false })
-  container!: ViewContainerRef;
+  @ViewChild('container', { read: ViewContainerRef, static: false }) container!: ViewContainerRef;
   private destroy$ = new Subject<void>();
-  //#endregion
 
   createView(index: number, input: AbstractControl) {
     const e = this.container?.createComponent(NgxArrayItemComponent);

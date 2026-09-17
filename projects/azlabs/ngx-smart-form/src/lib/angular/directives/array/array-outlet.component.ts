@@ -28,31 +28,21 @@ type ComponentRefType = RefType<ComponentRef<NgxSmartFormArrayItemComponent>>;
   templateUrl: './array-outlet.component.html',
   styleUrls: ['./array-outlet.component.scss'],
 })
-export class NgxFormArrayOutletComponent
-  implements
-    OnDestroy,
-    ViewRefFactory<ComponentRef<NgxSmartFormArrayItemComponent>>
+export class NgxFormArrayOutletComponent implements OnDestroy,ViewRefFactory<ComponentRef<NgxSmartFormArrayItemComponent>>
 {
-  //#region input properties
   @Input() inputs: InputConfigInterface[] = [];
   @Input({ alias: 'auto-upload' }) autoupload: boolean = true;
   @Input({ alias: 'no-grid-layout' }) nogridlayout = true;
   @Input() template!: TemplateRef<any>;
   @Input({ required: true }) detached!: AbstractControl[];
-  //#endregion
 
-  //#region output properties
   @Output() removed = new EventEmitter<ComponentRefType>();
-  //#endregion
 
-  //#region local properties
-  @ViewChild('container', { read: ViewContainerRef, static: false })
-  containerRef!: ViewContainerRef;
+  @ViewChild('container', { read: ViewContainerRef, static: false }) _container!: ViewContainerRef;
   private destroy$ = new Subject<void>();
-  //#endregion
 
   createView(index: number, input: AbstractControl) {
-    const element = this.containerRef?.createComponent(
+    const element = this._container?.createComponent(
       NgxSmartFormArrayItemComponent,
     );
 
@@ -81,7 +71,7 @@ export class NgxFormArrayOutletComponent
   }
 
   clear(): void {
-    this.containerRef?.clear();
+    this._container?.clear();
   }
 
   ngOnDestroy(): void {

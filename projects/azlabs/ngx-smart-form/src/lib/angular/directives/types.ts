@@ -11,9 +11,10 @@ export type RefType<T> = {
 /** @internal */
 export type ViewRefFactory<T> = {
   removed: OutputRef<RefType<ViewRefFactory<T>>>;
-  /** Create a view instance a.k.a `ComponentRef`, `EmbededViewRef`, etc... based on provided form element */
+
+  /** create a view instance a.k.a `ComponentRef`, `EmbededViewRef`, etc... based on provided form element */
   createView(index: number, element: AbstractControl, triggered?: boolean): RefType<T>;
 
-  /** Clear the view container removing any ui element */
+  /** clear the view container removing any ui element */
   clear(): void;
 };

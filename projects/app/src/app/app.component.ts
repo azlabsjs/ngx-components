@@ -18,7 +18,7 @@ import {
   Optional,
   ViewChild,
 } from '@angular/core';
-import { AbstractControl, FormControl } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { GridColumnType, GridConfigType } from '@azlabsjs/ngx-clr-smart-grid';
 import { COMMON_PIPES, createPipeTransform } from '@azlabsjs/ngx-common';
 import { createSlide } from '@azlabsjs/ngx-slides';
@@ -215,6 +215,12 @@ export class AppComponent implements OnInit {
         profession: 'RESEARCH',
         category_id: 2,
       },
+      {
+        firstname: 'CASSEY',
+        lastname: 'MURASTORI',
+        profession: 'RESEARCH',
+        category_id: 2,
+      },
     ],
     phonenumber: ['22891969456', '22892384958'],
     persons: {
@@ -241,6 +247,12 @@ export class AppComponent implements OnInit {
       {
         firstname: 'RODRIGUE',
         lastname: 'KOLANI',
+        profession: 'RESEARCH',
+        category_id: 2,
+      },
+      {
+        firstname: 'CASSEY',
+        lastname: 'MURASTORI',
         profession: 'RESEARCH',
         category_id: 2,
       },
@@ -353,7 +365,60 @@ export class AppComponent implements OnInit {
   ondgItemClick(value: unknown) { }
 
 
-  onRemoved(event: {name: string, control: AbstractControl}) {
-    console.log('removed: ', event);
+
+  protected onRemoved(event: { name: string, control: AbstractControl }, formgroup: FormGroup | null | undefined) {
+    const { name, control } = event;
+
+    if (name.startsWith('stakeholders.') && formgroup) {
+      const state = formgroup.getRawValue();
+      const stakeholders = formgroup.get('stakeholders2') as FormGroup;
+      if (stakeholders) {
+        const val: { [prop: string]: unknown } = control.getRawValue();
+        let val2: any[] = formgroup.get('stakeholders')?.getRawValue() ?? [];
+        this.moveData(stakeholders, 'stakeholders2', val, { ...state, stakeholders: val2 });
+      }
+    }
+
+    if (name.startsWith('stakeholders2.') && formgroup) {
+      const state = formgroup.getRawValue();
+      const stakeholders = formgroup.get('stakeholders') as FormGroup;
+      if (stakeholders) {
+        const val: { [prop: string]: unknown } = control.getRawValue();
+        let val2: any[] = formgroup.get('stakeholders2')?.getRawValue() ?? [];
+        this.moveData(stakeholders, 'stakeholders', val, { ...state, stakeholders2: val2 });
+      }
+    }
+  }
+
+  private moveData(input: AbstractControl, name: string, value: { [prop: string]: unknown }, state: { [prop: string]: unknown }) {
+
+    if ('firstname' in value && value['firstname']) {
+      let items = input.getRawValue();
+
+      if (!Array.isArray(items)) {
+        return;
+      }
+
+      let found: { [prop: string]: unknown } | null | undefined = null;
+      for (const item of items) {
+        if (typeof item !== 'object' || item === null) {
+          continue
+        }
+
+        if (item['firstname'] === value['firstname']) {
+          found = item;
+        }
+      }
+
+      if (!found) {
+        items = items.concat([{ firstname: value['firstname'] }]);
+      }
+
+      this.formValue = { ...state, [name]: items };
+
+      console.log(this.formValue);
+
+      this.cdRef?.detectChanges();
+    }
   }
 }

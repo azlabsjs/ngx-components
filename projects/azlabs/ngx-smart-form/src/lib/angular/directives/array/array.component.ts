@@ -103,11 +103,12 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy, 
         return;
       }
 
+
+      const control = this.array.at(index);
       this.refs.splice(index, 1);
       this.array.removeAt(index, { emitEvent: true });
       this.array.updateValueAndValidity();
 
-      const control = this.array.at(index);
       if (control) {
         this._removed.emit({ index, control });
       }
@@ -124,8 +125,7 @@ export class NgxSmartFormArrayComponent implements AfterContentInit, OnDestroy, 
     if (count > 0) {
       for (let i = 0; i < count; i++) {
         const index = this._ref + i;
-        const { viewFactory: factory } = this;
-        const view = factory.createView(index, this.array.at(index), this.triggered);
+        const view = this.viewFactory.createView(index, this.array.at(index), this.triggered);
         this.refs.push(view);
       }
       this.setRefCount(this._ref + count);
