@@ -21,15 +21,15 @@
   <ng-container *ngIf="state$ | async as form">
     <ngx-smart-form #formRef [no-grid-layout]="false" (ready)="onFormReadyState(form)" (changes)="afterChanges()" (item-removed)="onRemoved($event)"
       (error)="onError($event)" [submitable]="true" [autoupload]="true" (submit)="ngxFormSubmit($event)" [form]="form"
-      [autoSubmit]="true" [path]="'http://localhost:3000/customers'" [template]="controlTemplate" [table-description]="description" [add-group]="add">
+      [autoSubmit]="true" [path]="'http://localhost:3000/customers'" [template]="controlTemplate" [table-description]="description" [add-group]="add" [state]="formValue ?? {}">
 
       <ng-template #description let-name="name">
         <p cds-text>Je suis une description ( {{name}} )</p>
       </ng-template>
 
-      <ng-template #add let-handler>
+      <ng-template #add let-handler let-name="name">
         <div class="flex items-center justify-between border-t border-slate-100 bg-slate-50/50 p-2">
-            <span class="text-slate-400"></span> <!-- Le tableau se met à jour instantanément -->
+            <span class="text-slate-400">({{ name }})</span> <!-- Le tableau se met à jour instantanément -->
             <button (click)="handler($event)" class="inline-flex items-center space-x-1.5 border-0 text-indigo-600 hover:text-indigo-800 transition-colors">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>

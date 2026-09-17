@@ -6,10 +6,10 @@
     </ng-container>
   </section>
   <ng-container *ngIf="refCount === 0">
-    <ng-container *ngTemplateOutlet="_placeholder; context: {$implicit: placeholder, add:  add.bind(this)}"></ng-container>
+    <ng-container *ngTemplateOutlet="_placeholder; context: {$implicit: placeholder, add:  add.bind(this), name, description}"></ng-container>
   </ng-container>
   <ng-container *ngIf="refCount !== 0">
-    <ng-container *ngTemplateOutlet="addref ? addref : _add; context: { $implicit: add.bind(this) }"></ng-container>
+    <ng-container *ngTemplateOutlet="addref ?? _add; context: { $implicit: add.bind(this), name, description }"></ng-container>
   </ng-container>
 </ngx-form-array-outlet>
 
@@ -17,10 +17,10 @@
 <ngx-table-form [class.hidden]="hidden" (removed)="removed($event)" [inputs]="inputs" [auto-upload]="autoupload" [template]="template" [label]="label" [detached]="detached" [title]="title" [modal]="modal" [name]="name" *ngIf="cssClass.includes('table')" #container>
   <section description>
     <ng-container *ngIf="tabledescription">
-      <ng-container *ngTemplateOutlet="tabledescription; context: {$implicit: name, name, description}"></ng-container>
+      <ng-container *ngTemplateOutlet="tabledescription; context: {$implicit: name, description}"></ng-container>
     </ng-container>
   </section>
-  <ng-container *ngTemplateOutlet="addref ? addref : _add; context: { $implicit: add.bind(this) }"></ng-container>
+  <ng-container *ngTemplateOutlet="addref ?? _add; context: { $implicit: add.bind(this), name, description }"></ng-container>
 </ngx-table-form>
 
 <ng-template #_add let-handler>
@@ -50,7 +50,7 @@
       </div>
     </div>
     <section class="px-4 py-2">
-      <ng-container *ngTemplateOutlet="addref ? addref : _add; context: { $implicit: add.bind(this) }"></ng-container>
+      <ng-container *ngTemplateOutlet="addref ?? _add; context: { $implicit: add.bind(this), name, description  }"></ng-container>
     </section>
   </div>
 </ng-template>

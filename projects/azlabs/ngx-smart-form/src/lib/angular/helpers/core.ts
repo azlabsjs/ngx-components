@@ -113,34 +113,34 @@ export function setFormValue(
   values: { [index: string]: any },
   inputs?: InputConfigInterface[] | InputConfigInterface,
 ) {
+  const fn = createSetValue(builder);
   for (const [key, value] of Object.entries(values)) {
     const input = Array.isArray(inputs) ? inputs?.find((config) => config.name === key) : inputs;
     if (typeof input === 'undefined' || input === null) {
       continue;
     }
 
-    createSetValue(builder)(formgroup, key, value, input);
+    fn(formgroup, key, value, input);
   }
 }
 
 /** @internal */
-function safeSetValue<T = unknown>(a: Optional<AbstractControl>, value: T, logger?: (err: unknown) => void) {
+function safeSetValue<T = unknown>(a: Optional<AbstractControl>, value: T) { // , logger?: (err: unknown) => void
   if (!a) {
     return;
   }
+
   try {
     a.setValue(value, { emitEvent: true });
   } catch (error) {
-    if (logger) {
-      logger(error);
-    }
+    console.error(error);
   }
 }
 
 /** @internal */
 export function setFormGroupValue(formgroup: FormGroup, values: { [index: string]: any }, inputs: InputConfigInterface[], builder: AngularReactiveFormBuilderBridge) {
 
-  const dictionnary = inputs.reduce((carry, current) => {
+  const d = inputs.reduce((carry, current) => {
     carry[current.name] = current;
     return carry;
   }, {} as { [k: string]: InputConfigInterface });
@@ -149,7 +149,7 @@ export function setFormGroupValue(formgroup: FormGroup, values: { [index: string
     const result = formgroup.get(key);
 
     if (result instanceof FormGroup) {
-      const config = dictionnary[key];
+      const config = d[key];
       if (!config) {
         continue;
       }
@@ -164,44 +164,53 @@ export function setFormGroupValue(formgroup: FormGroup, values: { [index: string
     }
 
     if (result instanceof FormArray) {
-      const config = dictionnary[key];
+      const config = d[key];
       if (!config) {
         continue;
       }
+
       setFormArrayValue(result, formgroup, key, config, value, builder);
       continue;
 
     }
 
-    safeSetValue(result, value, console.error);
-
+    safeSetValue(result, value);
   }
+
   formgroup.updateValueAndValidity();
 }
 
 
 /** @internal */
-function setFormArrayValue(array: Optional<FormArray>, parent: FormGroup, key: string, config: InputConfigInterface, value: unknown, builder: AngularReactiveFormBuilderBridge) {
+function setFormArrayValue(a: Optional<FormArray>, parent: FormGroup, key: string, config: InputConfigInterface, value: unknown, builder: AngularReactiveFormBuilderBridge) {
   const items = Array.isArray(value) ? value : [];
   if (isrepeatablegroup(config)) {
-    const leaf = getinputgroupinputs(config);
-    const control = array ?? new FormArray<any>([]);
-    for (const current of items) {
-      const result = builder.group(leaf);
-      setFormGroupValue(result, current, leaf, builder);
-      control.push(result);
-    }
-    parent.setControl(key, control);
+
+    const inputs = getinputgroupinputs(config);
+    const array = a ?? new FormArray<any>([]);
+
+    array.controls = items.map(current => {
+      const group = builder.group(inputs);
+      setFormGroupValue(group, current, inputs, builder);
+      return group;
+    });
+
+    parent.setControl(key, array);
+    array.updateValueAndValidity();
+
   } else if (isrepeatableinput(config)) {
-    const control = array ?? new FormArray<any>([]);
-    for (const current of items) {
-      const result = builder.control(config);
-      safeSetValue(result, current, console.error);
-      control.push(result);
-    }
-    parent.setControl(key, control);
+    const array = a ?? new FormArray<any>([]);
+
+    array.controls = items.map(current => {
+      const c = builder.control(config);
+      safeSetValue(c, current);
+      return c;
+    });
+    parent.setControl(key, array);
+    array.updateValueAndValidity();
+
   } else {
-    safeSetValue(array, items, console.error);
+    safeSetValue(a, items);
   }
 
   parent.updateValueAndValidity();
@@ -217,7 +226,7 @@ export function createSetValue(builder: AngularReactiveFormBuilderBridge) {
       } else if (result instanceof FormArray) {
         setFormArrayValue(result, formgroup, key, config, value, builder);
       } else {
-        safeSetValue(result, value, console.error);
+        safeSetValue(result, value);
       }
     }
   };
@@ -344,20 +353,20 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
 
       date = new Date();
       date.setTime(Date.parse(String(value)));
-    
+
       return date;
     }
-    
+
     function yeardiff(d2: Date, d1: Date) {
-        let diff = d2.getFullYear() - d1.getFullYear();
-        const mdiff = d2.getMonth() - d1.getMonth();
-        const ddiff = d2.getDate() - d1.getDate();
-        
-        if (mdiff < 0 || (mdiff === 0 && ddiff < 0)) {
-            diff--;
-        }
-        
-        return diff;
+      let diff = d2.getFullYear() - d1.getFullYear();
+      const mdiff = d2.getMonth() - d1.getMonth();
+      const ddiff = d2.getDate() - d1.getDate();
+
+      if (mdiff < 0 || (mdiff === 0 && ddiff < 0)) {
+        diff--;
+      }
+
+      return diff;
     }
 
     function uyeardiff(d2: Date, d1: Date) {
@@ -365,8 +374,8 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
     }
 
     function daydiff(d2: Date, d1: Date) {
-        const diff = Math.abs(d2.getTime() - d1.getTime());
-        return Math.floor(diff / (1000 * 60 * 60 * 24));
+      const diff = Math.abs(d2.getTime() - d1.getTime());
+      return Math.floor(diff / (1000 * 60 * 60 * 24));
     }
 
     function udaydiff(d2: Date, d1: Date) {
@@ -398,12 +407,12 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
 
 
     function evaluateDate(fn: (d1: Date, d2: Date) => number, c: string, date1: unknown, predicate: (n1: number, n2: number) => boolean) {
-      const d1 = parseDate(date1 as Date|string);
+      const d1 = parseDate(date1 as Date | string);
       const [d2, n] = parseConfig(c);
       return predicate(fn(d2, d1), n);
     }
 
-    return function(value: unknown) {
+    return function (value: unknown) {
       if (Array.isArray(config)) {
         return matchany(value, config);
       }
@@ -411,8 +420,8 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
       if (!value || String(value).trim() === '') {
         return false;
       }
-      
-      let strConfig =  String(config).trim() as string;
+
+      let strConfig = String(config).trim() as string;
       const index = strConfig.indexOf(':');
       if (index === -1) {
         return String(value) === strConfig;
@@ -420,7 +429,7 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
 
       const operator = strConfig.substring(0, index).trim();
       const to = strConfig.substring(index + 1).trim();
-      switch(operator.toLocaleLowerCase()) {
+      switch (operator.toLocaleLowerCase()) {
         case 'num_eq':
           return value && Number(value) === Number(to);
         case 'num_neq':
@@ -502,7 +511,7 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
                 const str = before(item.name, '*');
                 result = str.trim() !== '' ? p.trim().startsWith(str.substring(0, str.length - 1)) : result;
               } else {
-                result =  String(p) === String(item.name);
+                result = String(p) === String(item.name);
               }
 
               if (result === true) {
@@ -511,7 +520,7 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
             }
             return result;
           },
-          dependencyChanged: (formgroup: FormGroup,property: string,value: unknown) => {
+          dependencyChanged: (formgroup: FormGroup, property: string, value: unknown) => {
             const output: [[string, AbstractControl][], [string, AbstractControl][]] = [[], []];
             let str = before(name, '*');
             str = str.trim().substring(0, str.length - 1);
@@ -539,7 +548,7 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
                 const prefix = `${str}.${index}`;
                 let name = isformgroup(item) ? `${prefix}.${input}` : `${prefix}`;
                 let control = isformgroup(item) ? findcontrol(item, input) : item;
-                const dependencies = currentCondition.map(i => ({input: isformgroup(item) ? findcontrol(item, after(i.name, `${str}.*.`).trim()) : item, fn: i.values ?? [], name: i.name})).filter(i => !!i.input);
+                const dependencies = currentCondition.map(i => ({ input: isformgroup(item) ? findcontrol(item, after(i.name, `${str}.*.`).trim()) : item, fn: i.values ?? [], name: i.name })).filter(i => !!i.input);
 
                 if (dependencies.length === 0) {
                   continue;
@@ -563,7 +572,7 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
                   if (truthy === false) {
                     break;
                   }
-                  
+
                 }
 
                 const found = findparent(formgroup, name);
@@ -599,7 +608,7 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
               if (truthy === false) {
                 break;
               }
-              
+
             }
 
             if (!control && !!query) {
