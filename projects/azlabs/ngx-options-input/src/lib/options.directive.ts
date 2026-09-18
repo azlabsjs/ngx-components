@@ -18,13 +18,12 @@ import {
   mapStringListToInputOptions,
   OptionsConfig,
 } from '@azlabsjs/smart-form-core';
-import { Subject, from, lastValueFrom, of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, first, map, switchMap, tap } from 'rxjs/operators';
+import { lastValueFrom } from 'rxjs';
+import { first, map } from 'rxjs/operators';
 import {
   InputOptionsClient,
   ObservableOptionsConfig,
   OptionsConfigType,
-  QueryType,
   Subscribable,
   KeyType as _KeyType,
   Subscription,
@@ -41,7 +40,7 @@ type ObservationOptions = {
   threshold: number;
 };
 
-/** @description Creates a browser intersection observer instance */
+/** @description creates a browser intersection observer instance */
 export function createIntersectionObserver(callback: IntersectionObserverCallback, options?: ObservationOptions | undefined) {
   return new IntersectionObserver(callback, options);
 }
