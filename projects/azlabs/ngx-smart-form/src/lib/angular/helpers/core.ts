@@ -13,7 +13,7 @@ import {
   DisabledIfConstraint,
   OptionsConfig,
 } from '@azlabsjs/smart-form-core';
-import { isNumber } from '@azlabsjs/utilities';
+import { deepEqual, isNumber } from '@azlabsjs/utilities';
 import {
   AngularReactiveFormBuilderBridge,
   Condition,
@@ -184,31 +184,50 @@ export function setFormGroupValue(formgroup: FormGroup, values: { [index: string
 /** @internal */
 function setFormArrayValue(a: Optional<FormArray>, parent: FormGroup, key: string, config: InputConfigInterface, value: unknown, builder: AngularReactiveFormBuilderBridge) {
   const items = Array.isArray(value) ? value : [];
+  const array = a ?? new FormArray<any>([]);
+  const values = array.getRawValue();
+  const max = array.controls.length - 1;
+
   if (isrepeatablegroup(config)) {
 
     const inputs = getinputgroupinputs(config);
-    const array = a ?? new FormArray<any>([]);
 
-    array.controls = items.map(current => {
-      const group = builder.group(inputs);
-      group.setParent(array);
-      setFormGroupValue(group, current, inputs, builder);
-      return group;
-    });
+    for (let i = 0; i < items.length; i++) {
+      if (i > max) {
+        const group = builder.group(inputs);
+        group.setParent(array);
+        setFormGroupValue(group, items[i], inputs, builder);
+        array.push(group);
+        continue;
+      }
 
-    console.log('After setting array....');
+      if (deepEqual(items[i], values[i])) {
+        continue;
+      }
+
+      setFormGroupValue(array.at(i) as FormGroup, items[i], inputs, builder);
+    }
+
     parent.setControl(key, array);
     array.updateValueAndValidity();
 
   } else if (isrepeatableinput(config)) {
-    const array = a ?? new FormArray<any>([]);
+    for (let i = 0; i < items.length; i++) {
+      if (i > max) {
+        const c = builder.control(config);
+        c.setParent(array);
+        safeSetValue(c, items[i]);
+        array.push(c);
+        continue;
+      }
 
-    array.controls = items.map(current => {
-      const c = builder.control(config);
-      c.setParent(array);
-      safeSetValue(c, current);
-      return c;
-    });
+      if (items[i] === values[i]) {
+        continue;
+      }
+
+      safeSetValue(array.at(i), items[i]);
+    }
+
     parent.setControl(key, array);
     array.updateValueAndValidity();
 
@@ -1025,10 +1044,10 @@ export function createComputableDepencies(
   return dependencies;
 }
 
-/** @internal recursively get errors from an angular reactive control (eg: FormGroup, FormControl, FormArray) */
-export function collectErrors(control: AbstractControl) {
-  const errors: ValidationErrors[] = [];
-  const errorDict: {[prop: string]: unknown} = {};
+
+// @internal
+export function collectErrorDict(control: AbstractControl) {
+  const errors: { [prop: string]: unknown } = {};
   const getErrors = (c: AbstractControl, _name: string = '') => {
     if (c instanceof FormGroup) {
       for (const name of Object.keys(c.controls)) {
@@ -1037,26 +1056,51 @@ export function collectErrors(control: AbstractControl) {
           getErrors(current, `${_name}.${name}`);
         }
       }
-    } else if (c instanceof FormArray) {
-      // for (const _c of c.controls) {
-      //   getErrors(_c, `${_name}.${name}`);
-      // }
+      return;
+    }
+    
+    if (c instanceof FormArray) {
+      c.controls.forEach((c, index) => getErrors(c, `${_name}.${index}`));
+      return;
+    }
 
-      c.controls.forEach((c, index) => getErrors(c, `${_name}.${index}`))
-    } else {
-      if (!c.valid && c.errors) {
-        errors.push(c.errors);
-      }
 
-      if (_name && !c.valid && c.errors) {
-        errorDict[_name] = {errors: c.errors, value: c.value};
-      }
+    if (_name && !c.valid && c.errors) {
+      errors[_name] = { errors: c.errors, value: c.value };
     }
   };
 
   getErrors(control);
 
-  console.log(errorDict);
+  return errors;
+}
+
+/** @internal recursively get errors from an angular reactive control (eg: FormGroup, FormControl, FormArray) */
+export function collectErrors(control: AbstractControl) {
+  const errors: ValidationErrors[] = [];
+  const getErrors = (c: AbstractControl) => {
+    if (c instanceof FormGroup) {
+      for (const name of Object.keys(c.controls)) {
+        const current = c.get(name);
+        if (current) {
+          getErrors(current);
+        }
+      }
+      return;
+    }
+
+    if (c instanceof FormArray) {
+      c.controls.forEach((c) => getErrors(c));
+      return;
+    }
+
+    if (!c.valid && c.errors) {
+      errors.push(c.errors);
+    }
+  };
+
+  getErrors(control);
+
   return errors;
 }
 

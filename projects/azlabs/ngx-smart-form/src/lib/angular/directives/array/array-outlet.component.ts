@@ -67,6 +67,11 @@ export class NgxFormArrayOutletComponent implements OnDestroy, ViewRefFactory<Co
     return ref;
   }
 
+  updateView(ref: RefType<ComponentRef<NgxSmartFormArrayItemComponent>>, element: AbstractControl): void {
+    ref.element.instance.formgroup = element as FormGroup;
+    ref.element.changeDetectorRef.detectChanges();
+  }
+
   clear(): void {
     this._container?.clear();
   }

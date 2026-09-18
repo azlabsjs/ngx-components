@@ -121,7 +121,6 @@ export class NgxSmartFormComponent implements ReactiveFormComponentInterface, Af
 
   setValue(state: { [k: string]: unknown }): void {
     this.model.setValue(state);
-    // notify ui for value changes
     this.cdRef?.markForCheck();
   }
 
@@ -202,8 +201,6 @@ export class NgxSmartFormComponent implements ReactiveFormComponentInterface, Af
 
     const errors = collectErrors(this.formGroup);
     
-    console.log('Errors: ', this.formGroup.getRawValue());
-
     if (!this.model.isValid() && errors.length > 0) {
       return;
     }

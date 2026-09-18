@@ -108,7 +108,7 @@ export function equalsValidator(name: string) {
             return carry;
           }, {} as ValidationErrors);
         control2.setErrors(_errors);
-        control2.updateValueAndValidity({ onlySelf: true });
+        control2.updateValueAndValidity();
       }
       return null;
     }

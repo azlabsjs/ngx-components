@@ -325,11 +325,13 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    setTimeout(() => {
+    const t = setTimeout(() => {
       this._pageResult$.next(_values);
       this.placeholder = undefined;
       this.formValue = this.fromState;
       this.cdRef?.detectChanges();
+
+      clearTimeout(t);
     }, 3000);
 
 
@@ -360,10 +362,10 @@ export class AppComponent implements OnInit {
       );
     }, 1000);
 
-    const timeout = setTimeout(() => {
-      this.smartForm.setValue(this.fromState);
-      clearTimeout(timeout);
-    }, 3000);
+    // const timeout = setTimeout(() => {
+    //   this.smartForm.setValue(this.fromState);
+    //   clearTimeout(timeout);
+    // }, 3000);
   }
 
   afterChanges() {
@@ -438,7 +440,7 @@ export class AppComponent implements OnInit {
 
       this.formValue = { ...state, [name]: items };
 
-      console.log(this.formValue);
+      // console.log(this.formValue);
 
       this.cdRef?.detectChanges();
     }

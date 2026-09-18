@@ -40,28 +40,6 @@
           },
           {
             "formId": 234,
-            "controlName": "country",
-            "required": true,
-            "disabled": false,
-            "readonly": false,
-            "unique": false,
-            "isRepeatable": false,
-            "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-4",
-            "label": "PAYS",
-            "placeholder": "...",
-            "type": "select",
-            "classes": "clr-input",
-            "selectableModel": "http://localhost:3000/countries",
-            "exists": {
-              "url": "http://localhost:3000/countries",
-              "conditions": []
-            },
-            "keyfield": "id",
-            "valuefield": "name",
-            "groupfield": "id"
-          },
-          {
-            "formId": 234,
             "controlName": "city",
             "required": true,
             "disabled": false,
@@ -242,30 +220,6 @@
             "multiple": 0,
             "options": [],
             "children": []
-          },
-          {
-            "formId": 234,
-            "controlName": "country",
-            "controlIndex": 8,
-            "required": true,
-            "disabled": false,
-            "readonly": false,
-            "unique": false,
-            "isRepeatable": false,
-            "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-4",
-            "id": 1240,
-            "label": "PAYS",
-            "placeholder": "...",
-            "type": "select",
-            "classes": "clr-input",
-            "selectableModel": "http://localhost:3000/countries",
-            "exists": {
-              "url": "http://localhost:3000/countries",
-              "conditions": []
-            },
-            "keyfield": "id",
-            "valuefield": "name",
-            "groupfield": "id"
           },
           {
             "formId": 234,
@@ -452,30 +406,6 @@
             "multiple": 0,
             "options": [],
             "children": []
-          },
-          {
-            "formId": 234,
-            "controlName": "country",
-            "controlIndex": 8,
-            "required": true,
-            "disabled": false,
-            "readonly": false,
-            "unique": false,
-            "isRepeatable": false,
-            "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-4",
-            "id": 1240,
-            "label": "PAYS",
-            "placeholder": "...",
-            "type": "select",
-            "classes": "clr-input",
-            "selectableModel": "http://localhost:3000/countries",
-            "exists": {
-              "url": "http://localhost:3000/countries",
-              "conditions": []
-            },
-            "keyfield": "id",
-            "valuefield": "name",
-            "groupfield": "id"
           },
           {
             "formId": 234,

@@ -19,7 +19,7 @@ import {
   OptionsConfig,
 } from '@azlabsjs/smart-form-core';
 import { Subject, from, lastValueFrom, of } from 'rxjs';
-import { debounceTime, first, map, switchMap, tap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, first, map, switchMap, tap } from 'rxjs/operators';
 import {
   InputOptionsClient,
   ObservableOptionsConfig,
@@ -32,7 +32,6 @@ import {
 } from './types';
 import { INPUT_OPTIONS_CLIENT, OPTIONS_CACHE } from './tokens';
 import { CacheType } from './cache';
-import { deepEqual } from '@azlabsjs/utilities';
 import { isEmpty } from './utils';
 
 /** @internal */
@@ -76,7 +75,6 @@ function isobservable(o: OptionsConfigType): o is ObservableOptionsConfig {
   selector: '[fetchOptions]',
 })
 export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
-  //#region input properties
   @Input() loaded!: boolean;
   @Input() name!: string;
   @Input() auto: boolean = true;
@@ -92,52 +90,25 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   get options() {
     return this._options;
   }
-  //#endregion
 
-  //#region outputs properties
   @Output() optionsChange = new EventEmitter<InputOptions>();
   @Output() loadingChange = new EventEmitter<boolean>();
-  //#endregion
 
   // local properties
   private observer!: IntersectionObserver;
-  private search$ = new Subject<[_KeyType, Omit<OptionsConfigType, 'refetch'>, QueryType]>();
+  // private search$ = new Subject<[_KeyType, Omit<OptionsConfigType, 'refetch'>, QueryType]>();
   private subscriptions: Subscription[] = [];
   private observable!: Subscribable<{ [k: string]: unknown }>;
-  private key!: _KeyType;
   private lastQuery: Optional<{ [prop: string]: unknown }> = null;
 
-  // directive constructor
   constructor(
     private elemRef: ElementRef,
     @Inject(INPUT_OPTIONS_CLIENT) private client: InputOptionsClient,
     @Inject(DOCUMENT) private document: Document,
     @Inject(OPTIONS_CACHE)
     @NgOptional()
-    private cache: CacheType<Record<string, unknown>, InputOptions>
-  ) {
-    this.subscriptions.push(
-      this.search$
-        .asObservable()
-        .pipe(
-          debounceTime(500),
-          switchMap(([key, options, params]) => {
-            const result = this.cache.get(key);
-            return result
-              ? of({ key, params, options, values: result })
-              : from(this.sendRequest(options as OptionsConfig, params)).pipe(map((values) => ({ key, params, options, values })));
-          }),
-          tap((state) => {
-            const { key, options, params, values } = state;
-            this.cache.put(key, values, (_values) => this.sendRequest(options as OptionsConfig, params));
-
-            this.loadingChange.emit(false);
-            this.optionsChange.emit(values);
-          })
-        )
-        .subscribe()
-    );
-  }
+    private cache: CacheType<unknown, InputOptions>
+  ) { }
 
   ngAfterViewInit() {
     if (this.auto) {
@@ -189,6 +160,11 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     this.fetchAsync(options, this.lastQuery);
   }
 
+  next(values: InputOptions) {
+    this.loadingChange.emit(false);
+    this.optionsChange.emit(values);
+  }
+
   private observeView() {
     if (this.observer) {
       this.observer.disconnect();
@@ -225,14 +201,28 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   private async fetchAsync(options: OptionsConfigType, params: Record<string, unknown> = {}) {
     const query = typeof this.limit !== 'undefined' && this.limit !== null ? { page: 1, per_page: this.limit, ...params } : { ...params };
     const { refetch, ...rest } = options;
-    const key = { ...rest, ...params };
+    const key = rest;
 
-    if (this.key && !deepEqual(this.key, key)) {
-      this.cache.dispose(this.key);
+    // query value from cache and dispatch options change if value is in cache
+    const cached = this.cache.get(key);
+    if (!cached) {
+      this.cache.put(key, () => this.sendRequest(options as OptionsConfig, query), this);
+      return;
     }
 
-    this.key = key;
-    this.search$.next([key, rest, query]);
+    if (cached.expired()) {
+      this.cache.dispose(key);
+      this.cache.put(key, () => this.sendRequest(options as OptionsConfig, query), this);
+      return;
+    }
+
+    const values = cached.value();
+    if (values) {
+      this.optionsChange.emit(values);
+      return;
+    }
+
+    cached.subscribe(this);
   }
 
   private sendRequest(options: OptionsConfig, params: Record<string, unknown>) {

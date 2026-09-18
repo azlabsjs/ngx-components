@@ -1,6 +1,5 @@
 import {
   AfterContentInit,
-  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -15,7 +14,7 @@ import {
 import { AbstractControl, FormArray } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
-import { takeUntil, tap } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil, tap } from 'rxjs/operators';
 import { cloneAbstractControl } from '../../helpers';
 import { AngularReactiveFormBuilderBridge } from '../../types';
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
@@ -48,8 +47,7 @@ import { Optional } from './types';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxSmartFormControlArrayComponent
-  implements AfterContentInit, OnDestroy, AfterViewInit {
+export class NgxSmartFormControlArrayComponent implements AfterContentInit, OnDestroy {
   @Input({ alias: 'formArray' }) array!: FormArray;
   @Input('no-grid-layout') nogridlayout = false;
   @Input('add-button') addButtonRef: Optional<TemplateRef<any>>;
@@ -64,27 +62,22 @@ export class NgxSmartFormControlArrayComponent
 
   @ViewChild('container', { static: false }) viewFactory!: ViewRefFactory<any>;
 
-  _refCount = 0;
-  get refCount() {
-    return this._refCount;
-  }
   private refs: RefType<unknown>[] = [];
   private destroy$ = new Subject<void>();
+  protected capacity = 0;
 
-  constructor(
-    private cdRef: ChangeDetectorRef | null,
-    @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
-    private builder: AngularReactiveFormBuilderBridge
-  ) { }
-
-  ngAfterViewInit(): void {
-    this.update.bind(this).call(null);
-  }
+  constructor(private cdRef: ChangeDetectorRef | null, @Inject(ANGULAR_REACTIVE_FORM_BRIDGE) private builder: AngularReactiveFormBuilderBridge) { }
 
   ngAfterContentInit(): void {
-    this.array.valueChanges
-      .pipe(takeUntil(this.destroy$), tap(this.update.bind(this)))
-      .subscribe();
+    if (this.array) {
+      this.array.valueChanges.pipe(takeUntil(this.destroy$), distinctUntilChanged()).subscribe((values) => {
+        const cap0 = this.capacity;
+        this.capacity = values.length;
+        if (this.capacity !== cap0) {
+          this.update(this.array);
+        }
+      });
+    }
   }
 
   add(event: Event) {
@@ -94,7 +87,7 @@ export class NgxSmartFormControlArrayComponent
   }
 
   removed<T>(ref: RefType<T>) {
-    if (this._refCount >= 0) {
+    if (this.capacity >= 0) {
       const index = this.refs.findIndex((c) => c.index === ref.index);
       if (index === -1) {
         return;
@@ -102,12 +95,19 @@ export class NgxSmartFormControlArrayComponent
 
       const control = this.array.at(index);
       this.refs.splice(index, 1);
-      this.array.removeAt(index, { emitEvent: true });
+      this.capacity -= 1;
+      this.array.removeAt(index, { emitEvent: true }); // this will set _parent property null on the removed control
       this.array.updateValueAndValidity();
 
       if (control) {
+        control.clearAsyncValidators();
+        control.clearValidators();
+        control.setErrors(null); // remove any errors on the control to make it valid
+        control.updateValueAndValidity();
         this._removed.emit({ index, control });
       }
+
+      this.cdRef?.markForCheck();
     }
   }
 
@@ -115,28 +115,22 @@ export class NgxSmartFormControlArrayComponent
     this.destroy$.next();
   }
 
-  private update() {
-    const length = this.array.controls.length;
-    const count = length - this._refCount;
-    if (count > 0) {
-      for (let i = 0; i < count; i++) {
-        const index = this._refCount + i;
-        const { viewFactory: factory } = this;
-        const view = factory?.createView(index, this.array.at(index));
-        this.refs.push(view);
+  private update(array: FormArray) {
+    const length = array.controls.length;
+    const max = this.refs.length - 1;
+    const refs = []; //# if supported by javascript create a fixed size array
+
+    for (let i = 0; i < length; i++) {
+      const element = array.at(i);
+      if (i > max) {
+        refs.push(this.viewFactory.createView(i, element));
+        continue;
       }
-      this.setRefCount(this._refCount + count);
+      this.viewFactory.updateView(this.refs[i], array.at(i));
     }
 
-    if (count < 0) {
-      const refCount = Math.max(this._refCount - 1, 0);
-      this.setRefCount(refCount);
-      this.listChange.emit(refCount);
+    if (refs.length > 0) {
+      this.refs = this.refs.concat(...refs);
     }
-  }
-
-  private setRefCount(value: number) {
-    this._refCount = value;
-    this.cdRef?.markForCheck();
   }
 }

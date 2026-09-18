@@ -146,7 +146,6 @@ export const createAppTranslator = createTranslate((values) => {
     provideFormsInitialization('/assets/forms.json'),
     /* injector: Injector */
     provideHttpClient('http://localhost:4000', () => {
-      // Replace the interceptor function by using the injector
       return (request, next) => {
         request = request.clone({
           options: {

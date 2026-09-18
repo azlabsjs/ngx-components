@@ -100,11 +100,11 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
           for (let index = 0; index < control.length; index++) {
             const item = control.at(index);
             if (item) {
-              item.disable({ onlySelf: true, emitEvent: true });
+              item.disable({ emitEvent: true });
             }
           }
         } else {
-          control.disable({ onlySelf: true, emitEvent: true });
+          control.disable({ emitEvent: true });
         }
       },
       (control) => {
@@ -112,11 +112,11 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
           for (let index = 0; index < control.length; index++) {
             const item = control.at(index);
             if (item) {
-              item.enable({ onlySelf: true, emitEvent: true });
+              item.enable({ emitEvent: true });
             }
           }
         } else {
-          control.enable({ onlySelf: true, emitEvent: true });
+          control.enable({ emitEvent: true });
         }
       },
     )(values ?? []);

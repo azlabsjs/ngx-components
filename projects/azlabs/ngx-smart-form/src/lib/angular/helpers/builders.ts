@@ -332,10 +332,10 @@ export class ComponentReactiveFormHelpers {
     field?: string
   ): void {
     if (control) {
-      control.markAsTouched({ onlySelf: true });
-      control.markAsDirty({ onlySelf: true });
-      control.markAsPristine({ onlySelf: true });
-      control.updateValueAndValidity({ onlySelf: true });
+      control.markAsTouched();
+      control.markAsDirty();
+      control.markAsPristine();
+      control.updateValueAndValidity();
     }
   }
 

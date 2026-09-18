@@ -5,10 +5,10 @@
       <ng-container *ngTemplateOutlet="tabledescription; context: {$implicit: name, name, description}"></ng-container>
     </ng-container>
   </section>
-  <ng-container *ngIf="refCount === 0">
+  <ng-container *ngIf="capacity === 0">
     <ng-container *ngTemplateOutlet="_placeholder; context: {$implicit: placeholder, add:  add.bind(this), name, description}"></ng-container>
   </ng-container>
-  <ng-container *ngIf="refCount !== 0">
+  <ng-container *ngIf="capacity !== 0">
     <ng-container *ngTemplateOutlet="addref ?? _add; context: { $implicit: add.bind(this), name, description }"></ng-container>
   </ng-container>
 </ngx-form-array-outlet>

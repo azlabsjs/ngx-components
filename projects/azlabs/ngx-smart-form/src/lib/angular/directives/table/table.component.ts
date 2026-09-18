@@ -13,6 +13,7 @@ import {
   ViewChild,
   ViewContainerRef,
   Injector,
+  Optional,
 } from '@angular/core';
 import { RefType, ViewRefFactory } from '../types';
 import { AbstractControl, FormGroup } from '@angular/forms';
@@ -57,7 +58,7 @@ export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDes
 
   private subscriptions: Subscription[] = [];
 
-  constructor(private injector: Injector) { }
+  constructor(private injector: Injector, @Optional() private cdref: ChangeDetectorRef | null) { }
 
   createView(index: number, formgroup: AbstractControl, triggered: boolean = false) {
     const subject = new Subject<number>();
@@ -73,7 +74,6 @@ export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDes
       autoupload: this.autoupload,
       inputs,
       remove: (e: Event) => {
-        console.log('Destroying...', e);
         e?.preventDefault();
         ref?.destroy();
         subject.next(ref.index);
@@ -91,6 +91,12 @@ export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDes
     this.subscriptions.push(subscription);
 
     return ref;
+  }
+
+
+  updateView(ref: RefType<EmbeddedViewRef<any>>, formgroup: AbstractControl) {
+    ref.element.context.formgroup = formgroup;
+    this.cdref?.markForCheck();
   }
 
   clear(): void {

@@ -56,7 +56,7 @@ export type ObservableOptionsConfig<T = { [k: string]: unknown; }> = Omit<Option
 };
 
 /** @interal */
-export type KeyType = Record<string, unknown>;
+export type KeyType = unknown;
 
 /** @internal */
 export type QueryType = { page?: number; per_page?: number } & Record<string, unknown>;

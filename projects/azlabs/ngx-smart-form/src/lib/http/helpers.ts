@@ -1,4 +1,5 @@
 import {
+  useFetchBackend,
   useRequestClient,
 } from '@azlabsjs/requests';
 import { from, mergeMap, of, throwError } from 'rxjs';
@@ -12,6 +13,10 @@ export function isValidURL(url: string) {
   } catch {
     return false;
   }
+}
+
+export function isFetchSupported(): boolean {
+  return typeof globalThis !== 'undefined' && typeof globalThis.fetch === 'function';
 }
 
 /**
@@ -68,7 +73,8 @@ export function rxRequest(request: RequestOptionsType) {
       'Content-Type': 'application/json;charset=UTF-8',
     };
   }
-  const client = useRequestClient();
+  const backend = isFetchSupported() && method.toUpperCase() === 'GET' ? useFetchBackend() : undefined;
+  const client = useRequestClient(backend);
 
   return from(
     client.request({
