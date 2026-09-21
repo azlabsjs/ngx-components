@@ -96,10 +96,8 @@ export function equalsValidator(name: string) {
     const result = constraint(value1, value2);
     if (result) {
       const { errors } = control2;
-      // Case the result of the constraint is a truthy value
-      // we remove the equals error on the other control
-      // To prevent cyclic calls, we first check if the control has an error before
-      // updating control value and validity
+      // case the result of the constraint is a truthy value we remove the equals error on the other control
+      // To prevent cyclic calls, we first check if the control has an error before updating control value and validity
       if (errors && control2.hasError('equals')) {
         const _errors = (Object.keys(errors) as (keyof typeof errors)[])
           .filter((name) => name !== 'equals')
