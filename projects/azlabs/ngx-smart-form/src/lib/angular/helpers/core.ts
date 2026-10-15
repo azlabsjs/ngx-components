@@ -20,7 +20,7 @@ import {
   ComputedInputValueConfigType,
 } from '../types';
 import { cloneAbstractControl } from './clone';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Observable, Subject, Subscription, tap } from 'rxjs';
 import { ClauseFn, CONDITION_PROPERTIES, ConditionProperty } from './types';
 import { JSDate } from '@azlabsjs/js-datetime';
 
@@ -107,12 +107,7 @@ export function findcontrol<T extends AbstractControl | null>(g: FormGroup, key:
 }
 
 /** @internal set value for formgroup form controls */
-export function setFormValue(
-  builder: AngularReactiveFormBuilderBridge,
-  formgroup: FormGroup,
-  values: { [index: string]: any },
-  inputs?: InputConfigInterface[] | InputConfigInterface,
-) {
+export function setFormValue(builder: AngularReactiveFormBuilderBridge, formgroup: FormGroup, values: { [index: string]: any }, inputs?: InputConfigInterface[] | InputConfigInterface) {
   const fn = createSetValue(builder);
   for (const [key, value] of Object.entries(values)) {
     const input = Array.isArray(inputs) ? inputs?.find((config) => config.name === key) : inputs;
@@ -522,18 +517,21 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
     const items: Condition[] = [];
     if (Array.isArray(inputs) && inputs.length !== 0) {
       const conditions = findconditions(inputs, prop);
-      for (const [name, condition] of conditions) {
+      for (const [name, x] of conditions) {
         const position = name.indexOf('*');
-        const currentCondition = [...condition];
+        const isAnyConfig = position !== -1;
+        const condition = [...x];
         items.push({
-          match: (p) => {
+          name,
+          config: condition,
+          match: (property) => {
             let result = false;
-            for (const item of currentCondition) {
-              if (position !== -1) {
+            for (const item of condition) {
+              if (isAnyConfig) {
                 const str = before(item.name, '*');
-                result = str.trim() !== '' ? p.trim().startsWith(str.substring(0, str.length - 1)) : result;
+                result = str.trim() !== '' ? property.trim() === str.trim().substring(0, str.length - 1) : result;
               } else {
-                result = String(p) === String(item.name);
+                result = String(property) === String(item.name);
               }
 
               if (result === true) {
@@ -545,32 +543,33 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
           dependencyChanged: (formgroup: FormGroup, property: string, value: unknown) => {
             const output: [[string, AbstractControl][], [string, AbstractControl][]] = [[], []];
             let str = before(name, '*');
-            str = str.trim().substring(0, str.length - 1);
-            if (position !== -1 && str.trim() !== '' && property.trim().startsWith(str)) {
-              const parent = findcontrol(formgroup, str) as FormArray;
+            const parentName = str.substring(0, str.length - 1);
+            if (isAnyConfig && str.trim() !== '' && property.trim() === parentName) {
+              const parent = findcontrol(formgroup, parentName) as FormArray;
               if (!parent) {
                 return output;
               }
 
               if (!(parent instanceof FormArray)) {
-                throw new Error(`parent at ${str} is not a form array`);
+                console.error(`parent at ${parentName} is not a form array`);
+                return output;
               }
 
               if (parent.length === 0) {
                 return output;
               }
 
-              const input = after(name, `${str}.*.`).trim();
+              const key = after(name, `${parentName}.*.`).trim();
               for (let index = 0; index < parent.length; index++) {
                 const item = parent.at(index);
                 if (!item) {
                   continue;
                 }
 
-                const prefix = `${str}.${index}`;
-                let name = isformgroup(item) ? `${prefix}.${input}` : `${prefix}`;
-                let control = isformgroup(item) ? findcontrol(item, input) : item;
-                const dependencies = currentCondition.map(i => ({ input: isformgroup(item) ? findcontrol(item, after(i.name, `${str}.*.`).trim()) : item, fn: i.values ?? [], name: i.name })).filter(i => !!i.input);
+                const n = `${parentName}.${index}`;
+                const name = isformgroup(item) ? `${n}.${key}` : `${n}`;
+                let control = isformgroup(item) ? findcontrol(item, key) : item;
+                const dependencies = condition.map(i => ({ input: isformgroup(item) ? findcontrol(item, after(i.name, `${parentName}.*.`).trim()) : item, fn: i.values ?? [], name: i.name })).filter(i => !!i.input);
 
                 if (dependencies.length === 0) {
                   continue;
@@ -619,7 +618,7 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
 
             let control = findcontrol(formgroup, name);
             let truthy = false;
-            for (const c of currentCondition) {
+            for (const c of condition) {
               let inputvalue = value;
               if (c.name !== property) {
                 const selected = findcontrol(formgroup, c.name);
@@ -742,34 +741,24 @@ export function getPropertyValue<TReturn = any>(
 }
 
 /** returns the corresponding value of an input element */
-export function getInputValue<TReturn = any>(
-  v: any,
-  key: string,
-  character: string = '.',
-): TReturn {
-  if (
-    key === '' ||
-    typeof key === 'undefined' ||
-    key === null ||
-    typeof v !== 'object' ||
-    v === null
-  ) {
+export function getInputValue<TReturn = any>(v: any, key: string, character: string = '.'): TReturn {
+  if (key === '' || typeof key === 'undefined' || key === null || typeof v !== 'object' || v === null) {
     return v ?? null;
   }
 
   character = character ?? '.';
 
   const properties = key.split(character);
+  const len = properties.length;
   let carry: any | null = v;
+  let i = 0;
 
-  for (let i = 0; i < properties.length; i++) {
+  while (i < len) {
     const property = properties[i];
 
     if (property === '*' && Array.isArray(carry)) {
       const least = properties.slice(i + 1).join(character);
-      return carry.map((c) =>
-        getInputValue(c, least, character),
-      ) as any as TReturn;
+      return carry.map((c) => getInputValue(c, least, character)) as any as TReturn;
     }
     if (typeof carry === 'object') {
       carry = carry[property];
@@ -778,35 +767,29 @@ export function getInputValue<TReturn = any>(
     if (carry === null) {
       break;
     }
+
+    i += 1;
   }
+
   return carry ?? null;
 }
 
 /** @description query for the value located at a given leaf of the tree of control in an abstract control */
-export function pickcontrol(
-  model: AbstractControl | null,
-  key: string,
-  character: string = '.',
-): AbstractControl | null {
-  if (
-    key === '' ||
-    typeof key === 'undefined' ||
-    key === null ||
-    typeof model === 'undefined' ||
-    model === null
-  ) {
+export function pickcontrol(model: AbstractControl | null, key: string, character: string = '.'): AbstractControl | null {
+  if (key === '' || typeof key === 'undefined' || key === null || typeof model === 'undefined' || model === null) {
     return model ?? null;
   }
+
   character = character ?? '.';
   if (key.includes(character)) {
     const properties = key.split(character);
     let carry: AbstractControl | null = cloneAbstractControl(model);
-
-    for (let i = 0; i < properties.length; i++) {
+    const len = properties.length;
+    let i = 0;
+    while (i < len) {
       const property = properties[i];
-
       if (property === '*' && carry instanceof FormArray) {
-        return carry;
+        break;
       }
 
       if (carry instanceof FormGroup) {
@@ -816,7 +799,10 @@ export function pickcontrol(
       if (carry === null) {
         break;
       }
+
+      i += 1;
     }
+
     return carry;
   }
 
@@ -830,11 +816,13 @@ export function useSupportedAggregations() {
       return 0;
     }
 
+    args = args.flat();
     return sum(...args) / args.length;
   }
 
   function sum(...args: unknown[]) {
-    return args
+      return args
+      .flat()
       .map((v) => Number(v))
       .filter((v) => !isNaN(v))
       .reduce((carry, curr) => {
@@ -848,28 +836,27 @@ export function useSupportedAggregations() {
   }
 
   function min(...args: unknown[]) {
-    return Math.min(...args.map((v) => Number(v)).filter((v) => !isNaN(v)));
+    return Math.min(...args.flat().map((v) => Number(v)).filter((v) => !isNaN(v)));
   }
 
   function max(...args: unknown[]) {
-    return Math.max(...args.map((v) => Number(v)).filter((v) => !isNaN(v)));
+    return Math.max(...args.flat().map((v) => Number(v)).filter((v) => !isNaN(v)));
   }
 
   function concat(character: string, ...args: unknown[]) {
-    return args.map((v) => String(v)).join(character);
+    return args.flat().map((v) => String(v)).join(character);
   }
 
   function multiply(...args: unknown[]) {
     if (args.length === 0) {
       return 0;
     }
+
     return args
+      .flat()
       .map((v) => Number(v))
       .map((v) => (!isNaN(v) ? v : 0))
-      .reduce((carry, curr) => {
-        carry *= curr;
-        return carry;
-      }, 1);
+      .reduce((carry, curr) => carry * curr, 1);
   }
 
   function divide(...args: unknown[]) {
@@ -877,6 +864,7 @@ export function useSupportedAggregations() {
       return 0;
     }
     return args
+      .flat()
       .slice(1)
       .map((v) => Number(v))
       .map((v) => (!isNaN(v) ? v : 1))
@@ -885,9 +873,8 @@ export function useSupportedAggregations() {
           return carry;
         }
 
-        carry /= curr;
+        return carry / curr;
 
-        return carry;
       }, Number(args[0]));
   }
 
@@ -896,6 +883,7 @@ export function useSupportedAggregations() {
       return 0;
     }
     return args
+      .flat()
       .slice(1)
       .map((v) => Number(v))
       .filter((v) => !isNaN(v))
@@ -927,114 +915,59 @@ type ArgsBuilderType = (model: any, params: unknown[]) => void;
 /**
  * computes a dependencies trees of input that has their value that needs to be computed based on other input value or provided raw values
  */
-export function createComputableDepencies(
-  items: InputConfigInterface[],
-  aggregations: Record<string, (...args: any) => unknown>,
-) {
-  const dependencies: {
-    [prop: string]: ComputedInputValueConfigType<any>;
-  } = {};
+export function createComputableDepencies(items: InputConfigInterface[], aggregations: Record<string, (...args: any) => unknown>) {
+  const dependencies: { [prop: string]: ComputedInputValueConfigType<any>; } = {};
   const inputs = [...items];
 
-  const decorated = (values: InputConfigInterface[]) => {
+  const decorated = (values: InputConfigInterface[], parent?: string) => {
     for (const input of values) {
       if (hasleaf(input)) {
-        decorated(input.children);
+        decorated(input.children, parent ? `${!!input.isRepeatable ? `${parent}.${input.name}.*` : `${parent}.${input.name}`}` : `${!!input.isRepeatable ? `${input.name}.*` : `${input.name}`}`);
         continue;
       }
 
       if (input.compute) {
-        if (typeof input.compute.fn === 'string') {
-          const method = aggregations[input.compute.fn];
-          const args = (input.compute as { fn: string; args: string[] }).args;
-          const argbuilders: ArgsBuilderType[] = [];
-          const deps: string[] = [];
-          for (const arg of args) {
-            if (String(arg).startsWith('[') && arg.endsWith(']')) {
-              const name = arg.slice(1, arg.length - 1);
-              const star_index = name.indexOf('*');
+        const method = typeof input.compute.fn === 'string' ? aggregations[input.compute.fn as string] : input.compute.fn;
+        const args = 'args' in input.compute ? input.compute['args'] : input.compute['deps'] ?? [];
+        const deps: { key: string, name?: string, type: 'list' | 'scalar' | 'group' }[] = [];
+        const params: string[] = [];
+        const inplace: [number, string][] = [];
 
-              const dot_index = name.indexOf('.');
-              const after_dot = name.slice(dot_index + 1);
-              const depName =
-                star_index !== -1
-                  ? name.slice(0, star_index - 1)
-                  : dot_index !== -1
-                    ? name.slice(0, dot_index)
-                    : name;
+        for (let index = 0; index < args.length; index++) {
+          const arg = args[index];
+          if (String(arg).startsWith('[') && arg.endsWith(']')) {
+            const name = arg.slice(1, arg.length - 1);
+            const index1 = name.indexOf('*');
+            const index2 = name.indexOf('.');
+            const index3 = name.slice(index2 + 1);
 
-              deps.push(depName);
-              let builder: ArgsBuilderType;
+            params.push(name);
+            inplace.push([index, name]);
 
-              if (star_index !== -1) {
-                builder = (model: any, stack: unknown[]) => {
-                  const result =
-                    getInputValue<unknown[]>(model, name.slice(star_index)) ??
-                    [];
-                  if (result) {
-                    stack.push(...result);
-                  }
-                };
-              } else if (dot_index !== -1 && after_dot.trim() !== '') {
-                builder = (model: any, stack: unknown[]) => {
-                  stack.push(getInputValue<unknown>(model, after_dot));
-                };
-              } else {
-                builder = (model: any, stack: unknown[]) => {
-                  stack.push(model);
-                };
-              }
-
-              argbuilders.push(builder);
-            } else {
-              argbuilders.push((_, p: unknown[]) => {
-                p.push(arg);
-              });
+            if (index1 !== -1) {
+              deps.push({ key: name.slice(0, index1 - 1), name: name.slice(index1 + 2), type: 'list' });
+              continue;
             }
+
+            if (index2 !== -1 && index3.trim() !== '') {
+              deps.push({ key: name.slice(0, index2), name: name.slice(index2 + 1), type: 'group' });
+              continue;
+            }
+
+            deps.push({ key: name, type: 'scalar' });
+            continue;
           }
 
-          for (const dep of deps) {
-            const current = dependencies[dep] ?? {
-              values: [],
-              cancel: new Subject<void>(),
-            };
-            const values = current.values ?? [];
-            values.push({
-              name: input.name,
-              fn: (model: any) => {
-                const stack: unknown[] = [];
-                for (const builder of argbuilders) {
-                  builder(model, stack);
-                }
-                return method(...stack);
-              },
-            });
-            dependencies[dep] = {
-              values,
-              cancel: current.cancel ?? new Subject<void>(),
-            };
-          }
-        } else {
-          const compute = input.compute as {
-            fn: (model: any) => unknown;
-            deps: string[];
-          };
-          for (const dep of compute.deps) {
-            const current = dependencies[dep] ?? {
-              values: [],
-              cancel: new Subject<void>(),
-            };
-            const values = current.values ?? [];
-            values.push({
-              name: input.name,
-              fn: compute.fn,
-            });
-            dependencies[dep] = {
-              values,
-              cancel: current.cancel ?? new Subject<void>(),
-            };
-          }
+          params.push(arg);
         }
+
+        for (const { key, name, type } of deps) {
+          const current = dependencies[key] ?? { values: [], cancel: new Subject<void>() };
+          const values = current.values ?? [];
+          values.push({ path: `${parent ? `${parent}.` : ''}${input.name}`, name: input.name, fn: method, params, inplace });
+          dependencies[key] = { name, type, values, cancel: current.cancel ?? new Subject<void>() };
+        }
+
       }
     }
   };
@@ -1058,7 +991,7 @@ export function collectErrorDict(control: AbstractControl) {
       }
       return;
     }
-    
+
     if (c instanceof FormArray) {
       c.controls.forEach((c, index) => getErrors(c, `${_name}.${index}`));
       return;
@@ -1117,6 +1050,26 @@ export function flatteninputs(formgroup: FormGroup) {
         continue;
       }
 
+      if (control instanceof FormArray && control.length !== 0) {
+        for (let index = 0; index < control.length; index++) {
+          const element = control.at(index);
+
+          if (!element) {
+            continue;
+          }
+
+          if (element instanceof FormGroup) {
+            resolve(element, root.trim() !== '' ? `${root}.${n}.${index}` : `${n}.index`);
+            continue;
+          }
+
+          const name = root.trim() !== '' ? `${root}.${n}.${index}` : `${n}.index`;
+          names.push([name, element]);
+        }
+
+        continue;
+      }
+
       const name = root.trim() !== '' ? `${root}.${n}` : String(n);
       names.push([name, control]);
     }
@@ -1128,7 +1081,7 @@ export function flatteninputs(formgroup: FormGroup) {
 }
 
 /** @internal */
-function createRefetchObservable(formgroup: FormGroup, refetch: OptionsConfig['refetch']) {
+function createRefetchObservable(formgroup: FormGroup | FormArray, refetch: OptionsConfig['refetch'], parent?: string) {
   return new Observable<{ [k: string]: unknown }>((subscriber) => {
     if (!refetch) {
       return;
@@ -1137,25 +1090,58 @@ function createRefetchObservable(formgroup: FormGroup, refetch: OptionsConfig['r
     const subscriptions: Subscription[] = [];
     for (const item of refetch) {
       const { trigger, query } = item;
-      const { input: name, event: _ } = typeof trigger === 'object' && trigger !== null ? trigger : { input: trigger, event: 'change' };
+      let { input: name, event: _ } = typeof trigger === 'object' && trigger !== null ? trigger : { input: trigger, event: 'change' };
+
+      if (!query) {
+        continue;
+      }
 
       if (name.indexOf('*') !== -1) {
-        const str = before(name, '*');
-        const str2 = after(name, '*').substring(1);
-        const array: FormArray | null = findcontrol(formgroup, str.substring(0, str.length - 1));
+        let array: FormArray | FormGroup | null = null;
+        let str2!: string;
+        if (parent) {
+          name = parent && name.startsWith(parent) ? name.substring(`${parent}.*.`.length) : name;
+          const matchMany = name.indexOf('*') !== -1;
+          let str = matchMany ? before(name, '*') : '';
+          str = str.substring(0, str.length - 1);
+          str2 = matchMany ? after(name, '*').substring(1) : name;
+          array = str !== '' ? findcontrol(formgroup as FormGroup, str) : formgroup;
+
+        } else {
+          let str = before(name, '*');
+          str = str.substring(0, str.length - 1);
+          str2 = after(name, '*').substring(1);
+          array = str !== '' ? findcontrol(formgroup as FormGroup, str) : formgroup;
+        }
+
 
         if (array instanceof FormArray) {
-          const len = array.length;
-          for (let i = 0; i < len; i++) {
+          let i = 0;
+          const len = array.length
+
+          while (i < len) {
             const at = array.at(i);
             const c = str2.trim() !== '' && at instanceof FormGroup ? at.get(str2) : at;
 
-            if (c && query) {
+            if (c) {
               const subscription = c.valueChanges.subscribe((value) => subscriber.next(value ? { [query]: value } : {}));
               subscriptions.push(subscription);
             }
+
+            i += 1;
+          }
+
+          continue;
+        }
+
+        if (array instanceof FormGroup) {
+          const c = array.get(str2);
+          if (c) {
+            const subscription = c.valueChanges.subscribe((value) => subscriber.next(value ? { [query]: value } : {}));
+            subscriptions.push(subscription);
           }
         }
+
       } else {
         const c = formgroup.get(name);
 
@@ -1183,15 +1169,15 @@ function createRefetchObservable(formgroup: FormGroup, refetch: OptionsConfig['r
 }
 
 /** @internal */
-export function withRefetchObservable(inputs: InputConfigInterface[], formgroup: FormGroup): InputConfigInterface[] {
+export function withRefetchObservable(inputs: InputConfigInterface[], formgroup: FormGroup, parent?: string): InputConfigInterface[] {
   return inputs.map(item => {
-    if (isinputgroup(item)) {
+    if (isinputgroup(item) && !!!item.isRepeatable) {
       return { ...item, children: withRefetchObservable(item.children, formgroup) } as InputGroup;
     }
 
     if (isoptionsinput(item) && 'refetch' in item.optionsConfig && Array.isArray(item.optionsConfig['refetch'])) {
       const { optionsConfig: { refetch } } = item;
-      return { ...item, optionsConfig: { ...item.optionsConfig, refetch: createRefetchObservable(formgroup, refetch) } };
+      return { ...item, optionsConfig: { ...item.optionsConfig, refetch: createRefetchObservable(formgroup, refetch, parent) } };
     }
 
     return item;

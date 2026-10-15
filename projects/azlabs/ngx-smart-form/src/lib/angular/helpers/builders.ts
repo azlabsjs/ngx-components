@@ -122,42 +122,20 @@ export class ComponentReactiveFormHelpers {
     return group;
   }
 
-  public static buildGroup(
-    builder: FormBuilder,
-    inputs: InputConfigInterface[],
-    requestClient?: RequestClient
-  ) {
+  public static buildGroup(builder: FormBuilder, inputs: InputConfigInterface[], requestClient?: RequestClient) {
     const group = builder.group({});
     for (const config of inputs) {
       if (config.type !== InputTypes.CHECKBOX_INPUT) {
-        group.addControl(
-          config.name,
-          ComponentReactiveFormHelpers.buildControl(
-            builder,
-            config,
-            requestClient
-          )
-        );
+        group.addControl(config.name, ComponentReactiveFormHelpers.buildControl(builder, config, requestClient));
       } else {
-        group.addControl(
-          config.name,
-          ComponentReactiveFormHelpers.buildArray(builder, config)
-        );
+        group.addControl(config.name, ComponentReactiveFormHelpers.buildArray(builder, config));
       }
     }
     return group;
   }
 
-  public static buildControl(
-    builder: FormBuilder,
-    config: InputConfigInterface,
-    requestClient?: RequestClient
-  ) {
-    const validators = [
-      !!config.rules?.isRequired || required(config)
-        ? Validators.required
-        : Validators.nullValidator,
-    ];
+  public static buildControl(builder: FormBuilder,config: InputConfigInterface,requestClient?: RequestClient) {
+    const validators = [!!config.rules?.isRequired || required(config) ? Validators.required : Validators.nullValidator];
     const asyncValidators: AsyncValidatorFn[] = [];
     let hasEqualsConstraint = false;
     let hasEmailConstraint = false;
@@ -165,39 +143,39 @@ export class ComponentReactiveFormHelpers {
       // checks if maxlength rule is set to true and apply the rule to the input
       !!config.rules?.maxLength || config.constraints?.max
         ? validators.push(
-            Validators.maxLength(
-              nullIfEmpty(config.maxLength) ??
-                nullIfEmpty(config.constraints?.max) ??
-                Math.pow(2, 31) - 1
-            )
+          Validators.maxLength(
+            nullIfEmpty(config.maxLength) ??
+            nullIfEmpty(config.constraints?.max) ??
+            Math.pow(2, 31) - 1
           )
+        )
         : // tslint:disable-next-line:no-unused-expression
-          null;
+        null;
       // Checks if maxlength rule is set to true and apply the rule to the input
       !!config.rules?.minLength || config.constraints?.min
         ? validators.push(
-            Validators.minLength(
-              nullIfEmpty(config.minLength) ??
-                nullIfEmpty(config.constraints?.min) ??
-                1
-            )
+          Validators.minLength(
+            nullIfEmpty(config.minLength) ??
+            nullIfEmpty(config.constraints?.min) ??
+            1
           )
+        )
         : // tslint:disable-next-line:no-unused-expression
-          null;
+        null;
       !!config.rules?.email || !!config.constraints?.email
         ? validators.push(Validators.email)
         : // tslint:disable-next-line:no-unused-expression
-          null;
+        null;
       !!config.rules?.pattern || !!config.constraints?.pattern
         ? validators.push(
-            Validators.pattern(
-              nullIfEmpty(config.pattern) ??
-                nullIfEmpty(config.constraints?.pattern?.fn) ??
-                ''
-            )
+          Validators.pattern(
+            nullIfEmpty(config.pattern) ??
+            nullIfEmpty(config.constraints?.pattern?.fn) ??
+            ''
           )
+        )
         : // tslint:disable-next-line:no-unused-expression
-          null;
+        null;
     }
 
 
@@ -210,32 +188,32 @@ export class ComponentReactiveFormHelpers {
     if (isNumberConfig(config)) {
       config.rules?.min || config.constraints?.min
         ? validators.push(
-            Validators.min(
-              nullIfEmpty(config.min) ??
-                nullIfEmpty(config.constraints?.min) ??
-                -1
-            )
+          Validators.min(
+            nullIfEmpty(config.min) ??
+            nullIfEmpty(config.constraints?.min) ??
+            -1
           )
+        )
         : // tslint:disable-next-line:no-unused-expression
-          null;
+        null;
       // Checks if maxlength rule is set to true and apply the rule to the input
       config.rules?.max || !!config.constraints?.max
         ? validators.push(
-            Validators.max(
-              nullIfEmpty(config.max) ??
-                nullIfEmpty(config.constraints?.max) ??
-                Math.pow(2, 31) - 1
-            )
+          Validators.max(
+            nullIfEmpty(config.max) ??
+            nullIfEmpty(config.constraints?.max) ??
+            Math.pow(2, 31) - 1
           )
+        )
         : // tslint:disable-next-line:no-unused-expression
-          null;
+        null;
     }
 
 
     // Validation rules form date input
     if (isDateConfig(config)) {
 
-      let format: string|((value: unknown) => string) = 'DD/MM/YYYY';
+      let format: string | ((value: unknown) => string) = 'DD/MM/YYYY';
       if ('constraints' in config) {
         const constraint = config.constraints ?? {};
         format = 'format' in constraint ? String(constraint.format ?? 'DD/MM/YYYY') : format;
@@ -246,13 +224,13 @@ export class ComponentReactiveFormHelpers {
       config.rules?.minDate || !!config.constraints?.min
         ? validators.push(CustomValidators.minDate(JSDate.format(nullIfEmpty(config.minDate) ?? nullIfEmpty(config.constraints?.min), 'YYYY-MM-DD'), format))
         : // tslint:disable-next-line:no-unused-expression
-          null;
+        null;
 
       // Checks if maxlength rule is set to true and apply the rule to the input
       config.rules?.maxDate || !!config.constraints?.max
         ? validators.push(CustomValidators.maxDate(JSDate.format(nullIfEmpty(config.maxDate) ?? nullIfEmpty(config.constraints?.max), 'YYYY-MM-DD'), format))
         : // tslint:disable-next-line:no-unused-expression
-          null;
+        null;
     }
 
     // #region add constraint rule
@@ -298,9 +276,7 @@ export class ComponentReactiveFormHelpers {
           (options as InputOptions).map(
             (current: InputOption, index: number) => {
               // Added validation rule to checkbox array
-              (array as FormArray<AbstractControl>).push(
-                builder.control(current.selected)
-              );
+              (array as FormArray<AbstractControl>).push(builder.control(current.selected));
             }
           );
         })
@@ -315,10 +291,7 @@ export class ComponentReactiveFormHelpers {
 
   public static validateFormGroupFields(control: FormGroup | FormArray): void {
     for (const value of Object.values(control.controls)) {
-      if (
-        (value instanceof FormGroup || value instanceof FormArray) &&
-        !value.valid
-      ) {
+      if ((value instanceof FormGroup || value instanceof FormArray) && !value.valid) {
         ComponentReactiveFormHelpers.validateFormGroupFields(value);
       } else {
         ComponentReactiveFormHelpers.markControlAsTouched(value);
@@ -394,10 +367,10 @@ export function createAngularAbstractControl(
 ) {
   return form
     ? ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(
-        builder,
-        [...form?.controlConfigs],
-        requestClient
-      )
+      builder,
+      [...form?.controlConfigs],
+      requestClient
+    )
     : undefined;
 }
 

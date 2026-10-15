@@ -23,6 +23,7 @@ import { BUTTON_DIRECTIVES } from '../buttons';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 import { ModalDirective } from '../modal';
 import { PIPES } from './pipes';
+import { withRefetchObservable } from '../../helpers';
 
 /** @internal */
 type ContextType = {
@@ -62,7 +63,7 @@ export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDes
 
   createView(index: number, formgroup: AbstractControl, triggered: boolean = false) {
     const subject = new Subject<number>();
-    const inputs = [...this.configs];
+    const inputs = withRefetchObservable([...this.configs], formgroup as FormGroup, this.name);
 
     // case a modal component is provided we open the modal and pass required input configuration to it
     if (triggered && this.modal) {
@@ -112,6 +113,7 @@ export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDes
       this.modal.detached = this.detached;
       this.modal.view = this.view;
       this.modal.name = this.name;
+
       if (this.label) {
         this.modal.label = this.label;
       }

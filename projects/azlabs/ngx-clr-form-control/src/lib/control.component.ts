@@ -44,7 +44,6 @@ type Optional<T> = T | null | undefined;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
-  //#region component inputs
   @Input() inline = false;
   @Input() describe = true;
   @Input() hidden: Optional<boolean> = false;
@@ -70,9 +69,7 @@ export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
   @Input() textview!: Optional<TemplateRef<any>>;
   @Input() date: Optional<TemplateRef<any>>;
   @Input() select: Optional<TemplateRef<any>>;
-  //#endregion
-
-  //#region component outputs
+  
   @Output() valueChange = new EventEmitter<InputEventArgs>();
   @Output('item-removed') remove = new EventEmitter<any>();
   @Output('item-selected') selected = new EventEmitter<InputEventArgs>();
@@ -83,12 +80,9 @@ export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
   @Output('keyup') keyup = new EventEmitter<InputEventArgs>();
   @Output('keypress') keypress = new EventEmitter<InputEventArgs>();
   @Output('blur') blur = new EventEmitter<InputEventArgs>();
-  //#endregion
-
-  //#region class properties
+  
   private subscriptions: Subscription[] = [];
   readonly inputTypes = InputTypes;
-  //#endregion
 
   /** @description Creates an instance of Form Control Component */
   constructor(private cdRef: ChangeDetectorRef) {}

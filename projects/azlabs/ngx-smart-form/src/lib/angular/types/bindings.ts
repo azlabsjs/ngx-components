@@ -8,10 +8,8 @@ export type DetachedInputType = [
 
 /** @internal */
 export interface Condition {
+  name: string;
+  config: unknown;
   match: (name: string) => boolean;
-  dependencyChanged: (
-    formgroup: FormGroup,
-    dependency: string,
-    value: unknown
-  ) => [[string, AbstractControl][], [string, AbstractControl][]];
+  dependencyChanged: (formgroup: FormGroup, dependency: string, value: unknown) => [[string, AbstractControl][], [string, AbstractControl][]];
 }

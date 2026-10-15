@@ -95,7 +95,6 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
 
   // local properties
   private observer!: IntersectionObserver;
-  // private search$ = new Subject<[_KeyType, Omit<OptionsConfigType, 'refetch'>, QueryType]>();
   private subscriptions: Subscription[] = [];
   private observable!: Subscribable<{ [k: string]: unknown }>;
   private lastQuery: Optional<{ [prop: string]: unknown }> = null;
@@ -200,7 +199,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   private async fetchAsync(options: OptionsConfigType, params: Record<string, unknown> = {}) {
     const query = typeof this.limit !== 'undefined' && this.limit !== null ? { page: 1, per_page: this.limit, ...params } : { ...params };
     const { refetch, ...rest } = options;
-    const key = rest;
+    const key = {...rest, query };
 
     // query value from cache and dispatch options change if value is in cache
     const cached = this.cache.get(key);
@@ -240,5 +239,8 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     for (const subscripton of this.subscriptions) {
       subscripton.unsubscribe();
     }
+
+
+    console.log('destroying....');
   }
 }

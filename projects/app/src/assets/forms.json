@@ -79,6 +79,26 @@
         ]
       },
       {
+        "formId": 234,
+        "controlName": "coefficient",
+        "controlIndex": 12,
+        "required": true,
+        "disabled": false,
+        "readonly": false,
+        "unique": false,
+        "isRepeatable": false,
+        "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-4",
+        "id": 1290,
+        "label": "Coefficient",
+        "placeholder": "...",
+        "type": "number",
+        "classes": "clr-input",
+        "max": 100,
+        "multiple": 0,
+        "options": [],
+        "children": []
+      },
+      {
         "formId": 220,
         "controlName": "stakeholders",
         "controlIndex": 11,
@@ -222,9 +242,62 @@
             "children": []
           },
           {
+            "formId": 220,
+            "controlName": "gpg_x_2",
+            "controlIndex": 8,
+            "required": true,
+            "disabled": false,
+            "readonly": false,
+            "unique": false,
+            "isRepeatable": false,
+            "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-3",
+            "id": 1249,
+            "label": "Total GPG * 2",
+            "placeholder": "...",
+            "type": "number",
+            "classes": "clr-input",
+            "maxLength": 100,
+            "multiple": 0,
+            "options": [],
+            "children": [],
+            "compute": {
+              "fn": "multiply",
+              "args": [
+                "[stakeholders.*.gpg]",
+                2,
+                "[coefficient]"
+              ]
+            }
+          },
+          {
+            "formId": 234,
+            "controlName": "country",
+            "controlIndex": 9,
+            "required": true,
+            "disabled": false,
+            "readonly": false,
+            "unique": false,
+            "isRepeatable": false,
+            "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-4",
+            "id": 1240,
+            "label": "PAYS",
+            "placeholder": "...",
+            "type": "select",
+            "classes": "clr-input",
+            "selectableModel": "http://localhost:3000/countries",
+            "exists": {
+              "url": "http://localhost:3000/countries",
+              "conditions": []
+            },
+            "keyfield": "id",
+            "valuefield": "name",
+            "groupfield": "id",
+            "requiredIf": "stakeholders.*.gpg:10"
+          },
+          {
             "formId": 234,
             "controlName": "city",
-            "controlIndex": 8,
+            "controlIndex": 10,
             "required": true,
             "disabled": false,
             "readonly": false,
@@ -260,7 +333,8 @@
             },
             "keyfield": "id",
             "valuefield": "name",
-            "groupfield": "id"
+            "groupfield": "id",
+            "requiredIf": "stakeholders.*.gpg:10"
           }
         ]
       },
@@ -401,16 +475,68 @@
             "placeholder": "...",
             "type": "number",
             "classes": "clr-input",
-            "requiredIf": "stakeholders.*.category_id:1",
+            "requiredIf": "stakeholders2.*.category_id:1",
             "max": 100,
             "multiple": 0,
             "options": [],
             "children": []
           },
           {
+            "formId": 220,
+            "controlName": "gpg_x_2",
+            "controlIndex": 8,
+            "required": true,
+            "disabled": false,
+            "readonly": false,
+            "unique": false,
+            "isRepeatable": false,
+            "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-3",
+            "id": 1249,
+            "label": "Total GPG * 2",
+            "placeholder": "...",
+            "type": "number",
+            "classes": "clr-input",
+            "maxLength": 100,
+            "multiple": 0,
+            "options": [],
+            "children": [],
+            "compute": {
+              "fn": "multiply",
+              "args": [
+                "[stakeholders2.*.gpg]",
+                2
+              ]
+            }
+          },
+          {
+            "formId": 234,
+            "controlName": "country",
+            "controlIndex": 9,
+            "required": true,
+            "disabled": false,
+            "readonly": false,
+            "unique": false,
+            "isRepeatable": false,
+            "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-4",
+            "id": 1240,
+            "label": "PAYS",
+            "placeholder": "...",
+            "type": "select",
+            "classes": "clr-input",
+            "selectableModel": "http://localhost:3000/countries",
+            "exists": {
+              "url": "http://localhost:3000/countries",
+              "conditions": []
+            },
+            "keyfield": "id",
+            "valuefield": "name",
+            "groupfield": "id",
+            "requiredIf": "stakeholders2.*.gpg:10"
+          },
+          {
             "formId": 234,
             "controlName": "city",
-            "controlIndex": 8,
+            "controlIndex": 10,
             "required": true,
             "disabled": false,
             "readonly": false,
@@ -435,7 +561,7 @@
               },
               "refetch": [
                 {
-                  "trigger": "stakeholders.*.country",
+                  "trigger": "stakeholders2.*.country",
                   "query": "country_id"
                 }
               ]
@@ -446,7 +572,8 @@
             },
             "keyfield": "id",
             "valuefield": "name",
-            "groupfield": "id"
+            "groupfield": "id",
+            "requiredIf": "stakeholders2.*.gpg:10"
           }
         ]
       },
@@ -624,33 +751,6 @@
           "fn": "multiply",
           "args": [
             "[persons.age]",
-            2
-          ]
-        }
-      },
-      {
-        "formId": 220,
-        "controlName": "total_gpg_x_2",
-        "controlIndex": 13,
-        "required": true,
-        "disabled": false,
-        "readonly": false,
-        "unique": false,
-        "isRepeatable": false,
-        "dynamicControlContainerClass": "clr-col-sm-12 clr-col-md-3",
-        "id": 1249,
-        "label": "Total GPG * 2",
-        "placeholder": "...",
-        "type": "number",
-        "classes": "clr-input",
-        "maxLength": 100,
-        "multiple": 0,
-        "options": [],
-        "children": [],
-        "compute": {
-          "fn": "multiply",
-          "args": [
-            "[stakeholders_total_gpg]",
             2
           ]
         }

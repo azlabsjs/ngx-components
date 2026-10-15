@@ -18,6 +18,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { NgxSmartFormArrayItemComponent } from './array-item.component';
 import { BUTTON_DIRECTIVES } from '../buttons';
+import { withRefetchObservable } from '../../helpers';
 
 // @internal
 type ComponentRefType = RefType<ComponentRef<NgxSmartFormArrayItemComponent>>;
@@ -35,6 +36,7 @@ export class NgxFormArrayOutletComponent implements OnDestroy, ViewRefFactory<Co
   @Input({ alias: 'no-grid-layout' }) nogridlayout = true;
   @Input() template!: TemplateRef<any>;
   @Input({ required: true }) detached!: AbstractControl[];
+  @Input() name!: string;
 
   @Output() removed = new EventEmitter<ComponentRefType>();
 
@@ -47,8 +49,9 @@ export class NgxFormArrayOutletComponent implements OnDestroy, ViewRefFactory<Co
   createView(index: number, input: AbstractControl) {
     const element = this._container?.createComponent(NgxSmartFormArrayItemComponent, { index, injector: this.injector });
 
-    element.instance.controls = [...this.inputs];
-    element.instance.formgroup = input as FormGroup;
+    const formgroup = input as FormGroup;
+    element.instance.controls = withRefetchObservable([...this.inputs], formgroup, this.name);
+    element.instance.formgroup = formgroup;
     element.instance.template = this.template;
     element.instance.autoupload = this.autoupload;
     element.instance.index = index;

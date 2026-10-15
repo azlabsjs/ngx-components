@@ -26,6 +26,7 @@ import {
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
 import { FormConfigType, FormModelState } from './types';
 import { InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
+import { deepEqual } from '@azlabsjs/utilities';
 
 /** @internal */
 const memoizedComputeProperties = memoize(createComputableDepencies);
@@ -33,18 +34,24 @@ const memoizedComputeProperties = memoize(createComputableDepencies);
 /** @internal */
 const aggregations = useSupportedAggregations();
 
+/** @internal */
+type Hook = (control: AbstractControl, name: string, conditions: Condition[]) => void;
+
 @Injectable()
 export class FormModel<T extends FormConfigType> implements OnDestroy {
   _detectChanges$ = new Subject<void>();
   readonly detectChanges$ = this._detectChanges$.asObservable();
 
   private computed: { [prop: string]: ComputedInputValueConfigType<any>; } | null = null;
-  private trackedDependencies: string[] | null = [];
+  private trackedList: { [prop: string]: unknown[] } = {};
+  private _trackedControls = new WeakMap<AbstractControl, [string, ComputedInputValueConfigType, ...any[]]>();
   private subscriptions: Subscription[] = [];
   private value!: { [k: string]: unknown };
 
   // @internal
   private readonly _detached = new Map<string, AbstractControl>();
+  private readonly _weakDetached = new WeakMap<AbstractControl>();
+
   private required: Condition[] = [];
   private disabled: Condition[] = [];
   private group!: FormGroup;
@@ -71,103 +78,90 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
     this.setFormState(config, formgroup);
 
     const { controlConfigs: values } = this.form;
-    this.required = useCondition(
-      'requiredIf',
-      (control, name, parent, path) => {
-        if (parent && !parent.get(name) && control) {
-          parent?.addControl(name, control);
-        }
-        if (this._detached.has(path)) {
-          this._detached.delete(path);
-        }
-      },
-      (control, name, parent, path) => {
-        if (parent && !!parent.get(name)) {
-          parent?.removeControl(name);
-        }
 
-        if (!this._detached.has(path) && control) {
-          this._detached.set(path, control);
-        }
-      },
-      (name) => this._detached.get(name) ?? null,
-    )(values ?? []);
+    this.required = useCondition('requiredIf', (control, name, parent, path) => {
+      if (parent && !parent.get(name) && control) {
+        parent?.addControl(name, control);
+      }
 
-    this.disabled = useCondition(
-      'disabledIf',
-      (control, name) => {
-        if (control instanceof FormArray) {
-          for (let index = 0; index < control.length; index++) {
-            const item = control.at(index);
-            if (item) {
-              item.disable({ emitEvent: true });
-            }
+      this.attach(path, control);
+
+    }, (control, name, parent, path) => {
+      if (parent && !!parent.get(name)) {
+        parent?.removeControl(name);
+      }
+
+      this.detach(path, control);
+
+    }, (name) => this._detached.get(name) ?? null)(values ?? []);
+
+    this.disabled = useCondition('disabledIf', (control, name) => {
+      if (control instanceof FormArray) {
+        for (let index = 0; index < control.length; index++) {
+          const item = control.at(index);
+          if (item) {
+            item.disable({ emitEvent: true });
           }
-        } else {
-          control.disable({ emitEvent: true });
         }
-      },
-      (control) => {
-        if (control instanceof FormArray) {
-          for (let index = 0; index < control.length; index++) {
-            const item = control.at(index);
-            if (item) {
-              item.enable({ emitEvent: true });
-            }
+      } else {
+        control.disable({ emitEvent: true });
+      }
+    }, (control) => {
+      if (control instanceof FormArray) {
+        for (let index = 0; index < control.length; index++) {
+          const item = control.at(index);
+          if (item) {
+            item.enable({ emitEvent: true });
           }
-        } else {
-          control.enable({ emitEvent: true });
         }
-      },
-    )(values ?? []);
+      } else {
+        control.enable({ emitEvent: true });
+      }
+    })(values ?? []);
 
-    this.compute(Object.entries(this.computed ?? {}));
+    this.trackComputedValues(Object.entries(this.computed ?? {}));
 
     if (initialized && this.value) {
       this.setValue(this.value);
     }
 
-    const items = flatteninputs(this.group);
-    this.addConditionHook(items, this.disabled, (control, name, conditions) => {
-      if (conditions.length !== 0) {
-        const subscription = control.valueChanges
-          .pipe(
-            distinctUntilChanged(),
-            tap((value) => {
-              for (const item of conditions) {
-                item.dependencyChanged(this.group, name, value);
-              }
-            }),
-          )
-          .subscribe();
-
-        this.subscriptions.push(subscription);
-      }
+    this.addConditions(flatteninputs(this.group), (control, name, conditions) => {
+      const subscription = control.valueChanges.pipe(
+        distinctUntilChanged((previous, current) => deepEqual(previous, current)),
+        tap((value) => {
+          for (const item of conditions) {
+            item.dependencyChanged(this.group, name, value);
+          }
+        }),
+      ).subscribe();
+      this.subscriptions.push(subscription);
+    }, (control, name, conditions) => {
+      const subscription = control.valueChanges.pipe(
+        distinctUntilChanged((previous, current) => deepEqual(previous, current)),
+        tap((value) => {
+          for (const item of conditions) {
+            item.dependencyChanged(this.group, name, value);
+          }
+        }),
+      ).subscribe();
+      this.subscriptions.push(subscription);
     });
 
-    this.addConditionHook(items, this.required, (control, name, conditions) => {
-      if (conditions.length !== 0) {
-        const subscription = control.valueChanges
-          .pipe(
-            distinctUntilChanged(),
-            tap((value) => {
-              try {
-                this.onValueChange.bind(this).call(null, name, value, conditions)
-              } finally { }
-            }),
-          )
-          .subscribe();
-
-        this.subscriptions.push(subscription);
-      }
-    });
   }
 
   setValue(value: { [k: string]: unknown }): void {
     const { controlConfigs } = this.form;
     setFormValue(this.builder, this.group, value, controlConfigs ?? []);
-    const items = flatteninputs(this.group);
-    this.addConditions(items);
+
+    this.addConditions(flatteninputs(this.group), (control, name, conditions) => {
+      for (const item of conditions) {
+        item.dependencyChanged(this.group, name, control.getRawValue());
+      }
+    }, (control, name, conditions) => {
+      for (const item of conditions) {
+        item.dependencyChanged(this.group, name, control.getRawValue());
+      }
+    });
   }
 
   getValue(): { [k: string]: unknown } {
@@ -215,92 +209,369 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
     this.destroy();
   }
 
-  private addConditions(items: [string, AbstractControl<any, any>][]) {
-    this.addConditionHook(items, this.disabled, (control, name, conditions) => {
-      for (const item of conditions) {
-        item.dependencyChanged(this.group, name, control.value);
-      }
-    });
-
-    this.addConditionHook(items, this.required, (control, name, conditions) => {
-      this.onValueChange.bind(this).call(null, name, control.value, conditions);
-    });
+  private addConditions(items: [string, AbstractControl<any, any>][], disabledHook: Hook, requiredHook: Hook) {
+    this.addConditionHook(items, this.disabled, disabledHook);
+    this.addConditionHook(items, this.required, requiredHook);
   }
 
   private addConditionHook(controls: [string, AbstractControl][], values: Condition[], callback: (control: AbstractControl, name: string, conditions: Condition[]) => void) {
+    if (values.length === 0) {
+      return;
+    }
+
     for (const [name, control] of controls) {
-      const conditions = values.filter((item) => item.match(name));
-      if (conditions.length !== 0) {
-        callback(control, name, conditions);
+      const result = values.filter((item) => item.match(name));
+      if (result.length !== 0) {
+        callback(control, name, result);
       }
     }
   }
 
-  private compute(deps: [string, ComputedInputValueConfigType, ...any][]) {
+  private trackComputedValues(deps: [string, ComputedInputValueConfigType, ...any][]) {
     for (const dep of deps) {
-      const [name, config] = dep;
+      const [key, { name, type, cancel }] = dep;
+      const control = pickcontrol(this.group, key);
 
-      if (this.trackedDependencies?.includes(name)) {
-        continue;
-      }
-
-      const control = pickcontrol(this.group, name);
       if (!control) {
-        this.cancelComputationSubscription(config, name);
+        this.untrackChanges(cancel, key);
         continue;
       }
 
-      this.trackedDependencies?.push(name);
 
-      control.valueChanges
-        .pipe(
-          tap((state) => {
-            for (const value of config.values) {
-              const input = pickcontrol(this.group, value.name);
-              input?.setValue(value.fn(state));
+      if (!name) {
+        this._trackedControls.set(control, dep);
+      }
+
+      if (type === 'list' && control instanceof FormArray && name && name !== '') {
+        control.valueChanges.subscribe((value) => this.setComputedValueOnFormArrayChange(control, value, dep));
+        continue;
+      }
+
+      if (type === 'group' && control instanceof FormGroup && name && name !== '') {
+        const pickedControl = control.get(name)
+        if (pickedControl) {
+          pickedControl.valueChanges.pipe(distinctUntilChanged(), takeUntil(cancel)).subscribe(value => this.setComputedValueOnChange(pickedControl, value, dep));
+        }
+        continue;
+      }
+
+      control.valueChanges.pipe(takeUntil(cancel)).subscribe(value => this.setComputedValueOnChange(control, value, dep));
+    }
+
+  }
+
+  private computeValues(dep: [string, ComputedInputValueConfigType, ...any]) {
+    const [key, { name, type, cancel }] = dep;
+    const control = pickcontrol(this.group, key);
+
+    if (!control) {
+      this.untrackChanges(cancel, key);
+      return;
+    }
+
+    if (type === 'list' && control instanceof FormArray && name && name !== '') {
+      this.setComputedValueOnFormArrayChange(control, control.getRawValue(), dep);
+      return;
+    }
+
+    if (type === 'group' && control instanceof FormGroup && name && name !== '') {
+      const pickedControl = control.get(name)
+      if (pickedControl) {
+        this.setComputedValueOnChange(pickedControl, pickedControl.getRawValue(), dep);
+      }
+      return;
+    }
+
+    this.setComputedValueOnChange(control, control.getRawValue(), dep);
+
+  }
+
+  private setComputedValueOnFormArrayChange(control: FormArray, value: unknown, dep: [string, ComputedInputValueConfigType, ...any]) {
+    if (!Array.isArray(value)) {
+      return;
+    }
+
+    const [key, { name, values }] = dep;
+
+    if (!name) {
+      return;
+    }
+
+    this.listItemChanges(control, key, value, name, (input) => {
+      for (const item of values) {
+        const args = [...item.params];
+        const len = args.length;
+        const inplace = item.inplace;
+        const siblings: [number, string][] = [];
+
+        for (const [pos, n] of inplace) {
+          if (pos >= len) {
+            continue;
+          }
+
+          if (item.path.startsWith(`${key}.`) && `${key}.*.${n}` === n) {
+            // add input to the list of controls being tracked for computation
+            if (input) {
+              this._trackedControls.set(input, dep);
             }
-          }),
-          takeUntil(config.cancel),
-        )
-        .subscribe();
+
+            if (this.isDetached(input)) {
+              args.splice(pos, 1)
+            } else {
+              args[pos] = input.getRawValue();
+            }
+            continue;
+          }
+
+          // push name to the siblings stack
+          if (item.path.startsWith(`${key}.`) && n.startsWith(`${key}.*.`)) {
+            siblings.push([pos, n.substring(`${key}.*.`.length)]);
+            continue;
+          }
+
+          const index = n.indexOf('*');
+          if (index !== -1) {
+            const parentName = n.substring(0, index - 1);
+            const index2 = item.path.indexOf('*');
+
+            if (index2 !== -1 && item.path.substring(0, index2 - 1) === parentName) {
+              siblings.push([pos, n.substring(index + 2)]);
+              continue;
+            }
+
+            // read list values
+
+            console.log('Calling readValues ...', n, item.path, Array.from(this._detached.keys()));
+            args[pos] = this.readValues(this.group, n, index, (item) => this._trackedControls.set(item, dep));
+            continue;
+          }
+
+          const pickedControl = pickcontrol(this.group, n);
+          if (pickedControl) {
+            this._trackedControls.set(pickedControl, dep);
+          }
+
+          if (pickedControl && this.isDetached(pickedControl)) {
+            args.splice(pos, 1)
+          } else {
+            args[pos] = pickedControl?.getRawValue();
+          }
+        }
+
+        this.setComputedValue(this.group, item.path, item.fn, args, siblings, (item) => this._trackedControls.set(item, dep));
+      }
+    });
+  }
+
+  private setComputedValueOnChange(control: AbstractControl, value: unknown, dep: [string, ComputedInputValueConfigType, ...any]) {
+    const [key, { values }] = dep;
+
+    for (const item of values) {
+      const args = [...item.params];
+      const len = args.length;
+      const inplace = item.inplace;
+      const siblings: [number, string][] = [];
+
+      for (const [pos, n] of inplace) {
+        if (pos >= len) {
+          continue;
+        }
+
+        if (key === n) {
+
+          if (control) { this._trackedControls.set(control, dep); }
+
+          if (control && this.isDetached(control)) {
+            args.splice(pos, 1)
+          } else {
+            args[pos] = value;
+          }
+          continue;
+        }
+
+        const index = n.indexOf('*');
+        if (index !== -1) {
+          const parentName = n.substring(0, index - 1);
+          const index2 = item.path.indexOf('*');
+
+          if (index2 !== -1 && item.path.substring(0, index2 - 1) === parentName) {
+            siblings.push([pos, n.substring(index + 2)]);
+            continue;
+          }
+
+          args[pos] = this.readValues(this.group, n, index, (item) => this._trackedControls.set(item, dep));
+          continue;
+        }
+
+        const pickedControl = pickcontrol(this.group, n);
+        if (pickedControl) { this._trackedControls.set(pickedControl, dep); }
+
+        if (pickedControl && this.isDetached(pickedControl)) {
+          args.splice(pos, 1)
+        } else {
+          args[pos] = pickedControl?.getRawValue();
+        }
+      }
+
+      this.setComputedValue(this.group, item.path, item.fn, args, siblings, (item) => this._trackedControls.set(item, dep));
+    }
+
+  }
+
+  private listItemChanges(control: FormArray, name: string, value: unknown[], key: string, callback: (input: AbstractControl) => void) {
+    const previousValues = this.trackedList[name];
+    this.trackedList[name] = value;
+
+    for (let index = 0; index < control.length; index++) {
+      const m = control.at(index);
+      if (!(m instanceof FormGroup)) {
+        continue;
+      }
+
+      const input = m.get(key);
+      if (!input) {
+        continue;
+      }
+
+      const previousVal: { [prop: string]: unknown } | null = previousValues && index < previousValues.length ? previousValues[index] as { [prop: string]: unknown } : null;
+      const namePreviousVal = previousVal && typeof previousVal === 'object' && key in previousVal ? previousVal[key] : null;
+
+      if (namePreviousVal !== input.value) {
+        callback(input);
+      }
     }
   }
 
-  private onValueChange(name: string, value: unknown, conditions: Condition[]) {
-    const { group: fg } = this;
-    for (const item of conditions) {
-      const [visible, invisible] = item.dependencyChanged(fg, name, value);
-      if (this.computed) {
-        for (const [prop] of invisible) {
-          for (const [key, config] of Object.entries(this.computed)) {
-            if (key === prop || prop.startsWith(key)) {
-              const dependency = pickcontrol(this.group, prop);
-              for (const element of config.values) {
-                pickcontrol(this.group, element.name)?.setValue(element.fn(dependency?.value));
-              }
-            }
-          }
+  private readValues(model: FormGroup, name: string, index: number, trackDependency: (control: AbstractControl) => void) {
+    const p1 = name.substring(0, index - 1);
+    const p2 = name.substring(index + 2);
+    const array = pickcontrol(model, p1);
+
+    if (!array) {
+      // TODO: throw error to fail computing value
+      return;
+    }
+
+    if (!(array instanceof FormArray)) {
+      // TODO: throw error to fail computing value
+      return;
+    }
+
+    if (p2.trim() !== '') {
+      const values = [];
+
+      for (let i = 0; i < array.length; i++) {
+        const x = array.at(i);
+
+        if (!(x instanceof FormGroup)) {
+          // TODO: throw error to fail computing value
+          continue;
         }
 
-        const computations: [string, ComputedInputValueConfigType, AbstractControl | null][] = [];
-        for (const [prop] of visible) {
-          for (const [key, config] of Object.entries(this.computed)) {
-            if (key === prop || prop.startsWith(key)) {
-              const dependency = pickcontrol(this.group, prop);
-              this.cancelComputationSubscription(config, key);
-              computations.push([key, config, dependency]);
+        const y = x.get(p2);
+        if (y) {
+          trackDependency(y);
+
+          if (!this.isDetached(y)) {
+            console.log('child control is not detached...', `${p1}.${i}.${p2}`);
+            values.push(y.getRawValue());
+          } else {
+            console.log('child control is detached...', `${p1}.${i}.${p2}`);
+          }
+        }
+        // TODO: throw error to fail computing value
+      }
+
+      console.log('returning...', values);
+      return values;
+
+    }
+    return array.getRawValue();
+  }
+
+  private setComputedValue(model: AbstractControl, key: string, fn: (...args: unknown[]) => unknown, args: unknown[], inplace: [number, string][], trackDependency: (control: AbstractControl) => void) {
+
+
+
+    const index = key.indexOf('*');
+    if (index !== -1) {
+      const name = key.substring(0, index - 1);
+      const array = pickcontrol(model, name);
+
+      if (!(array instanceof FormArray)) {
+        return;
+      }
+
+      const path = key.substring(index + 2);
+      if (path.trim() !== '') {
+        for (let index = 0; index < array.length; index++) {
+          const current = array.at(index);
+
+          if (!(current instanceof FormGroup)) {
+            // TODO: throw error to fail computing value
+            continue;
+          }
+
+          // query and replace the input siblings values
+          for (const [pos, n] of inplace) {
+            const pickedControl = current.get(n);
+            if (pickedControl) { trackDependency(pickedControl); }
+
+            if (pickedControl && this.isDetached(pickedControl)) {
+              args.splice(pos, 1)
+            } else {
+              args[pos] = pickedControl?.getRawValue();
             }
           }
-        }
 
-        for (const [_, config, dependency] of computations) {
-          for (const element of config.values) {
-            pickcontrol(this.group, element.name)?.setValue(element.fn(dependency?.value));
-          }
+          current.get(path)?.setValue(fn(...args));
         }
-        this.compute(computations);
+        return;
+      }
+
+
+      array.setValue(fn(...args) as unknown[]);
+
+      return;
+    }
+
+    const pickedControl = pickcontrol(model, key);
+    if (pickedControl) { trackDependency(pickedControl); }
+    pickedControl?.setValue(fn(...args) as unknown[]);
+  }
+
+  private detach(path: string, model: AbstractControl) {
+    if (!this._weakDetached.has(model)) {
+      this._weakDetached.delete(model);
+    }
+
+    if (!this._detached.has(path) && model) {
+      this._detached.set(path, model);
+
+      if (this._trackedControls.has(model)) {
+        const dep = this._trackedControls.get(model);
+        if (dep) {
+          this.computeValues(dep);
+        }
       }
     }
+  }
+
+  private attach(path: string, model: AbstractControl) {
+    console.log('attaching...', path);
+    this._detached.delete(path);
+    this._weakDetached.delete(model);
+
+    if (this._trackedControls.has(model)) {
+      const dep = this._trackedControls.get(model);
+      if (dep) {
+        this.computeValues(dep);
+      }
+    }
+  }
+
+  private isDetached(model: AbstractControl) {
+    return this._weakDetached.has(model);
   }
 
   private setFormState(config: T, formgroup: FormGroup) {
@@ -312,13 +583,8 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
     this._detectChanges$.next();
   }
 
-  private cancelComputationSubscription(config: ComputedInputValueConfigType, name: string) {
-    config.cancel.next();
-
-    if (this.trackedDependencies) {
-      const index = this.trackedDependencies.indexOf(name);
-      this.trackedDependencies.splice(index, 1);
-    }
+  private untrackChanges(cancel: ComputedInputValueConfigType['cancel'], name: string) {
+    cancel.next();
   }
 
   private unsubscribe() {

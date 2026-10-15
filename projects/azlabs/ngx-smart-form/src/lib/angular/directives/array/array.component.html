@@ -1,5 +1,5 @@
 <ngx-form-array-outlet [class.hidden]="hidden" (removed)="removed($event)" [inputs]="inputs" [auto-upload]="autoupload"
-  [template]="template" [no-grid-layout]="noGridLayout" [detached]="detached" *ngIf="!(cssClass | istable)" #container>
+  [template]="template" [no-grid-layout]="noGridLayout" [detached]="detached" *ngIf="!(cssClass | istable)" [name]="name" #container>
   <section description>
     <ng-container *ngIf="tabledescription">
       <ng-container *ngTemplateOutlet="tabledescription; context: {$implicit: name, name, description}"></ng-container>

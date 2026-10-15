@@ -89,9 +89,9 @@ export class NgxSmartFormArrayComponent implements OnDestroy, AfterContentInit {
 
   add(_: Event) {
     const g = this.builder.group(this.inputs);
-    const clone = cloneAbstractControl(g) as FormGroup;
+    // const clone = cloneAbstractControl(g) as FormGroup;
     this.triggered = true;
-    this.array.push(clone);
+    this.array.push(g);
   }
 
   removed<T>(ref: RefType<T>) {
@@ -126,15 +126,17 @@ export class NgxSmartFormArrayComponent implements OnDestroy, AfterContentInit {
   private update(array: FormArray) {
     const length = array.controls.length;
     const max = this.refs.length - 1;
-    const refs = []; //# if supported by javascript create a fixed size array
+    const refs = [];
 
     for (let i = 0; i < length; i++) {
       const element = array.at(i);
+      
       if (i > max) {
         refs.push(this.viewFactory.createView(i, element, this.triggered));
         continue;
       }
-      this.viewFactory.updateView(this.refs[i], array.at(i));
+
+      this.viewFactory.updateView(this.refs[i], element);
     }
 
     if (refs.length > 0) {

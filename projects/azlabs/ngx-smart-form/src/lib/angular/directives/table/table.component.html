@@ -20,7 +20,7 @@
   <tr>
     <td *ngFor="let input of inputs | excludeinput: ['html', 'control_group', 'hidden']" class="bottom text-ellipsis"
       [ngClass]="{error: formgroup.get(input.name)?.touched && formgroup.get(input.name)?.errors && (formgroup.get(input.name)?.errors | keys).length > 0}">
-      <ng-container *ngIf="formgroup.get(input.name) as control">
+        <ng-container *ngIf="formgroup.get(input.name) as control">
         <ng-container *ngTemplateOutlet="
             view;
             context: {
