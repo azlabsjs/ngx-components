@@ -15,7 +15,6 @@ import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { distinctUntilChanged, filter, takeUntil, tap } from 'rxjs/operators';
-import { cloneAbstractControl } from '../../helpers';
 import { AngularReactiveFormBuilderBridge } from '../../types';
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
 import { CommonModule } from '@angular/common';
@@ -89,7 +88,6 @@ export class NgxSmartFormArrayComponent implements OnDestroy, AfterContentInit {
 
   add(_: Event) {
     const g = this.builder.group(this.inputs);
-    // const clone = cloneAbstractControl(g) as FormGroup;
     this.triggered = true;
     this.array.push(g);
   }

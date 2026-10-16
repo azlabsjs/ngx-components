@@ -239,8 +239,5 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     for (const subscripton of this.subscriptions) {
       subscripton.unsubscribe();
     }
-
-
-    console.log('destroying....');
   }
 }

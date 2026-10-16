@@ -14,11 +14,7 @@ import {
   OptionsConfig,
 } from '@azlabsjs/smart-form-core';
 import { deepEqual, isNumber } from '@azlabsjs/utilities';
-import {
-  AngularReactiveFormBuilderBridge,
-  Condition,
-  ComputedInputValueConfigType,
-} from '../types';
+import { AngularReactiveFormBuilderBridge, Condition, ComputedInputValueConfigType } from '../types';
 import { cloneAbstractControl } from './clone';
 import { Observable, Subject, Subscription, tap } from 'rxjs';
 import { ClauseFn, CONDITION_PROPERTIES, ConditionProperty } from './types';
@@ -812,23 +808,19 @@ export function pickcontrol(model: AbstractControl | null, key: string, characte
 /** @internal */
 export function useSupportedAggregations() {
   function avg(...args: unknown[]) {
+    args = args.flat();
     if (args.length === 0) {
       return 0;
     }
-
-    args = args.flat();
     return sum(...args) / args.length;
   }
 
   function sum(...args: unknown[]) {
-      return args
+    return args
       .flat()
       .map((v) => Number(v))
       .filter((v) => !isNaN(v))
-      .reduce((carry, curr) => {
-        carry += curr;
-        return carry;
-      }, 0);
+      .reduce((carry, curr) => carry + curr, 0);
   }
 
   function count(...args: unknown[]) {
@@ -848,23 +840,23 @@ export function useSupportedAggregations() {
   }
 
   function multiply(...args: unknown[]) {
+    args = args.flat();
     if (args.length === 0) {
       return 0;
     }
-
     return args
-      .flat()
       .map((v) => Number(v))
       .map((v) => (!isNaN(v) ? v : 0))
       .reduce((carry, curr) => carry * curr, 1);
   }
 
   function divide(...args: unknown[]) {
+    args = args.flat();
     if (args.length === 0) {
       return 0;
     }
+
     return args
-      .flat()
       .slice(1)
       .map((v) => Number(v))
       .map((v) => (!isNaN(v) ? v : 1))
@@ -879,11 +871,11 @@ export function useSupportedAggregations() {
   }
 
   function substract(...args: unknown[]) {
+    args = args.flat();
     if (args.length === 0) {
       return 0;
     }
     return args
-      .flat()
       .slice(1)
       .map((v) => Number(v))
       .filter((v) => !isNaN(v))

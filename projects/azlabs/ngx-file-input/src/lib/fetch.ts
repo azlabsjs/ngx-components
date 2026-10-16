@@ -31,9 +31,7 @@ function createfilename(extension?: string) {
 }
 
 /** creates a closure object which uses fecth api to query or load file from url */
-export function createWithFetchAPI(
-  logger: (message: unknown, ...options: any[]) => void = console.error
-) {
+export function createWithFetchAPI(logger: (message: unknown, ...options: any[]) => void = console.error) {
   return async (url: string) => {
     try {
       const response = await fetch(url, {

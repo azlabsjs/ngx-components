@@ -43,7 +43,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
   readonly detectChanges$ = this._detectChanges$.asObservable();
 
   private computed: { [prop: string]: ComputedInputValueConfigType<any>; } | null = null;
-  private trackedList: { [prop: string]: unknown[] } = {};
+  private _trackedArrayValues: { [prop: string]: unknown[] } = {};
   private _trackedControls = new WeakMap<AbstractControl, [string, ComputedInputValueConfigType, ...any[]]>();
   private subscriptions: Subscription[] = [];
   private value!: { [k: string]: unknown };
@@ -85,14 +85,12 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
       }
 
       this.attach(path, control);
-
     }, (control, name, parent, path) => {
       if (parent && !!parent.get(name)) {
         parent?.removeControl(name);
       }
 
       this.detach(path, control);
-
     }, (name) => this._detached.get(name) ?? null)(values ?? []);
 
     this.disabled = useCondition('disabledIf', (control, name) => {
@@ -121,10 +119,6 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
 
     this.trackComputedValues(Object.entries(this.computed ?? {}));
 
-    if (initialized && this.value) {
-      this.setValue(this.value);
-    }
-
     this.addConditions(flatteninputs(this.group), (control, name, conditions) => {
       const subscription = control.valueChanges.pipe(
         distinctUntilChanged((previous, current) => deepEqual(previous, current)),
@@ -147,6 +141,9 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
       this.subscriptions.push(subscription);
     });
 
+    if (initialized && this.value) {
+      this.setValue(this.value);
+    }
   }
 
   setValue(value: { [k: string]: unknown }): void {
@@ -239,7 +236,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
 
 
       if (!name) {
-        this._trackedControls.set(control, dep);
+        this.trackChanges(control, dep);
       }
 
       if (type === 'list' && control instanceof FormArray && name && name !== '') {
@@ -297,7 +294,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
       return;
     }
 
-    this.listItemChanges(control, key, value, name, (input) => {
+    this.listItemChanges(control, key, value, name, (inputs, previous, current) => {
       for (const item of values) {
         const args = [...item.params];
         const len = args.length;
@@ -309,23 +306,27 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
             continue;
           }
 
-          if (item.path.startsWith(`${key}.`) && `${key}.*.${n}` === n) {
-            // add input to the list of controls being tracked for computation
-            if (input) {
-              this._trackedControls.set(input, dep);
-            }
+          for (const input of inputs) {
+            this.trackChanges(input, dep);
+          }
 
-            if (this.isDetached(input)) {
-              args.splice(pos, 1)
-            } else {
-              args[pos] = input.getRawValue();
+          if (item.path === n) {
+            // add input to the list of controls being tracked for computation
+            const values = [];
+            for (const input of inputs) {
+              if (input && !this.isDetached(input)) {
+                values.push(input.getRawValue());
+              }
             }
+            args[pos] = values;
+
             continue;
           }
 
           // push name to the siblings stack
           if (item.path.startsWith(`${key}.`) && n.startsWith(`${key}.*.`)) {
             siblings.push([pos, n.substring(`${key}.*.`.length)]);
+
             continue;
           }
 
@@ -341,15 +342,12 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
 
             // read list values
 
-            console.log('Calling readValues ...', n, item.path, Array.from(this._detached.keys()));
-            args[pos] = this.readValues(this.group, n, index, (item) => this._trackedControls.set(item, dep));
+            args[pos] = this.readValues(this.group, n, index, (item) => this.trackChanges(item, dep));
             continue;
           }
 
           const pickedControl = pickcontrol(this.group, n);
-          if (pickedControl) {
-            this._trackedControls.set(pickedControl, dep);
-          }
+          this.trackChanges(pickedControl, dep);
 
           if (pickedControl && this.isDetached(pickedControl)) {
             args.splice(pos, 1)
@@ -358,7 +356,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
           }
         }
 
-        this.setComputedValue(this.group, item.path, item.fn, args, siblings, (item) => this._trackedControls.set(item, dep));
+        this.setComputedValue(this.group, item.path, item.fn, args, siblings, (item) => this.trackChanges(item, dep));
       }
     });
   }
@@ -379,7 +377,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
 
         if (key === n) {
 
-          if (control) { this._trackedControls.set(control, dep); }
+          this.trackChanges(control, dep);
 
           if (control && this.isDetached(control)) {
             args.splice(pos, 1)
@@ -399,13 +397,12 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
             continue;
           }
 
-          args[pos] = this.readValues(this.group, n, index, (item) => this._trackedControls.set(item, dep));
+          args[pos] = this.readValues(this.group, n, index, (item) => this.trackChanges(item, dep));
           continue;
         }
 
         const pickedControl = pickcontrol(this.group, n);
-        if (pickedControl) { this._trackedControls.set(pickedControl, dep); }
-
+        this.trackChanges(pickedControl, dep);
         if (pickedControl && this.isDetached(pickedControl)) {
           args.splice(pos, 1)
         } else {
@@ -413,14 +410,16 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
         }
       }
 
-      this.setComputedValue(this.group, item.path, item.fn, args, siblings, (item) => this._trackedControls.set(item, dep));
+      this.setComputedValue(this.group, item.path, item.fn, args, siblings, (item) => this.trackChanges(item, dep));
     }
 
   }
 
-  private listItemChanges(control: FormArray, name: string, value: unknown[], key: string, callback: (input: AbstractControl) => void) {
-    const previousValues = this.trackedList[name];
-    this.trackedList[name] = value;
+  private listItemChanges(control: FormArray, name: string, value: unknown[], key: string, callback: (inputs: AbstractControl[], previous: unknown, current: unknown) => void) {
+    const at0 = this._trackedArrayValues[name];
+    const previousValues = Array.isArray(at0) ? [...at0] : [];
+    const currentValues = Array.isArray(value) ? value : [];
+    const trackedControls: AbstractControl[] = [];
 
     for (let index = 0; index < control.length; index++) {
       const m = control.at(index);
@@ -429,20 +428,18 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
       }
 
       const input = m.get(key);
-      if (!input) {
-        continue;
+      if (input) {
+        trackedControls.push(input);
       }
+    }
 
-      const previousVal: { [prop: string]: unknown } | null = previousValues && index < previousValues.length ? previousValues[index] as { [prop: string]: unknown } : null;
-      const namePreviousVal = previousVal && typeof previousVal === 'object' && key in previousVal ? previousVal[key] : null;
-
-      if (namePreviousVal !== input.value) {
-        callback(input);
-      }
+    if (!deepEqual(previousValues, currentValues)) {
+      this._trackedArrayValues[name] = currentValues;
+      callback(trackedControls, previousValues, currentValues);
     }
   }
 
-  private readValues(model: FormGroup, name: string, index: number, trackDependency: (control: AbstractControl) => void) {
+  private readValues(model: FormGroup, name: string, index: number, trackDependency: (control: AbstractControl | undefined | null) => void) {
     const p1 = name.substring(0, index - 1);
     const p2 = name.substring(index + 2);
     const array = pickcontrol(model, p1);
@@ -469,30 +466,23 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
         }
 
         const y = x.get(p2);
-        if (y) {
-          trackDependency(y);
+        trackDependency(y);
 
+        if (y) {
           if (!this.isDetached(y)) {
-            console.log('child control is not detached...', `${p1}.${i}.${p2}`);
             values.push(y.getRawValue());
-          } else {
-            console.log('child control is detached...', `${p1}.${i}.${p2}`);
           }
         }
         // TODO: throw error to fail computing value
       }
 
-      console.log('returning...', values);
       return values;
 
     }
     return array.getRawValue();
   }
 
-  private setComputedValue(model: AbstractControl, key: string, fn: (...args: unknown[]) => unknown, args: unknown[], inplace: [number, string][], trackDependency: (control: AbstractControl) => void) {
-
-
-
+  private setComputedValue(model: AbstractControl, key: string, fn: (...args: unknown[]) => unknown, args: unknown[], inplace: [number, string][], trackDependency: (control: AbstractControl | null | undefined) => void) {
     const index = key.indexOf('*');
     if (index !== -1) {
       const name = key.substring(0, index - 1);
@@ -508,15 +498,13 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
           const current = array.at(index);
 
           if (!(current instanceof FormGroup)) {
-            // TODO: throw error to fail computing value
             continue;
           }
 
           // query and replace the input siblings values
           for (const [pos, n] of inplace) {
             const pickedControl = current.get(n);
-            if (pickedControl) { trackDependency(pickedControl); }
-
+            trackDependency(pickedControl);
             if (pickedControl && this.isDetached(pickedControl)) {
               args.splice(pos, 1)
             } else {
@@ -536,7 +524,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
     }
 
     const pickedControl = pickcontrol(model, key);
-    if (pickedControl) { trackDependency(pickedControl); }
+    trackDependency(pickedControl);
     pickedControl?.setValue(fn(...args) as unknown[]);
   }
 
@@ -547,31 +535,41 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
 
     if (!this._detached.has(path) && model) {
       this._detached.set(path, model);
+      model.setValue(null);
+      model.setErrors(null);
+      model.updateValueAndValidity({ emitEvent: true });
 
       if (this._trackedControls.has(model)) {
         const dep = this._trackedControls.get(model);
         if (dep) {
-          this.computeValues(dep);
+          setTimeout(() => this.computeValues(dep), 300);
         }
       }
     }
+
   }
 
   private attach(path: string, model: AbstractControl) {
-    console.log('attaching...', path);
     this._detached.delete(path);
     this._weakDetached.delete(model);
 
     if (this._trackedControls.has(model)) {
       const dep = this._trackedControls.get(model);
       if (dep) {
-        this.computeValues(dep);
+        setTimeout(() => this.computeValues(dep), 300);
       }
     }
   }
 
   private isDetached(model: AbstractControl) {
     return this._weakDetached.has(model);
+  }
+
+
+  private trackChanges(input: AbstractControl | null | undefined, dep: [string, ComputedInputValueConfigType, ...any]) {
+    if (input && !this._trackedControls.has(input)) {
+      this._trackedControls.set(input, dep);
+    }
   }
 
   private setFormState(config: T, formgroup: FormGroup) {

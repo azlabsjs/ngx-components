@@ -15,7 +15,6 @@ import { AbstractControl, FormArray } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { distinctUntilChanged, takeUntil, tap } from 'rxjs/operators';
-import { cloneAbstractControl } from '../../helpers';
 import { AngularReactiveFormBuilderBridge } from '../../types';
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
 import { CommonModule } from '@angular/common';
@@ -82,7 +81,7 @@ export class NgxSmartFormControlArrayComponent implements AfterContentInit, OnDe
 
   add(event: Event) {
     const input = this.builder.control(this.config);
-    this.array.push(cloneAbstractControl(input));
+    this.array.push(input);
     event.preventDefault();
   }
 

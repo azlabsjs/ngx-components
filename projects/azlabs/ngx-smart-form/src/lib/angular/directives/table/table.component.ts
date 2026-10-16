@@ -7,7 +7,6 @@ import {
   EventEmitter,
   Input,
   OnDestroy,
-  Optional as ngOptional,
   Output,
   TemplateRef,
   ViewChild,
@@ -80,10 +79,7 @@ export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDes
         subject.next(ref.index);
       },
       destroy: subject.asObservable(),
-    }, {
-      index,
-      injector: this.injector
-    });
+    }, { index, injector: this.injector });
 
     const ref: RefType<EmbeddedViewRef<any>> = { index, element, destroy: () => element.destroy() };
 
