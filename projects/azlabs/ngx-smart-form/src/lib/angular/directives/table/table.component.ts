@@ -50,6 +50,7 @@ export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDes
   @Input() title!: string;
   @Input() modal!: ModalDirective;
   @Input() name!: string;
+  @Input({ alias: 'edit-mode' }) editmode: 'modal' | 'inline' | 'both' | 'none' = 'both'; // edit-mode-modal
 
   @Output() removed = new EventEmitter<RefType<EmbeddedViewRef<any>>>();
 
@@ -59,7 +60,7 @@ export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDes
   private subscriptions: Subscription[] = [];
 
   constructor(private injector: Injector, @Optional() private cdref: ChangeDetectorRef | null) { }
-
+  
   createView(index: number, formgroup: AbstractControl, triggered: boolean = false) {
     const subject = new Subject<number>();
     const inputs = withRefetchObservable([...this.configs], formgroup as FormGroup, this.name);
@@ -100,7 +101,12 @@ export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDes
     this._container?.clear();
   }
 
-  showModalView(inputs: InputConfigInterface[], formgroup: AbstractControl) {
+  showModalView(inputs: InputConfigInterface[], formgroup: AbstractControl, disabled: boolean = false) {
+    
+    if (!disabled && formgroup.disabled) {
+      formgroup.enable();
+    }
+
     if (this.modal) {
       this.modal.formgroup = formgroup as FormGroup;
       this.modal.inputs = inputs;
@@ -114,8 +120,15 @@ export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDes
         this.modal.label = this.label;
       }
 
-      this.modal.stateChanged();
       this.modal.open();
+
+      const subscription = this.modal.closed.subscribe(() => {
+        if (this.editmode === 'modal' || this.editmode === 'none' && formgroup.enabled) {
+          formgroup.disable();  
+        }
+      });
+
+      this.subscriptions.push(subscription);
     }
   }
 

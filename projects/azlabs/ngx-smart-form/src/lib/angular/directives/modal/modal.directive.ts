@@ -27,26 +27,41 @@ export class ModalDirective {
   @Input() view!: TemplateRef<any>;
   @Input() label!: TemplateRef<any>;
 
+  /** @deprecated */
   @Output() stateChange = new EventEmitter<void>();
-  @Output() closeChange = new EventEmitter<void>();
-  @Output() openChange = new EventEmitter<void>();
+  /** @deprecated listen for close event intead */
+  @Output() closeChange = new EventEmitter<boolean>();
+  @Output() openChange = new EventEmitter<boolean>();
   @Output() sizeChange = new EventEmitter<SizeType>();
+  @Output() closed = new EventEmitter<void>();
+  @Output() opened = new EventEmitter<void>();
 
   close() {
     this.closeChange.emit();
   }
 
   open() {
-    this.openChange.emit();
+    this.openChange.emit(true);
+    this.opened.emit();
+  }
+
+  openChanged(value: boolean) {
+    if(value === true) {
+      this.opened.emit();
+    } else {
+      this.closed.emit();
+    }
   }
 
   resize(size: SizeType) {
     this.sizeChange.emit(size);
   }
 
+  /** @deprecated */
   stateChanged() {
     this.stateChange.emit();
   }
+
 
   validate() {
     ComponentReactiveFormHelpers.validateFormGroupFields(this.formgroup);

@@ -128,10 +128,10 @@ export class ModalComponent implements OnChanges {
   @ContentChild('template') template!: Optional<TemplateRef<unknown>>;
 
   @HostListener('document:keydown.escape', ['$event'])
-  onEscapeKeyPress(event: Event) {
+  onEscapeKeyPress(_: Event) {
     if (this._state.opened) {
       this.close();
-      event?.stopPropagation();
+      // event?.stopPropagation();
     }
   }
 
@@ -179,10 +179,9 @@ export class ModalComponent implements OnChanges {
     }
   }
 
-  onClose(event?: Event) {
+  onClose() {
     this.setState({ opened: false });
     this.openedChange.emit(false);
-    event?.stopPropagation();
   }
 
   setProperty(name: keyof typeof this, value: any) {

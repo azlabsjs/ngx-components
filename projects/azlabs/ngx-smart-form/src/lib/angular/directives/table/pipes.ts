@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { PIPES as _PIPES } from '../../pipes';
 import { InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
 import { JSObject } from '@azlabsjs/js-object';
+import { FormGroup } from '@angular/forms';
 
 @Pipe({
   name: 'withconfigvalue',
@@ -35,12 +36,43 @@ export class AppendCssClass implements PipeTransform {
   pure: true,
 })
 export class ExcludeInput implements PipeTransform {
-  
+
   transform(value: InputConfigInterface[], name: string | string[]) {
     const names = Array.isArray(name) ? name : [name];
     return [...value].filter(x => names.indexOf(x.type) === -1);
   }
 }
 
-// exported standalone pipes
-export const PIPES = [WithConfigValuePipe, AppendCssClass, ExcludeInput, ..._PIPES] as const;
+
+@Pipe({
+  name: 'readonlyinput',
+  standalone: true,
+  pure: true,
+})
+export class ReadOnlyInput implements PipeTransform {
+  transform(input: InputConfigInterface) {
+    let { constraints } = input;
+    constraints = constraints ?? {};
+    return { ...input, disabled: true, constraints: { ...constraints, disabled: true } } as InputConfigInterface;
+  }
+}
+
+
+@Pipe({
+  name: 'disableform',
+  standalone: true,
+  pure: true,
+})
+export class DisableFormGroup implements PipeTransform {
+  transform(formgroup: FormGroup) {
+    if (!formgroup) {
+      return;
+    }
+
+    formgroup.disable()
+    return formgroup;
+  }
+
+}
+
+export const PIPES = [WithConfigValuePipe, AppendCssClass, ExcludeInput, ReadOnlyInput, DisableFormGroup, ..._PIPES] as const;

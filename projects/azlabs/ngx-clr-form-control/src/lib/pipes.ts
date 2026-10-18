@@ -28,5 +28,17 @@ export class RequiredPipe implements PipeTransform {
   }
 }
 
-// exported standalone pipes
-export const PIPES = [AcceptFilePipe, RequiredPipe] as const;
+
+@Pipe({
+  standalone: true,
+  pure: true,
+  name: 'isdisabled'
+})
+export class IsDisabled implements PipeTransform {
+  transform(value: InputConfigInterface) {
+    return value.disabled || ( !!value.constraints && 'disabled' in value.constraints && !!value.constraints.disabled);
+  }
+
+}
+
+export const PIPES = [AcceptFilePipe, RequiredPipe, IsDisabled] as const;

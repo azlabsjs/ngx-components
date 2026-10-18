@@ -102,9 +102,11 @@
 .flex {
   display: flex;
 }
+
 .flex-row {
   flex-direction: row;
 }
+
 .justify-between {
   justify-content: space-between;
 } 
@@ -141,4 +143,10 @@
 
 .z-3 {
   z-index: 3;
+}
+
+
+.table-pencil {
+  width: var(--ngx-table-pencil-width, 24px);
+  height: var(--ngx-table-pencil-height, 24px);
 }

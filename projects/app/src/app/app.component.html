@@ -39,7 +39,7 @@
         </div>
       </ng-template>
 
-      <ngx-modal #modal (openChange)="onOpenChange(modal)" ngxformmodal
+      <ngx-modal #modal (openedChange)="formmodal.openChanged($event)" (openChange)="onOpenChange(modal)" ngxformmodal
         #formmodal="formmodal">
         <div class="ngx-modal-body">
           <ngx-form-ui *ngIf="formmodal.formgroup" [no-grid-layout]="false" [autoupload]="true"

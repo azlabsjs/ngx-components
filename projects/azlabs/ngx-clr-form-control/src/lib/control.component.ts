@@ -84,7 +84,7 @@ export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
   private subscriptions: Subscription[] = [];
   readonly inputTypes = InputTypes;
 
-  /** @description Creates an instance of Form Control Component */
+  /** @description creates an instance of Form Control Component */
   constructor(private cdRef: ChangeDetectorRef) {}
 
   ngAfterContentInit() {

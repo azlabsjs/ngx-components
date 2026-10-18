@@ -113,7 +113,7 @@
         "placeholder": "...",
         "requiredIf": "category_id:1",
         "type": "control_group",
-        "classes": "controls-header table",
+        "classes": "controls-header table table-edit-mode-modal",
         "multiple": 0,
         "options": [],
         "children": [
