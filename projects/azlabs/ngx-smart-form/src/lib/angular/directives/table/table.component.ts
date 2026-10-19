@@ -17,21 +17,15 @@ import {
 import { RefType, ViewRefFactory } from '../types';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { BUTTON_DIRECTIVES } from '../buttons';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 import { ModalDirective } from '../modal';
 import { PIPES } from './pipes';
 import { withRefetchObservable } from '../../helpers';
+import { ContextType } from './types';
 
-/** @internal */
-type ContextType = {
-  formgroup: AbstractControl;
-  autoupload: boolean;
-  inputs: InputConfigInterface[];
-  remove: (event: Event) => void;
-  destroy: Observable<number>;
-};
+
 
 @Component({
   standalone: true,
@@ -76,7 +70,8 @@ export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDes
       inputs,
       remove: (e: Event) => {
         e?.preventDefault();
-        ref?.destroy();
+        if (!ref) return;
+        ref.destroy();
         subject.next(ref.index);
       },
       destroy: subject.asObservable(),
