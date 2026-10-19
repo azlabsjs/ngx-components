@@ -22,15 +22,9 @@ import {
   SimpleChanges,
   TemplateRef,
 } from '@angular/core';
-import { Optional, OutletConfig, SizeType } from './types';
+import { Optional, OutletConfig, SizeType, StateType } from './types';
 import { PIPES } from './pipes';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
-
-/** @internal */
-type StateType = {
-  opened: boolean;
-  size: SizeType;
-};
 
 @Component({
   imports: [CommonModule, ...PIPES, COMMON_PIPES],
@@ -131,12 +125,11 @@ export class ModalComponent implements OnChanges {
   onEscapeKeyPress(_: Event) {
     if (this._state.opened) {
       this.close();
-      // event?.stopPropagation();
     }
   }
 
-  // class constructor
   constructor(private renderer: Renderer2, private _ref: ChangeDetectorRef | null, @Inject(DOCUMENT) private document: Document | null) { }
+
 
   ngOnChanges(changes: SimpleChanges): void {
     const state = (Object.keys(this._state) as (keyof StateType)[]).reduce(
@@ -154,9 +147,7 @@ export class ModalComponent implements OnChanges {
   }
 
   /** control or change component local state object */
-  private setState(
-    _partial: Partial<StateType> | ((_state: StateType) => StateType)
-  ) {
+  private setState(_partial: Partial<StateType> | ((_state: StateType) => StateType)) {
     if (typeof _partial === 'function' && _partial !== null) {
       this._state = _partial({ ...this.state });
     } else {

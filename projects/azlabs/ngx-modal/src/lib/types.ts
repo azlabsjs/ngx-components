@@ -27,3 +27,9 @@ export type OutletConfig = {
   injector?: Injector;
   content?: any[][];
 };
+
+/** @internal */
+export type StateType = {
+  opened: boolean;
+  size: SizeType;
+};
