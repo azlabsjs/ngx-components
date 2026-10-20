@@ -733,8 +733,7 @@ export function createFormConfig(
                 description: 'description',
                 name: 'beneficiaries',
                 isRepeatable: true,
-                // classes: 'table table-edit-mode-modal',
-                classes: 'control_group',
+                classes: 'table table-edit-mode-modal',
                 children: beneficiary(photo_documents_url, identity_documents_url, mariage_certificates_url, school_certificates_url, upload_url, countries_url, subdivisions_url, agences_api_url, card_delivery_sites_api_url),
                 constraints: {} // requiredIf: [{ name: 'show_beneficiaries', values: [1] }, { name: 'has_beneficiaries', values: [1] }]
             } as InputGroup,
@@ -743,8 +742,7 @@ export function createFormConfig(
                 description: 'description',
                 name: 'unupdated_beneficiaries',
                 isRepeatable: true,
-                // classes: 'table table-edit-mode-modal',
-                classes: 'control_group',
+                classes: 'table table-edit-mode-modal',
                 children: _unupdatedBeneficiaries(upload_url),
                 constraints: {} // requiredIf: [{ name: 'show_beneficiaries', values: [1] }, { name: 'has_beneficiaries', values: [1] }]
             } as InputGroup,

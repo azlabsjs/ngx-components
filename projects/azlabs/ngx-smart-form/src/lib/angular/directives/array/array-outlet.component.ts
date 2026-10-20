@@ -157,11 +157,10 @@ export class NgxFormArrayOutletComponent implements OnDestroy, ViewRefFactory<Co
     element.instance.index = index;
     element.instance.nogridlayout = this.nogridlayout;
     element.instance.detached = this.detached ?? [];
-    element.instance.label = this._label;
-    element.instance.addref = this._addref;
+    element.instance.label = this.label;
+    element.instance.addref = this.addref;
 
     const ref: ComponentRefType = { index, element, destroy: () => element.destroy() };
-
     element.instance.componentDestroyer
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {

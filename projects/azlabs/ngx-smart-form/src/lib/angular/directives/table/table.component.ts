@@ -15,7 +15,7 @@ import {
   Optional as ngOptional,
 } from '@angular/core';
 import { RefType, ViewRefFactory } from '../types';
-import { AbstractControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject, Subscription } from 'rxjs';
 import { BUTTON_DIRECTIVES } from '../buttons';
@@ -172,22 +172,26 @@ export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDes
 
     if (formgroup.disabled) {
       formgroup.enable();
+      
+      if (formgroup instanceof FormGroup) {
+        this.disableControls(formgroup, inputs);
+      }
     }
 
     if (this.modal) {
       this.modal.formgroup = formgroup as FormGroup;
       this.modal.inputs = inputs;
-      this.modal.autoupload = this._autoupload;
-      this.modal.title = this._title;
-      this.modal.detached = this._detached;
-      this.modal.name = this._name;
+      this.modal.autoupload = this.autoupload;
+      this.modal.title = this.title;
+      this.modal.detached = this.detached;
+      this.modal.name = this.name;
 
-      if (this._view) {
-        this.modal.view = this._view;
+      if (this.view) {
+        this.modal.view = this.view;
       }
 
-      if (this._label) {
-        this.modal.label = this._label;
+      if (this.label) {
+        this.modal.label = this.label;
       }
 
       this.modal.open();
@@ -205,6 +209,36 @@ export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDes
   ngOnDestroy(): void {
     for (const subscription of this.subscriptions) {
       subscription?.unsubscribe();
+    }
+  }
+
+  private disableControls(formgroup: FormGroup, inputs: InputConfigInterface[]) {
+
+    for (const input of inputs) {
+      if (input.disabled || ('constraints' in input && input.constraints && 'disabled' in input.constraints && Boolean(input.constraints['disabled']))) {
+        const current = formgroup.get(input.name);
+
+        if (!current) {
+          continue;
+        }
+
+        if (current instanceof FormGroup && 'children' in input && Array.isArray(input.children)) {
+          this.disableControls(current, input.children);
+          continue;
+        }
+
+        if (current instanceof FormArray && input.isRepeatable && 'children' in input && Array.isArray(input.children)) {
+          for (let index = 0; index < current.length; index++) {
+            const element = current.at(index);
+            if (element && element instanceof FormGroup) {
+              this.disableControls(element, input.children);
+            }
+          }
+          continue;
+        }
+
+        current.disable({ emitEvent: true });
+      }
     }
   }
 }
