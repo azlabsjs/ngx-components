@@ -12,6 +12,7 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { NgxSmartFormGroupComponent } from '../group';
 import { BUTTON_DIRECTIVES } from '../buttons';
 import { PIPES } from '../../pipes';
+import { Optional } from './types';
 
 @Component({
   standalone: true,
@@ -33,6 +34,8 @@ export class NgxSmartFormArrayItemComponent {
   @Input() index!: number;
   @Input() autoupload = false;
   @Input('no-grid-layout') nogridlayout = false;
+  @Input() label!: Optional<TemplateRef<any>>;
+  @Input({ alias: 'add-button' }) addref!: Optional<TemplateRef<Node>>;
   @Input({ required: true }) detached!: AbstractControl[];
 
   @Output() componentDestroyer = new EventEmitter();

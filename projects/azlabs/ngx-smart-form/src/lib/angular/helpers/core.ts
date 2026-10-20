@@ -260,43 +260,34 @@ function hasleaf(input: InputConfigInterface): input is InputGroup {
 // @internal
 function findconditions(inputs: InputConfigInterface[], prop: ConditionProperty) {
   const items: [string, Conditional[]][] = [];
-  function isconditional(
-    property: ConditionProperty,
-    constraint: InputConfigInterface['constraints'],
-  ): constraint is RequiredIfConstraint & DisabledIfConstraint {
+  function isconditional(property: ConditionProperty, constraint: InputConfigInterface['constraints']): constraint is RequiredIfConstraint & DisabledIfConstraint {
     if (!constraint) {
       return false;
     }
     return CONDITION_PROPERTIES.indexOf(property) !== -1 && property in constraint;
   }
 
-  function search(
-    property: ConditionProperty,
-    values: InputConfigInterface[],
-    parent?: string,
-    repeatable: boolean = false,
-  ) {
-    for (const v of values) {
-      if (hasleaf(v)) {
-        const label = parent ? `${parent}.${v.name}` : v.name;
-        search(property, v.children, label, v.isRepeatable ?? false);
+  function search(property: ConditionProperty, values: InputConfigInterface[], parent?: string, repeatable: boolean = false) {
+    for (const current of values) {
+      if (hasleaf(current)) {
+        search(property, current.children, parent ? `${parent}.${current.name}` : current.name, current.isRepeatable ?? false);
       }
 
       let cond: Conditional | Conditional[] | undefined | null;
-      if (v.constraints) {
-        const { constraints } = v;
+      if (current.constraints) {
+        const { constraints } = current;
         cond = isconditional(property, constraints) ? (constraints[property] as Conditional) : undefined;
       }
 
       if (!cond) {
-        const { [property]: condition } = v;
+        const { [property]: condition } = current;
         cond = condition;
       }
 
       if (cond) {
-        let { name } = v;
+        let { name } = current;
         if (parent) {
-          name = `${parent}${repeatable ? '.*' : ''}.${v.name}`;
+          name = `${parent}${repeatable ? '.*' : ''}.${current.name}`;
         }
 
         items.push([name, Array.isArray(cond) ? cond : [cond]]);
@@ -589,7 +580,6 @@ export function useCondition(prop: ConditionProperty, then: ClauseFn, _else: Cla
                   if (truthy === false) {
                     break;
                   }
-
                 }
 
                 const found = findparent(formgroup, name);

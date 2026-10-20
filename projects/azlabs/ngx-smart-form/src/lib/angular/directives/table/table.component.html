@@ -3,7 +3,7 @@
   <table class="table table-compact">
     <thead>
       <tr>
-        <th *ngFor="let item of configs | excludeinput: ['html', 'control_group', 'hidden']" class="left text-ellipsis fit">
+        <th *ngFor="let item of inputs | excludeinput: ['html', 'control_group', 'hidden']" class="left text-ellipsis fit">
           <span class="text-ellipsis">{{ item.label | text }}</span>
           <small class="required" *ngIf="item.rules?.isRequired ?? (item | required)">(*)</small>
         </th>
@@ -20,7 +20,7 @@
   <ng-container *ngTemplateOutlet="t; context: { disabled: formgroup ? formgroup.disabled : false }"></ng-container>
   <ng-template #t let-disabled="disabled">
     <ng-container *ngIf="editmode === 'inline' || editmode === 'both' ? formgroup : formgroup | disableform">
-      <tr>
+      <tr *ngIf="view">
         <td *ngFor="let input of inputs | excludeinput: ['html', 'control_group', 'hidden']" class="bottom text-ellipsis"
           [ngClass]="{error: formgroup.get(input.name)?.touched && formgroup.get(input.name)?.errors && (formgroup.get(input.name)?.errors | keys).length > 0}">
             <ng-container *ngIf="(editmode === 'inline' || editmode === 'both' ? input : input | readonlyinput ) | appendcss : 'border-0' as config" >
@@ -39,7 +39,7 @@
         </td>
         <td class="middle center bg-light z-2 right-0 sticky">
           <section class="flex flex-row justify-arround gap-2 items-center">
-            <svg *ngIf="editmode === 'modal' || editmode === 'both'"  (click)="showModalView(inputs, formgroup, disabled)" class="cursor-pointer table-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+            <svg *ngIf="editmode === 'modal' || editmode === 'both'"  (click)="showModalView(inputs, formgroup)" class="cursor-pointer table-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 20h9" />
               <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
             </svg>

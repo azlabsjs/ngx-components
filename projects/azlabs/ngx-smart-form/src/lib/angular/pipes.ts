@@ -68,7 +68,7 @@ export class IsRepeatablePipe implements PipeTransform {
   standalone: true,
 })
 export class SafeHTMLPipe implements PipeTransform {
-  constructor(private sanitized: DomSanitizer) {}
+  constructor(private sanitized: DomSanitizer) { }
   transform(value: string) {
     return this.sanitized.bypassSecurityTrustHtml(value);
   }
@@ -117,8 +117,8 @@ export class AsInputConfigArray implements PipeTransform {
     return Array.isArray(value)
       ? value
       : [value].filter(
-          (current) => typeof current !== 'undefined' && current !== null
-        );
+        (current) => typeof current !== 'undefined' && current !== null
+      );
   }
 }
 
@@ -128,7 +128,11 @@ export class AsInputConfigArray implements PipeTransform {
   standalone: true,
 })
 export class InArrayPipe implements PipeTransform {
-  transform<T extends AbstractControl>(input: T, list: T[], name?: string) {
+  transform<T extends AbstractControl>(input: T, list: T[] | null | undefined, name?: string) {
+    if (!list) {
+      return false;
+    }
+    
     return list.indexOf(input) !== -1;
   }
 }

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Directive,
   EventEmitter,
   Input,
@@ -8,6 +9,7 @@ import {
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { ComponentReactiveFormHelpers } from '../../helpers';
+import { Optional } from './types';
 
 /** @description modal size type declaration */
 export type SizeType = 'sm' | 'md' | 'lg' | 'xl' | 'full';
@@ -22,7 +24,7 @@ export class ModalDirective {
   @Input() inputs!: InputConfigInterface[];
   @Input() autoupload!: boolean;
   @Input() title!: string;
-  @Input() detached!: AbstractControl[];
+  @Input() detached!: Optional<AbstractControl[]>;
   @Input() name!: string;
   @Input() view!: TemplateRef<any>;
   @Input() label!: TemplateRef<any>;
@@ -36,6 +38,9 @@ export class ModalDirective {
   @Output() closed = new EventEmitter<void>();
   @Output() opened = new EventEmitter<void>();
 
+
+  constructor(private ref: ChangeDetectorRef) { }
+
   close() {
     this.closeChange.emit();
   }
@@ -46,7 +51,7 @@ export class ModalDirective {
   }
 
   openChanged(value: boolean) {
-    if(value === true) {
+    if (value === true) {
       this.opened.emit();
     } else {
       this.closed.emit();
@@ -62,6 +67,42 @@ export class ModalDirective {
     this.stateChange.emit();
   }
 
+
+  setDetached(values: Optional<AbstractControl[]>) {
+    this.detached = values;
+    this.ref.markForCheck();
+  }
+
+  setLabel(name: TemplateRef<unknown>) {
+    this.label = name;
+    this.ref.markForCheck();
+  }
+
+  setAutoUpload(value: boolean) {
+    this.autoupload = value;
+    this.ref.markForCheck();
+  }
+
+  setInputs(value: InputConfigInterface[]) {
+    this.inputs = value;
+    this.ref.markForCheck();
+  }
+
+  setTitle(title: string) {
+    this.title = title;
+    this.ref.markForCheck();
+  }
+
+
+  setView(view: TemplateRef<unknown>) {
+    this.view = view;
+    this.ref.markForCheck();
+  }  
+  
+  setName(name: string) {
+    this.name = name;
+    this.ref.markForCheck();
+  }
 
   validate() {
     ComponentReactiveFormHelpers.validateFormGroupFields(this.formgroup);

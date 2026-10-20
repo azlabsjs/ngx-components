@@ -41,7 +41,7 @@ export class NgxFormComponent {
   @Input() label!: TemplateRef<any> | undefined | null;
   @Input() autoupload = false;
   @Input({ alias: 'no-grid-layout' }) nogridlayout = false;
-  @Input({ required: true }) state!: FormGroupState & { [k: string]: unknown };
+  @Input({ required: true }) state!: Omit<FormGroupState, 'detached'> & { [k: string]: unknown, detached: Optional<AbstractControl[]> };
   @Input({ required: true }) inputs!: InputConfigInterface[];
 
   @Input({ alias: 'table-description' }) tabledescription!: Optional<TemplateRef<any>>;

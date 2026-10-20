@@ -1,26 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import {
-  FormBuilder,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
-import {
-  CLR_FORM_CONTROL_DIRECTIVES,
-  NgxInputErrorComponent,
-} from '@azlabsjs/ngx-clr-form-control';
-import {
-  FORM_DIRECTIVES,
-} from '@azlabsjs/ngx-smart-form';
-import {
-  FormConfigInterface,
-  InputConfigInterface,
-  OptionsInput,
-  OptionsInputConfigInterface,
-} from '@azlabsjs/smart-form-core';
+import { Component, signal as createSignal } from '@angular/core';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CLR_FORM_CONTROL_DIRECTIVES, NgxInputErrorComponent } from '@azlabsjs/ngx-clr-form-control';
+import { FORM_DIRECTIVES } from '@azlabsjs/ngx-smart-form';
+// import { FormConfigInterface, InputConfigInterface, OptionsInput, OptionsInputConfigInterface } from '@azlabsjs/smart-form-core';
 import { ClrIconModule } from '@clr/angular';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 import { RequiredPipe } from '../pipes';
+import { createFormConfig } from './config';
+import { MODAL_DIRECTIVES } from '@azlabs/ngx-modal';
+
+// @internal
+function subtractYears(date: string | number | Date, years: number) {
+  const d = new Date(date);
+  d.setFullYear(d.getFullYear() - years);
+  return d.toISOString().split('T')[0];
+}
 
 @Component({
   standalone: true,
@@ -34,6 +29,7 @@ import { RequiredPipe } from '../pipes';
     CLR_FORM_CONTROL_DIRECTIVES,
     ...FORM_DIRECTIVES,
     ...COMMON_PIPES,
+    ...MODAL_DIRECTIVES
   ],
   selector: 'app-form-control',
   styles: [
@@ -54,187 +50,208 @@ import { RequiredPipe } from '../pipes';
   templateUrl: './form-control.component.html',
 })
 export class FormControlComponent {
-  form = {
-    id: '',
-    title: '',
-    controlConfigs: [
-      {
-        minDate: '',
-        maxDate: '',
-        currentDate: new Date().toLocaleDateString(),
-        label: 'Date',
-        type: 'date',
-        name: 'date',
-        classes: 'clr-date',
-        isRepeatable: false,
-        containerClass: 'clr-col-6',
-        constraints: {
-          required: true,
-          min: '1950-01-01',
-          max: new Date().toISOString().split('T')[0],
-        },
-        description: 'description du champ date'
-      },
-      {
-        min: 0,
-        label: 'Taxes',
-        type: 'number',
-        name: 'tax',
-        classes: 'clr-input',
-        isRepeatable: false,
-        containerClass: 'clr-col-6',
-        constraints: {
-          required: true,
-          max: 10,
-        },
-        description: 'description du champ tax'
-      },
-      {
-        label: 'Firstname',
-        type: 'text',
-        name: 'name',
-        classes: 'clr-input',
-        isRepeatable: false,
-        containerClass: 'clr-col-6',
-        constraints: {
-          requiredIf: [
-            {
-              name: 'tax',
-              values: 'gt:18',
-            },
-            {
-              name: 'date',
-              values: 'daydiff_lte:30',
-            },
-          ],
-          max: 50,
-        },
-        description: 'description du champ firstname'
-      } as InputConfigInterface,
-      {
-        cols: 0,
-        rows: 0,
-        maxLength: 0,
-        label: 'Description',
-        type: 'textarea',
-        name: 'description',
-        classes: 'clr-textarea',
-        isRepeatable: false,
-        containerClass: 'clr-col-12',
-        description: 'description du champ description'
-      },
-      {
-        label: 'Phone number',
-        type: 'phone',
-        name: 'phone_number',
-        classes: 'clr-input',
-        isRepeatable: false,
-        containerClass: 'clr-col-6',
-        constraints: {
-          required: true,
-          max: 20,
-        },
-        description: 'description du champ phone number'
-      },
-      {
-        min: '',
-        label: 'Time',
-        type: 'time',
-        name: 'at',
-        classes: 'clr-input',
-        isRepeatable: false,
-        containerClass: 'clr-col-12',
-        constraints: {
-          requiredIf: {
-            name: 'name',
-            values: 'len_lt:10'
-          }
-        },
-        description: 'description du champ time'
-      },
-      {
-        label: 'Sexe',
-        name: 'sex',
-        type: 'select',
-        classes: 'clr-input',
-        placeholder: '...',
-        isRepeatable: false,
-        containerClass: 'clr-col-6',
-        options: [
-          { name: 'FEMININ', value: 'F' },
-          { name: 'MASCULIN', value: 'M' },
-          // { name: 'AUTRES', value: 'O' }, # uncomment this line to add other as sex
-        ],
-        constraints: {
-          required: true,
-          disabled: false,
-        },
-        description: 'description du champ sex'
-      } as OptionsInput,
-      {
-        uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
-        pattern: 'image/*',
-        multiple: false,
-        maxFileSize: 12,
-        autoupload: false,
-        uploadAs: 'content',
-        label: 'No auto upload file',
-        type: 'file',
-        name: 'file2_id',
-        classes: 'clr-input',
-        hidden: false,
-        isRepeatable: false,
-        containerClass: 'clr-col-4',
-        constraints: {
-          required: true,
-        },
-        description: 'description du champ no upload'
-      },
-      {
-        // uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
-        pattern: 'image/*,application/pdf',
-        multiple: false,
-        maxFileSize: 12,
-        autoupload: true,
-        uploadAs: 'content',
-        label: 'Auto upload file',
-        type: 'file',
-        name: 'file_id',
-        classes: 'clr-input',
-        description: 'Upload file to server',
-        hidden: false,
-        isRepeatable: false,
-        containerClass: 'clr-col-4',
-        read: 'url',
-        constraints: {
-          required: false,
-          disabled: false,
-        },
-      },
-      {
-        label: 'modules.kyc.policyholders.person.columns.sex',
-        name: 'pat_type_id',
-        type: 'radio',
-        classes: 'clr-input',
-        placeholder: '...',
-        value: null,
-        index: undefined,
-        isRepeatable: false,
-        containerClass: 'input-col-sm-12 input-col-md-6',
-        options: [
-          { name: 'FEMININ', value: 'F' },
-          { name: 'MASCULIN', value: 'M' },
-          { name: 'Autres', value: 'O' },
-        ],
-        constraints: {
-          required: true,
-          disabled: false,
-          min: 1,
-        },
-        description: 'description du champ select sex'
-      } as OptionsInputConfigInterface,
-    ],
-  } as FormConfigInterface;
+  form = createFormConfig({
+      rightholder_types_url: 'http://localhost:3000/categories',
+      countries_url: 'http://localhost:3000/countries',
+      subdivisions_url: 'http://localhost:3000/countries',
+      agences_api_url: 'http://localhost:3000/countries',
+      card_delivery_sites_api_url: 'http://localhost:3000/cities?disabled=false',
+      upload_url: 'https://storagev2.lik.tg/api/storage/object/upload',
+      photo_documents_url: 'http://localhost:3000/countries',
+      identity_documents_url: 'http://localhost:3000/countries',
+      mariage_certificates_url: 'http://localhost:3000/countries',
+      school_certificates_url: 'http://localhost:3000/countries',
+  }, {
+    person: { maxbirthdate: subtractYears(new Date(), 18), minbirthdate: '1900-01-01' }
+  });
+  
+  // {
+  //   id: '',
+  //   title: '',
+  //   controlConfigs: [
+  //     {
+  //       minDate: '',
+  //       maxDate: '',
+  //       currentDate: new Date().toLocaleDateString(),
+  //       label: 'Date',
+  //       type: 'date',
+  //       name: 'date',
+  //       classes: 'clr-date',
+  //       isRepeatable: false,
+  //       containerClass: 'clr-col-6',
+  //       constraints: {
+  //         required: true,
+  //         min: '1950-01-01',
+  //         max: new Date().toISOString().split('T')[0],
+  //       },
+  //       description: 'description du champ date'
+  //     },
+  //     {
+  //       min: 0,
+  //       label: 'Taxes',
+  //       type: 'number',
+  //       name: 'tax',
+  //       classes: 'clr-input',
+  //       isRepeatable: false,
+  //       containerClass: 'clr-col-6',
+  //       constraints: {
+  //         required: true,
+  //         max: 10,
+  //       },
+  //       description: 'description du champ tax'
+  //     },
+  //     {
+  //       label: 'Firstname',
+  //       type: 'text',
+  //       name: 'name',
+  //       classes: 'clr-input',
+  //       isRepeatable: false,
+  //       containerClass: 'clr-col-6',
+  //       constraints: {
+  //         requiredIf: [
+  //           {
+  //             name: 'tax',
+  //             values: 'gt:18',
+  //           },
+  //           {
+  //             name: 'date',
+  //             values: 'daydiff_lte:30',
+  //           },
+  //         ],
+  //         max: 50,
+  //       },
+  //       description: 'description du champ firstname'
+  //     } as InputConfigInterface,
+  //     {
+  //       cols: 0,
+  //       rows: 0,
+  //       maxLength: 0,
+  //       label: 'Description',
+  //       type: 'textarea',
+  //       name: 'description',
+  //       classes: 'clr-textarea',
+  //       isRepeatable: false,
+  //       containerClass: 'clr-col-12',
+  //       description: 'description du champ description'
+  //     },
+  //     {
+  //       label: 'Phone number',
+  //       type: 'phone',
+  //       name: 'phone_number',
+  //       classes: 'clr-input',
+  //       isRepeatable: false,
+  //       containerClass: 'clr-col-6',
+  //       constraints: {
+  //         required: true,
+  //         max: 20,
+  //       },
+  //       description: 'description du champ phone number'
+  //     },
+  //     {
+  //       min: '',
+  //       label: 'Time',
+  //       type: 'time',
+  //       name: 'at',
+  //       classes: 'clr-input',
+  //       isRepeatable: false,
+  //       containerClass: 'clr-col-12',
+  //       constraints: {
+  //         requiredIf: {
+  //           name: 'name',
+  //           values: 'len_lt:10'
+  //         }
+  //       },
+  //       description: 'description du champ time'
+  //     },
+  //     {
+  //       label: 'Sexe',
+  //       name: 'sex',
+  //       type: 'select',
+  //       classes: 'clr-input',
+  //       placeholder: '...',
+  //       isRepeatable: false,
+  //       containerClass: 'clr-col-6',
+  //       options: [
+  //         { name: 'FEMININ', value: 'F' },
+  //         { name: 'MASCULIN', value: 'M' },
+  //         // { name: 'AUTRES', value: 'O' }, # uncomment this line to add other as sex
+  //       ],
+  //       constraints: {
+  //         required: true,
+  //         disabled: false,
+  //       },
+  //       description: 'description du champ sex'
+  //     } as OptionsInput,
+  //     {
+  //       uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
+  //       pattern: 'image/*',
+  //       multiple: false,
+  //       maxFileSize: 12,
+  //       autoupload: false,
+  //       uploadAs: 'content',
+  //       label: 'No auto upload file',
+  //       type: 'file',
+  //       name: 'file2_id',
+  //       classes: 'clr-input',
+  //       hidden: false,
+  //       isRepeatable: false,
+  //       containerClass: 'clr-col-4',
+  //       constraints: {
+  //         required: true,
+  //       },
+  //       description: 'description du champ no upload'
+  //     },
+  //     {
+  //       // uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
+  //       pattern: 'image/*,application/pdf',
+  //       multiple: false,
+  //       maxFileSize: 12,
+  //       autoupload: true,
+  //       uploadAs: 'content',
+  //       label: 'Auto upload file',
+  //       type: 'file',
+  //       name: 'file_id',
+  //       classes: 'clr-input',
+  //       description: 'Upload file to server',
+  //       hidden: false,
+  //       isRepeatable: false,
+  //       containerClass: 'clr-col-4',
+  //       read: 'url',
+  //       constraints: {
+  //         required: false,
+  //         disabled: false,
+  //       },
+  //     },
+  //     {
+  //       label: 'modules.kyc.policyholders.person.columns.sex',
+  //       name: 'pat_type_id',
+  //       type: 'radio',
+  //       classes: 'clr-input',
+  //       placeholder: '...',
+  //       value: null,
+  //       index: undefined,
+  //       isRepeatable: false,
+  //       containerClass: 'input-col-sm-12 input-col-md-6',
+  //       options: [
+  //         { name: 'FEMININ', value: 'F' },
+  //         { name: 'MASCULIN', value: 'M' },
+  //         { name: 'Autres', value: 'O' },
+  //       ],
+  //       constraints: {
+  //         required: true,
+  //         disabled: false,
+  //         min: 1,
+  //       },
+  //       description: 'description du champ select sex'
+  //     } as OptionsInputConfigInterface,
+  //   ],
+  // } as FormConfigInterface;
 
-  constructor(private fb: FormBuilder) { }
+
+  signal = createSignal<{value: Record<string, unknown>}>({value: {}});
+
+  constructor(private fb: FormBuilder) {
+    // setTimeout(() => this.signal.update(state => ({...state, value: {beneficiaries: [{policynumber: '00040914894285224', beneficiary_type_id: 'C'}, {policynumber: '00360914894285224', beneficiary_type_id: 'E'}]}})) , 2000)
+    this.signal.update(state => ({...state, value: {beneficiaries: [{policynumber: '00040914894285224', beneficiary_type_id: 'C'}, {policynumber: '00360914894285224', beneficiary_type_id: 'E'}]}}));
+  }
 }

@@ -412,8 +412,6 @@ export class AppComponent implements OnInit {
   }
 
   private moveData(input: AbstractControl, name: string, value: { [prop: string]: unknown }, state: { [prop: string]: unknown }) {
-    console.log('Moving data...');
-
     if ('firstname' in value && value['firstname']) {
       let items = input.getRawValue();
 
@@ -437,8 +435,6 @@ export class AppComponent implements OnInit {
       }
 
       this.formValue = { ...state, [name]: items };
-
-      // console.log(this.formValue);
 
       this.cdRef?.detectChanges();
     }

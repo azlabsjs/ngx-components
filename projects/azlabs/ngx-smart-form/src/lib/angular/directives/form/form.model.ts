@@ -17,7 +17,9 @@ import {
 } from '../../helpers';
 import { memoize } from '@azlabsjs/functional';
 import {
+  BehaviorSubject,
   distinctUntilChanged,
+  map,
   Subject,
   Subscription,
   takeUntil,
@@ -49,15 +51,15 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
   private value!: { [k: string]: unknown };
 
   // @internal
-  private readonly _detached = new Map<string, AbstractControl>();
-  private readonly _weakDetached = new WeakMap<AbstractControl>();
+  private readonly _detached = new BehaviorSubject(new Map<string, AbstractControl>());
+  private readonly _weakDetached = new WeakMap<AbstractControl, boolean>();
 
   private required: Condition[] = [];
   private disabled: Condition[] = [];
   private group!: FormGroup;
   private form!: T;
   get state(): Required<FormModelState<T>> {
-    return { formGroup: this.group, detached: Array.from(this._detached.values()), form: this.form };
+    return { formGroup: this.group, detached: this._detached.asObservable().pipe(map(value => Array.from(value.values()))), form: this.form };
   }
 
   constructor(@Inject(ANGULAR_REACTIVE_FORM_BRIDGE) private builder: AngularReactiveFormBuilderBridge) { }
@@ -91,7 +93,8 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
       }
 
       this.detach(path, control);
-    }, (name) => this._detached.get(name) ?? null)(values ?? []);
+    }, (name) => this._detached.getValue().get(name) ?? null)(values ?? []);
+
 
     this.disabled = useCondition('disabledIf', (control, name) => {
       if (control instanceof FormArray) {
@@ -147,8 +150,8 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
   }
 
   setValue(value: { [k: string]: unknown }): void {
-    const { controlConfigs } = this.form;
-    setFormValue(this.builder, this.group, value, controlConfigs ?? []);
+    const { controlConfigs: inputs } = this.form;
+    setFormValue(this.builder, this.group, value, inputs ?? []);
 
     this.addConditions(flatteninputs(this.group), (control, name, conditions) => {
       for (const item of conditions) {
@@ -530,12 +533,15 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
 
   private detach(path: string, model: AbstractControl) {
     if (!this._weakDetached.has(model)) {
-      this._weakDetached.delete(model);
+      this._weakDetached.set(model, true);
     }
 
-    if (!this._detached.has(path) && model) {
-      this._detached.set(path, model);
-      model.setValue(null);
+    const cache = this._detached.getValue();
+    if (!cache.has(path) && model) {
+      cache.set(path, model);
+      this._detached.next(cache);
+
+      model.reset();
       model.setErrors(null);
       model.updateValueAndValidity({ emitEvent: true });
 
@@ -546,11 +552,13 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
         }
       }
     }
-
   }
 
   private attach(path: string, model: AbstractControl) {
-    this._detached.delete(path);
+    const cache = this._detached.getValue();
+    cache.delete(path);
+    this._detached.next(cache);
+
     this._weakDetached.delete(model);
 
     if (this._trackedControls.has(model)) {

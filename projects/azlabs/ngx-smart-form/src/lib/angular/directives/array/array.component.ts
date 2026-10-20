@@ -11,7 +11,7 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { distinctUntilChanged, filter, takeUntil, tap } from 'rxjs/operators';
@@ -45,7 +45,7 @@ import { Optional } from './types';
 export class NgxSmartFormArrayComponent implements OnDestroy, AfterContentInit {
   @Input() autoupload = true;
   @Input() modal!: ModalDirective;
-  @Input() detached!: AbstractControl[];
+  @Input() detached!: Optional<AbstractControl[]>;
   @Input() template!: TemplateRef<any>;
   @Input() label!: Optional<TemplateRef<any>>;
   @Input() description!: Optional<string>;
@@ -58,7 +58,7 @@ export class NgxSmartFormArrayComponent implements OnDestroy, AfterContentInit {
 
   @Input({ alias: 'formArray' }) array!: FormArray;
   @Input({ alias: 'no-grid-layout' }) noGridLayout = false;
-  @Input({ alias: 'class', transform: (value: string | string[]) => (typeof value === 'string' ? [value] : value).map((v) => v.split(' ').map((i) => i.split(',')).flat().map((v) => v.trim())).flat() })
+  @Input({ alias: 'class', transform: (value: string | string[]) => (typeof value === 'string' ? value.split(/\s+/) : value ?? []).map((v) => v.split(/\s+/).map((i) => i.split(',')).flat().map((v) => v.trim())).flat() })
   cssClass!: string | string[];
   @Input() hidden: boolean = false;
   @Input({ alias: 'table-description' }) tabledescription!: Optional<TemplateRef<any>>;

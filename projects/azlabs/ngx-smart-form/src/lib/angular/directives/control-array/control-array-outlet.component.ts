@@ -26,27 +26,59 @@ import { Optional } from './types';
   templateUrl: './control-array-outlet.component.html',
   styleUrls: ['./control-array-outlet.component.scss'],
 })
-export class NgxFormControlArrayOutletComponent implements OnDestroy, ViewRefFactory<ComponentRef<NgxArrayItemComponent>>
-{
-  @Input({ required: true }) config!: InputConfigInterface;
-  @Input({ alias: 'auto-upload' }) autoupload = true;
-  @Input({ required: true }) template: Optional<TemplateRef<any>>;
-  @Input({ required: true }) detached!: AbstractControl[];
-  
+export class NgxFormControlArrayOutletComponent implements OnDestroy, ViewRefFactory<ComponentRef<NgxArrayItemComponent>> {
+  _template!: Optional<TemplateRef<any>>;
+  @Input() set template(value: Optional<TemplateRef<any>>) {
+    this._template = value;
+    for (const ref of this.componentRefs) {
+      ref.instance.template = value;
+      ref.changeDetectorRef.markForCheck();
+    }
+  }
+
+  _config!: InputConfigInterface;
+  @Input() set config(value: InputConfigInterface) {
+    this._config = value;
+    for (const ref of this.componentRefs) {
+      ref.instance.config = {...value};
+      ref.changeDetectorRef.markForCheck();
+    }
+  }
+
+  _autoupload: boolean = true;
+  @Input({ alias: 'auto-upload' }) set autoupload(value: boolean) {
+    this._autoupload = value;
+    for (const ref of this.componentRefs) {
+      ref.instance.autoupload = value;
+      ref.changeDetectorRef.markForCheck();
+    }
+  }
+
+  _detached!: Optional<AbstractControl[]>;
+  @Input() set detached(value: Optional<AbstractControl[]>) {
+    this._detached = value;
+    for (const ref of this.componentRefs) {
+      ref.instance.detached = value;
+      ref.changeDetectorRef.markForCheck();
+    }
+  }
+
   @Output() removed = new EventEmitter<RefType<ComponentRef<NgxArrayItemComponent>>>();
 
   @ViewChild('container', { read: ViewContainerRef, static: false }) container!: ViewContainerRef;
   private destroy$ = new Subject<void>();
+  private componentRefs: ComponentRef<NgxArrayItemComponent>[] = [];
 
   createView(index: number, input: AbstractControl) {
     const e = this.container?.createComponent(NgxArrayItemComponent);
+    this.componentRefs.push(e);
 
-    e.instance.config = { ...this.config };
+    e.instance.config = { ...this._config };
     e.instance.control = input;
-    e.instance.template = this.template;
-    e.instance.autoupload = this.autoupload;
+    e.instance.template = this._template;
+    e.instance.autoupload = this._autoupload;
     e.instance.index = index;
-    e.instance.detached = this.detached;
+    e.instance.detached = this._detached;
 
     const ref: RefType<ComponentRef<NgxArrayItemComponent>> = {
       index: e.instance.index,
@@ -70,6 +102,11 @@ export class NgxFormControlArrayOutletComponent implements OnDestroy, ViewRefFac
   }
 
   clear(): void {
+    for (const element of this.componentRefs) {
+      element.destroy();
+    }
+
+    this.componentRefs = [];
     this.container?.clear();
   }
 

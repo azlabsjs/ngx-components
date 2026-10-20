@@ -1,14 +1,6 @@
-<ngx-form-ui
-  [template]="template"
-  [add-group]="addgroup"
-  [add]="add"
-  [label]="label"
-  [autoupload]="autoupload"
-  [no-grid-layout]="noGridLayout"
-  [state]="model.state"
-  [modal]="formmodal ?? modal"
-  [table-description]="tabledescription"
-  [inputs]="model.state.form.controlConfigs || []"
+<ngx-form-ui [template]="template" [add-group]="addgroup" [add]="add" [label]="label" [autoupload]="autoupload"
+  [no-grid-layout]="noGridLayout" [state]="{formGroup: model.state.formGroup, detached: (model.state.detached | async)}"
+  [modal]="formmodal ?? modal" [table-description]="tabledescription" [inputs]="model.state.form.controlConfigs || []"
   (item-removed)="onRemoved($event)">
   <section before><ng-content select="[before]"></ng-content></section>
   <section after><ng-content select="[after]"></ng-content></section>
@@ -19,7 +11,8 @@
       <ng-container *ngTemplateOutlet="submitRef ? submitRef : _submitRef; context: { $implicit: onSubmit.bind(this) }"></ng-container>
     </ng-container>
     <ng-template #_submitRef let-handler>
-      <button type="button" [disabled]="performingAction || disabled" class="btn btn-primary" (click)="handler($event)">SUBMIT</button>
+      <button type="button" [disabled]="performingAction || disabled" class="btn btn-primary"
+        (click)="handler($event)">SUBMIT</button>
     </ng-template>
   </section>
 </ngx-form-ui>

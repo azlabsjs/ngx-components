@@ -18,10 +18,14 @@ import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { PIPES } from '../../pipes';
+import { NgxSmartFormGroupHeaderPipe } from './group-header.pipe';
+import { NgxSmartFormControlArrayComponent } from '../control-array';
+import { FORM_PIPES } from '../form/pipes';
+import { Optional } from './types';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ...PIPES],
+  imports: [CommonModule, ...PIPES, ...FORM_PIPES, NgxSmartFormGroupHeaderPipe, NgxSmartFormControlArrayComponent],
   selector: 'ngx-smart-form-group',
   templateUrl: './group.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,15 +47,32 @@ export class NgxSmartFormGroupComponent implements OnInit, AfterViewInit, OnChan
   }
   @Input() template!: TemplateRef<any>;
   @Input() autoupload: boolean = false;
-  @Input({ alias: 'no-grid-layout' }) noGridLayout = false;
+  @Input({ alias: 'no-grid-layout' }) nogridlayout = false;
   @Input({ required: true }) detached!: AbstractControl[];
+
+  @Input({ alias: 'add' }) add!: Optional<TemplateRef<any>>;
+  @Input() label!: Optional<TemplateRef<any>>;
+
+  @Output() formGroupChange = new EventEmitter<FormGroup>();
+  @Output('item-removed') removed = new EventEmitter<{ name: string, control: AbstractControl }>();
 
   // @internal
   private _destroy$ = new Subject<void>();
 
-  @Output() formGroupChange = new EventEmitter<FormGroup>();
-
   constructor(private cdRef: ChangeDetectorRef) { }
+
+  protected   onRemoved(event: { index: number, control: AbstractControl }, parent: string) {
+    if (!event) {
+      return;
+    }
+
+    if (typeof event.index === 'undefined' || event.index === null || !event.control) {
+      return;
+    }
+
+    const name = `${parent}.${event.index}`;
+    this.removed.emit({ name, control: event.control });
+  }
 
   //
   ngOnInit(): void {

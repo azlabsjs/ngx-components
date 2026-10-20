@@ -54,7 +54,7 @@ export class NgxSmartFormControlArrayComponent implements AfterContentInit, OnDe
   @Input() name!: string;
   @Input() autoupload = true;
   @Input() config!: InputConfigInterface;
-  @Input({ required: true }) detached!: AbstractControl[];
+  @Input() detached!: Optional<AbstractControl[]>;
 
   @Output() listChange = new EventEmitter<number>();
   @Output('item-removed') _removed = new EventEmitter<{ index: number, control: AbstractControl }>();
@@ -117,7 +117,7 @@ export class NgxSmartFormControlArrayComponent implements AfterContentInit, OnDe
   private update(array: FormArray) {
     const length = array.controls.length;
     const max = this.refs.length - 1;
-    const refs = []; //# if supported by javascript create a fixed size array
+    const refs = [];
 
     for (let i = 0; i < length; i++) {
       const element = array.at(i);

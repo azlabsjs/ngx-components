@@ -32,15 +32,11 @@
   <ng-template #_layout let-controls="controls" let-group="group" let-autoupload="autoupload">
     <ng-container *ngFor="let value of controls | asInputs">
       <ng-container *ngIf="value | asInputGroup | hasChildren; else _input">
-        <div *ngIf="group?.get(value.name) as local"
-          [class]="nogridlayout | containercssclass: value.containerClass | csshidden : (value | ishidden) || (local | inarray : state.detached)"
-          [hidden]="(value | ishidden) || (local | inarray : state.detached)">
+        <div *ngIf="group?.get(value.name) as local" [class]="nogridlayout | containercssclass: value.containerClass | csshidden : (value | ishidden) || (local | inarray : state.detached)" [hidden]="(value | ishidden) || (local | inarray : state.detached)">
           <ng-container
             *ngTemplateOutlet="label ?? labelRef; context: { $implicit: value.label, config: value, control: local }"></ng-container>
           <ng-template #labelRef let-label let-config="config" let-control="control">
-            <div [class.hidden]="(config | ishidden) || (local | inarray : state.detached)"
-              [innerHTML]="config.label | ngxGroupHeader | safeHtml"
-              [hidden]="(config | ishidden) || (local | inarray : state.detached)"></div>
+            <div *ngIf="config.label" [class.hidden]="(config | ishidden) || (local | inarray : state.detached)" [innerHTML]="config.label | ngxGroupHeader | safeHtml" [hidden]="(config | ishidden) || (local | inarray : state.detached)"></div>
           </ng-template>
 
           <ng-container *ngIf="value | repeatable; else _norepeat">
@@ -87,7 +83,6 @@
   </ng-container>
 
   <ng-template #notRepeatableRef>
-    <ng-container
-      *ngTemplateOutlet="template; context: {control, value, autoupload, template: { label }, hidden: (value | ishidden) || (control | inarray : state.detached)}"></ng-container>
+    <ng-container *ngTemplateOutlet="template; context: {control, value, autoupload, template: { label }, hidden: (value | ishidden) || (control | inarray : state.detached)}"></ng-container>
   </ng-template>
 </ng-template>
