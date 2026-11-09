@@ -3,16 +3,19 @@ type Disposable = {
   dispose(): void;
 };
 
+type Observer<T> = { next: (value: T) => void }
+type Observable<T> = { subscribe: (observer: Observer<T>) => void };
+
 /**  @internal */
-export type ValueResolver<TValue> = (value: TValue) => Promise<TValue> | TValue;
+export type ValueResolver<TValue> = () => Promise<TValue> | TValue;
 
 /** @description cache instance type definition */
 export type CacheType<TKey, TValue> = {
   /** updated value at a given index */
-  put(key: TKey, value: TValue, update?: ValueResolver<TValue>): void;
+  put(key: TKey, value: TValue | ValueResolver<TValue>, subscriber?: Observer<TValue>): void;
 
   /** return value at index `key` or undefined if value expired or does not exists */
-  get(key: TKey): TValue | undefined;
+  get(key: TKey): (ValueType<TValue> & Observable<TValue>) | undefined;
 
   /** remove all items from cache */
   clear(): void;
@@ -24,12 +27,13 @@ export type CacheType<TKey, TValue> = {
   dispose(key: TKey): void;
 };
 
+
 /** @intrenal cached value type definition */
 type ValueType<TValue = unknown> = {
   value: () => TValue;
   refetch: () => void;
   expired: () => boolean;
-  update: (value: TValue) => Promise<TValue>;
+  // update: (value: TValue) => Promise<TValue>;
 } & Disposable;
 
 /** @internal key value pair instance of cached value */
@@ -54,50 +58,72 @@ function isPromise(p: unknown): p is Promise<unknown> {
  * cached value factory function
  *
  * @param interval Number of seconds after which value is refresh
- * @param ttl number of seconds after which the cached item is not valid
+ * @param time number of seconds after which the cached item is not valid
  *
  */
-function cached<TValue>(
-  value: TValue,
-  update?: ValueResolver<TValue>,
-  interval?: number,
-  ttl?: number
-) {
-  let x = value;
+function cached<TValue>(fn: ValueResolver<TValue>, subscriber?: { next: (value: TValue) => unknown }, interval?: number, time?: number) {
   const refetchTime = interval ?? -1;
   let timeout: ReturnType<typeof setInterval> | null = null;
   let expiresAt: Date | undefined;
-  const fn = update ?? (() => Promise.resolve(x));
+  let state: TValue | null = null;
+  let subscribers: Set<{ next: (value: TValue) => unknown }> | null = new Set([]);
 
-  function setExpiredDate(ttl: number | undefined) {
-    if (ttl) {
+  if (subscriber) {
+    subscribers.add(subscriber);
+  }
+
+  function setExpiredDate(t: number | undefined) {
+    if (t) {
       const date = new Date();
-      date.setSeconds(date.getSeconds() + ttl);
+      date.setSeconds(date.getSeconds() + t);
       expiresAt = date;
     }
   }
 
-  setExpiredDate(ttl);
-  const cache = {
-    value: () => x,
-    refetch: () => {
-      const result = fn(x);
+  function notify(value: TValue) {
+    if (!subscribers) {
+      return;
+    }
 
-      if (isPromise(result)) {
-        result.then((resolved) => {
-          x = resolved;
-          setExpiredDate(ttl);
-        });
-      } else {
-        x = result as TValue;
-        setExpiredDate(ttl);
+    for (const subscriber of subscribers) {
+      subscriber.next(value);
+    }
+  }
+
+  function fetch() {
+    const result = fn();
+    if (!isPromise(result)) {
+      state = result;
+      notify(state);
+      setExpiredDate(time);
+      return;
+    }
+
+    result.then((resolved) => {
+      state = resolved;
+      notify(state);
+      setExpiredDate(time);
+    });
+  }
+
+  setExpiredDate(time);
+  const cache = {
+    value: () => state,
+    refetch: () => fetch(),
+    expired: () => expiresAt ? new Date().getTime() > expiresAt.getTime() : false,
+    subscribe: (observer) => {
+      if (subscribers) {
+        subscribers.add(observer);
       }
     },
-    expired: () => {
-      return expiresAt ? new Date().getTime() > expiresAt.getTime() : false;
+    dispose() {
+      state = null;
+      subscribers = null;
+      if (timeout) {
+        clearInterval(timeout);
+      }
     },
-    update: fn,
-  } as ValueType<TValue>;
+  } as ValueType<TValue> & Observable<TValue>;
 
   if (refetchTime < 0 && refetchTime !== Infinity) {
     timeout = setInterval(() => {
@@ -105,53 +131,35 @@ function cached<TValue>(
     }, refetchTime * 1000);
   }
 
-  Object.defineProperty(cache, 'dispose', {
-    value: () => {
-      if (timeout !== null) {
-        clearInterval(timeout);
-      }
-    },
-  });
+  fetch();
 
   return cache;
 }
 
 /** @internal  cache instance default implementation */
 export class Cache<TKey, TValue> implements CacheType<TKey, TValue> {
-  // internal state for the cache
-  private items: Pair<TKey, ValueType<TValue>>[] = [];
+  private items: Pair<TKey, ValueType<TValue> & Observable<TValue>>[] = [];
   private equals!: (a: TKey, b: TKey) => boolean;
   private interval: number;
-  private ttl: number;
+  private time: number;
 
   /** creates a cache instance */
   public constructor(equals?: EqualFn<TKey>, interval?: number, ttl?: number) {
     this.equals = equals ?? ((a, b) => a === b);
     this.interval = interval ?? 60 * 60; // cached item will be refetched after each 1h by default
-    this.ttl = ttl ?? 3600 - 1; // cached value will expire after 59min after it has been cached or updated
+    this.time = ttl ?? 3600 - 1; // cached value will expire after 59min after it has been cached or updated
   }
 
-  put(key: TKey, value: TValue, update?: ValueResolver<TValue>) {
-    // remove the key if it already exists in cache
+  put(key: TKey, value: TValue | ValueResolver<TValue>, subscriber?: Observer<TValue>) {
     this.delete(key);
-
-    // then add the key in front of the existing items
-    // to make search faster for new keys
+    const isFn = typeof value === 'function';
     this.items = [
-      pair(
-        key,
-        cached(
-          value,
-          update ? (x) => update(x) : undefined,
-          update ? this.interval : undefined,
-          update ? this.ttl : undefined
-        )
-      ),
+      pair(key, cached(isFn ? value as ValueResolver<TValue> : () => value as TValue, subscriber, isFn ? this.interval : undefined, isFn ? this.time : undefined)),
       ...this.items,
     ];
   }
 
-  private getCached(key: TKey): ValueType<TValue> | undefined {
+  private getCached(key: TKey) {
     const index = this.items.findIndex(([k]) => this.equals(k, key));
     if (-1 === index) {
       return undefined;
@@ -159,13 +167,10 @@ export class Cache<TKey, TValue> implements CacheType<TKey, TValue> {
 
     const [, v] = this.items[index];
     if (v.expired()) {
-      // first remove item from cache
       this.deleteAt(index);
-
-      // we return undefined if the cached item has expired, at it means it does not exists
-      // in cache therefore must be refetched manually
       return undefined;
     }
+
     return v;
   }
 
@@ -174,8 +179,7 @@ export class Cache<TKey, TValue> implements CacheType<TKey, TValue> {
   }
 
   get(key: TKey) {
-    // return the value either expired or not
-    return this.getCached(key)?.value();
+    return this.getCached(key);
   }
 
   delete(key: TKey) {

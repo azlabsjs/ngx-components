@@ -8,10 +8,8 @@ export const defaultStrings = {
   fileSizeError: 'file size must be less than or equal to {{maxFilesize}}Mo.',
   addButtonText: 'click on the the button to add a new input element',
   validation: {
-    minlength:
-      'input value must contain at least {{requiredLength}} characters',
-    maxlength:
-      'maximum number of characters for this input is {{requiredLength}}',
+    minlength: 'input value must contain at least {{requiredLength}} characters',
+    maxlength:'maximum number of characters for this input is {{requiredLength}}',
     maxLength: 'maximum number of characters for this input is {{value}}',
     minLength: 'input value must contain at least {{value}} characters',
     invalid: 'input value this input is invalid',

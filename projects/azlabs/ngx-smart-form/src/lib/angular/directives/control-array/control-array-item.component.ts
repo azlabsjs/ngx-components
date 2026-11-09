@@ -22,18 +22,14 @@ import { Optional } from './types';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxArrayItemComponent {
-  //#region input properties
   @Input() index!: number;
   @Input() control!: AbstractControl;
   @Input() config!: InputConfigInterface;
   @Input() template: Optional<TemplateRef<any>>;
   @Input() autoupload = false;
-  @Input() detached: AbstractControl[] = [];
-  //#endregion
+  @Input() detached!: Optional<AbstractControl[]>;
 
-  // #region output properties
   @Output() destroy = new EventEmitter();
-  // #endregion
 
   clicked(event: Event) {
     this.destroy.emit();

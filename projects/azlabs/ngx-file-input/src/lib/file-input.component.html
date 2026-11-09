@@ -1,23 +1,12 @@
 <ng-content select="label"></ng-content>
 <ng-container *ngIf="state">
   <div [ngClass]="{ error: state | haserror }" class="flex-files-input">
-    <input
-      #input
-      fileinput
-      type="file"
-      [placeholder]="placeholder"
-      [class]="cssClass ?? ''"
-      [max-size]="maxFilesize || 10"
-      [max]="multiple ? maxFiles : 1"
-      [multiple]="multiple"
-      (sizeError)="sizeError($event)"
-      [accept]="accept"
-      (acceptedFiles)="accepted($event)"
-      (unAcceptedFiles)="notAccepted($event)"
-      (reset)="onReset()" />
+    <input #input fileinput type="file" [placeholder]="placeholder" [class]="cssClass ?? ''" [max-size]="maxFilesize || 10" [max]="multiple ? maxFiles : 1" [multiple]="multiple" (sizeError)="sizeError($event)" [accept]="accept" (acceptedFiles)="accepted($event)" (unAcceptedFiles)="notAccepted($event)" (reset)="onReset()" />
     <span *ngIf="state.uploading" class="spinner spinner-inline"></span>
-    <a *ngIf="tooltip && (state | haserror)" href="#" role="tooltip" aria-haspopup="true" class="tooltip tooltip-sm input__error_text">
-      <svg class="error-icon" version="1.1" viewBox="0 0 36 36" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <a *ngIf="tooltip && (state | haserror)" href="#" role="tooltip" aria-haspopup="true"
+      class="tooltip tooltip-sm input__error_text">
+      <svg class="error-icon" version="1.1" viewBox="0 0 36 36" preserveAspectRatio="xMidYMid meet"
+        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
         <title>error</title>
         <circle cx="18" cy="26.06" r="1.33" />
         <path d="M18,22.61a1,1,0,0,1-1-1v-12a1,1,0,1,1,2,0v12A1,1,0,0,1,18,22.61Z" />

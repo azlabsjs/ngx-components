@@ -28,19 +28,14 @@ export class NgxPasswordInputComponent {
   @Input() config!: TextInput;
   @ContentChild('input') inputRef!: TemplateRef<any>;
 
-  // tslint:disable-next-line: variable-name
   Mt = Math;
-  _state: StateType = {
-    showPassword: false,
-  };
+  _state: StateType = { showPassword: false };
   get state() {
     return this._state;
   }
 
   public toggle() {
-    this.setState(({ showPassword }) => ({
-      showPassword: !showPassword,
-    }));
+    this.setState(({ showPassword }) => ({ showPassword: !showPassword }));
   }
 
   constructor(private cdRef: ChangeDetectorRef) {}

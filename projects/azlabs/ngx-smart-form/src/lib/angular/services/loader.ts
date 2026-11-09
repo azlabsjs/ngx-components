@@ -43,13 +43,9 @@ export function createInputConfig(
     controlIndex: input['controlIndex'],
     value: input['value'],
     requiredIf: input['requiredIf'],
-    children: ((input['children'] as Record<string, unknown>[]) ?? [])?.map(
-      createInputConfig
-    ),
+    children: ((input['children'] as Record<string, unknown>[]) ?? [])?.map(createInputConfig),
     uniqueOn: input['uniqueOn'],
-    containerClass:
-      // Added support legacy `dynamicControlContainerClass` property
-      input['containerClass'] ?? input['dynamicControlContainerClass'],
+    containerClass: input['containerClass'] ?? input['dynamicControlContainerClass'], // Added support legacy `dynamicControlContainerClass` property
     valuefield: input['valuefield'],
     groupfield: input['groupfield'],
     keyfield: input['keyfield'],

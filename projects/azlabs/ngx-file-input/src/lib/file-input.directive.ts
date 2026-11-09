@@ -4,6 +4,7 @@ import {
   Directive,
   ElementRef,
   EventEmitter,
+  HostListener,
   Inject,
   Input,
   OnDestroy,
@@ -16,101 +17,86 @@ import { EventType } from './types';
   selector: '[fileinput]',
 })
 export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
-  //#region directive inputs
   @Input() multiple: boolean = false;
-  private _accept!: string[];
-  @Input() set accept(value: string | string[]) {
-    this._accept = Array.isArray(value)
-      ? value
-      : typeof value === 'string'
-      ? value.split(',').map((x) => x.trim())
-      : [];
-  }
-  get accept() {
-    return this._accept;
-  }
+  @Input({ transform: (value: string | string[]) => Array.isArray(value) ? value : typeof value === 'string' ? value.split(',').map((x) => x.trim()) : [] }) accept: string[] = [];
   @Input() acceptCallback!: (value: File) => boolean;
-  private _class!: string[];
-  @Input('class') set setClass(value: string | string[]) {
-    this._class =
-      typeof value === 'string'
-        ? value.split(' ')
-        : Array.isArray(value)
-        ? value
-        : [];
-  }
+  @Input({ alias: 'class', transform: (value: string) => typeof value === 'string' ? value.split(' ') : Array.isArray(value) ? value : [] }) cssClass: string[] = [];
   @Input({ alias: 'max' }) maxFiles = 1;
-  @Input({ alias: 'max-size' }) maxFileSize = 10; // MB
-  //#endregion
+  @Input({ alias: 'max-size' }) maxFileSize = 10;
 
-  //#region directive outputs
   @Output() sizeError = new EventEmitter<File[]>();
   @Output() unAcceptedFiles = new EventEmitter<File[]>();
   @Output() acceptedFiles = new EventEmitter<File[]>();
   @Output() removed = new EventEmitter();
   @Output() reset = new EventEmitter<void>();
-  //#endregion
 
-  //#region directive local properties
-  private tags: HTMLElement[] = [];
-  //#endregion
+  private nodes: HTMLElement[] = [];
+  private fileInput!: HTMLInputElement;
 
-  // constructor the directive class
-  public constructor(
-    private elementRef: ElementRef,
-    @Inject(DOCUMENT) private document: Document
-  ) {}
+  private inputClickFn = this.inputClick.bind(this);
+  private inputChangeFn = this.inputChange.bind(this);
+
+  public constructor(private elementRef: ElementRef, @Inject(DOCUMENT) private document: Document) { }
 
   ngAfterContentInit(): void {
-    let element = this.elementRef.nativeElement as HTMLElement;
-    let input: HTMLInputElement;
+    let element = this.elementRef.nativeElement as HTMLInputElement;
 
     if (!element) {
       throw new Error('directive must be attached to a valid element');
     }
-    if (
-      typeof (element as HTMLInputElement).type === 'undefined' ||
-      (element as HTMLInputElement).type !== 'file'
-    ) {
-      input = this.createInputElement(element);
-      this.tags.push(input);
-    } else {
-      input = this.initTag(element);
-      this.tags.push(input);
-    }
 
-    if (input) {
-      input.addEventListener('click', this.onSelect.bind(this));
-      input.addEventListener('change', this.onChange.bind(this));
+    this.fileInput = 'type' in element && element.type === 'file' ? this.initTag(element) : this.createInputTag(element);
+    this.removeListeners();
+
+    if (this.fileInput) {
+      this.nodes.push(this.fileInput);
+      this.fileInput.addEventListener('click', this.inputClickFn);
+      this.fileInput.addEventListener('change', this.inputChangeFn);
     }
   }
 
-  /**  @description add required files for the HTML input element */
-  private initTag(element: any) {
-    element.accept = this._accept;
-    element.multiple = this.multiple;
-    element.classList.add(...(this._class ?? []));
+  @HostListener('click', ['$event'])
+  onHostClick(event: MouseEvent): void {
+    if (event.target === this.fileInput) {
+      return;
+    }
 
-    return element;
+    if (this.fileInput) {
+      this.fileInput.click();
+    }
   }
 
-  /** @description file input click listener */
-  private onSelect(event: Event) {
-    const e = event as unknown as EventType<HTMLInputElement>;
-    if (e.target) {
-      e.target.value = '';
+  private initTag(node: HTMLInputElement) {
+    node.multiple = this.multiple;
+
+    if (this.accept.length > 0) {
+      node.accept = this.accept.join(',');
+    }
+
+    if (this.cssClass.length > 0) {
+      node.classList.add(...this.cssClass);
+    }
+
+    return node;
+  }
+
+  private inputClick(event: Event) {
+
+    // prevent input event click event to be propagated to the parent element
+    event.stopPropagation();
+
+    if (event.target) {
       this.reset.emit();
     }
   }
 
-  /** @description file change listener */
-  private onChange(event: Event) {
+  private inputChange(event: Event) {
     const e = event as unknown as EventType<HTMLInputElement>;
     if (e.target && e.target.value === '') {
       return;
     }
 
-    if (e.target && (e.target.files || []).length === 0) {
+    if (e.target && (e.target.files ?? []).length === 0) {
       return;
     }
 
@@ -118,89 +104,84 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
   }
 
   /** @description creates an HTML file input */
-  private createInputElement(parent: HTMLElement) {
-    if (this.document) {
-      let el = this.document.createElement('input');
-      el.classList.add('ngx-file-input');
-      el.type = 'file';
-      el = this.initTag(el);
-      parent.appendChild(el);
-      return el;
+  private createInputTag(parent: HTMLElement) {
+    if (!this.document) {
+      throw new Error('unsupported platform, cannot initialize input tag');
     }
 
-    throw new Error('platform document is not defined');
+    let node = this.document.createElement('input');
+    node.classList.add('ngx-file-input', 'hidden');
+    node.type = 'file';
+    node = this.initTag(node);
+    parent.appendChild(node);
+
+    return node;
   }
 
   /** @description handles input change event */
   private handleOnChange(target: HTMLInputElement) {
-    if (target.files) {
-      const {
-        sizedErrored = [],
-        unAcceptedFiles = [],
-        acceptedFiles = [],
-      } = {} as { [k: string]: File[] };
-      const files = this.getDroppedFiles(target.files);
-
-      for (const file of files) {
-        if (!this.inSizeRange(file)) {
-          sizedErrored.push(file);
-          continue;
-        }
-        if (
-          (typeof this.acceptCallback !== 'undefined' &&
-            this.acceptCallback !== null &&
-            this.acceptCallback(file)) ||
-          !this.accepted(file)
-        ) {
-          unAcceptedFiles.push(file);
-          continue;
-        }
-        acceptedFiles.push(file);
-      }
-
-      if (sizedErrored.length !== 0) {
-        target.value = '';
-        return this.sizeError.emit(sizedErrored);
-      }
-
-      if (unAcceptedFiles.length !== 0) {
-        target.value = '';
-        return this.unAcceptedFiles.emit(unAcceptedFiles);
-      }
-
-      this.acceptedFiles.emit(acceptedFiles);
+    if (!target.files) {
+      return;
     }
+
+    const sizedErrored: File[] = [];
+    const unAcceptedFiles: File[] = [];
+    const acceptedFiles: File[] = [];
+    const files = this.getDroppedFiles(target.files);
+
+    for (const file of files) {
+      if (!this.inRange(file)) {
+        sizedErrored.push(file);
+        continue;
+      }
+      if ((typeof this.acceptCallback !== 'undefined' && this.acceptCallback !== null && this.acceptCallback(file)) || !this.accepted(file)) {
+        unAcceptedFiles.push(file);
+        continue;
+      }
+
+      acceptedFiles.push(file);
+    }
+
+    if (sizedErrored.length !== 0) {
+      target.value = '';
+      return this.sizeError.emit(sizedErrored);
+    }
+
+    if (unAcceptedFiles.length !== 0) {
+      target.value = '';
+      return this.unAcceptedFiles.emit(unAcceptedFiles);
+    }
+
+    this.acceptedFiles.emit(acceptedFiles);
   }
 
   /** @description returns the list of dropped files */
   private getDroppedFiles(files: FileList) {
-    return this.maxFiles === 1
-      ? [files[0]]
-      : Array.from(
-          (function* () {
-            for (let index = 0; index < files.length; index++) {
-              const item = files![index];
-              if (item !== null && typeof item !== 'undefined') {
-                yield item;
-              }
-            }
-          })()
-        );
+    return this.maxFiles === 1 ? [files[0]] : Array.from(
+      (function* () {
+        for (let index = 0; index < files.length; index++) {
+          const item = files![index];
+          if (item !== null && typeof item !== 'undefined') {
+            yield item;
+          }
+        }
+      })()
+    );
   }
 
   /** @description returns the list of accepted files */
   private accepted(file: File) {
-    const types = this._accept ?? [];
-    if (types.length === 0) {
+    const values = this.accept ?? [];
+    if (values.length === 0) {
       return true;
     }
 
-    for (const item of types) {
-      if (item.trim() === '*') {
+    for (const name of values) {
+      if (name.trim() === '*') {
         return true;
       }
 
-      if (file.type.match(item)) {
+      if (file.type.match(name)) {
         return true;
       }
     }
@@ -208,14 +189,22 @@ export class HTMLFileInputDirective implements OnDestroy, AfterContentInit {
   }
 
   /** @description check if the size is in the valid size range for dropped files */
-  private inSizeRange(file: File) {
+  private inRange(file: File) {
     return Number((file.size / 1024 / 1024).toFixed(4)) <= this.maxFileSize;
   }
 
-  ngOnDestroy(): void {
-    for (const element of this.tags) {
-      element?.removeEventListener('click', this.onSelect.bind(this));
-      element?.removeEventListener('click', this.onSelect.bind(this));
+  private removeListeners() {
+    for (const node of this.nodes) {
+      if (!node) {
+        continue;
+      }
+
+      node.removeEventListener('click', this.inputClickFn);
+      node.removeEventListener('change', this.inputChangeFn);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.removeListeners();
   }
 }

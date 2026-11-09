@@ -27,4 +27,18 @@ export class ContainerCssClassPipe implements PipeTransform {
   }
 }
 
-export const FORM_PIPES = [HiddenCssClassPipe, ContainerCssClassPipe] as const;
+
+@Pipe({
+  name: 'join',
+  standalone: true,
+  pure: true
+})
+export class Join implements PipeTransform {
+  transform(character: string, ...args: string[]) {
+    args = [...args].filter(arg => typeof arg !== 'undefined' && arg !== null);
+    return args.join(character);
+  }
+
+}
+
+export const FORM_PIPES = [HiddenCssClassPipe, ContainerCssClassPipe, Join] as const;

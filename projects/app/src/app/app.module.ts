@@ -1,4 +1,4 @@
-import { inject, Injector, NgModule } from '@angular/core';
+import { inject, Injector, LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import {
@@ -22,7 +22,6 @@ import {
 } from '@azlabsjs/ngx-smart-form';
 import { ClarityIcons, uploadCloudIcon } from '@cds/core/icon';
 import { AppComponent } from './app.component';
-import { TestPipe } from './pipes/test.pipe';
 import {
   FORM_CONTROL_DIRECTIVES,
   useOptionsInterceptor,
@@ -37,7 +36,7 @@ import {
   AsyncTextPipe,
 } from '@azlabsjs/ngx-common';
 import { RouterModule } from '@angular/router';
-import { HTTPValuePipe, TRANSLATE_PIPES } from './pipes';
+import { HTTPValuePipe, AsyncTranslatePipe, RequiredPipe, TestPipe } from './pipes';
 import {
   OPTIONS_DIRECTIVES,
   provideCacheConfig,
@@ -53,12 +52,23 @@ import {
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { useTranslationsFactory } from './translations';
 import { MODAL_DIRECTIVES } from '@azlabs/ngx-modal';
+import localeFr from '@angular/common/locales/fr';
+import { registerLocaleData } from '@angular/common';
+
+registerLocaleData(localeFr);
 
 ClarityIcons.addIcons(uploadCloudIcon);
 
 export function createTranslateLoader() {
   return new TranslateHttpLoader(inject(HttpClient), './assets/i18n/', '.json');
 }
+
+export const createTranslate = useTranslationsFactory();
+export const createAppTranslator = createTranslate((values) => {
+  const result = { ...(values['app'] ?? {}), auth: values['auth'] ?? {} };
+  return result;
+});
+
 
 @NgModule({
   bootstrap: [AppComponent],
@@ -78,18 +88,19 @@ export function createTranslateLoader() {
     }),
     HTTPValuePipe,
     ClarityModule,
-    // CdsModule,
     ...DIRECTIVES,
     ...COMMON_PIPES,
-    ...TRANSLATE_PIPES,
     ...FORM_CONTROL_DIRECTIVES,
     ...FORM_DIRECTIVES,
     ...OPTIONS_DIRECTIVES,
     ...MODAL_DIRECTIVES,
     FormControlComponent,
     NgxDropzoneModule.forRoot(),
+    RequiredPipe,
+    AsyncTranslatePipe,
   ],
   providers: [
+    { provide: LOCALE_ID, useValue: 'fr-FR' },
     provideSupportedCountries(['tg', 'ci', 'gh']),
     providePreferredCountries(['ci']),
     providePipes({
@@ -135,7 +146,6 @@ export function createTranslateLoader() {
     provideFormsInitialization('/assets/forms.json'),
     /* injector: Injector */
     provideHttpClient('http://localhost:4000', () => {
-      // Replace the interceptor function by using the injector
       return (request, next) => {
         request = request.clone({
           options: {
@@ -149,33 +159,30 @@ export function createTranslateLoader() {
         return next(request);
       };
     }),
-    provideTranslations(useTranslationsFactory()),
     provideInputTranslations({
       loadingText: 'Chargement en cours...',
       validation: {
-        minlength: 'La longueur minimal du champ est de {{requiredLength}}',
-        maxlength: 'La longueur maximale du champ est de {{requiredLength}}',
-        maxLength: 'La longueur maximale du champ est de {{value}}',
-        minLength: 'La longueur minimal du champ est de {{value}}',
-        invalid: 'La valeur du champ est invalide',
-        required: 'Le champ est requis',
-        unique: 'La valeur de ce champ est déja existante',
-        email:
-          'La valeur de ce champ doit être un adresse mail valid [example@email.com]',
-        pattern: 'La valeur du champ est invalide',
-        min: 'La valeur minimal du champ est de {{min}}',
-        max: 'La valeur maximal du champ est de {{max}}',
-        phone: 'Veuillez saisir un numéro de téléphone valid',
-        minDate: 'Veuillez saisir une date ultérieure à la date du {{min}}',
-        maxDate: 'Veuillez saisir une date antérieure à la date du {{max}}',
-        exists:
-          "La valeur du champ n'existe pas dans la dans la base de données",
-        equals:
-          'La valeur du champ {{value}} ne correspond pas à la valeur saisie',
+        "minlength": "La longueur minimal du champ est de [requiredLength]",
+        "maxlength": "La longueur maximale du champ est de [requiredLength]",
+        "maxLength": "La longueur maximale du champ est de [requiredLength]",
+        "minLength": "La longueur minimal du champ est de [requiredLength]",
+        "invalid": "La valeur du champ est invalide",
+        "required": "Le champ est requis",
+        "unique": "La valeur de ce champ est déja existante",
+        "email": "La valeur de ce champ doit être un adresse mail valid [example@email.com]",
+        "pattern": "La valeur du champ est invalide",
+        "min": "La valeur minimal du champ est de [min]",
+        "max": "La valeur maximal du champ est de [max]",
+        "phone": "Veuillez saisir un numéro de téléphone valid",
+        "minDate": "Veuillez saisir une date ultérieure à la date du [min]",
+        "maxDate": "Veuillez saisir une date antérieure à la date du [max]",
+        "exists": "La valeur du champ n'existe pas dans la dans la base de données",
+        "equals": "La valeur du champ [value] ne correspond pas à la valeur saisie"
       },
     }),
     TranslatePipe,
     ngProvideHttpClient(withInterceptorsFromDi()),
+    provideTranslations(createAppTranslator),
   ],
 })
-export class AppModule {}
+export class AppModule { }

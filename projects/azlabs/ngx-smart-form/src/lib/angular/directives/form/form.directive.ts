@@ -26,18 +26,11 @@ import { deepEqual } from '@azlabsjs/utilities';
   standalone: true,
   providers: [FormModel],
 })
-export class NgxFormDirective
-  implements
-    ReactiveFormDirectiveInterface,
-    OnInit,
-    OnDestroy,
-    OnChanges,
-    AfterViewInit
-{
-  //#region local properties
+export class NgxFormDirective implements ReactiveFormDirectiveInterface, OnDestroy, OnChanges, OnInit, AfterViewInit {
+
   private subscriptions: Subscription[] = [];
   private changeSubscription: Subscription | null = null;
-  //#endregion
+  private init: boolean = false;
 
   get formGroup() {
     return this.model.state.formGroup;
@@ -50,9 +43,7 @@ export class NgxFormDirective
   }
 
   private _value!: { [k: string]: unknown };
-  @Input({ alias: 'value' }) set value(
-    value: Optional<{ [k: string]: unknown }>,
-  ) {
+  @Input({ alias: 'value' }) set value(value: Optional<{ [k: string]: unknown }>) {
     if (typeof value !== 'undefined' && value !== null) {
       this._value = value;
     }
@@ -61,29 +52,25 @@ export class NgxFormDirective
     return this.model.getValue();
   }
 
-  @Input() set ngxform(value: FormConfigInterface) {
-    this.updateModel(value);
+  private _form!: FormConfigInterface;
+  @Input() set ngxform(value: Optional<FormConfigInterface>) {
+    if (value) {
+      this._form = value;
+    }
   }
+
   @Input() set form(value: FormConfigInterface) {
-    this.updateModel(value);
+    if (value) {
+      this._form = value;
+    }
   }
 
   @Output() valueChanges = new EventEmitter<unknown>();
   @Output() ready = new EventEmitter<void>();
   @Output() submitted = new EventEmitter<{ [k: string]: unknown }>();
 
-  public constructor(
-    private model: FormModel<FormConfigInterface>,
-    private cdRef: ChangeDetectorRef | null,
-  ) {
-    const subscription = this.model.detectChanges$.subscribe(() =>
-      this.cdRef?.detectChanges(),
-    );
-    this.subscriptions.push(subscription);
-  }
-
-  ngOnInit(): void {
-    this.setValue(this._value);
+  public constructor(private model: FormModel<FormConfigInterface>, private cdRef: ChangeDetectorRef | null) {
+    this.subscriptions.push(this.model.detectChanges$.subscribe(() => this.cdRef?.detectChanges()));
   }
 
   setValue(state: { [k: string]: unknown }): void {
@@ -92,22 +79,31 @@ export class NgxFormDirective
     }
 
     // set or update the form state of the current component
-    if (state) {
-      this.model.setValue(state);
+    if (!state) {
+      return;
     }
 
+    this.model.setValue(state);
+
     // notify ui for value changes
-    this.cdRef?.markForCheck();
+    this.cdRef?.detectChanges();
   }
 
   addAsyncValidator(validator: AsyncValidatorFn, control?: string): void {
-    const c = control ? this.formGroup.get(control) : this.formGroup;
+    const c = this.model.get(control);
     if (c) {
       c.addAsyncValidators(validator);
     }
   }
 
-  ngAfterViewInit(): void {
+
+  ngOnInit() {
+    if (this._form) {
+      this.updateModel(this._form, this._value ?? {});
+    }
+  }
+
+  ngAfterViewInit() {
     const t = setTimeout(() => {
       this.ready.emit();
       clearTimeout(t);
@@ -115,7 +111,7 @@ export class NgxFormDirective
   }
 
   addValidator(validator: ValidatorFn, control?: string): void {
-    const c = control ? this.formGroup.get(control) : this.formGroup;
+    const c = this.model.get(control);
     if (c) {
       c.addValidators(validator);
     }
@@ -126,23 +122,22 @@ export class NgxFormDirective
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (
-      'state' in changes ||
-      ('value' in changes && this.valueHasChanged(changes['value']))
-    ) {
-      this.setValue(this._value);
+    if ('value' in changes && this.hasChanged(changes['value']) && 'form' in changes && this.hasChanged(changes['form']) && changes['form'].currentValue) {
+      this.updateModel(changes['form'].currentValue, changes['value'].currentValue);
+    } else if ('value' in changes && this.hasChanged(changes['value'])) {
+      this.setValue(changes['value'].currentValue);
+    } else if ('form' in changes && this.hasChanged(changes['form']) && changes['form'].currentValue) {
+      this.updateModel(changes['form'].currentValue);
     }
   }
 
   validate() {
     this.model.validate();
 
-    const subscription = this.formGroup.statusChanges
-      .pipe(
-        filter((status) => ['PENDING', 'DISABLED'].indexOf(status) === -1),
-        first(),
-      )
-      .subscribe(() => this.cdRef?.markForCheck());
+    const subscription = this.model.statusChanges().pipe(
+      filter((status) => ['PENDING', 'DISABLED'].indexOf(status) === -1),
+      first(),
+    ).subscribe(() => this.cdRef?.markForCheck());
 
     this.subscriptions.push(subscription);
   }
@@ -153,13 +148,12 @@ export class NgxFormDirective
     }
 
     this.validate();
-
     const errors = collectErrors(this.formGroup);
-    if (!this.formGroup.valid && errors.length > 0) {
+    if (!this.model.isValid() && errors.length > 0) {
       return;
     }
 
-    this.submitted.emit(this.formGroup.getRawValue());
+    this.submitted.emit(this.model.getValue());
   }
 
   ngOnDestroy(): void {
@@ -172,9 +166,9 @@ export class NgxFormDirective
     this.changeSubscription = null;
   }
 
-  private updateModel(config: FormConfigInterface) {
+  private updateModel(config: FormConfigInterface, value?: { [prop: string]: unknown }) {
     const formgroup = this.formGroup;
-    const value = formgroup ? formgroup.getRawValue() : null;
+    const oldValue = this.formGroup?.getRawValue();
 
     // update model configuration
     this.model.update(config);
@@ -184,26 +178,20 @@ export class NgxFormDirective
       return;
     }
 
-    // case the formgroup reference changes, subscribe to the new formgroup valueChanges
     if (this.formGroup !== formgroup) {
       if (this.changeSubscription) {
         this.changeSubscription.unsubscribe();
       }
-
-      // subscribe to new formgroup changes
-      this.changeSubscription = this.formGroup.valueChanges.subscribe((value) =>
-        this.valueChanges.emit(value),
-      );
+      this.changeSubscription = this.model.valueChanges().subscribe(this.valueChanges.emit.bind(this.valueChanges));
     }
 
-    // we maintain the state of the directive by setting
-    // it model state to the previous state.
+    value = value ?? oldValue;
     if (value) {
       this.setValue(value);
     }
   }
 
-  private valueHasChanged(change: SimpleChange) {
+  private hasChanged(change: SimpleChange) {
     const { previousValue, currentValue } = change;
     return !deepEqual(previousValue, currentValue);
   }

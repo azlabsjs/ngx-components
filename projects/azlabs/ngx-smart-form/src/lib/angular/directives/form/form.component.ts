@@ -10,7 +10,7 @@ import {
   Input,
   OnChanges,
   OnDestroy,
-  Optional,
+  Optional as ngOptional,
   Output,
   SimpleChanges,
   TemplateRef,
@@ -37,6 +37,7 @@ import { PIPES } from '../../pipes';
 import { FormModel } from './form.model';
 import { NgxFormComponent } from './form-ui.component';
 import { ModalDirective } from '../modal';
+import { Optional } from './types';
 
 /** @internal */
 const AUTO_SUBMIT_ERROR_MESSAGE =
@@ -51,9 +52,7 @@ const AUTO_SUBMIT_ERROR_MESSAGE =
   providers: [FormModel],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxSmartFormComponent
-  implements ReactiveFormComponentInterface, AfterViewInit, OnDestroy, OnChanges
-{
+export class NgxSmartFormComponent implements ReactiveFormComponentInterface, AfterViewInit, OnDestroy, OnChanges {
   get formGroup() {
     return this.model.state.formGroup;
   }
@@ -62,9 +61,7 @@ export class NgxSmartFormComponent
     return this.model.state.form;
   }
 
-  //#region input properties
   @Input() template!: TemplateRef<any>;
-  @Input() addTemplate!: TemplateRef<any>;
   @Input() label!: TemplateRef<any>;
   @Input() performingAction = false;
   @Input() disabled = false;
@@ -79,9 +76,13 @@ export class NgxSmartFormComponent
   @Input() action: HTTPRequestMethods = 'POST';
   @Input('no-grid-layout') noGridLayout = false;
   @Input() modal!: ModalDirective;
-  //#endregion
 
-  //#region output properties
+  /** @deprecated */
+  @Input() addTemplate!: TemplateRef<any>;
+  @Input({ alias: 'add' }) add!: TemplateRef<any>;
+  @Input({ alias: 'add-group' }) addgroup!: TemplateRef<any>;
+  @Input({ alias: 'table-description' }) tabledescription!: Optional<TemplateRef<any>>;
+
   @Output() submit = new EventEmitter<{ [index: string]: any }>();
   @Output() ready = new EventEmitter();
   @Output() changes = new EventEmitter();
@@ -89,7 +90,7 @@ export class NgxSmartFormComponent
   @Output() complete = new EventEmitter<unknown>();
   @Output() error = new EventEmitter<unknown>();
   @Output() performingRequest = new EventEmitter<boolean>();
-  //#endregion
+  @Output('item-removed') removed = new EventEmitter<{ name: string, control: AbstractControl }>();
 
   @HostListener('keyup.enter', ['$event'])
   onEnterButtonCliked(event: Event) {
@@ -98,30 +99,19 @@ export class NgxSmartFormComponent
     }
   }
 
-  //#region
   @ContentChild('submitButton') submitRef!: TemplateRef<Node>;
   @ContentChild(ModalDirective) formmodal!: ModalDirective | null;
-  //#endregion
 
   private subscriptions: Subscription[] = [];
   private changeSubscription: Subscription | null = null;
 
-  public constructor(
-    protected readonly model: FormModel<FormConfigInterface>,
-    private cdRef: ChangeDetectorRef | null,
-    @Inject(HTTP_REQUEST_CLIENT) @Optional() private client?: RequestClient,
-  ) {
-    const subscription = this.model.detectChanges$.subscribe(() =>
-      this.cdRef?.detectChanges(),
-    );
+  public constructor(protected readonly model: FormModel<FormConfigInterface>, private cdRef: ChangeDetectorRef | null, @Inject(HTTP_REQUEST_CLIENT) @ngOptional() private client?: RequestClient) {
+    const subscription = this.model.detectChanges$.subscribe(() => this.cdRef?.detectChanges());
     this.subscriptions.push(subscription);
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (
-      'state' in changes &&
-      changes['state'].currentValue !== changes['state'].previousValue
-    ) {
+    if ('state' in changes && changes['state'].currentValue !== changes['state'].previousValue) {
       const { currentValue: state } = changes['state'];
       if (this.form && this.formGroup && state) {
         this.setValue(state);
@@ -130,10 +120,7 @@ export class NgxSmartFormComponent
   }
 
   setValue(state: { [k: string]: unknown }): void {
-    // set or update the form state of the current component
     this.model.setValue(state);
-
-    // notify ui for value changes
     this.cdRef?.markForCheck();
   }
 
@@ -145,7 +132,6 @@ export class NgxSmartFormComponent
     }, 700);
   }
 
-  //#region component interface method definitions
   controlValueChanges(name: string): Observable<unknown> {
     return this.formGroup?.get(name)?.valueChanges ?? EMPTY;
   }
@@ -156,7 +142,7 @@ export class NgxSmartFormComponent
   }
 
   setControlValue(control: string, value: any): void {
-    this.formGroup.get(control)?.setValue(value);
+    this.model.get(control)?.setValue(value, { emitEvent: true });
   }
 
   disableControls(controls: ControlsStateMap): void {
@@ -203,11 +189,8 @@ export class NgxSmartFormComponent
       return;
     }
 
-    // validate the formgroup object to ensure it passes validation before submitting
     this.model.validate();
 
-    // wait the for status changes of the formgroup
-    // to make sure ui update error message
     const subscription = this.formGroup?.statusChanges
       .pipe(filter((status) => ['PENDING', 'DISABLED'].indexOf(status) === -1))
       .subscribe(() => this.cdRef?.detectChanges());
@@ -216,47 +199,39 @@ export class NgxSmartFormComponent
       this.subscriptions.push(subscription);
     }
 
-    // We simply return without performing any further action if the validation fails
-    // Due to some issue with form group being invalid while all controls does not
-    // have error, we are adding a check that verifies if all controls has error before
-    // breaking out of the function
     const errors = collectErrors(this.formGroup);
-    if (!this.formGroup.valid && errors.length > 0) {
+    
+    if (!this.model.isValid() && errors.length > 0) {
       return;
     }
 
     const path = this.path ?? this.form?.endpointURL;
-    const clientDefined =
-      typeof this.client !== 'undefined' && this.client !== null;
-    const pathDefined = path !== null && path !== 'undefined';
-    const shouldSubmit = this.autoSubmit && clientDefined;
+    const hasReqClient = typeof this.client !== 'undefined' && this.client !== null;
+    const hasPath = path !== null && path !== 'undefined';
+    const canSubmit = this.autoSubmit && hasReqClient;
 
-    // case component is configured to auto submit form values, we send
-    // request using the configured client object
-    if (shouldSubmit && pathDefined) {
-      await this.sendRequest(path || 'http://localhost');
+    if (canSubmit && hasPath) {
+      await this.sendRequest(path);
       return;
     }
-    const configError =
-      (this.autoSubmit && !clientDefined) || (this.autoSubmit && !pathDefined);
+    const configError = (this.autoSubmit && !hasReqClient) || (this.autoSubmit && !hasPath);
 
-    // case there is no configuration error, emit a submit event
     if (!configError) {
       this.submit.emit(this.model.getValue());
       return;
     }
-    // We throw an error if developper misconfigured the smart form component
+
     throw new Error(AUTO_SUBMIT_ERROR_MESSAGE);
   }
 
   setComponentForm(value: FormConfigInterface): void {
     if (value) {
-      // we set the controls container class
       const controls = (value.controlConfigs ?? []).map((current) => ({
         ...current,
         containerClass: current.containerClass ?? 'input-col-md-12',
         isRepeatable: current.isRepeatable ?? false,
       }));
+
       const form = { ...value, controlConfigs: controls };
       this.updateModel(form, this.formGroup);
     }
@@ -270,7 +245,6 @@ export class NgxSmartFormComponent
   reset(): void {
     this.model.reset();
   }
-  //#endregion
 
   setControlConfig(config?: InputConfigInterface, name?: string) {
     if (!this.form) {
@@ -302,6 +276,11 @@ export class NgxSmartFormComponent
     this.changeSubscription = null;
   }
 
+
+  protected onRemoved(event: { name: string, control: AbstractControl }) {
+    this.removed.emit(event);
+  }
+
   private async sendRequest(path: string) {
     try {
       this.performingRequest.emit(true);
@@ -327,9 +306,8 @@ export class NgxSmartFormComponent
       if (this.changeSubscription) {
         this.changeSubscription.unsubscribe();
       }
-      const subscription = this.formGroup.valueChanges.subscribe((value) =>
-        this.formGroupChange.emit(value),
-      );
+      const subscription = this.model.valueChanges().subscribe((value) => this.formGroupChange.emit(value));
+
       this.changeSubscription = subscription;
     }
   }

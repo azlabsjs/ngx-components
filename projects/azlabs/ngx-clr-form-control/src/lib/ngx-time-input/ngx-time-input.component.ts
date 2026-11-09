@@ -11,10 +11,8 @@ import { NgxCommonModule } from '../common';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxTimeInputComponent {
-  //#region component inputs
   @Input() control!: AbstractControl;
   @Input() describe = true;
   @Input() config!: TimeInput;
-  @ContentChild('input') inputRef!: TemplateRef<any>;
-  //#endregion
+  @ContentChild('input') input!: TemplateRef<any>;
 }

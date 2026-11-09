@@ -1,28 +1,17 @@
 /* modal (background) */
 .modal {
   display: none;
-  /* hidden by default */
   position: fixed;
-  /* stay in place */
   z-index: var(--ngx-modal-z-index, 1050);
-  
-  /* sit on top */
-  /* location of the box */
   left: 0;
   top: 0;
   width: 100vw;
-
-  /* full width */
   height: 100vh;
-
-  /* full height */
-  overflow: auto;
-
-  /* enable scroll if needed */
-  background-color: rgb(0, 0, 0);
-
-  /* fallback color */
+  overflow: hidden;
   background-color: rgba(0, 0, 0, 0.5);
+  inset: 0px;
+  -webkit-backdrop-filter: var(--ngx-modal-backdrop-filter, blur(3px));
+  backdrop-filter: var(--ngx-modal-backdrop-filter, blur(3px));
 }
 
 /* modal opened state */
@@ -39,32 +28,32 @@
 }
 
 .modal .modal-content {
-  min-height: var(--search-modal-min-height, 220px) !important;
-  max-height: calc(100vh - 8px);
+  min-height: var(--ngx-modal-min-height, 220px) !important;
+  max-height: var(--ngx-modal-max-height, calc(100vh - 50px));
 }
 
 .modal.sm .modal-content {
   width: 14.4rem;
-  min-height: var(--search-modal-min-height, 220px) !important;
-  max-height: calc(100vh - 8px);
+  min-height: var(--ngx-modal-min-height, 220px) !important;
+  max-height: var(--ngx-modal-max-height, calc(100vh - 50px));
 }
 
 .modal.md .modal-content {
   width: 36.4rem;
-  min-height: var(--search-modal-min-height, 220px) !important;
-  max-height: calc(100vh - 8px);
+  min-height: var(--ngx-modal-min-height, 220px) !important;
+  max-height: var(--ngx-modal-max-height, calc(100vh - 50px));
 }
 
 .modal.lg .modal-content {
   width: 43.2rem;
-  min-height: var(--search-modal-min-height, 220px) !important;
-  max-height: calc(100vh - 8px);
+  min-height: var(--ngx-modal-min-height, 220px) !important;
+  max-height: var(--ngx-modal-max-height, calc(100vh - 50px));
 }
 
 .modal.xl .modal-content {
   width: 80%;
   height: auto;
-  max-height: calc(100vh - 8px);
+  max-height: var(--ngx-modal-max-height, calc(100vh - 50px));
 }
 
 .modal.full .modal-content {
@@ -95,9 +84,9 @@
 .modal.full .modal-content {
   border: 1px solid var(--ngx-modal-content-border-color, #888);
   border-radius: var(--ngx-modal-content-border-radius, 0.15rem);
-  box-shadow: 0 0.05rem 0rem 0rem
-    var(--ngx-modal-content-box-shadow-color, rgba(0, 0, 0, 0.1));
+  box-shadow: 0 0.05rem 0rem 0rem var(--ngx-modal-content-box-shadow-color, rgba(0, 0, 0, 0.1));
 }
+
 /* modal content*/
 
 /* modal title */
@@ -121,12 +110,13 @@
   overflow-y: scroll;
   scrollbar-width: thin;
   padding: 0.5rem 2rem;
-  margin: var(--search-modal-margin, 0) !important;
+  margin: var(--ngx-modal-margin, 0) !important;
 }
 
 .modal.full :host ::ng-deep .ngx-modal-body {
-  margin: var(--search-modal-margin, 0) !important;
+  margin: var(--ngx-modal-margin, 0) !important;
 }
+
 /*! modal body !*/
 
 /* modal footer */
@@ -194,15 +184,18 @@
   0% {
     transform: scale(0);
   }
+
   100% {
     transform: scale(1);
   }
 }
+
 @keyframes scaleDown {
   0% {
     transform: scale(1);
     opacity: 1;
   }
+
   100% {
     transform: scale(0);
     opacity: 0;
@@ -214,10 +207,12 @@
     transform: scale(1);
     opacity: 1;
   }
+
   99.9% {
     transform: scale(2);
     opacity: 0;
   }
+
   100% {
     transform: scale(0);
   }
@@ -228,9 +223,11 @@
     transform: scale(2);
     opacity: 0;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
   }
 }
+
 /*! Animation styles */

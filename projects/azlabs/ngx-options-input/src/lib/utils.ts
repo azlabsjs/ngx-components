@@ -1,24 +1,8 @@
 import { Injector } from '@angular/core';
-import {
-  getHttpHost,
-  HTTPRequest,
-  HTTPRequestMethods,
-  HTTPResponseType,
-  Interceptor,
-  useRequestClient,
-} from '@azlabsjs/requests';
-import {
-  customToResourceURL,
-  isCustomURL,
-  isValidHttpUrl,
-  OptionsConfig,
-} from '@azlabsjs/smart-form-core';
-import { filter, from, map, ObservableInput } from 'rxjs';
-import {
-  InputOptionsClient,
-  InterceptorFactory,
-  OptionsQueryConfigType,
-} from './types';
+import { getHttpHost, HTTPRequest, HTTPRequestMethods, HTTPResponseType, Interceptor, useRequestClient } from '@azlabsjs/requests';
+import { customToResourceURL, isCustomURL, isValidHttpUrl, OptionsConfig } from '@azlabsjs/smart-form-core';
+import { from, map, ObservableInput } from 'rxjs';
+import { InputOptionsClient, InterceptorFactory, Optional, OptionsQueryConfigType } from './types';
 
 type _OptionsRequestFunction = <T>(
   param: string,
@@ -205,18 +189,11 @@ function resolveInterceptorFactory(
 }
 
 /** @internal */
-export function optionsQueryClient(
-  injector: Injector,
-  endpoint?: string,
-  queriesConfig?: OptionsQueryConfigType
-) {
+export function optionsQueryClient(injector: Injector, endpoint?: string, queriesConfig?: OptionsQueryConfigType) {
   const fn = (config: OptionsQueryParams, injector: Injector, factory?: InterceptorFactory<HTTPRequest>) => queryOptions(config, injector, factory);
 
   Object.defineProperty(fn, 'request', {
-    value: (
-      config: OptionsConfig & { name?: string },
-      search?: Record<string, unknown>
-    ) => {
+    value: (config: OptionsConfig & { name?: string }, search?: Record<string, unknown>) => {
 
       const { source, name } = config;
       const { queries, interceptorFactory: factory } = queriesConfig ?? {}
@@ -230,11 +207,20 @@ export function optionsQueryClient(
       }
 
       const request = { ...config, url: createRequestURL(config, endpoint ?? ''), search }
-      console.log( 'Request: ', request);
       return fn(request, injector, queries && name ? resolveInterceptorFactory(queries, name, factory) : factory);
     },
     configurable: true,
     writable: true
   });
   return fn as any as _OptionsRequestFunction & InputOptionsClient;
+}
+
+
+/** @internal */
+export function isEmpty(value: Optional<{ [prop: string]: unknown }>) {
+  if (!value) {
+    return true;
+  }
+
+  return Object.keys(value).length === 0;
 }

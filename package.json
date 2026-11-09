@@ -1,9 +1,9 @@
 {
   "name": "ngx-components",
-  "version": "0.17.95",
+  "version": "0.17.150",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --port 8756",
+    "start": "ng serve --port 8000",
     "build:all": "ng build --configuration production @azlabsjs/ngx-common && ng build --configuration production @azlabsjs/ngx-modal && ng build --configuration production @azlabsjs/ngx-dropzone && ng build --configuration production @azlabsjs/ngx-dropdown && ng build --configuration production @azlabsjs/ngx-intl-tel-input && ng build --configuration production @azlabsjs/ngx-file-input && ng build --configuration production @azlabsjs/ngx-options-input && ng build --configuration production @azlabsjs/ngx-clr-form-control && ng build --configuration production @azlabsjs/ngx-smart-form && ng build --configuration production @azlabsjs/ngx-clr-smart-grid && ng build --configuration production @azlabsjs/ngx-slides",
     "watch": "ng build --watch",
     "test": "ng test",
@@ -27,7 +27,7 @@
     "@azlabsjs/js-object": "^0.2.10",
     "@azlabsjs/requests": ">=0.2.0 | <0.4.0",
     "@azlabsjs/rx-query": "^0.3.0",
-    "@azlabsjs/smart-form-core": "^0.2.63",
+    "@azlabsjs/smart-form-core": "^0.2.72",
     "@azlabsjs/uploader": ">=0.2.0 | <0.4.0",
     "@azlabsjs/utilities": "^0.2.10",
     "@cds/core": "^6.11.0",

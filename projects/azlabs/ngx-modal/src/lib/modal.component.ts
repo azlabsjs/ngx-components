@@ -5,7 +5,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -13,22 +13,18 @@ import {
   ContentChild,
   EventEmitter,
   HostListener,
+  Inject,
   Input,
   OnChanges,
   Output,
+  Renderer2,
   SimpleChange,
   SimpleChanges,
   TemplateRef,
 } from '@angular/core';
-import { Optional, OutletConfig, SizeType } from './types';
+import { Optional, OutletConfig, SizeType, StateType } from './types';
 import { PIPES } from './pipes';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
-
-/** @internal */
-type StateType = {
-  opened: boolean;
-  size: SizeType;
-};
 
 @Component({
   imports: [CommonModule, ...PIPES, COMMON_PIPES],
@@ -101,17 +97,12 @@ type StateType = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModalComponent implements OnChanges {
-  // #region component internal properties
-  private _state: StateType = {
-    opened: false,
-    size: 'lg',
-  };
+
+  private _state: StateType = { opened: false, size: 'lg' };
   get state() {
     return this._state;
   }
-  // #region
 
-  // #region input properties
   @Input() opened: boolean = false;
   private _size!: SizeType;
   @Input() set size(value: SizeType) {
@@ -125,24 +116,20 @@ export class ModalComponent implements OnChanges {
   @Input() outlet!: OutletConfig | null | undefined;
   @Input() cssClass!: string | string[];
   @Input() actions!: TemplateRef<any>;
-  // #endregion
 
-  // #region output properties
   @Output() openedChange = new EventEmitter<boolean>();
-  // #region
 
-  @ContentChild('template') templateRef!: Optional<TemplateRef<unknown>>;
+  @ContentChild('template') template!: Optional<TemplateRef<unknown>>;
 
   @HostListener('document:keydown.escape', ['$event'])
-  onEscapeKeyPress(event: Event) {
+  onEscapeKeyPress(_: Event) {
     if (this._state.opened) {
       this.close();
-      event?.stopPropagation();
     }
   }
 
-  // class constructor
-  constructor(private _ref?: ChangeDetectorRef) {}
+  constructor(private renderer: Renderer2, private _ref: ChangeDetectorRef | null, @Inject(DOCUMENT) private document: Document | null) { }
+
 
   ngOnChanges(changes: SimpleChanges): void {
     const state = (Object.keys(this._state) as (keyof StateType)[]).reduce(
@@ -160,9 +147,7 @@ export class ModalComponent implements OnChanges {
   }
 
   /** control or change component local state object */
-  private setState(
-    _partial: Partial<StateType> | ((_state: StateType) => StateType)
-  ) {
+  private setState(_partial: Partial<StateType> | ((_state: StateType) => StateType)) {
     if (typeof _partial === 'function' && _partial !== null) {
       this._state = _partial({ ...this.state });
     } else {
@@ -173,16 +158,21 @@ export class ModalComponent implements OnChanges {
 
   close() {
     this.onClose();
+    if (this.document && this.document.body) {
+      this.renderer.removeStyle(this.document.body, 'overflow');
+    }
   }
 
   open() {
     this.setState({ opened: true });
+    if (this.document && this.document.body) {
+      this.renderer.setStyle(this.document.body, 'overflow', 'hidden');
+    }
   }
 
-  onClose(event?: Event) {
+  onClose() {
     this.setState({ opened: false });
     this.openedChange.emit(false);
-    event?.stopPropagation();
   }
 
   setProperty(name: keyof typeof this, value: any) {

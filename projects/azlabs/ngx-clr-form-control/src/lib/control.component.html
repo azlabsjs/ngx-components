@@ -22,11 +22,10 @@
           [tooltip-error]="tooltiperror">
           <label class="clr-control-label" *ngIf="describe" [for]="config.name">
             <ng-container *ngTemplateOutlet="label ?? _label; context: { $implicit: config!.label, config }"></ng-container>
-            <small class="required-text" *ngIf="config.rules?.isRequired ?? (config | required)">(*)</small>
+            <small class="required-text" *ngIf="config | required">(*)</small>
           </label>
         </ngx-file-input>
       </ng-container>
-  
       <!-- error -->
       <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
     </ng-container>
@@ -44,6 +43,7 @@
     <!-- Select input -->
     <ng-container *ngSwitchCase="inputTypes.SELECT_INPUT">
       <ngx-select-input
+        [input]="select"
         [control]="formControl"
         [config]="inputConfig | selectInput"
         [describe]="describe"
@@ -52,12 +52,14 @@
         (selected)="selected.emit($event)">
         <label class="clr-control-label" *ngIf="describe" [for]="inputConfig.name">
           <ng-container *ngTemplateOutlet="label ?? _label; context: { $implicit: inputConfig!.label, config: inputConfig }"></ng-container>
-          <small class="required-text" *ngIf="inputConfig.rules?.isRequired ?? (inputConfig | required)">(*)</small>
+          <small class="required-text" *ngIf="inputConfig | required">(*)</small>
         </label>
-      </ngx-select-input>
 
-      <!-- error -->
-      <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
+        <section>
+          <ng-container *ngTemplateOutlet="description; context: { text: inputConfig.description } "></ng-container>
+          <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
+        </section>
+      </ngx-select-input>
     </ng-container>
     <!--\ Select input -->
 
@@ -67,36 +69,42 @@
         <div class="clr-input-wrapper">
           <label class="clr-control-label" *ngIf="describe" [for]="inputConfig!.name">
             <ng-container *ngTemplateOutlet="label ?? _label;context: { $implicit: inputConfig!.label, config: inputConfig }"></ng-container>
-            <span class="required-text" *ngIf="inputConfig.rules?.isRequired ?? (inputConfig | required)">(*)</span>
+            <span class="required-text" *ngIf="inputConfig | required">(*)</span>
           </label>
-          <ngx-phone-input [control]="formControl" [config]="inputConfig" [describe]="describe" [class]="'clr-input'" [countries]="countries">
-            <ng-template #input let-config="config" let-onBlur="onBlur" let-onFocus="onFocus" let-keypress="keypress" let-selected="selected" let-change="change" let-required="required" let-disabled="disabled" let-value="value">
+          <ngx-phone-input [input]="_input" [error]="err" [control]="formControl" [config]="inputConfig" [describe]="describe" [class]="'clr-input'" [countries]="countries">
+            <ng-template #_input let-config="config" let-onBlur="onBlur" let-onFocus="onFocus" let-keypress="keypress" let-selected="selected" let-change="change" let-required="required" let-disabled="disabled" let-value="value">
               <input noAutoComplete [value]="value" [required]="required" [class]="'effect-24 ' + config!.classes" (blur)="onBlur($event)" (focus)="onFocus($event)" (keypress)="keypress($event)" (change)="change($event)" (input)="change($event)" [disabled]="disabled" placeholder="{{ selected?.placeHolder }}" autocomplete="off" type="tel" />
+            </ng-template>
+            <ng-container *ngTemplateOutlet="description; context: { text: inputConfig.description } "></ng-container>
+            <ng-template #err let-control>
+              <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: control.touched, $implicit: control.errors, errors: control.errors }"></ng-container>
             </ng-template>
           </ngx-phone-input>
         </div>
       </div>
-
-      <!-- error -->
-      <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
     </ng-container>
     <!--\ Phone input -->
 
     <!-- Date input -->
     <ng-container *ngSwitchCase="inputTypes.DATE_INPUT">
-      <ngx-date-input [control]="formControl" [config]="inputConfig | dateInput" [describe]="describe">
+      <ngx-date-input (blur)="onBlur($event, inputConfig!.name)" [control]="formControl" [config]="inputConfig | dateInput" [describe]="describe">
         <ng-template #input let-control="control" let-onBlur="onBlur" let-config="config">
-          <clr-date-container>
-            <label class="clr-control-label" *ngIf="describe" [for]="config.name">
-              <ng-container *ngTemplateOutlet="label ?? _label; context: { $implicit: config!.label, config }"></ng-container>
-              <span class="required-text" *ngIf="config.rules?.isRequired ?? (config | required)">(*)</span>
-            </label>
-            <input noAutoComplete type="date" [attr.title]="config!.label" (blur)="onBlur($event)" [formControl]="control" [value]="control.value" [min]="config!.minDate ?? config.constraints?.min" [max]="config.maxDate ?? config.constraints?.max" clrDate />
-          </clr-date-container>
+          <ng-container *ngTemplateOutlet="date ?? _date; context: { $implicit: config, config, onBlur, control, describe, label: label ?? _label }" ></ng-container >
+          <ng-template #_date let-control="control" let-onBlur="onBlur" let-config="config" let-describe="describe" let-label="label">
+            <clr-date-container>
+              <label class="clr-control-label" *ngIf="describe" [for]="config.name">
+                <ng-container *ngTemplateOutlet="label; context: { $implicit: config!.label, config }"></ng-container>
+                <span class="required-text" *ngIf="config | required">(*)</span>
+              </label>
+              <input noAutoComplete type="date" [attr.title]="config!.label" (blur)="onBlur($event)" [formControl]="control" [value]="control.value" [min]="config!.minDate ?? config.constraints?.min" [max]="config.maxDate ?? config.constraints?.max" clrDate />
+            </clr-date-container>
+          </ng-template>
         </ng-template>
       </ngx-date-input>
-      <!-- error -->
-      <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
+      <section>
+        <ng-container *ngTemplateOutlet="description; context: { text: inputConfig.description } "></ng-container>
+        <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
+      </section>
     </ng-container>
     <!--\ Date input -->
 
@@ -108,16 +116,16 @@
             <div class="clr-input-wrapper">
               <label class="clr-control-label" *ngIf="describe" [for]="config!.name">
                 <ng-container *ngTemplateOutlet=" label ?? _label; context: { $implicit: config!.label, config }"></ng-container>
-                <span class="required-text" *ngIf="config.rules?.isRequired ?? (config | required)">(*)</span>
+                <span class="required-text" *ngIf="config | required">(*)</span>
               </label>
               <input noAutoComplete (keyup)="onKeyUp($event, config!.name)" (keydown)="onKeyDown($event, config!.name)" (keypress)="onKeyPress($event, config!.name)" (blur)="onBlur($event, config!.name)" type="time" [max]="config!.max || max" [min]="config!.min ? config!.min : 0" [class]="config!.classes" [formControl]="control" placeholder="{{config!.placeholder ? config!.placeholder : ''}}" [value]="control.value" />
+              
+              <ng-container *ngTemplateOutlet="description; context: { text: config.description } "></ng-container>
+              <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
             </div>
           </div>
         </ng-template>
       </ngx-time-input>
-
-      <!-- error -->
-      <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
     </ng-container>
     <!--\ Time input -->
 
@@ -129,7 +137,7 @@
             <div class="clr-form-control">
               <label class="clr-control-label" *ngIf="describe" [for]="config!.name">
                 <ng-container *ngTemplateOutlet="label ?? _label; context: { $implicit: config!.label, config }"></ng-container>
-                <span class="required-text"*ngIf="config.rules?.isRequired ?? (config | required)">(*)</span>
+                <span class="required-text"*ngIf="config | required">(*)</span>
               </label>
               <div class="clr-control-container" [class]="control.errors ? 'clr-error' : ''">
                 <div class="clr-textarea-wrapper">
@@ -143,13 +151,13 @@
                     placeholder="{{config!.placeholder ? config!.placeholder : ''}}" [rows]="config!.rows"></textarea>
                   <cds-icon class="clr-validate-icon"shape="exclamation-circle"></cds-icon>
                 </div>
+
+                <ng-container *ngTemplateOutlet="description; context: { text: config.description } "></ng-container>
+                <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
               </div>
             </div>
           </ng-template>
         </ngx-textarea-input>
-
-        <!-- error -->
-        <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
       </ng-container>
     </ng-container>
     <!--\ Textarea input -->
@@ -162,7 +170,7 @@
             <div class="clr-input-wrapper">
               <label class="clr-control-label" *ngIf="describe" [for]="config!.name">
                 <ng-container *ngTemplateOutlet="label ?? _label; context: { $implicit: config!.label, config }"></ng-container>
-                <span class="required-text" *ngIf="config.rules?.isRequired ?? (config | required)">(*)</span>
+                <span class="required-text" *ngIf="config | required">(*)</span>
               </label>
               <input
                 noAutoComplete
@@ -177,13 +185,13 @@
                 [formControl]="control"
                 [value]="control.value"
                 placeholder="{{config!.placeholder ? config!.placeholder : ''}}" />
+
+                <ng-container *ngTemplateOutlet="description; context: { text: config.description } "></ng-container>
+                <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
             </div>
           </div>
         </ng-template>
       </ngx-number-input>
-
-      <!-- error -->
-      <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
     </ng-container>
     <!--\ Number input -->
 
@@ -194,7 +202,7 @@
           <clr-radio-container clrInline>
             <label class="clr-control-label" *ngIf="describe">
               <ng-container *ngTemplateOutlet="label ?? _label; context: { $implicit: config!.label, config }"></ng-container>
-              <span class="required-text" *ngIf="config.rules?.isRequired ?? (config | required)">(*)</span>
+              <span class="required-text" *ngIf="config | required">(*)</span>
             </label>
             <clr-radio-wrapper *ngFor="let option of options">
               <input
@@ -209,11 +217,11 @@
               <label>{{ option.description ?? option.name }}</label>
             </clr-radio-wrapper>
           </clr-radio-container>
+
+          <ng-container *ngTemplateOutlet="description; context: { text: config.description } "></ng-container>
+          <ng-container *ngTemplateOutlet=" error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
         </ng-template>
       </ngx-radio-input>
-
-      <!-- error -->
-      <ng-container *ngTemplateOutlet=" error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
     </ng-container>
     <!--\ Radio input -->
 
@@ -222,12 +230,14 @@
       <ngx-checkbox-input [control]="formControl" [config]="inputConfig | selectInput" [describe]="describe">
         <label label class="clr-control-label" *ngIf="describe">
           <ng-container *ngTemplateOutlet="label ?? _label; context: { $implicit: inputConfig!.label, config: inputConfig }"></ng-container>
-          <small class="required-text" *ngIf="inputConfig.rules?.isRequired ?? (inputConfig | required)">(*)</small>
+          <small class="required-text" *ngIf="inputConfig | required">(*)</small>
         </label>
-      </ngx-checkbox-input>
 
-      <!-- error -->
-      <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
+        <section>
+          <ng-container *ngTemplateOutlet="description; context: { text: inputConfig.description } "></ng-container>
+          <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
+        </section>
+      </ngx-checkbox-input>
     </ng-container>
     <!--\ Checkbox input -->
 
@@ -239,7 +249,7 @@
             <div class="clr-input-wrapper password-clr-input-wrapper password-wrapper">
               <label [for]="inputConfig!.name" class="clr-control-label" *ngIf="describe">
                 <ng-container *ngTemplateOutlet="label ?? _label; context: { $implicit: inputConfig!.label, config: inputConfig }"></ng-container>
-                <small class="required-text" *ngIf="inputConfig.rules?.isRequired ?? (inputConfig | required)">(*)</small>
+                <small class="required-text" *ngIf="inputConfig | required">(*)</small>
               </label>
               <input
                 [noAutoComplete]="'new-password'"
@@ -256,15 +266,15 @@
                 [class]="config!.classes + ' password-input'"
                 [formControl]="control"
                 placeholder="{{ config!.placeholder ? config!.placeholder : '' }}" />
-              <cds-icon shape="eye" (click)="toggle($event)" *ngIf="state.showPassword" class="password-trigger"></cds-icon>
-              <cds-icon shape="eye-hide" (click)="toggle($event)" *ngIf="!state.showPassword" class="password-trigger"></cds-icon>
+                <cds-icon shape="eye" (click)="toggle($event)" *ngIf="state.showPassword" class="password-trigger"></cds-icon>
+                <cds-icon shape="eye-hide" (click)="toggle($event)" *ngIf="!state.showPassword" class="password-trigger"></cds-icon>
+                
+                <ng-container *ngTemplateOutlet="description; context: { text: config.description }"></ng-container>
+                <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
             </div>
           </div>
         </ng-template>
       </ngx-password-input>
-
-      <!-- error -->
-      <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
     </ng-container>
     <!--\ Password input -->
 
@@ -282,7 +292,7 @@
         <div class="clr-input-wrapper">
           <label [for]="config!.name" class="clr-control-label" *ngIf="describe">
             <ng-container *ngTemplateOutlet="label ?? _label; context: { $implicit: config!.label, config }"></ng-container>
-            <small class="required-text" *ngIf="config.rules?.isRequired ?? (config | required)">(*)</small>
+            <small class="required-text" *ngIf="config | required">(*)</small>
           </label>
           <input
             noAutoComplete
@@ -298,13 +308,13 @@
             [formControl]="control"
             [value]="control.value"
             placeholder="{{ config!.placeholder ? config!.placeholder : '' }}" />
+
+            <ng-container *ngTemplateOutlet="description; context: { text: config.description } "></ng-container>
+            <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
         </div>
       </div>
     </ng-template>
   </ngx-text-input>
-  
-  <!-- error -->
-  <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
 </ng-template>
 <!--\ Text input -->
 
@@ -317,3 +327,8 @@
   <ngx-input-error error *ngIf="touched" [errors]="errors"></ngx-input-error>
 </ng-template>
 <!--\ Input errors -->
+
+<!-- description -->
+<ng-template #description let-text="text">
+    <span [class]="'input__subtext'" *ngIf="describe" [innerHTML]="text ?? '' | trustHtml"></span>
+</ng-template>

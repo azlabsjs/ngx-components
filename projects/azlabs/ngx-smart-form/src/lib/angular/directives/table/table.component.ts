@@ -7,29 +7,25 @@ import {
   EventEmitter,
   Input,
   OnDestroy,
-  Optional,
   Output,
   TemplateRef,
   ViewChild,
   ViewContainerRef,
+  Injector,
+  Optional as ngOptional,
 } from '@angular/core';
 import { RefType, ViewRefFactory } from '../types';
-import { AbstractControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { BUTTON_DIRECTIVES } from '../buttons';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 import { ModalDirective } from '../modal';
 import { PIPES } from './pipes';
+import { withRefetchObservable } from '../../helpers';
+import { ContextType, Optional } from './types';
 
-/** @internal */
-type ContextType = {
-  formgroup: AbstractControl;
-  autoupload: boolean;
-  inputs: InputConfigInterface[];
-  remove: (event: Event) => void;
-  destroy: Observable<number>;
-};
+
 
 @Component({
   standalone: true,
@@ -39,95 +35,210 @@ type ContextType = {
   styleUrls: ['./table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxTableForm
-  implements ViewRefFactory<EmbeddedViewRef<any>>, OnDestroy
-{
-  //#region component inputs
-  @Input() label!: TemplateRef<any> | null | undefined;
-  @Input({ alias: 'template' }) view!: TemplateRef<any>;
-  @Input({ alias: 'inputs' }) configs: InputConfigInterface[] = [];
-  @Input({ alias: 'auto-upload' }) autoupload: boolean = true;
-  @Input({ required: true }) detached!: AbstractControl[];
-  @Input() title!: string;
+export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDestroy {
+  _view!: Optional<TemplateRef<any>>;
+  @Input({ alias: 'template' }) set view(value: Optional<TemplateRef<any>>) {
+    this._view = value;
+    if (this.modal && value) {
+      this.modal.setView(value);
+    }
+  }
+  get view() {
+    return this._view;
+  }
+
+  _label!: Optional<TemplateRef<any>>;
+  @Input() set label(value: Optional<TemplateRef<any>>) {
+    this._label = value;
+    if (this.modal && value) {
+      this.modal.setLabel(value);
+    }
+  }
+  get label() {
+    return this._label;
+  }
+
+  _inputs: InputConfigInterface[] = [];
+  @Input() set inputs(value: InputConfigInterface[]) {
+    this._inputs = value;
+    if (this.modal && value) {
+      this.modal.setInputs(value);
+    }
+  }
+  get inputs() {
+    return this._inputs;
+  }
+
+  _autoupload: boolean = true;
+  @Input({ alias: 'auto-upload' }) set autoupload(value: boolean) {
+    this._autoupload = value;
+    if (this.modal) {
+      this.modal.setAutoUpload(value);
+    }
+  }
+  get autoupload() {
+    return this._autoupload;
+  }
+
+  _detached: Optional<AbstractControl[]> = [];
+  @Input() set detached(value: Optional<AbstractControl[]>) {
+    this._detached = value;
+    if (this.modal) {
+      this.modal.setDetached(value);
+    }
+  }
+  get detached() {
+    return this._detached;
+  }
+
+  _title!: string;
+  @Input() set title(value: string) {
+    this._title = value;
+    if (this.modal) {
+      this.modal.setTitle(value);
+    }
+  }
+  get title() {
+    return this._title;
+  }
+
+
+  _name!: string;
+  @Input() set name(value: string) {
+    this._name = value;
+    if (this.modal) {
+      this.modal.setName(value);
+    }
+  }
+  get name() {
+    return this._name;
+  }
+
+
   @Input() modal!: ModalDirective;
-  @Input() name!: string;
-  //#endregion
+  @Input({ alias: 'edit-mode' }) editmode: 'modal' | 'inline' | 'both' | 'none' = 'both'; // edit-mode-modal
 
-  //#region component output
   @Output() removed = new EventEmitter<RefType<EmbeddedViewRef<any>>>();
-  //#endregion
 
-  //#region component properties
-  @ViewChild('container', { read: ViewContainerRef, static: false })
-  containerRef!: ViewContainerRef;
-  @ViewChild('template', { static: false }) templateRef!: TemplateRef<any>;
-  //#endregion
+  @ViewChild('container', { read: ViewContainerRef, static: false }) _container!: ViewContainerRef;
+  @ViewChild('template', { static: false }) _template!: TemplateRef<any>;
 
   private subscriptions: Subscription[] = [];
 
-  constructor(@Optional() private cdRef: ChangeDetectorRef | null) {}
+  constructor(private injector: Injector, @ngOptional() private cdref: ChangeDetectorRef | null) { }
 
-  createView(
-    index: number,
-    formgroup: AbstractControl,
-    triggered: boolean = false
-  ) {
+  createView(index: number, formgroup: AbstractControl, triggered: boolean = false) {
     const subject = new Subject<number>();
-    const inputs = [...this.configs];
+    const inputs = withRefetchObservable([...this._inputs], formgroup as FormGroup, this.name);
 
     // case a modal component is provided we open the modal and pass required input configuration to it
     if (triggered && this.modal) {
-      this.modal.formgroup = formgroup as FormGroup;
-      this.modal.inputs = inputs;
-      this.modal.autoupload = this.autoupload;
-      this.modal.title = this.title;
-      this.modal.detached = this.detached;
-      this.modal.view = this.view;
-      this.modal.name = this.name;
-      if (this.label) {
-        this.modal.label = this.label;
-      }
-      
-      this.modal.stateChanged();
-      this.modal.open();
+      this.showModalView(inputs, formgroup);
     }
 
-    const element = this.containerRef?.createEmbeddedView<ContextType>(
-      this.templateRef,
-      {
-        formgroup,
-        autoupload: this.autoupload,
-        inputs,
-        remove: (e: Event) => {
-          e?.preventDefault();
-          ref?.destroy();
-          subject.next(ref.index);
-        },
-        destroy: subject.asObservable(),
-      }
-    );
-    const ref: RefType<EmbeddedViewRef<any>> = {
-      index,
-      element,
-      destroy: () => element.destroy(),
-    };
+    const element = this._container?.createEmbeddedView<ContextType>(this._template, {
+      formgroup,
+      autoupload: this.autoupload,
+      inputs,
+      remove: (e: Event) => {
+        e?.preventDefault();
+        if (!ref) return;
+        ref.destroy();
+        subject.next(ref.index);
+      },
+      destroy: subject.asObservable(),
+    }, { index, injector: this.injector });
 
-    const subscription = element.context.destroy.subscribe(() =>
-      this.removed.emit(ref)
-    );
+    const ref: RefType<EmbeddedViewRef<any>> = { index, element, destroy: () => element.destroy() };
+
+    const subscription = element.context.destroy.subscribe(() => this.removed.emit(ref));
 
     this.subscriptions.push(subscription);
 
     return ref;
   }
 
+
+  updateView(ref: RefType<EmbeddedViewRef<any>>, formgroup: AbstractControl) {
+    ref.element.context.formgroup = formgroup;
+    this.cdref?.markForCheck();
+  }
+
   clear(): void {
-    this.containerRef?.clear();
+    this._container?.clear();
+  }
+
+  showModalView(inputs: InputConfigInterface[], formgroup: AbstractControl) {
+
+    if (formgroup.disabled) {
+      formgroup.enable();
+      
+      if (formgroup instanceof FormGroup) {
+        this.disableControls(formgroup, inputs);
+      }
+    }
+
+    if (this.modal) {
+      this.modal.formgroup = formgroup as FormGroup;
+      this.modal.inputs = inputs;
+      this.modal.autoupload = this.autoupload;
+      this.modal.title = this.title;
+      this.modal.detached = this.detached;
+      this.modal.name = this.name;
+
+      if (this.view) {
+        this.modal.view = this.view;
+      }
+
+      if (this.label) {
+        this.modal.label = this.label;
+      }
+
+      this.modal.open();
+
+      const subscription = this.modal.closed.subscribe(() => {
+        if (this.editmode === 'modal' || this.editmode === 'none' && formgroup.enabled) {
+          formgroup.disable();
+        }
+      });
+
+      this.subscriptions.push(subscription);
+    }
   }
 
   ngOnDestroy(): void {
     for (const subscription of this.subscriptions) {
       subscription?.unsubscribe();
+    }
+  }
+
+  private disableControls(formgroup: FormGroup, inputs: InputConfigInterface[]) {
+
+    for (const input of inputs) {
+      if (input.disabled || ('constraints' in input && input.constraints && 'disabled' in input.constraints && Boolean(input.constraints['disabled']))) {
+        const current = formgroup.get(input.name);
+
+        if (!current) {
+          continue;
+        }
+
+        if (current instanceof FormGroup && 'children' in input && Array.isArray(input.children)) {
+          this.disableControls(current, input.children);
+          continue;
+        }
+
+        if (current instanceof FormArray && input.isRepeatable && 'children' in input && Array.isArray(input.children)) {
+          for (let index = 0; index < current.length; index++) {
+            const element = current.at(index);
+            if (element && element instanceof FormGroup) {
+              this.disableControls(element, input.children);
+            }
+          }
+          continue;
+        }
+
+        current.disable({ emitEvent: true });
+      }
     }
   }
 }

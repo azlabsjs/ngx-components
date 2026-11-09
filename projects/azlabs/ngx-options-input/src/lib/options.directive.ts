@@ -7,7 +7,7 @@ import {
   Inject,
   Input,
   OnDestroy,
-  Optional,
+  Optional as NgOptional,
   Output,
 } from '@angular/core';
 import {
@@ -18,20 +18,20 @@ import {
   mapStringListToInputOptions,
   OptionsConfig,
 } from '@azlabsjs/smart-form-core';
-import { Subject, from, lastValueFrom, of } from 'rxjs';
-import { debounceTime, first, map, switchMap, tap } from 'rxjs/operators';
+import { lastValueFrom } from 'rxjs';
+import { first, map } from 'rxjs/operators';
 import {
   InputOptionsClient,
   ObservableOptionsConfig,
   OptionsConfigType,
-  QueryType,
   Subscribable,
   KeyType as _KeyType,
   Subscription,
+  Optional,
 } from './types';
 import { INPUT_OPTIONS_CLIENT, OPTIONS_CACHE } from './tokens';
 import { CacheType } from './cache';
-import { deepEqual } from '@azlabsjs/utilities';
+import { isEmpty } from './utils';
 
 /** @internal */
 type ObservationOptions = {
@@ -40,11 +40,8 @@ type ObservationOptions = {
   threshold: number;
 };
 
-/** @description Creates a browser intersection observer instance */
-export function createIntersectionObserver(
-  callback: IntersectionObserverCallback,
-  options?: ObservationOptions | undefined
-) {
+/** @description creates a browser intersection observer instance */
+export function createIntersectionObserver(callback: IntersectionObserverCallback, options?: ObservationOptions | undefined) {
   return new IntersectionObserver(callback, options);
 }
 
@@ -77,69 +74,39 @@ function isobservable(o: OptionsConfigType): o is ObservableOptionsConfig {
   selector: '[fetchOptions]',
 })
 export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
-  //#region input properties
   @Input() loaded!: boolean;
   @Input() name!: string;
   @Input() auto: boolean = true;
   @Input({ alias: 'query' }) search: string = 'label';
   @Input({ alias: 'limit' }) limit!: number;
   private _options!: OptionsConfigType | undefined;
-  @Input({ alias: 'config' }) set options(
-    value: OptionsConfigType | undefined
-  ) {
+  @Input({ alias: 'config' }) set options(value: OptionsConfigType | undefined) {
     this._options = value;
-    if (value && isobservable(value)) {
-      this.observable = value.refetch;
+    if (this._options && isobservable(this._options)) {
+      this.observable = this._options.refetch;
     }
   }
   get options() {
     return this._options;
   }
-  //#endregion
 
-  //#region outputs properties
   @Output() optionsChange = new EventEmitter<InputOptions>();
   @Output() loadingChange = new EventEmitter<boolean>();
-  //#endregion
 
   // local properties
   private observer!: IntersectionObserver;
-  private search$ = new Subject<[_KeyType, Omit<OptionsConfigType, 'refetch'>, QueryType]>();
   private subscriptions: Subscription[] = [];
   private observable!: Subscribable<{ [k: string]: unknown }>;
-  private key!: _KeyType;
+  private lastQuery: Optional<{ [prop: string]: unknown }> = null;
 
-  // directive constructor
   constructor(
     private elemRef: ElementRef,
     @Inject(INPUT_OPTIONS_CLIENT) private client: InputOptionsClient,
     @Inject(DOCUMENT) private document: Document,
     @Inject(OPTIONS_CACHE)
-    @Optional()
-    private cache: CacheType<Record<string, unknown>, InputOptions>
-  ) {
-    this.subscriptions.push(
-      this.search$
-        .asObservable()
-        .pipe(
-          debounceTime(500),
-          switchMap(([key, options, params]) => {
-            const result = this.cache.get(key);
-            return result
-              ? of({ key, params, options, values: result })
-              : from(this.sendRequest(options as OptionsConfig, params)).pipe(map((values) => ({ key, params, options, values })));
-          }),
-          tap((state) => {
-            const { key, options, params, values } = state;
-            this.cache.put(key, values, (_values) => this.sendRequest(options as OptionsConfig, params));
-
-            this.loadingChange.emit(false);
-            this.optionsChange.emit(values);
-          })
-        )
-        .subscribe()
-    );
-  }
+    @NgOptional()
+    private cache: CacheType<unknown, InputOptions>
+  ) { }
 
   ngAfterViewInit() {
     if (this.auto) {
@@ -149,54 +116,69 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
         !('IntersectionObserver' in view) &&
         !('IntersectionObserverEntry' in view) &&
         !('intersectionRatio' in view.IntersectionObserverEntry.prototype)
-        ? this.query()
+        ? this.query(this.lastQuery)
         : this.observeView();
     }
 
     // subscribe to observable
     if (this.observable) {
-      const subscription = this.observable.subscribe((value) => {
-        this.fetch(undefined, value);
+      const subscription = this.observable.subscribe((query) => {
+        this.fetch(undefined, query);
       });
 
       this.subscriptions.push(subscription);
     }
   }
 
-  query() {
+  query(params?: Optional<{ [prop: string]: unknown }>) {
     const { loaded, options } = this;
     if (loaded || typeof options === 'undefined' || options === null) {
       return Promise.resolve();
     }
 
     this.loadingChange.emit(true);
-    const { source } = options;
-    return isresource(source) ? this.fetchAsync(options) : this.fetchSync(options);
+    return isresource(options.source) ? this.fetchAsync(options, params ?? {}) : this.fetchSync(options);
   }
 
   fetch(value?: string, query?: { [k: string]: unknown }) {
     const { options, search } = this;
-    if (typeof options !== 'undefined' && options !== null) {
-
-      this.loadingChange.emit(true);
-      let searchquery = query ?? {};
-      if (value) {
-        searchquery[search] = value;
-      }
-
-      this.fetchAsync(options, searchquery);
+    if (typeof options === 'undefined' || options === null) {
+      return;
     }
+
+    query = query ?? {};
+    if (value) {
+      query[search] = value;
+    }
+
+    // set the last query property to equal to the current query in order to
+    // preserve the state of the input on next intersection
+    this.lastQuery = query;
+    this.loadingChange.emit(true);
+    this.fetchAsync(options, this.lastQuery);
+  }
+
+  next(values: InputOptions) {
+    this.loadingChange.emit(false);
+    this.optionsChange.emit(values);
   }
 
   private observeView() {
     if (this.observer) {
       this.observer.disconnect();
     }
-    this.observer = createIntersectionObserver((entries, _) => {
+
+    this.observer = createIntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          this.query();
+        if (!entry.isIntersecting) {
+          return;
         }
+
+        if (isEmpty(this.lastQuery) && this.loaded) {
+          return
+        }
+
+        this.query(this.lastQuery);
       });
     });
 
@@ -214,21 +196,31 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   }
 
   /** @interal */
-  private async fetchAsync(
-    options: OptionsConfigType,
-    params: Record<string, unknown> = {}
-  ) {
+  private async fetchAsync(options: OptionsConfigType, params: Record<string, unknown> = {}) {
     const query = typeof this.limit !== 'undefined' && this.limit !== null ? { page: 1, per_page: this.limit, ...params } : { ...params };
     const { refetch, ...rest } = options;
-    const key = { ...rest, ...params };
+    const key = {...rest, query };
 
-    if (this.key && !deepEqual(this.key, key)) {
-      this.cache.dispose(this.key);
+    // query value from cache and dispatch options change if value is in cache
+    const cached = this.cache.get(key);
+    if (!cached) {
+      this.cache.put(key, () => this.sendRequest(options as OptionsConfig, query), this);
+      return;
     }
 
-    this.key = key;
+    if (cached.expired()) {
+      this.cache.dispose(key);
+      this.cache.put(key, () => this.sendRequest(options as OptionsConfig, query), this);
+      return;
+    }
 
-    this.search$.next([key, rest, query]);
+    const values = cached.value();
+    if (values) {
+      this.optionsChange.emit(values);
+      return;
+    }
+
+    cached.subscribe(this);
   }
 
   private sendRequest(options: OptionsConfig, params: Record<string, unknown>) {

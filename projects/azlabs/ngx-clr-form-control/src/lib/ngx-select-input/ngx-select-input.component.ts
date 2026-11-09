@@ -4,10 +4,10 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
-  HostListener,
   Inject,
   Input,
   Output,
+  TemplateRef,
   ViewChild,
 } from '@angular/core';
 import { FormControl, FormsModule } from '@angular/forms';
@@ -19,6 +19,7 @@ import {
 } from '@azlabsjs/ngx-options-input';
 import { NgxCommonModule } from '../common';
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select';
+import { Thunk } from './pipes';
 
 // @internal
 type OptionalConfig = Omit<OptionsInput, 'options'> & { options?: OptionsInput['options'] };
@@ -36,6 +37,7 @@ type StateType = {
     NgxCommonModule,
     FormsModule,
     NgSelectModule,
+    Thunk,
     ...OPTIONS_DIRECTIVES,
   ],
   selector: 'ngx-select-input',
@@ -44,7 +46,6 @@ type StateType = {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxSelectInputComponent {
-  //#region component properties
   _state: StateType = {
     performingAction: false,
     config: null,
@@ -54,9 +55,7 @@ export class NgxSelectInputComponent {
     return this._state;
   }
   private fetchOnFocus: boolean = false;
-  //#endregion
 
-  //#region component inputs
   @Input() control!: FormControl<any>;
   @Input() describe = true;
   @Input() disabled = false;
@@ -69,37 +68,22 @@ export class NgxSelectInputComponent {
     this.autoSelect(config);
 
     options = options ?? [];
-    this.setState((state) => ({
-      ...state,
-      config,
-      loaded: options.length !== 0,
-    }));
+    this.setState((state) => ({...state, config, loaded: options.length !== 0 }));
   }
   @Input({ alias: 'loading-text' }) loadingText!: string;
-  @Input() parent: string | null | undefined = '.ng-select-container';
-  //#endregion
+  @Input() parent: string | null | undefined = 'body';
+  @Input() input!: TemplateRef<any> | null | undefined;
 
-  //#region component outputs
   @Output() remove = new EventEmitter<any>();
   @Output() selected = new EventEmitter<InputEventArgs>();
-  //#endregion
+
 
   @ViewChild('optionsRef', { static: false })
   options!: FetchOptionsDirective;
 
   @ViewChild('ngselect', { static: false }) ngselect: NgSelectComponent | null | undefined;
 
-  @HostListener('window:scroll', [])
-  onScroll() {
-    if (this.ngselect && this.ngselect.isOpen) {
-      this.ngselect.close();
-    }
-  }
-
-  constructor(
-    @Inject(DOCUMENT) private document: Document,
-    private cdRef: ChangeDetectorRef
-  ) {
+  constructor(@Inject(DOCUMENT) private document: Document, private cdRef: ChangeDetectorRef) {
     const { defaultView: view } = this.document;
 
     if (!view) {
@@ -107,11 +91,7 @@ export class NgxSelectInputComponent {
     }
 
     const { IntersectionObserverEntry: entry } = view;
-    this.fetchOnFocus = !(
-      'IntersectionObserver' in view &&
-      'IntersectionObserverEntry' in view &&
-      'intersectionRatio' in entry.prototype
-    );
+    this.fetchOnFocus = !('IntersectionObserver' in view && 'IntersectionObserverEntry' in view && 'intersectionRatio' in entry.prototype);
   }
 
   onFocus(): void {
@@ -133,25 +113,21 @@ export class NgxSelectInputComponent {
 
     config = {
       ...config,
-      options: options.map((state) => ({
-        ...state,
-        name: state?.name?.toUpperCase(),
-        description: state.description?.toUpperCase(),
-      })),
+      options: options.map((state) => ({...state, name: state?.name?.toUpperCase(), description: state.description?.toUpperCase()})),
     };
 
     this.autoSelect(config);
-
     this.setState((state) => ({ ...state, performingAction: false, config: config }));
   }
 
   modelChange(value: any) {
-    this.control.setValue(value);
-    this.cdRef?.markForCheck();
+    this.control.setValue(value, { onlySelf: false, emitEvent: true, emitModelToViewChange: true, emitViewToModelChange: true });
+    this.control.updateValueAndValidity();
+    this.cdRef?.detectChanges();
   }
 
   loadingChange(value: boolean) {
-    this.setState((v) => ({ ...v, performingAction: value }));
+    this.setState((v) => ({ ...v, performingAction: value, loaded: !value }));
   }
 
   setState(state: (state: StateType) => StateType) {
@@ -159,11 +135,11 @@ export class NgxSelectInputComponent {
     this.cdRef?.markForCheck();
   }
 
-  removed(e: unknown, config: OptionalConfig) {
+  removed(config: OptionalConfig, e?: unknown) {
     this.remove.emit({ name: config.name, event: e });
   }
 
-  select(e: unknown, config: OptionalConfig) {
+  select(config: OptionalConfig, e?: unknown) {
     this.selected.emit({ name: config.name, value: e });
   }
 
@@ -171,6 +147,7 @@ export class NgxSelectInputComponent {
     const { autoselect, options: items } = config;
     if (items && autoselect && items.length === 1) {
       this.control.setValue(items[0].value);
+      this.control.disable();
     }
   }
 

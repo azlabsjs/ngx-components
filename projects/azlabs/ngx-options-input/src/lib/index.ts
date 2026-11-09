@@ -8,7 +8,7 @@ export {
   InterceptorFactory,
 } from './types';
 
-export { optionsQueryClient } from './helpers';
+export { optionsQueryClient } from './utils';
 
 /** exported library providers */
 export { provideCacheConfig, provideQueryClient } from './providers';

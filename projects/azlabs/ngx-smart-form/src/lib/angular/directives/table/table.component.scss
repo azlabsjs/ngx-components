@@ -17,8 +17,7 @@
 
 .table td,
 .table th {
-  border-left: var(--array-table-borderwidth, calc(1 * (1rem / 20))) solid
-    var(--array-table-border-color, hsl(198, 14%, 82%));
+  border-left: var(--array-table-borderwidth, calc(1 * (1rem / 20))) solid var(--array-table-border-color, hsl(198, 14%, 82%));
   background: var(--array-table-background-color, none);
   text-align: var(--array-table-text-align, inherit) !important;
 }
@@ -26,20 +25,15 @@
 .table th,
 .table-compact th {
   font-weight: var(--array-table-header-font-weight, bold) !important;
-  padding: var(
-    --array-table-header-padding,
-    calc(4 * calc(6 * calc((1rem / 20) * 1)) / 3)
-      calc(4 * calc(6 * calc((1rem / 20) * 1)) / 3)
-  ) !important;
+  padding: var(--array-table-header-padding,
+      calc(4 * calc(6 * calc((1rem / 20) * 1)) / 3) calc(4 * calc(6 * calc((1rem / 20) * 1)) / 3)) !important;
 }
 
 .table td:has(input:focus) {
   border-width: var(--array-table-borderwidth, calc(1 * (1rem / 12)));
   border-style: solid;
-  border-color: var(
-    --array-table-border-focus-color,
-    hsl(198, 100%, 34%)
-  ) !important;
+  border-color: var(--array-table-border-focus-color,
+      hsl(198, 100%, 34%)) !important;
 }
 
 .table td.error,
@@ -52,8 +46,7 @@
 
 .table {
   border-collapse: separate;
-  border: var(--array-table-borderwidth, calc(1 * (1rem / 20))) solid
-    var(--array-table-border-color, hsl(198, 14%, 82%)) !important;
+  border: var(--array-table-borderwidth, calc(1 * (1rem / 20))) solid var(--array-table-border-color, hsl(198, 14%, 82%)) !important;
   border-radius: var(--array-table-border-radius, 0) !important;
   max-width: 100%;
   width: 100%;
@@ -91,9 +84,69 @@
   overflow-x: scroll;
 }
 
-.table-footer {
-  display: inline-block;
-  margin: var(--table-margin, 0);
-  margin-top: var(--table-footer-v-margin, 16px);
-  margin-bottom: var(--table-footer-v-margin, 16px);
+.cursor-pointer {
+  cursor: pointer;
+}
+
+:host ::ng-deep .text-ellipsis, .text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fit {
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.justify-between {
+  justify-content: space-between;
+} 
+
+.justify-arround {
+  justify-content: space-around;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.sticky {
+  position: sticky;
+}
+
+.right-0 {
+  right: 0;
+}
+
+.bg-light {
+  background-color: var(--light-bg-color, #ffffff) !important;
+  background: var(--light-bg-color, #ffffff) !important;
+}
+
+.bg-light-50 {
+  background-color: var(--light-bg-color, #ffffff) !important;
+  background: var(--light-bg-color, #ffffff) !important;
+}
+
+.z-2 {
+  z-index: 2;
+}
+
+.z-3 {
+  z-index: 3;
+}
+
+
+.table-pencil {
+  width: var(--ngx-table-pencil-width, 24px);
+  height: var(--ngx-table-pencil-height, 24px);
 }

@@ -27,7 +27,6 @@ type StateType = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxRadioInputComponent {
-  // #region component input properties
   @Input() control!: AbstractControl;
   @Input() set config(config: OptionsInput) {
     if (!config) {
@@ -38,21 +37,13 @@ export class NgxRadioInputComponent {
     this.autoSelect(config);
 
     options = options ?? [];
-    this.setState((state) => ({
-      ...state,
-      config,
-      loaded: options.length !== 0,
-    }));
+    this.setState((state) => ({ ...state, config, loaded: options.length !== 0 }));
   }
   @Input() describe = true;
-  // #endregion
-  @ContentChild('input') inputRef!: TemplateRef<any>;
+  @ContentChild('input') input!: TemplateRef<any>;
 
-  //#region component outputs
   @Output() configChange = new EventEmitter<OptionsInput>();
-  //#endregion
 
-  // #region component properties
   private _state: StateType = {
     config: null,
     loaded: false,
@@ -61,7 +52,6 @@ export class NgxRadioInputComponent {
   get state() {
     return this._state;
   }
-  // #endregion
 
   /** @description radion input component class constructor */
   constructor(private cdRef: ChangeDetectorRef) {}
@@ -75,11 +65,7 @@ export class NgxRadioInputComponent {
     config = { ...config, options };
     this.autoSelect(config);
 
-    this.setState((state) => ({
-      ...state,
-      config: config,
-      loaded: true,
-    }));
+    this.setState((state) => ({ ...state, config: config, loaded: true }));
     this.configChange.emit(config);
   }
 

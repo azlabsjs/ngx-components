@@ -18,17 +18,18 @@ import {
   Optional,
   ViewChild,
 } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { GridColumnType, GridConfigType } from '@azlabsjs/ngx-clr-smart-grid';
 import { COMMON_PIPES, createPipeTransform } from '@azlabsjs/ngx-common';
 import { createSlide } from '@azlabsjs/ngx-slides';
 import {
   FormsClient,
   FORM_CLIENT,
-  uniqueValidator,
   HTTP_REQUEST_CLIENT,
   RequestClient,
   existsValidator,
+  ReactiveFormDirectiveInterface,
+  ModalDirective,
 } from '@azlabsjs/ngx-smart-form';
 import {
   FileInput,
@@ -36,12 +37,6 @@ import {
   InputTypes,
 } from '@azlabsjs/smart-form-core';
 import { BehaviorSubject, filter, Subject, takeUntil, tap } from 'rxjs';
-import { TestPipe, TRANSLATE_PIPES } from './pipes';
-import { FORM_CONTROL_DIRECTIVES } from '@azlabsjs/ngx-clr-form-control';
-import { DIRECTIVES as GRID_DIRECTIVES } from '@azlabsjs/ngx-clr-smart-grid';
-import { FormControlComponent } from './form-control/form-control.component';
-import { ClarityModule } from '@clr/angular';
-import { ReactiveFormDirectiveInterface } from 'projects/azlabs/ngx-smart-form/src/lib';
 import { ModalComponent } from '@azlabs/ngx-modal';
 
 const _values = {
@@ -200,8 +195,8 @@ export class AppComponent implements OnInit {
   ];
 
   fromState = {
-    document_id:
-      'https://storagev2.lik.tg/api/storage/object/download?name=17652725236937ebcb22e06493916050&signature=63a33124004cb0a0ca3450230f5204b09442f911409d178a8f5b2d3679238675',
+    birthdate: '2027-10-10',
+    document_id: 'https://storagev2.lik.tg/api/storage/object/download?name=17652725236937ebcb22e06493916050&signature=63a33124004cb0a0ca3450230f5204b09442f911409d178a8f5b2d3679238675',
     fruits: ['2', '3', '4'],
     category_id: 1,
     lastname: 'AZOMEDOH',
@@ -212,12 +207,27 @@ export class AppComponent implements OnInit {
         firstname: 'EKUE',
         lastname: 'AYI',
         profession: 'INFORMATIQUE',
+        phone: '22891952345',
+        country: 1,
+        gpg: 10
       },
       {
         firstname: 'RODRIGUE',
         lastname: 'KOLANI',
         profession: 'RESEARCH',
         category_id: 2,
+        phone: '22891952345',
+        country: 2,
+        gpg: 10
+      },
+      {
+        firstname: 'CASSEY',
+        lastname: 'MURASTORI',
+        profession: 'RESEARCH',
+        category_id: 2,
+        phone: '22891952345',
+        country: 1,
+        gpg: 10
       },
     ],
     phonenumber: ['22891969456', '22892384958'],
@@ -225,10 +235,11 @@ export class AppComponent implements OnInit {
       firstname: 'MADELEINE',
       lastname: 'DE LA COURT',
       email: 'madeleined@example.com',
+      phonenumber: '22891952345'
     },
   };
 
-    fromState2 = {
+  fromState2 = {
     document_id:
       'https://storagev2.lik.tg/api/storage/object/download?name=17652725236937ebcb22e06493916050&signature=63a33124004cb0a0ca3450230f5204b09442f911409d178a8f5b2d3679238675',
     fruits: ['2', '3', '4'],
@@ -241,12 +252,27 @@ export class AppComponent implements OnInit {
         firstname: 'EKUE',
         lastname: 'AYI',
         profession: 'INFORMATIQUE',
+        phone: '22891952345',
+        country: 1,
+        gpg: 10
       },
       {
         firstname: 'RODRIGUE',
         lastname: 'KOLANI',
         profession: 'RESEARCH',
         category_id: 2,
+        phone: '22891952345',
+        country: 2,
+        gpg: 10
+      },
+      {
+        firstname: 'CASSEY',
+        lastname: 'MURASTORI',
+        profession: 'RESEARCH',
+        category_id: 2,
+        phone: '22891952345',
+        country: 1,
+        gpg: 10
       },
     ],
     phonenumber: ['22891969456', '22892384958'],
@@ -272,7 +298,6 @@ export class AppComponent implements OnInit {
       .get(220)
       .pipe(
         filter((state) => typeof state !== 'undefined' && state !== null),
-        // tap((state) => console.log('Form: ', state)),
         tap((state) => this._state$.next(state)),
         takeUntil(this._destroy$),
       )
@@ -280,42 +305,46 @@ export class AppComponent implements OnInit {
   }
 
   onOpenChange(_t28: ModalComponent) {
-    // console.log('modal: ', _t28);
     _t28.open();
   }
 
-  formModalStateChange() {
+  modalStateChange() {
     this.cdRef?.detectChanges();
   }
 
+  modalSubmit(modal: ModalDirective, e: MouseEvent) {
+    if (e.detail === 0) {
+      return;
+    }
+
+    modal.validate();
+    if (modal.formgroup.valid) {
+      modal.close();
+    }
+  }
+
   ngOnInit(): void {
-    setTimeout(() => {
-      // console.log('Loaded values: ', _values)
+    const t = setTimeout(() => {
       this._pageResult$.next(_values);
       this.placeholder = undefined;
-
-      console.log('Changing to fromState')
       this.formValue = this.fromState;
       this.cdRef?.detectChanges();
+
+      clearTimeout(t);
     }, 3000);
 
 
-    setTimeout(() => {
-      console.log('Changing to fromState2')
-      this.formValue = this.fromState2;
-      this.cdRef?.detectChanges();
-    }, 7000);
+    // setTimeout(() => {
+    //   this.formValue = this.fromState2;
+    //   this.cdRef?.detectChanges();
+    // }, 7000);
   }
 
   // Listen to datagrid refresh events
-  onDgRefresh(_: unknown) {
-    // console.log(event);
-  }
+  onDgRefresh(_: unknown) { }
 
   // Listen to data grid selection changes events
-  onSelectedChanges(event: unknown | unknown[]) {
-    console.log(event);
-  }
+  onSelectedChanges(event: unknown | unknown[]) { }
 
   onFormReadyState(event: FormConfigInterface) {
     setTimeout(() => {
@@ -332,39 +361,82 @@ export class AppComponent implements OnInit {
       );
     }, 1000);
 
-    const timeout = setTimeout(() => {
-      this.smartForm.setValue(this.fromState);
-      clearTimeout(timeout);
-    }, 3000);
+    // const timeout = setTimeout(() => {
+    //   this.smartForm.setValue(this.fromState);
+    //   clearTimeout(timeout);
+    // }, 3000);
   }
 
   afterChanges() {
     // const timeout = setTimeout(() => {
-    //   this.smartForm
-    //     ?.controlValueChanges('profession')
-    //     .pipe(tap((state) => console.log('State changes:', state)))
-    //     .subscribe();
+    //   this.smartForm?.controlValueChanges('profession').subscribe();
     //   clearTimeout(timeout);
     // }, 300);
   }
 
-  onBlur(event: FocusEvent) {
-    console.log(event);
+  onBlur(event: FocusEvent) { }
+
+  onFocus(event: FocusEvent) { }
+
+  onError(error: unknown) { }
+
+  ngxFormSubmit(event: Record<string, any>, formgroup: FormGroup) {
   }
 
-  onFocus(event: FocusEvent) {
-    console.log(event);
+  ondgItemClick(value: unknown) { }
+
+
+
+  protected onRemoved(event: { name: string, control: AbstractControl }, formgroup: FormGroup | null | undefined) {
+    const { name, control } = event;
+
+    if (name.startsWith('stakeholders.') && formgroup) {
+      const state = formgroup.getRawValue();
+      const stakeholders = formgroup.get('stakeholders2') as FormGroup;
+      if (stakeholders) {
+        const val: { [prop: string]: unknown } = control.getRawValue();
+        let val2: any[] = formgroup.get('stakeholders')?.getRawValue() ?? [];
+        this.moveData(stakeholders, 'stakeholders2', val, { ...state, stakeholders: val2 });
+      }
+    }
+
+    if (name.startsWith('stakeholders2.') && formgroup) {
+      const state = formgroup.getRawValue();
+      const stakeholders = formgroup.get('stakeholders') as FormGroup;
+      if (stakeholders) {
+        const val: { [prop: string]: unknown } = control.getRawValue();
+        let val2: any[] = formgroup.get('stakeholders2')?.getRawValue() ?? [];
+        this.moveData(stakeholders, 'stakeholders', val, { ...state, stakeholders2: val2 });
+      }
+    }
   }
 
-  onError(error: unknown) {
-    console.log('Submit error: ', error);
-  }
+  private moveData(input: AbstractControl, name: string, value: { [prop: string]: unknown }, state: { [prop: string]: unknown }) {
+    if ('firstname' in value && value['firstname']) {
+      let items = input.getRawValue();
 
-  ngxFormSubmit(event: Record<string, any>) {
-    console.log(JSON.stringify(event));
-  }
+      if (!Array.isArray(items)) {
+        return;
+      }
 
-  ondgItemClick(value: unknown) {
-    console.log('Item clicked:', value);
+      let found: { [prop: string]: unknown } | null | undefined = null;
+      for (const item of items) {
+        if (typeof item !== 'object' || item === null) {
+          continue
+        }
+
+        if (item['firstname'] === value['firstname']) {
+          found = item;
+        }
+      }
+
+      if (!found) {
+        items = items.concat([{ ...value }]);
+      }
+
+      this.formValue = { ...state, [name]: items };
+
+      this.cdRef?.detectChanges();
+    }
   }
 }

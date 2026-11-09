@@ -37,18 +37,17 @@ type StateType = {
   standalone: true,
   imports: [
     NgxCommonModule,
-    ...OPTIONS_DIRECTIVES,
     ReactiveFormsModule,
     FormsModule,
     CheckboxComponent,
     ...PIPES,
+    ...OPTIONS_DIRECTIVES,
   ],
   selector: 'ngx-checkbox-input',
   templateUrl: './ngx-checkbox-input.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
-  //#region component inputs
   @Input() disabled = false;
   @Input() describe = true;
   @Input() control!: AbstractControl;
@@ -59,23 +58,15 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
 
     let { options } = config;
     this.autoSelect(config);
-  
+
     options = options ?? [];
-    this.setState((state) => ({
-      ...state,
-      config,
-      loaded: options.length !== 0,
-    }));
+    this.setState((state) => ({ ...state, config, loaded: options.length !== 0 }));
   }
   @ContentChild('input') inputRef!: TemplateRef<any>;
-  //#endregion
 
-  //#region component outputs
   @Output() configChange = new EventEmitter<OptionsInput>();
   @Output() change = new EventEmitter<unknown[]>();
-  //#endregion
 
-  // #region component properties
   private _state: StateType = {
     config: {} as OptionsInput,
     loaded: false,
@@ -85,23 +76,16 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
     return this._state;
   }
   private _destroy$ = new Subject<void>();
-  // #endregion
 
   /** create an instance of ngx checkbox input component  */
-  constructor(private changes: ChangeDetectorRef) {}
+  constructor(private changes: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.control.valueChanges
       .pipe(
         distinctUntilChanged(),
-        tap((v) => {
-          this.setState((state) => ({
-            ...state,
-            selection: v.map((i: unknown) => ({ value: i, checked: true })),
-          }));
-        })
-      )
-      .subscribe();
+        tap((v) => this.setState((state) => ({ ...state, selection: v.map((i: unknown) => ({ value: i, checked: true })) })))
+      ).subscribe();
   }
 
   ngOnDestroy(): void {
@@ -120,11 +104,7 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
     config = { ...config, options };
     this.autoSelect(config);
 
-    this.setState((state) => ({
-      ...state,
-      config: config,
-      loaded: true,
-    }));
+    this.setState((state) => ({ ...state, config: config, loaded: true }));
     this.configChange.emit(config);
   }
 

@@ -1,6 +1,5 @@
 import {
   AfterContentInit,
-  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -12,11 +11,10 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
-import { takeUntil, tap } from 'rxjs/operators';
-import { cloneAbstractControl } from '../../helpers';
+import { distinctUntilChanged, filter, takeUntil, tap } from 'rxjs/operators';
 import { AngularReactiveFormBuilderBridge } from '../../types';
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
 import { CommonModule } from '@angular/common';
@@ -27,9 +25,7 @@ import { NgxFormArrayOutletComponent } from './array-outlet.component';
 import { RefType, ViewRefFactory } from '../types';
 import { ModalDirective } from '../modal';
 import { PIPES } from './pipes';
-
-// @internal
-type Optional<T> = T | null | undefined;
+import { Optional } from './types';
 
 @Component({
   standalone: true,
@@ -46,95 +42,78 @@ type Optional<T> = T | null | undefined;
   styleUrls: ['./array.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NgxSmartFormArrayComponent
-  implements AfterContentInit, OnDestroy, AfterViewInit
-{
-  //#region inputs properties
+export class NgxSmartFormArrayComponent implements OnDestroy, AfterContentInit {
   @Input() autoupload = true;
   @Input() modal!: ModalDirective;
-  @Input() detached!: AbstractControl[];
+  @Input() detached!: Optional<AbstractControl[]>;
   @Input() template!: TemplateRef<any>;
   @Input() label!: Optional<TemplateRef<any>>;
+  @Input() description!: Optional<string>;
   @Input() name!: string;
   @Input() title!: string;
+  /** @deprecated */
   @Input() placeholder!: Optional<string>;
   @Input({ alias: 'add-button' }) addref!: Optional<TemplateRef<Node>>;
   @Input({ alias: 'controls' }) inputs!: InputConfigInterface[];
+
   @Input({ alias: 'formArray' }) array!: FormArray;
   @Input({ alias: 'no-grid-layout' }) noGridLayout = false;
-  @Input({
-    alias: 'class',
-    transform: (value: string | string[]) => {
-      const classes = typeof value === 'string' ? [value] : value;
-      return classes
-        .map((v) =>
-          v
-            .split(' ')
-            .map((i) => i.split(','))
-            .flat()
-            .map((v) => v.trim()),
-        )
-        .flat();
-    },
-  })
+  @Input({ alias: 'class', transform: (value: string | string[]) => (typeof value === 'string' ? value.split(/\s+/) : value ?? []).map((v) => v.split(/\s+/).map((i) => i.split(',')).flat().map((v) => v.trim())).flat() })
   cssClass!: string | string[];
   @Input() hidden: boolean = false;
-  //#endregion
+  @Input({ alias: 'table-description' }) tabledescription!: Optional<TemplateRef<any>>;
 
-  //#region output properties
   @Output() listChange = new EventEmitter<number>();
-  //#endregion
+  @Output('item-removed') _removed = new EventEmitter<{ index: number, control: AbstractControl }>();
+  @ViewChild('container', { static: false }) viewFactory!: ViewRefFactory<any>;
 
-  // #region view children
-  @ViewChild('container', { static: false })
-  viewFactory!: ViewRefFactory<any>;
-  // #endregion
-
-  // #region local properties
-  _ref = 0;
-  get refCount() {
-    return this._ref;
-  }
   private refs: RefType<unknown>[] = [];
   private destroy$ = new Subject<void>();
   private triggered = false;
-  // #endregion
+  protected capacity = 0;
 
-  // component instance initializer
-  constructor(
-    private cdRef: ChangeDetectorRef | null,
-    @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
-    private builder: AngularReactiveFormBuilderBridge,
-  ) {}
-
-  ngAfterViewInit(): void {
-    this.update.bind(this).call(null);
-  }
+  constructor(private cdRef: ChangeDetectorRef | null, @Inject(ANGULAR_REACTIVE_FORM_BRIDGE) private builder: AngularReactiveFormBuilderBridge) { }
 
   ngAfterContentInit(): void {
-    this.array.valueChanges
-      .pipe(takeUntil(this.destroy$), tap(this.update.bind(this)))
-      .subscribe();
+    if (this.array) {
+      this.array.valueChanges.pipe(takeUntil(this.destroy$), distinctUntilChanged()).subscribe((values) => {
+        const cap0 = this.capacity;
+        this.capacity = values.length;
+        if (this.capacity !== cap0) {
+          this.update(this.array);
+        }
+      });
+    }
   }
 
   add(_: Event) {
     const g = this.builder.group(this.inputs);
-    const clone = cloneAbstractControl(g) as FormGroup;
     this.triggered = true;
-    this.array.push(clone);
+    this.array.push(g);
   }
 
   removed<T>(ref: RefType<T>) {
-    if (this._ref >= 0) {
-      const index = this.refs.findIndex((c) => {
-        return c.index === ref.index;
-      });
+    if (this.capacity >= 0) {
+      const index = this.refs.findIndex((c) => c.index === ref.index);
       if (index === -1) {
         return;
       }
+
+      const control = this.array.at(index);
       this.refs.splice(index, 1);
-      this.array.removeAt(index, { emitEvent: true });
+      this.capacity -= 1;
+      this.array.removeAt(index, { emitEvent: true }); // this will set _parent property null on the removed control
       this.array.updateValueAndValidity();
+
+      if (control) {
+        control.clearAsyncValidators();
+        control.clearValidators();
+        control.setErrors(null); // remove any errors on the control to make it valid
+        control.updateValueAndValidity();
+        this._removed.emit({ index, control });
+      }
+
+      this.cdRef?.markForCheck();
     }
   }
 
@@ -142,35 +121,26 @@ export class NgxSmartFormArrayComponent
     this.destroy$.next();
   }
 
-  private update() {
-    const length = this.array.controls.length;
-    const count = length - this._ref;
-    if (count > 0) {
-      for (let i = 0; i < count; i++) {
-        const index = this._ref + i;
-        const { viewFactory: factory } = this;
-        const view = factory.createView(
-          index,
-          this.array.at(index),
-          this.triggered,
-        );
-        this.refs.push(view);
+  private update(array: FormArray) {
+    const length = array.controls.length;
+    const max = this.refs.length - 1;
+    const refs = [];
+
+    for (let i = 0; i < length; i++) {
+      const element = array.at(i);
+      
+      if (i > max) {
+        refs.push(this.viewFactory.createView(i, element, this.triggered));
+        continue;
       }
-      this.setRefCount(this._ref + count);
+
+      this.viewFactory.updateView(this.refs[i], element);
     }
 
-    if (count < 0) {
-      const refCount = this._ref > 0 ? this._ref - 1 : 0;
-      this.setRefCount(refCount);
-      this.listChange.emit(refCount);
+    if (refs.length > 0) {
+      this.refs = this.refs.concat(...refs);
     }
 
-    // set the tiggered value to false after each update call to reset it state
     this.triggered = false;
-  }
-
-  private setRefCount(value: number) {
-    this._ref = value;
-    this.cdRef?.markForCheck();
   }
 }

@@ -1,5 +1,5 @@
 import { Injector, Provider, inject } from '@angular/core';
-import { optionsQueryClient } from './helpers';
+import { optionsQueryClient } from './utils';
 import { INPUT_OPTIONS_CLIENT, OPTIONS_CACHE } from './tokens';
 import { OptionsQueryConfigType } from './types';
 import { deepEqual } from '@azlabsjs/utilities';

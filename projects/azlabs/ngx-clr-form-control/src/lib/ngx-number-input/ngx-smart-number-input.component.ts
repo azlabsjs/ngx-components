@@ -17,11 +17,9 @@ import { NgxCommonModule } from '../common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxNumberInputComponent {
-  //#region component inputs
   @Input() control!: AbstractControl;
   @Input() describe = true;
   @Input() config!: NumberInput;
-  @ContentChild('input') inputRef!: TemplateRef<any>;
+  @ContentChild('input') input!: TemplateRef<any>;
   Mt = Math;
-  //#endregion
 }
