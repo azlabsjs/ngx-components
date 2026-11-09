@@ -1,15 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ContentChild,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output,
-  TemplateRef,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import {
   AbstractControl,
   FormsModule,
@@ -62,7 +51,6 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
     options = options ?? [];
     this.setState((state) => ({ ...state, config, loaded: options.length !== 0 }));
   }
-  @ContentChild('input') inputRef!: TemplateRef<any>;
 
   @Output() configChange = new EventEmitter<OptionsInput>();
   @Output() change = new EventEmitter<unknown[]>();

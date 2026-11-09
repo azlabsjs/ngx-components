@@ -1,15 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ContentChild,
-  EventEmitter,
-  Inject,
-  Input,
-  LOCALE_ID,
-  OnDestroy,
-  Output,
-  TemplateRef
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Inject, Input, LOCALE_ID, OnDestroy, Output, TemplateRef } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import { DateInput } from '@azlabsjs/smart-form-core';
 import { NgxCommonModule } from '../common';
@@ -121,8 +110,7 @@ export class NgxDateInputComponent implements OnDestroy {
   @Input() config!: DateInput;
 
   @Output() blur = new EventEmitter<Event>();
-
-  @ContentChild('input') input!: TemplateRef<any>;
+  @Input() input!: TemplateRef<any>;
 
 
   /** @internal */

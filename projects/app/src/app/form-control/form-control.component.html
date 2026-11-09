@@ -7,8 +7,8 @@
             <span>{{ label }}</span>
           </ng-template>
           <ng-template #error let-touched="touched" let-errors>
-            <ngx-input-error *ngIf="touched" [errors]="errors" [template]="template">
-              <ng-template #template let-value let-params="params">
+            <ngx-input-error *ngIf="touched" [errors]="errors" [template]="inputerror">
+              <ng-template #inputerror let-value let-params="params">
                 <span [class]="config.type + '-input'">{{ "validation.[value]" | parseStr : { value } | text | parseStr : params }}</span>
               </ng-template>
             </ngx-input-error>

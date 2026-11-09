@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ContentChild, Input, TemplateRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, TemplateRef } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { TimeInput } from '@azlabsjs/smart-form-core';
 import { NgxCommonModule } from '../common';
@@ -14,5 +14,5 @@ export class NgxTimeInputComponent {
   @Input() control!: AbstractControl;
   @Input() describe = true;
   @Input() config!: TimeInput;
-  @ContentChild('input') input!: TemplateRef<any>;
+  @Input() input!: TemplateRef<any>;
 }

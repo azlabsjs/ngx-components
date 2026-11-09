@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ContentChild,
-  Input,
-  TemplateRef,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, TemplateRef } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { TextInput } from '@azlabsjs/smart-form-core';
 import { NgxCommonModule } from '../common';
@@ -26,7 +19,7 @@ export class NgxPasswordInputComponent {
   @Input() control!: AbstractControl;
   @Input() describe = true;
   @Input() config!: TextInput;
-  @ContentChild('input') inputRef!: TemplateRef<any>;
+  @Input() input!: TemplateRef<any>;
 
   Mt = Math;
   _state: StateType = { showPassword: false };
@@ -38,7 +31,7 @@ export class NgxPasswordInputComponent {
     this.setState(({ showPassword }) => ({ showPassword: !showPassword }));
   }
 
-  constructor(private cdRef: ChangeDetectorRef) {}
+  constructor(private cdRef: ChangeDetectorRef) { }
 
   /** update component state and notify ui of state changes */
   private setState(state: (s: StateType) => StateType) {

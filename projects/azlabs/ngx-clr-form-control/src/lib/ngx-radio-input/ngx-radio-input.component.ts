@@ -1,13 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ContentChild,
-  EventEmitter,
-  Input,
-  Output,
-  TemplateRef,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, TemplateRef } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { InputOptions, OptionsInput } from '@azlabsjs/smart-form-core';
 import { NgxCommonModule } from '../common';
@@ -40,7 +31,7 @@ export class NgxRadioInputComponent {
     this.setState((state) => ({ ...state, config, loaded: options.length !== 0 }));
   }
   @Input() describe = true;
-  @ContentChild('input') input!: TemplateRef<any>;
+  @Input() input!: TemplateRef<any>;
 
   @Output() configChange = new EventEmitter<OptionsInput>();
 
@@ -54,7 +45,7 @@ export class NgxRadioInputComponent {
   }
 
   /** @description radion input component class constructor */
-  constructor(private cdRef: ChangeDetectorRef) {}
+  constructor(private cdRef: ChangeDetectorRef) { }
 
   onOptionsChange(options: InputOptions) {
     let { config } = this._state;
