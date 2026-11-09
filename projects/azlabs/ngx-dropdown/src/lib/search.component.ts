@@ -6,7 +6,7 @@ import {
   Input,
   Output,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 
 /** @internal */
@@ -17,7 +17,7 @@ type StateType = {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   selector: 'ngx-azl-dropdown-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],

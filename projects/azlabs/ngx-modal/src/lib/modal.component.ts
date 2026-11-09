@@ -5,7 +5,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -21,6 +21,7 @@ import {
   SimpleChange,
   SimpleChanges,
   TemplateRef,
+  DOCUMENT
 } from '@angular/core';
 import { Optional, OutletConfig, SizeType, StateType } from './types';
 import { PIPES } from './pipes';

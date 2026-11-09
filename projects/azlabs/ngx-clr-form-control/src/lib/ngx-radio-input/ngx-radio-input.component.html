@@ -1,9 +1,9 @@
-<ng-container *ngIf="state && state.config">
+@if (state && state.config) {
   <div fetchOptions (optionsChange)="onOptionsChange($event)" [loaded]="state.loaded" [config]="state.config.optionsConfig" [name]="state.config.name">
-    <ng-container *ngIf="state.config.options as options">
-      <ng-container *ngIf="options!.length > 0">
+    @if (state.config.options; as options) {
+      @if (options!.length > 0) {
         <ng-container *ngTemplateOutlet="input; context: { options: options, config: state.config, control }"></ng-container>
-      </ng-container>
-    </ng-container>
+      }
+    }
   </div>
-</ng-container>
+}

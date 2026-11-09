@@ -1,9 +1,8 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   standalone: true,
-  imports: [CommonModule],
   selector: 'ngx-close-button',
   template: `
     <a href="#" class="ngx__close_btn" (click)="onClickHandler($event)">

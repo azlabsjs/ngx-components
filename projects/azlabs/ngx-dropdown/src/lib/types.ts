@@ -9,3 +9,7 @@ export type Orientation = 'left' | 'right';
  * **Note** setSate() function parameter type
  */
 export type SetStateParam<T> = Partial<T> | ((state: T) => T);
+
+
+/** @internal */
+export type Optional<T> = T | null | undefined;

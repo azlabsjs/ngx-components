@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,7 +10,6 @@ import {
 
 @Component({
   standalone: true,
-  imports: [CommonModule],
   selector: 'ngx-checkbox',
   template: `
     <div class="clr-checkbox-wrapper">

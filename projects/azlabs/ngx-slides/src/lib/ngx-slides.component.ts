@@ -28,41 +28,42 @@ type StateType = {
   imports: [CommonModule],
   selector: 'ngx-slides',
   template: `
-    <div class="carousel" *ngIf="state">
-      <ng-container *ngFor="let slide of state.slides; let i = index">
-        <ng-container *ngIf="i === state.current">
-          <div class="slide" [@slideIn]="state.direction">
-            <ng-container
-              *ngTemplateOutlet="templateRef; context: { $implicit: slide }"
-            ></ng-container>
-          </div>
-        </ng-container>
-      </ng-container>
-
-      <ng-container
+    @if (state) {
+      <div class="carousel">
+        @for (slide of state.slides; track slide; let i = $index) {
+          @if (i === state.current) {
+            <div class="slide" [@slideIn]="state.direction">
+              <ng-container
+                *ngTemplateOutlet="templateRef; context: { $implicit: slide }"
+              ></ng-container>
+            </div>
+          }
+        }
+        <ng-container
         *ngTemplateOutlet="
           previousRef ?? prevButton;
           context: { $implicit: previous.bind(this) }
         "
-      ></ng-container>
-      <ng-container
+        ></ng-container>
+        <ng-container
         *ngTemplateOutlet="
           nextRef ?? nextButton;
           context: { $implicit: next.bind(this) }
         "
-      ></ng-container>
-      <ng-template #prevButton let-click>
-        <button class="control prev" (click)="click()">
-          <span class="arrow left"></span>
-        </button>
-      </ng-template>
-      <ng-template #nextButton let-click>
-        <button class="control next" (click)="click()">
-          <span class="arrow right"></span>
-        </button>
-      </ng-template>
-    </div>
-  `,
+        ></ng-container>
+        <ng-template #prevButton let-click>
+          <button class="control prev" (click)="click()">
+            <span class="arrow left"></span>
+          </button>
+        </ng-template>
+        <ng-template #nextButton let-click>
+          <button class="control next" (click)="click()">
+            <span class="arrow right"></span>
+          </button>
+        </ng-template>
+      </div>
+    }
+    `,
   styleUrls: ['./ngx-slides.component.scss'],
   animations: [
     trigger('slideIn', [

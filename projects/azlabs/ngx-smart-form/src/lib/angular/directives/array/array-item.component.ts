@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import {
   ChangeDetectionStrategy,
   Component,
@@ -17,11 +17,10 @@ import { Optional } from './types';
 @Component({
   standalone: true,
   imports: [
-    CommonModule,
     NgxSmartFormGroupComponent,
     ...BUTTON_DIRECTIVES,
-    ...PIPES,
-  ],
+    ...PIPES
+],
   selector: 'ngx-smart-form-array-item',
   templateUrl: './array-item.component.html',
   styleUrls: ['./array-item.component.scss'],

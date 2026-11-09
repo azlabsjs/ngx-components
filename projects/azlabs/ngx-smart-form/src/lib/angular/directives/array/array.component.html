@@ -1,26 +1,30 @@
-<ngx-form-array-outlet [class.hidden]="hidden" (removed)="removed($event)" [inputs]="inputs" [auto-upload]="autoupload" [template]="template" [no-grid-layout]="noGridLayout" [detached]="detached" *ngIf="!(cssClass | istable)" [name]="name" #container>
-  <section description>
-    <ng-container *ngIf="tabledescription">
-      <ng-container *ngTemplateOutlet="tabledescription; context: {$implicit: name, name, description}"></ng-container>
-    </ng-container>
-  </section>
-  <ng-container *ngIf="capacity === 0">
-    <ng-container *ngTemplateOutlet="_placeholder; context: {$implicit: placeholder, add:  add.bind(this), name, description}"></ng-container>
-  </ng-container>
-  <ng-container *ngIf="capacity !== 0">
-    <ng-container *ngTemplateOutlet="addref ?? _add; context: { $implicit: add.bind(this), name, description }"></ng-container>
-  </ng-container>
-</ngx-form-array-outlet>
+@if (!(cssClass | istable)) {
+  <ngx-form-array-outlet [class.hidden]="hidden" (removed)="removed($event)" [inputs]="inputs" [auto-upload]="autoupload" [template]="template" [no-grid-layout]="noGridLayout" [detached]="detached" [name]="name" #container>
+    <section description>
+      @if (tabledescription) {
+        <ng-container *ngTemplateOutlet="tabledescription; context: {$implicit: name, name, description}"></ng-container>
+      }
+    </section>
+    @if (capacity === 0) {
+      <ng-container *ngTemplateOutlet="_placeholder; context: {$implicit: placeholder, add:  add.bind(this), name, description}"></ng-container>
+    }
+    @if (capacity !== 0) {
+      <ng-container *ngTemplateOutlet="addref ?? _add; context: { $implicit: add.bind(this), name, description }"></ng-container>
+    }
+  </ngx-form-array-outlet>
+}
 
 <!-- table layout -->
-<ngx-table-form [class.hidden]="hidden" (removed)="removed($event)" [inputs]="inputs" [auto-upload]="autoupload" [template]="template" [label]="label" [detached]="detached" [title]="title" [modal]="modal" [name]="name" [edit-mode]="cssClass | tableeditmode" *ngIf="cssClass | istable" #container>
-  <section description>
-    <ng-container *ngIf="tabledescription">
-      <ng-container *ngTemplateOutlet="tabledescription; context: {$implicit: name, description}"></ng-container>
-    </ng-container>
-  </section>
-  <ng-container *ngTemplateOutlet="addref ?? _add; context: { $implicit: add.bind(this), name, description }"></ng-container>
-</ngx-table-form>
+@if (cssClass | istable) {
+  <ngx-table-form [class.hidden]="hidden" (removed)="removed($event)" [inputs]="inputs" [auto-upload]="autoupload" [template]="template" [label]="label" [detached]="detached" [title]="title" [modal]="modal" [name]="name" [edit-mode]="cssClass | tableeditmode" #container>
+    <section description>
+      @if (tabledescription) {
+        <ng-container *ngTemplateOutlet="tabledescription; context: {$implicit: name, description}"></ng-container>
+      }
+    </section>
+    <ng-container *ngTemplateOutlet="addref ?? _add; context: { $implicit: add.bind(this), name, description }"></ng-container>
+  </ngx-table-form>
+}
 
 <ng-template #_add let-handler>
   <div class="margin-top add-button">
