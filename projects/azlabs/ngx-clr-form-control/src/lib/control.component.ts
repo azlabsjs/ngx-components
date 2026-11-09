@@ -17,7 +17,7 @@ import { InputEventArgs } from './types';
 import { FILE_INPUT_DIRECTIVES } from '@azlabsjs/ngx-file-input';
 import { NgxCommonModule } from './common';
 import { ClarityModule } from '@clr/angular';
-import { ClarityIcons, eyeHideIcon, eyeIcon } from '@cds/core/icon';
+import { ClarityIcons, eyeHideIcon, eyeIcon, ClrIcon } from '@clr/angular/icon';
 import { DIRECTIVES } from './directives';
 import { PIPES } from './pipes';
 
@@ -30,6 +30,7 @@ type Optional<T> = T | null | undefined;
 @Component({
   standalone: true,
   imports: [
+    ClrIcon,
     NgxCommonModule,
     FormsModule,
     ReactiveFormsModule,

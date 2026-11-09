@@ -3,17 +3,8 @@ import { NgxFormControlComponent } from './control.component';
 import { TRANSLATIONS_DICTIONARY } from './tokens';
 import { defaultStrings } from './constants';
 import { of } from 'rxjs';
-import {
-  NgxUploadsEventsService,
-  UploadOptionsType,
-  provideUploadOptions,
-} from '@azlabsjs/ngx-file-input';
-import {
-  OptionsQueryConfigType,
-  provideCacheConfig,
-  provideQueryClient,
-} from '@azlabsjs/ngx-options-input';
-import '@cds/core/icon/register.js';
+import { NgxUploadsEventsService, UploadOptionsType, provideUploadOptions, } from '@azlabsjs/ngx-file-input';
+import { OptionsQueryConfigType, provideCacheConfig, provideQueryClient } from '@azlabsjs/ngx-options-input';
 
 type ConfigType = {
   translationsProvider?: Provider;
