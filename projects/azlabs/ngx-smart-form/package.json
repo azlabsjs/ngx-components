@@ -2,12 +2,12 @@
   "name": "@azlabsjs/ngx-smart-form",
   "version": "0.17.150",
   "peerDependencies": {
-    "@angular/common": ">=17.0.0 | <20.0.0",
-    "@angular/core": ">=17.0.0 | <20.0.0",
-    "@angular/forms": ">=17.0.0 | <20.0.0",
+    "@angular/common": ">=21.0.0 | <22.0.0",
+    "@angular/core": ">=21.0.0 | <22.0.0",
+    "@angular/forms": ">=21.0.0 | <22.0.0",
     "@azlabsjs/smart-form-core": "^0.2.72",
     "@azlabsjs/requests": ">=0.2.0 | <0.4.0",
-    "@azlabsjs/ngx-common": "^0.17.0",
+    "@azlabsjs/ngx-common": "^0.21.0",
     "@azlabsjs/utilities": "^0.2.10"
   },
   "dependencies": {

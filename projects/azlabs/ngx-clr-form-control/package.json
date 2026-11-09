@@ -2,16 +2,16 @@
   "name": "@azlabsjs/ngx-clr-form-control",
   "version": "0.17.150",
   "peerDependencies": {
-    "@angular/common": ">=17.0.0 | <20.0.0",
-    "@angular/core": ">=17.0.0 | <20.0.0",
-    "@angular/forms": ">=17.0.0 | <20.0.0",
-    "@clr/angular": "^17.10.0",
-    "@ng-select/ng-select": ">=12.0.0 | <15.0.0",
-    "@azlabsjs/ngx-file-input": "^0.17.79",
-    "@azlabsjs/ngx-options-input": "^0.17.79",
-    "@azlabsjs/ngx-intl-tel-input": "^0.17.79",
+    "@angular/common": ">=21.0.0 | <22.0.0",
+    "@angular/core": ">=21.0.0 | <22.0.0",
+    "@angular/forms": ">=21.0.0 | <22.0.0",
+    "@clr/angular": "^18.4",
+    "@ng-select/ng-select": ">=21.0.0 | <22.0.0",
+    "@azlabsjs/ngx-file-input": "^0.21.0",
+    "@azlabsjs/ngx-options-input": "^0.21.0",
+    "@azlabsjs/ngx-intl-tel-input": "^0.21.0",
     "@azlabsjs/smart-form-core": "^0.2.72",
-    "@azlabsjs/ngx-common": "^0.17.0"
+    "@azlabsjs/ngx-common": "^0.21.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
