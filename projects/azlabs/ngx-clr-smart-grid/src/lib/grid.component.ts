@@ -8,18 +8,15 @@ import {
   Output,
   TemplateRef,
 } from '@angular/core';
-import { ClarityModule, ClrDatagridSortOrder } from '@clr/angular';
+import { ClrDatagridModule, ClrDatagridSortOrder, selectionTypeAttribute } from '@clr/angular';
 import {
   PaginateResult,
   ProjectPaginateQueryParamType,
   GridColumnType,
   GridConfigType,
   DatagridColumnType,
-  LegacyGridColumnType,
-  remove,
 } from './core';
 import { CommonModule } from '@angular/common';
-import { NgxClrGridSelectDirective } from './directives';
 import { PIPES } from './pipes';
 import {
   AsyncPipe,
@@ -44,6 +41,7 @@ const GRID_CONFIG: Required<GridConfigType> = {
   selectableProp: '',
   preserveSelection: false,
   singleSelection: false,
+  selectionType: selectionTypeAttribute('none'),
   hasActionOverflow: false,
   hasDetails: false,
   hasExpandableRows: false,
@@ -66,10 +64,9 @@ type Optional<T> = T | null | undefined;
 @Component({
   standalone: true,
   imports: [
+    ClrDatagridModule,
     CommonModule,
-    ClarityModule,
     ...COMMON_PIPES,
-    NgxClrGridSelectDirective,
     ...PIPES,
   ],
   providers: [
@@ -89,7 +86,7 @@ type Optional<T> = T | null | undefined;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxClrSmartGridComponent {
-  //#region local properties
+
   public readonly defaultSort = ClrDatagridSortOrder.DESC;
   _state: StateType = {
     data: [] as { [index: string]: any }[],
@@ -99,9 +96,7 @@ export class NgxClrSmartGridComponent {
   get state() {
     return this._state;
   }
-  //#endregion
 
-  // #region input properties
   @Input() set pageResult(result: PaginateResult<any> | undefined | null) {
     if (result) {
       this.setState((state) => ({
@@ -129,76 +124,50 @@ export class NgxClrSmartGridComponent {
   })
   config: Required<GridConfigType> = GRID_CONFIG;
   private _columns: Required<DatagridColumnType>[] = [];
-  @Input({ alias: 'columns', required: true }) set setColumns(
-    values: GridColumnType[]
-  ) {
+  @Input({ alias: 'columns', required: true }) set setColumns(values: GridColumnType[]) {
     this._columns = values.map((column) =>
-      remove(
-        {
-          ...column,
-          label: (column as LegacyGridColumnType).label,
-          property:
-            (column as DatagridColumnType).property ??
-            (column as LegacyGridColumnType).label,
-          field: column.field ?? '',
-          style: column.style
-            ? {
-                class: Array.isArray(column.style.class)
-                  ? column.style.class.join(' ')
-                  : column.style.class || '',
-                styles: Array.isArray(column.style.styles)
-                  ? column.style.styles.join(' ')
-                  : column.style.styles || '',
-              }
-            : {},
-          type: column.type ?? 'string',
-          transform: column.transform || 'default',
-          sort: column.sort ?? {
-            compare: (a: unknown, b: unknown) => {
-              return Number(ClrDatagridSortOrder.DESC);
-            },
-          },
-          sortable: column.sortable ?? true,
+    ({
+      ...column,
+      field: column.field ?? '',
+      style: column.style
+        ? {
+          class: Array.isArray(column.style.class) ? column.style.class.join(' ') : column.style.class || '',
+          styles: Array.isArray(column.style.styles) ? column.style.styles.join(' ') : column.style.styles || '',
+        }
+        : {},
+      type: column.type ?? 'string',
+      transform: column.transform || 'default',
+      sort: column.sort ?? {
+        compare: (a: unknown, b: unknown) => {
+          return Number(ClrDatagridSortOrder.DESC);
         },
-        'label'
-      )
+      },
+      sortable: column.sortable ?? true,
+    })
     ) as Required<DatagridColumnType>[];
   }
   get columns() {
     return this._columns;
   }
-  //#endregion
 
-  @ContentChild('dgActionOverflow', { static: false })
-  dgoverflow!: TemplateRef<any>;
-  @ContentChild('dgRowDetail', { static: false })
-  dgrowdetail!: TemplateRef<any>;
-  @ContentChild('dgPlaceholder', { static: false })
-  dgplaceholder!: TemplateRef<any>;
-  @ContentChild('dgDetailBody', { static: false })
-  dgdetail!: TemplateRef<any>;
-  @ContentChild('dgActionBar', { static: false })
-  dgactionbar!: TemplateRef<any>;
-  @ContentChild('dgRow', { static: false })
-  dgrow!: Optional<TemplateRef<any>>;
+  @ContentChild('dgActionOverflow', { static: false }) dgoverflow!: TemplateRef<any>;
+  @ContentChild('dgRowDetail', { static: false }) dgrowdetail!: TemplateRef<any>;
+  @ContentChild('dgPlaceholder', { static: false }) dgplaceholder!: TemplateRef<any>;
+  @ContentChild('dgDetailBody', { static: false }) dgdetail!: TemplateRef<any>;
+  @ContentChild('dgActionBar', { static: false }) dgactionbar!: TemplateRef<any>;
+  @ContentChild('dgRow', { static: false }) dgrow!: Optional<TemplateRef<any>>;
 
-  // title & cell customization templates
   @ContentChild('title', { static: false }) title: Optional<TemplateRef<any>>;
   @ContentChild('cell', { static: false }) cell: Optional<TemplateRef<any>>;
 
-  // #region output properties
   @Output() selectedChange = new EventEmitter<unknown[] | unknown>();
-  @Output() dgRefresh = new EventEmitter<
-    ProjectPaginateQueryParamType<unknown>
-  >();
+  @Output() dgRefresh = new EventEmitter<ProjectPaginateQueryParamType<unknown>>();
   @Output() detailChange = new EventEmitter<unknown>();
   @Output() dgItemClick = new EventEmitter<unknown>();
-  // #endregion
 
   /** @description smart grid class constructor */
-  constructor(private cdRef: ChangeDetectorRef) {}
+  constructor(private cdRef: ChangeDetectorRef) { }
 
-  // listen to internal grid component select changes and notify parent component
   onSelectedStateChanges(state: unknown[] | unknown) {
     this.selectedChange.emit(state);
   }
@@ -210,16 +179,6 @@ export class NgxClrSmartGridComponent {
   onItemClick(event: Event, item: unknown) {
     this.dgItemClick.emit(item);
     event?.preventDefault();
-  }
-
-  /** @deprecated */
-  onClrDgRefresh(e: ProjectPaginateQueryParamType) {
-    this.onDgRefresh(e);
-  }
-
-  /** @deprecated */
-  onClrItemClick(e: Event, item: unknown) {
-    this.onItemClick(e, item);
   }
 
   /** @description update component state and notify ui of state changes */

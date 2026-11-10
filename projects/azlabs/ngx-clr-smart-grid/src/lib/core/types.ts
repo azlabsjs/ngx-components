@@ -1,4 +1,4 @@
-import { ClrDatagridComparatorInterface } from '@clr/angular';
+import { ClrDatagridComparatorInterface, SelectionType } from '@clr/angular';
 
 /** @internal Supported pipe transform type */
 export type PipeTransformType = string | ((value: any) => any) | undefined;
@@ -16,21 +16,18 @@ type BaseGridColumnType = {
   transformTitle?: PipeTransformType | PipeTransformType[];
   transform?: PipeTransformType | PipeTransformType[];
   style?: {
-    class?:
-      | string
-      | string[]
-      | ((value: unknown, model: Record<string, unknown>) => string);
-    styles?:
-      | string[]
-      | string
-      | ((value: unknown, model: Record<string, unknown>) => string);
+    class?: string | string[] | ((value: unknown, model: Record<string, unknown>) => string);
+    styles?: string[] | string | ((value: unknown, model: Record<string, unknown>) => string);
   };
   type?: 'string' | 'number';
   field?: string;
+
   /** @description Comparator function when sorting datagrid items */
   sort?: Comparator<unknown> | string | undefined;
+
   /** @description The sortable property makes the column available for sorting */
   sortable?: boolean;
+
   /** @description Property name used during sort queries */
   sortPropertyName?: string;
 };
@@ -48,7 +45,7 @@ export type LegacyGridColumnType = BaseGridColumnType & {
 export type DatagridColumnType = BaseGridColumnType & { property: string };
 
 /** @description Type definition of a smart grid column. It represents each column of the smart grid */
-export type GridColumnType = LegacyGridColumnType | DatagridColumnType;
+export type GridColumnType = DatagridColumnType;
 
 /** @description Type declaration for a grid column type with added searchable property */
 export type SearchableGridColumnType = GridColumnType &
@@ -72,13 +69,17 @@ export type SearchableGridColumnType = GridColumnType &
 export type GridConfigType = {
   transformColumnTitle?: PipeTransformType | PipeTransformType[];
   capitalizeColumnTitle?: boolean;
-  selectable: boolean;
   class: string;
   sizeOptions: number[];
   pageSize: number;
   selectableProp: string;
+
+  /** @deprecated */
+  selectable: boolean;
   preserveSelection: boolean;
+  /** @deprecated */
   singleSelection: boolean;
+  selectionType?: SelectionType;
   hasActionOverflow: boolean;
   hasDetails: boolean;
   hasExpandableRows: boolean;
@@ -91,8 +92,13 @@ export type GridConfigType = {
 
 /** @description Grid select directive input type declaration */
 export type GriSelectDirectiveInputType = {
+  /** @deprecated */
   selectable: boolean;
+
+  /** @deprecated */
   singleSelection: boolean;
+
+  selectionType?: SelectionType
 };
 
 /** @description Datagrid Detail columns type declaration */

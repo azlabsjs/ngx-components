@@ -23,6 +23,7 @@ import { RefType, ViewRefFactory } from '../types';
 import { NgxFormControlArrayOutletComponent } from './control-array-outlet.component';
 import { PIPES } from '../../pipes';
 import { Optional } from './types';
+import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 
 @Component({
   standalone: true,
@@ -31,6 +32,7 @@ import { Optional } from './types';
     NgxFormControlArrayOutletComponent,
     ...BUTTON_DIRECTIVES,
     ...PIPES,
+    ...COMMON_PIPES
   ],
   selector: 'ngx-smart-form-control-array',
   templateUrl: './control-array.component.html',

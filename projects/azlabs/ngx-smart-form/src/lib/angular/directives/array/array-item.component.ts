@@ -13,13 +13,15 @@ import { NgxSmartFormGroupComponent } from '../group';
 import { BUTTON_DIRECTIVES } from '../buttons';
 import { PIPES } from '../../pipes';
 import { Optional } from './types';
+import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 
 @Component({
   standalone: true,
   imports: [
     NgxSmartFormGroupComponent,
     ...BUTTON_DIRECTIVES,
-    ...PIPES
+    ...PIPES,
+    ...COMMON_PIPES,
 ],
   selector: 'ngx-smart-form-array-item',
   templateUrl: './array-item.component.html',

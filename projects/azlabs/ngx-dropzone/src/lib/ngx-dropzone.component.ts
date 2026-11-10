@@ -68,8 +68,7 @@ import {
   standalone: true,
 })
 export class NgxDropzoneComponent
-  implements OnInit, AfterViewInit, OnDestroy, DropzoneComponentInterface
-{
+  implements OnInit, AfterViewInit, OnDestroy, DropzoneComponentInterface {
   @ViewChild(NgxDropzoneDirective, { static: false })
   dropzoneDirective!: NgxDropzoneDirective;
   @Input() defaultMessage!: string;
@@ -165,7 +164,7 @@ export class NgxDropzoneComponent
   constructor(
     @Inject(PLATFORM_ID) private platform: object,
     @Inject(DROPZONE_CONFIG) private defaultConfig: DropzoneConfig
-  ) {}
+  ) { }
 
   // tslint:disable-next-line: typedef
   dropzone() {

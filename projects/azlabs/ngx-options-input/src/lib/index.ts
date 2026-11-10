@@ -1,12 +1,7 @@
 import { FetchOptionsDirective } from './options.directive';
 export { FetchOptionsDirective } from './options.directive';
-export { NgxOptionsInputModule } from './options.module';
 export { INPUT_OPTIONS_CLIENT, OPTIONS_CACHE } from './tokens';
-export {
-  InputOptionsClient,
-  OptionsQueryConfigType,
-  InterceptorFactory,
-} from './types';
+export { InputOptionsClient, OptionsQueryConfigType, InterceptorFactory } from './types';
 
 export { optionsQueryClient } from './utils';
 

@@ -1,4 +1,5 @@
 import { Injectable, Pipe, PipeTransform } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Pipe({
   pure: true,
@@ -69,5 +70,16 @@ export class StrLengthPipe implements PipeTransform {
 export class StrPipe implements PipeTransform {
   transform(value: unknown) {
     return String(value);
+  }
+}
+
+@Pipe({
+  name: 'trusthtml',
+  standalone: true,
+})
+export class TrustHTMLPipe implements PipeTransform {
+  constructor(private sanitized: DomSanitizer) { }
+  transform(value: string) {
+    return this.sanitized.bypassSecurityTrustHtml(value);
   }
 }

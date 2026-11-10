@@ -31,8 +31,6 @@
               "projects/app/src/assets"
             ],
             "styles": [
-              "node_modules/@cds/core/global.min.css",
-              "node_modules/@cds/core/styles/theme.dark.min.css",
               "node_modules/@clr/ui/clr-ui.min.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css",
               "node_modules/@angular/cdk/overlay-prebuilt.css",

@@ -22,7 +22,7 @@
 <div class="container">
   <h3>{{ "app.modules.users.title" | text }}</h3>
   @if (state$ | async; as form) {
-    <!-- <ngx-smart-form #formRef [no-grid-layout]="false" (ready)="onFormReadyState(form)" (changes)="afterChanges()" (item-removed)="onRemoved($event, formRef.formGroup)"
+    <ngx-smart-form #formRef [no-grid-layout]="false" (ready)="onFormReadyState(form)" (changes)="afterChanges()" (item-removed)="onRemoved($event, formRef.formGroup)"
     (error)="onError($event)" [submitable]="true" [autoupload]="true" (submit)="ngxFormSubmit($event, formRef.formGroup)" [form]="form"
     [autoSubmit]="true" [path]="'http://localhost:3000/customers'" [template]="controlTemplate" [table-description]="description" [add-group]="add" [state]="formValue ?? {}">
     <ng-template #description let-name="name">
@@ -52,7 +52,7 @@
     <ng-template #controlTemplate let-config="value" let-control="control" let-describe="describe"
       let-hidden="hidden">
       <ngx-clr-form-control [date]="date" class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control"
-        [hidden]="hidden" [inputConfig]="config" [describe]="describe ?? true" [error]="error" [label]="label">
+        [hidden]="hidden" [config]="config" [describe]="describe ?? true" [error]="error" [label]="label">
         <ng-template #label let-label>
           <span>{{ label }}</span>
         </ng-template>
@@ -81,11 +81,11 @@
       </button>
     </ng-template>
     <pre after>{{ formRef?.formGroup?.getRawValue() | json }}</pre>
-  </ngx-smart-form> -->
+  </ngx-smart-form>
   <!-- <div #formRef="ngxform" [ngxform]="form" [value]="formValue">
   <ngx-form-ui #formui *ngIf="formRef.formGroup" [no-grid-layout]="false" [autoupload]="true" [template]="template" [label]="label" [state]="{ formGroup: formRef.formGroup, detached: formRef.state.detached }" [inputs]="formRef.form.controlConfigs" (item-removed)="onRemoved($event)">
     <ng-template #template let-config="value" let-control="control" let-describe="describe">
-      <ngx-clr-form-control [date]="date" class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control" [inputConfig]="config" [describe]="describe ?? true" [error]="error" [label]="label">
+      <ngx-clr-form-control [date]="date" class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control" [config]="config" [describe]="describe ?? true" [error]="error" [label]="label">
         <ng-template #label let-label>
           <span>{{ label }}</span>
         </ng-template>
@@ -106,7 +106,7 @@
       </ngx-clr-form-control>
     </ng-template>
     <ng-template #label let-label>
-      <ng-container *ngIf="label | text | uppercase | safeHtml as content">
+      <ng-container *ngIf="label | text | uppercase | trusthtml as content">
         <div *ngIf="content | notEmpty" class="control__group__header" [innerHTML]="content"></div>
       </ng-container>
     </ng-template>
@@ -117,9 +117,9 @@
         class="flex justify-between items-center border-b p-4 bg-gray-50" style="border-bottom-left-radius: var(--ngx-modal-content-border-radius,5px); border-top-right-radius: var(--ngx-modal-content-border-radius, 5px);">
         <div>
           <p cds-text>
-            <strong class="inline-block text-2" [innerHTML]="'modules.kyc.policyholders.rightholders.title' | text | safeHtml"></strong>
+            <strong class="inline-block text-2" [innerHTML]="'modules.kyc.policyholders.rightholders.title' | text | trusthtml"></strong>
           </p>
-          <p cds-text class="" [innerHTML]="'modules.kyc.policyholders.rightholders.description' | text | safeHtml"></p>
+          <p cds-text class="" [innerHTML]="'modules.kyc.policyholders.rightholders.description' | text | trusthtml"></p>
         </div>
       </div>
       <div class="p-4">

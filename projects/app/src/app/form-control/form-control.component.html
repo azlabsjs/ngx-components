@@ -3,7 +3,7 @@
     @if (formRef.formGroup) {
       <ngx-form-ui #formui [no-grid-layout]="false" [autoupload]="true" [template]="template" [label]="label1" [state]="{ formGroup: formRef.formGroup, detached: formRef.state.detached | async }" [inputs]="formRef.form.controlConfigs">
         <ng-template #template let-config="value" let-control="control" let-describe="describe">
-          <ngx-clr-form-control [date]="date" class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control" [inputConfig]="config" [describe]="describe ?? true" [error]="error" [label]="label2">
+          <ngx-clr-form-control [date]="date" class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control" [config]="config" [describe]="describe ?? true" [error]="error" [label]="label2">
             <ng-template #label2 let-label>
               <span>{{ label }}</span>
             </ng-template>
@@ -44,7 +44,7 @@
           <div class="ngx-modal-footer"></div>
         </ngx-modal>
         <ng-template #label1 let-label>
-          @if (label | text | uppercase | safeHtml; as content) {
+          @if (label | text | uppercase | trusthtml; as content) {
             @if (content | notEmpty) {
               <div class="control__group__header" [innerHTML]="content"></div>
             }

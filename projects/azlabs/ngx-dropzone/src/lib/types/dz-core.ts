@@ -1,4 +1,5 @@
-import * as BaseDropzone from "dropzone";
+import { Dropzone as BaseDropzone } from "dropzone";
+
 export type Dropzone = any | BaseDropzone;
 
 export interface DropzoneDict {

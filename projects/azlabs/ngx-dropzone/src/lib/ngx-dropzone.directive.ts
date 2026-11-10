@@ -19,7 +19,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 
-import { autoDiscover, createDropzone, createDzConfig } from './helpers';
+import { createDropzone, createDzConfig } from './helpers';
 import {
   DropzoneConfig,
   DropzoneEvent,
@@ -84,7 +84,6 @@ export class NgxDropzoneDirective
     @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(DROPZONE_CONFIG) @Optional() private defaults: DropzoneConfig
   ) {
-    autoDiscover(false);
   }
 
   ngOnInit(): void {

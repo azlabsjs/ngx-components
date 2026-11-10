@@ -14,18 +14,12 @@ import { getObjectProperty } from '@azlabsjs/js-object';
 import { TranslationsType } from './types';
 
 interface SubscriptionStrategy {
-  createSubscription(
-    async: Subscribable<any> | Promise<any>,
-    updateLatestValue: any
-  ): Unsubscribable | Promise<any>;
+  createSubscription(async: Subscribable<any> | Promise<any>, updateLatestValue: any): Unsubscribable | Promise<any>;
   dispose(subscription: Unsubscribable | Promise<any>): void;
 }
 
 class SubscribableStrategy implements SubscriptionStrategy {
-  createSubscription(
-    async: Subscribable<any>,
-    updateLatestValue: any
-  ): Unsubscribable {
+  createSubscription(async: Subscribable<any>, updateLatestValue: any): Unsubscribable {
     // Subscription can be side-effectful, and we don't want any signal reads which happen in the
     // side effect of the subscription to be tracked by a component's template when that
     // subscription is triggered via the async pipe. So we wrap the subscription in `untracked` to
@@ -62,7 +56,7 @@ const _subscribableStrategy = new SubscribableStrategy();
   pure: false,
   standalone: true,
 })
-@Injectable({ providedIn: 'any' })
+@Injectable()
 export class CommonTextPipe implements OnDestroy, PipeTransform {
   private _ref: ChangeDetectorRef | null;
   private _latestValue: any = null;
@@ -73,12 +67,7 @@ export class CommonTextPipe implements OnDestroy, PipeTransform {
   private _strategy: SubscriptionStrategy | null = null;
   private _c: Observable<TranslationsType>;
 
-  constructor(
-    ref: ChangeDetectorRef,
-    @Inject(COMMON_STRINGS)
-    @Optional()
-    _commonStrings: Observable<TranslationsType>
-  ) {
+  constructor(ref: ChangeDetectorRef, @Inject(COMMON_STRINGS) @Optional() _commonStrings: Observable<TranslationsType>) {
     // Assign `ref` into `this._ref` manually instead of declaring `_ref` in the constructor
     // parameter list, as the type of `this._ref` includes `null` unlike the type of `ref`.
     this._ref = ref;
@@ -159,37 +148,16 @@ export class CommonTextPipe implements OnDestroy, PipeTransform {
   }
 }
 
-/** @deprecated Use `text` pipe instead */
-@Pipe({
-  name: 'commonString',
-  pure: false,
-  standalone: true,
-})
-@Injectable({ providedIn: 'any' })
-export class CommonStringsPipe implements PipeTransform {
-  /** @description strings pipe class constructor */
-  constructor(private textPipe: CommonTextPipe) {}
-
-  /** @description Redirect calls to text pipe transform method */
-  transform(q: string, prefix?: string, def: string = '') {
-    return this.textPipe.transform(q, prefix, def);
-  }
-}
-
 @Pipe({
   name: 'asyncText',
   pure: true,
   standalone: true,
 })
-@Injectable({ providedIn: 'any' })
+@Injectable()
 export class AsyncTextPipe implements PipeTransform {
   private translations: Observable<TranslationsType>;
 
-  constructor(
-    @Inject(COMMON_STRINGS)
-    @Optional()
-    translations: Observable<TranslationsType>
-  ) {
+  constructor(@Inject(COMMON_STRINGS) @Optional() translations: Observable<TranslationsType>) {
     this.translations = translations ?? of({});
   }
 

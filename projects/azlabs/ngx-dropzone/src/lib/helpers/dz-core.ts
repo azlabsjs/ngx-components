@@ -1,4 +1,4 @@
-import Dropzone from 'dropzone';
+import { Dropzone } from 'dropzone';
 import { DropzoneConfig } from '../types';
 
 /**
@@ -6,16 +6,9 @@ import { DropzoneConfig } from '../types';
  * @param container
  * @param options
  */
-export function createDropzone(
-  container: string | HTMLElement,
-  options: DropzoneConfig
-) {
+export function createDropzone(container: string | HTMLElement, options: DropzoneConfig) {
   return new Dropzone(container, options);
 }
-
-export const autoDiscover = (value: boolean = true) => {
-  Dropzone.autoDiscover = value;
-};
 
 /**
  * Creates the default dropzone preview template string
@@ -40,23 +33,20 @@ export function createDefaultPreviewTemplate(iconClass: string = 'icon') {
 }
 
 /**
- * @description Return the dictionary message to be used by the dropzone instances
+ * @description return the dictionary message to be used by the dropzone instances
  */
 export function useDefaultDictionary() {
   return {
     dictAcceptedFiles: 'Choose file to upload',
-    dictFallbackMessage:
-      'Your browser is outdated, please update it to the latest version.',
-    dictFileTooBig:
-      'File size must be less than or equal to {{maxFilesize}}Mo. Actual file size : ({{filesize}}Mo): ',
+    dictFallbackMessage: 'Your browser is outdated, please update it to the latest version.',
+    dictFileTooBig: 'File size must be less than or equal to {{maxFilesize}}Mo. Actual file size : ({{filesize}}Mo): ',
     dictInvalidFileType: 'Please choose an {{fileformat}} file type',
     dictCancelUpload: 'Upload cancelled',
     dictResponseError: 'An error happenned during file upload, please retry...',
     dictCancelUploadConfirmation: 'Please confirm to cancel the upload process',
     dictRemoveFileConfirmation: 'Please confirm to proceed',
     dictRemoveFile: 'Remove',
-    dictMaxFilesExceeded:
-      'You have reach the maximum of file that can be uploaded',
+    dictMaxFilesExceeded: 'You have reach the maximum of file that can be uploaded',
     dictDrag: 'Drag file(s) here or',
     dictDrag2: 'Click',
     dictUpload: 'to upload',

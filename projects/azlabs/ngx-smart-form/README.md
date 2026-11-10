@@ -345,14 +345,14 @@ From version `0.15.x`, smart form component does not provide internal implementa
 The component relies on angular content projection AI that allow developpers to provide their own inputs redering component. For easy transition, developpers can use the `@azlabs/ngx-clr-form-control` library components which provides clarity design input components for redering input elements. Below are configuration required for migration purpose:
 
 ```ts
-import { NgxSmartFormModule } from '@azlabsjs/ngx-smart-form';
+import { FORM_DIRECTIVES } from '@azlabsjs/ngx-smart-form';
 import { NgxClrFormControlModule } from '@azlabsjs/ngx-clr-form-control';
 
 // app.module.ts
 @NgModule({
   // ...
   imports: [
-    NgxSmartFormModule.forRoot(...),
+    ...FORM_DIRECTIVES,
     // Configure the clr form control module library
     NgxClrFormControlModule.forRoot(...)
   ]
@@ -370,3 +370,9 @@ export class AppModule {
   </ng-template>
 </ngx-smart-form>
 ```
+
+## Version 0.21.x changes
+
+Breaking changes:
+
+  - Removed deprecated `NgxSmartFormModule` class

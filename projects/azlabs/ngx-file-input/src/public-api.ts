@@ -5,22 +5,12 @@
 import { NgxSmartFileInputComponent } from './lib/file-input.component';
 import { HTMLFileInputDirective } from './lib/file-input.directive';
 
-//#region module exports
 export { UPLOADER_OPTIONS } from './lib/tokens';
-export {
-  UploadOptionsType,
-  InterceptorFactory,
-  EventArgType,
-} from './lib/types';
+export { UploadOptionsType, InterceptorFactory, EventArgType } from './lib/types';
 export { NgxSmartFileInputComponent } from './lib/file-input.component';
 export { NgxUploadsEventsService } from './lib/uploads-events.service';
-export { NgxFileInputModule } from './lib/file-input.module';
 export { HTMLFileInputDirective } from './lib/file-input.directive';
 export { provideUploadOptions, provideDownloadApi } from './lib/providers';
 
 /** @description library directives */
-export const FILE_INPUT_DIRECTIVES = [
-  NgxSmartFileInputComponent,
-  HTMLFileInputDirective,
-] as const;
-//#endregion
+export const FILE_INPUT_DIRECTIVES = [NgxSmartFileInputComponent, HTMLFileInputDirective] as const;

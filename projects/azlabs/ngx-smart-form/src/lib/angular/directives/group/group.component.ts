@@ -22,10 +22,11 @@ import { NgxSmartFormGroupHeaderPipe } from './group-header.pipe';
 import { NgxSmartFormControlArrayComponent } from '../control-array';
 import { FORM_PIPES } from '../form/pipes';
 import { Optional } from './types';
+import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ...PIPES, ...FORM_PIPES, NgxSmartFormGroupHeaderPipe, NgxSmartFormControlArrayComponent],
+  imports: [CommonModule, ...PIPES, ...FORM_PIPES, ...COMMON_PIPES, NgxSmartFormGroupHeaderPipe, NgxSmartFormControlArrayComponent],
   selector: 'ngx-smart-form-group',
   templateUrl: './group.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

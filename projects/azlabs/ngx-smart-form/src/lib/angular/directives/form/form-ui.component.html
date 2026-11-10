@@ -35,7 +35,7 @@
             *ngTemplateOutlet="label ?? labelRef; context: { $implicit: value.label, config: value, control: local }"></ng-container>
             <ng-template #labelRef let-label let-config="config" let-control="control">
               @if (config.label) {
-                <div [class.hidden]="(config | ishidden) || (local | inarray : state.detached)" [innerHTML]="config.label | ngxGroupHeader | safeHtml" [hidden]="(config | ishidden) || (local | inarray : state.detached)"></div>
+                <div [class.hidden]="(config | ishidden) || (local | inarray : state.detached)" [innerHTML]="config.label | ngxGroupHeader | trusthtml" [hidden]="(config | ishidden) || (local | inarray : state.detached)"></div>
               }
             </ng-template>
             @if (value | repeatable) {

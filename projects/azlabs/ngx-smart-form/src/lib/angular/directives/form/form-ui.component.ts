@@ -18,6 +18,7 @@ import { ModalDirective } from '../modal';
 import { FORM_PIPES } from './pipes';
 import { ComponentReactiveFormHelpers } from '../../helpers';
 import { AbstractControl } from '@angular/forms';
+import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 
 @Component({
   selector: 'ngx-form-ui',
@@ -31,6 +32,7 @@ import { AbstractControl } from '@angular/forms';
     NgxSmartFormGroupHeaderPipe,
     ...PIPES,
     ...FORM_PIPES,
+    ...COMMON_PIPES
   ],
   styleUrls: ['./form-grid.scss', './form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,14 +45,11 @@ export class NgxFormComponent {
   @Input({ alias: 'no-grid-layout' }) nogridlayout = false;
   @Input({ required: true }) state!: Omit<FormGroupState, 'detached'> & { [k: string]: unknown, detached: Optional<AbstractControl[]> };
   @Input({ required: true }) inputs!: InputConfigInterface[];
+  @Input({ alias: 'add' }) add!: TemplateRef<any>;
+  @Input({ alias: 'add-group' }) addgroup!: TemplateRef<any>;
 
   @Input({ alias: 'table-description' }) tabledescription!: Optional<TemplateRef<any>>;
   @ContentChild(ModalDirective) formmodal!: ModalDirective | null;
-
-  /** @deprecated */
-  @Input({ alias: 'add-template' }) addref!: Optional<TemplateRef<any>>;
-  @Input({ alias: 'add' }) add!: TemplateRef<any>;
-  @Input({ alias: 'add-group' }) addgroup!: TemplateRef<any>;
 
   @Output('item-removed') removed = new EventEmitter<{ name: string, control: AbstractControl }>();
 

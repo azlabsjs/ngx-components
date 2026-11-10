@@ -135,3 +135,12 @@ It's recommended to use `CLR_FORM_CONTROL_DIRECTIVES from '@azlabsjs/ngx-clr-for
 Also it's recommended to also to register providers at the root component level using `provideTranslations(...)` to register translation dictionnary for input errors, `provideQueryClient(...)` to register options requests http client and `provideUploadOptions(...)` to register file input upload configurations, if using standalone component or at `AppModule` level if running on angular >=15.x.
 
 **Note** Library is still under development and API might change. Please consult the current page for any version update.
+
+
+## Version 0.21.x
+
+Breaking changes:
+
+  - Removed deprecated `NgxClrFormControlModule` class
+  - Removed deprecated `NgxFormControlComponent.inputConfig` input from `NgxFormControlComponent` component
+  - Removed deprecated  `NgxFormControlComponent.class` input from `NgxFormControlComponent` component

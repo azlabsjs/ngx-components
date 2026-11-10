@@ -10,7 +10,6 @@ import { TimeInputPipe } from './time-input.pipe';
 import { TrustHTMLPipe } from './safe-html.pipe';
 import { IncludesPipe } from './includes.pipe';
 import { DefinedPipe } from './defined.pipe';
-import { JoinPipe } from './join.pipe';
 import { IsObjectPipe } from './is-object.pipe';
 import { NoAutoCompleteDirective } from './auto-complete-off.directive';
 
@@ -27,7 +26,6 @@ import { NoAutoCompleteDirective } from './auto-complete-off.directive';
     TrustHTMLPipe,
     IncludesPipe,
     DefinedPipe,
-    JoinPipe,
     IsObjectPipe,
     NoAutoCompleteDirective,
   ],
@@ -42,10 +40,9 @@ import { NoAutoCompleteDirective } from './auto-complete-off.directive';
     TrustHTMLPipe,
     IncludesPipe,
     DefinedPipe,
-    JoinPipe,
     IsObjectPipe,
     NoAutoCompleteDirective,
     CommonModule,
   ],
 })
-export class NgxCommonModule {}
+export class NgxCommonModule { }

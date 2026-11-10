@@ -127,3 +127,9 @@ export class MyComponent {
 
 }
 ```
+
+## Version 0.21.x changes
+
+Breaking changes:
+
+  - Removed deprecated `NgxIntlTelInputModule` class

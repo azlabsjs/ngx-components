@@ -160,8 +160,7 @@ export interface FormComponentInterface {
   setControlConfig(config?: InputConfigInterface, name?: string): void;
 
   /**
-   * @deprecated call the curren function to validate the internal
-   * formgroup object
+   * @deprecated call the curren function to validate the internal formgroup object
    */
   validateForm(): void;
 }

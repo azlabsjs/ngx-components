@@ -16,5 +16,4 @@ export {
 export { NgxClrGridSelectDirective } from './directives';
 export { GridRowClassPipe, CellClassPipe, CellStylePipe } from './pipes';
 export { NgxClrSmartGridComponent } from './grid.component';
-export { NgxClrSmartGridModule } from './grid.module';
 export { DIRECTIVES } from './common';

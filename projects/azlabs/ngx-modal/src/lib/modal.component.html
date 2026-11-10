@@ -1,4 +1,4 @@
-<div class="modal" [class]="cssClass | appendcss : state.size | join" [ngClass]="{ opened: state.opened }">
+<div class="modal" [class]="' ' | join : (cssClass | appendcss : state.size)" [ngClass]="{ opened: state.opened }">
   @if (animation === 'fade') {
     <div class="modal-content" [@fadeInOutSlideBottom]="state.opened ? 'open' : 'close'">
       <ng-container *ngTemplateOutlet="_content"></ng-container>

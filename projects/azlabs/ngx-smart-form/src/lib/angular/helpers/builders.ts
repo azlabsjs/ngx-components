@@ -134,7 +134,7 @@ export class ComponentReactiveFormHelpers {
     return group;
   }
 
-  public static buildControl(builder: FormBuilder,config: InputConfigInterface,requestClient?: RequestClient) {
+  public static buildControl(builder: FormBuilder, config: InputConfigInterface, requestClient?: RequestClient) {
     const validators = [!!config.rules?.isRequired || required(config) ? Validators.required : Validators.nullValidator];
     const asyncValidators: AsyncValidatorFn[] = [];
     let hasEqualsConstraint = false;
@@ -299,11 +299,7 @@ export class ComponentReactiveFormHelpers {
     }
   }
 
-  public static markControlAsTouched(
-    control?: AbstractControl,
-    /** @deprecated */
-    field?: string
-  ): void {
+  public static markControlAsTouched(control?: AbstractControl): void {
     if (control) {
       control.markAsTouched();
       control.markAsDirty();
@@ -346,10 +342,7 @@ export class ComponentReactiveFormHelpers {
     }
   }
 
-  public static setValidators(
-    control?: AbstractControl,
-    validators?: ValidatorFn | ValidatorFn[]
-  ): void {
+  public static setValidators(control?: AbstractControl,validators?: ValidatorFn | ValidatorFn[]): void {
     if (control) {
       control.setValidators(validators || null);
       control.updateValueAndValidity();
@@ -357,47 +350,15 @@ export class ComponentReactiveFormHelpers {
   }
 }
 
-/**
- * @deprecated
- */
-export function createAngularAbstractControl(
-  builder: FormBuilder,
-  form?: FormConfigInterface,
-  requestClient?: RequestClient
-) {
-  return form
-    ? ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(
-      builder,
-      [...form?.controlConfigs],
-      requestClient
-    )
-    : undefined;
-}
 
-/** @description Create angular form group instance from input configurations */
-export function createFormGroup(
-  builder: FormBuilder,
-  inputConfigs?: InputConfigInterface[],
-  requestClient?: RequestClient
-) {
-  return ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(
-    builder,
-    inputConfigs ?? [],
-    requestClient
-  );
+/** @description create angular form group instance from input configurations */
+export function createFormGroup(builder: FormBuilder, inputConfigs?: InputConfigInterface[], requestClient?: RequestClient) {
+  return ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(builder, inputConfigs ?? [], requestClient);
 }
 
 /** @description Creates angular form control instance from input configuration */
-export function createFormControl(
-  builder: FormBuilder,
-  inputConfig: InputConfigInterface,
-  requestClient?: RequestClient
-) {
-  return ComponentReactiveFormHelpers.buildControl(
-    builder,
-    inputConfig,
-    requestClient
-  );
+export function createFormControl(builder: FormBuilder, inputConfig: InputConfigInterface, requestClient?: RequestClient) {
+  return ComponentReactiveFormHelpers.buildControl(builder, inputConfig, requestClient);
 }
 
 /**

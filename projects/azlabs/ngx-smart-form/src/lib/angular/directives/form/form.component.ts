@@ -77,8 +77,6 @@ export class NgxSmartFormComponent implements ReactiveFormComponentInterface, Af
   @Input('no-grid-layout') noGridLayout = false;
   @Input() modal!: ModalDirective;
 
-  /** @deprecated */
-  @Input() addTemplate!: TemplateRef<any>;
   @Input({ alias: 'add' }) add!: TemplateRef<any>;
   @Input({ alias: 'add-group' }) addgroup!: TemplateRef<any>;
   @Input({ alias: 'table-description' }) tabledescription!: Optional<TemplateRef<any>>;

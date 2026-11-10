@@ -630,3 +630,11 @@ export class AppModule {
   // Application source code
 }
 ```
+
+
+## Version 0.21.x
+
+Here is the list of breaking changes:
+
+  - Deprecated `NgxClrSmartGridModule` has been removed and should not be used by dependent source codes. 
+  - Deprecated `LegacyGridColumnType` has been removed. `GridColumnType.label` is no more supported by the datagrid component

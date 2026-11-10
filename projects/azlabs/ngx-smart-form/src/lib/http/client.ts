@@ -15,10 +15,7 @@ type _RequestFunction = <T>(
   path: string,
   method: HTTPRequestMethods,
   body: unknown,
-  options?: {
-    headers?: HeadersInit;
-    responseType?: HTTPResponseType;
-  }
+  options?: { headers?: HeadersInit; responseType?: HTTPResponseType; }
 ) => ObservableInput<T>;
 
 /**

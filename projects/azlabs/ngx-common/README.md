@@ -90,3 +90,10 @@ export class AppComponent {
 
 }
 ```
+
+
+## Version 0.21.x changes
+
+Breaking changes:
+
+  - Removed deprecated `NgxCommonModule` class

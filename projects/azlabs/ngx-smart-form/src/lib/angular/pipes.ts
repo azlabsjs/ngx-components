@@ -1,10 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {
-  InputGroup,
-  InputConfigInterface,
-  InputTypes,
-} from '@azlabsjs/smart-form-core';
-import { DomSanitizer } from '@angular/platform-browser';
+import { InputGroup, InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
 import { AbstractControl } from '@angular/forms';
 
 /**
@@ -64,17 +59,6 @@ export class IsRepeatablePipe implements PipeTransform {
 }
 
 @Pipe({
-  name: 'safeHtml',
-  standalone: true,
-})
-export class SafeHTMLPipe implements PipeTransform {
-  constructor(private sanitized: DomSanitizer) { }
-  transform(value: string) {
-    return this.sanitized.bypassSecurityTrustHtml(value);
-  }
-}
-
-@Pipe({
   name: 'asInputs',
   pure: true,
   standalone: true,
@@ -123,21 +107,6 @@ export class AsInputConfigArray implements PipeTransform {
 }
 
 @Pipe({
-  name: 'inarray',
-  pure: true,
-  standalone: true,
-})
-export class InArrayPipe implements PipeTransform {
-  transform<T extends AbstractControl>(input: T, list: T[] | null | undefined, name?: string) {
-    if (!list) {
-      return false;
-    }
-    
-    return list.indexOf(input) !== -1;
-  }
-}
-
-@Pipe({
   name: 'required',
   pure: true,
   standalone: true,
@@ -154,7 +123,6 @@ export class RequiredPipe implements PipeTransform {
 
 /** @description exported pipes */
 export const PIPES = [
-  SafeHTMLPipe,
   IsRepeatablePipe,
   HasChildrenPipe,
   IsHiddenPipe,
@@ -162,6 +130,5 @@ export const PIPES = [
   AsInputGroupPipe,
   KeysPipe,
   AsInputConfigArray,
-  InArrayPipe,
   RequiredPipe,
 ] as const;

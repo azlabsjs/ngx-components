@@ -50,7 +50,7 @@ function is_not_empty(value: any) {
   pure: true,
   name: 'defined',
 })
-@Injectable({ providedIn: 'any' })
+@Injectable()
 export class DefinedPipe implements PipeTransform {
   /** @description Returns true if the provided value is not `undefined` not `null` */
   transform(value: unknown) {
@@ -63,7 +63,7 @@ export class DefinedPipe implements PipeTransform {
   pure: true,
   name: 'includes',
 })
-@Injectable({ providedIn: 'any' })
+@Injectable()
 export class IncludesPipe implements PipeTransform {
   /** @description Checks if the indexOf the provided search exists in the `value` parameter */
   transform(value: string | unknown[], search: unknown) {
@@ -76,7 +76,7 @@ export class IncludesPipe implements PipeTransform {
   pure: true,
   name: 'indexOf',
 })
-@Injectable({ providedIn: 'any' })
+@Injectable()
 export class IndexOfPipe implements PipeTransform {
   /** @description returns the index of the search parameter in the collection data type */
   transform(value: string | unknown[], search: unknown) {
@@ -89,7 +89,7 @@ export class IndexOfPipe implements PipeTransform {
   name: 'asAny',
   pure: true,
 })
-@Injectable({ providedIn: 'any' })
+@Injectable()
 export class AsAnyPipe implements PipeTransform {
   // Cast the provided value as any
   transform(value: unknown) {
@@ -102,7 +102,7 @@ export class AsAnyPipe implements PipeTransform {
   pure: true,
   standalone: true,
 })
-@Injectable({ providedIn: 'any' })
+@Injectable()
 export class KeysPipe implements PipeTransform {
   transform(value: { [prop: string]: unknown }) {
     return Object.keys(value);
@@ -114,7 +114,7 @@ export class KeysPipe implements PipeTransform {
   standalone: true,
   pure: true,
 })
-@Injectable({ providedIn: 'any' })
+@Injectable()
 export class NotEmptyPipe implements PipeTransform {
   transform(value: any) {
     return is_not_empty(value);
@@ -126,7 +126,7 @@ export class NotEmptyPipe implements PipeTransform {
   standalone: true,
   pure: true,
 })
-@Injectable({ providedIn: 'any' })
+@Injectable()
 export class EmptyPipe implements PipeTransform {
   transform(value: any) {
     return !is_not_empty(value);

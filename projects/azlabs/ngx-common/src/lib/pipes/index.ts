@@ -1,8 +1,6 @@
 import {
-  ArrayLengthPipe,
-  IsArrayPipe,
   ArrayPipe,
-  JoinPipe,
+  Join,
   LengthPipe,
   ConcatPipe,
   ContainsPipe,
@@ -15,7 +13,7 @@ import {
 } from './common/arrays.pipe';
 import { IsAsyncPipe, AsObservablePipe } from './common/async.pipe';
 import { ParseIntPipe } from './common/parse-int.pipe';
-import { ParseStrPipe, StrLengthPipe, FormatPipe, StrPipe } from './common/str.pipe';
+import { ParseStrPipe, StrLengthPipe, FormatPipe, StrPipe, TrustHTMLPipe } from './common/str.pipe';
 import { PipeResultPipe } from './common/pipe-result.pipe';
 import { PropertyValuePipe } from './common/property.pipe';
 import { NgxTransformPipe } from './transform';
@@ -28,37 +26,15 @@ import {
   NotEmptyPipe,
   EmptyPipe,
 } from './common/utils.pipe';
-import { CommonStringsPipe, AsyncTextPipe, CommonTextPipe } from './strings';
+import { AsyncTextPipe, CommonTextPipe } from './strings';
 
-export {
-  AsAnyPipe,
-  DefinedPipe,
-  IncludesPipe,
-  IndexOfPipe,
-  KeysPipe,
-  EmptyPipe,
-  NotEmptyPipe,
-} from './common/utils.pipe';
+export { AsAnyPipe, DefinedPipe, IncludesPipe, IndexOfPipe, KeysPipe, EmptyPipe, NotEmptyPipe, } from './common/utils.pipe';
 export { IsAsyncPipe, AsObservablePipe } from './common/async.pipe';
 export { PipeResultPipe } from './common/pipe-result.pipe';
 export { ParseIntPipe } from './common/parse-int.pipe';
-export { ParseStrPipe, StrLengthPipe, FormatPipe, StrPipe } from './common/str.pipe';
+export { ParseStrPipe, StrLengthPipe, FormatPipe, StrPipe, TrustHTMLPipe } from './common/str.pipe';
 export { PropertyValuePipe } from './common/property.pipe';
-export {
-  ArrayLengthPipe,
-  IsArrayPipe,
-  ArrayPipe,
-  JoinPipe,
-  LengthPipe,
-  ConcatPipe,
-  ContainsPipe,
-  IsarrayPipe,
-  InArrayPipe,
-  MergePipe,
-  ArrayFindPipe,
-  ArrayFirstPipe,
-  AsArrayPipe
-} from './common/arrays.pipe';
+export { ArrayPipe, Join, LengthPipe, ConcatPipe, ContainsPipe, IsarrayPipe, InArrayPipe, MergePipe, ArrayFindPipe, ArrayFirstPipe, AsArrayPipe } from './common/arrays.pipe';
 
 /** types & declarations from transform namespace */
 export * from './transform';
@@ -68,9 +44,7 @@ export * from './strings';
 
 /** @description standalone pipes */
 export const COMMON_PIPES = [
-  ArrayLengthPipe,
-  CommonStringsPipe,
-  IsArrayPipe,
+  TrustHTMLPipe,
   IsAsyncPipe,
   PipeResultPipe,
   ParseIntPipe,
@@ -83,7 +57,7 @@ export const COMMON_PIPES = [
   NgxTransformPipe,
   CommonTextPipe,
   AsyncTextPipe,
-  JoinPipe,
+  Join,
   DefinedPipe,
   IncludesPipe,
   IndexOfPipe,

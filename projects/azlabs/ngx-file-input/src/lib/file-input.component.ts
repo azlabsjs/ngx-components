@@ -85,7 +85,6 @@ type Optional<T> = T | null | undefined;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSmartFileInputComponent implements AfterViewInit, OnChanges {
-  //#region input properties
   @Input({ alias: 'upload-as' }) uploadAs!: string | undefined;
   @Input({ alias: 'placeholder' }) placeholder!: string | undefined;
   @Input({ alias: 'class' }) cssClass!: string | undefined;
@@ -97,57 +96,31 @@ export class NgxSmartFileInputComponent implements AfterViewInit, OnChanges {
   @Input() url!: string | undefined;
   @Input() describe: boolean = true;
   @Input() read: 'id' | 'url' | 'object' | undefined = 'id';
-  /**
-   * ng Input attribute that defines whether files must automatically
-   * be uploaded when the get accepted by the component
-   */
   @Input({ alias: 'autoupload' }) autoupload: boolean = false;
   @Input({ alias: 'tooltip-error' }) tooltip!: Optional<TemplateRef<any>>;
-  /** @deprecated */
-  @Input({ alias: 'file-size-error' }) fileSizeError!: string;
-  /** @deprecated */
-  @Input({ alias: 'file-upload-error' }) fileUploadError!: string;
 
   /** file object or url to file stream */
   @Input() file: Optional<string | File>;
-  //#endregion
 
-  // #region local properties
   _state: StateType = { uploading: false, error: undefined };
   get state() {
     return this._state;
   }
   private _api: (url: string) => Promise<File | null>;
-  // #endregion
 
-  // #region output properties
   @Output() reset = new EventEmitter<void>();
   @Output() value = new EventEmitter<ValueType>();
   @Output() error = new EventEmitter<ErrorStateType>();
-  // #endregion
 
   @ViewChild('input', { static: false }) input: Optional<ElementRef>;
 
   // Class constructor
-  constructor(
-    private cdRef: ChangeDetectorRef | null,
-    @Inject(UPLOADER_OPTIONS)
-    public readonly uploadOptions: UploadOptionsType<HTTPRequest, HTTPResponse>,
-    private uploadEvents: NgxUploadsEventsService,
-    private injector: Injector,
-    @NgOptional()
-    @Inject(DOWNLOAD_API)
-    api: (url: string) => Promise<File | null>
-  ) {
+  constructor(private cdRef: ChangeDetectorRef | null, @Inject(UPLOADER_OPTIONS) public readonly uploadOptions: UploadOptionsType<HTTPRequest, HTTPResponse>, private uploadEvents: NgxUploadsEventsService, private injector: Injector, @NgOptional() @Inject(DOWNLOAD_API) api: (url: string) => Promise<File | null>) {
     this._api = api ?? createWithFetchAPI();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes &&
-      'file' in changes &&
-      changes['file'].currentValue !== changes['file'].previousValue
-    ) {
+    if (changes && 'file' in changes && changes['file'].currentValue !== changes['file'].previousValue) {
       this.setInputValue(changes['file'].currentValue);
     }
   }
@@ -181,13 +154,7 @@ export class NgxSmartFileInputComponent implements AfterViewInit, OnChanges {
     this.value.emit(multiple ? e : e[0]);
   }
 
-  private async upload(
-    event: File[],
-    url: string | undefined,
-    o: UploadOptionsType<HTTPRequest, HTTPResponse>,
-    multiple: boolean = false,
-    uploadAs: string = 'file'
-  ) {
+  private async upload(event: File[], url: string | undefined, o: UploadOptionsType<HTTPRequest, HTTPResponse>, multiple: boolean = false, uploadAs: string = 'file') {
     // when the autoupload is set on the current component,
     // we send an upload request to configured url or server
     // url for each accepted files
@@ -291,8 +258,8 @@ export class NgxSmartFileInputComponent implements AfterViewInit, OnChanges {
 
       const args = multiple
         ? uploaded.map((result) =>
-            readPropertyValue<EventArgType>(result, this.read ?? 'id')
-          )
+          readPropertyValue<EventArgType>(result, this.read ?? 'id')
+        )
         : readPropertyValue<EventArgType>(uploaded[0], this.read ?? 'id');
 
       // emit the list of values

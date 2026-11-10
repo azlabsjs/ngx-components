@@ -9,13 +9,9 @@ import {
   ModalDirective
 } from './directives';
 
-/** @deprecated */
-import { SafeHTMLPipe } from './pipes';
-
 export {
   ComponentReactiveFormHelpers,
   cloneAbstractControl,
-  createAngularAbstractControl,
   createFormGroup,
   createFormControl,
   createFormArray,
@@ -24,10 +20,6 @@ export {
   pickcontrol,
   pickconfig,
 } from './helpers';
-
-export { NgxSmartFormModule } from './smart-form.module';
-
-export { SafeHTMLPipe } from './pipes';
 
 export { FormsLoader as NgxFormLoader } from './services';
 
@@ -75,7 +67,6 @@ export const FORM_DIRECTIVES = [
   NgxSmartFormGroupComponent,
   NgxSmartFormArrayComponent,
   NgxSmartFormArrayItemComponent,
-  SafeHTMLPipe,
   NgxTableForm,
   NgxFormComponent,
   ModalDirective

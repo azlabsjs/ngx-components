@@ -16,7 +16,7 @@ import { map, tap } from 'rxjs/operators';
 import { InputEventArgs } from './types';
 import { FILE_INPUT_DIRECTIVES } from '@azlabsjs/ngx-file-input';
 import { NgxCommonModule } from './common';
-import { ClarityModule } from '@clr/angular';
+import { ClrRadioModule, ClrDatepickerModule } from '@clr/angular';
 import { ClarityIcons, eyeHideIcon, eyeIcon, ClrIcon } from '@clr/angular/icon';
 import { DIRECTIVES } from './directives';
 import { PIPES } from './pipes';
@@ -34,9 +34,10 @@ type Optional<T> = T | null | undefined;
     NgxCommonModule,
     FormsModule,
     ReactiveFormsModule,
+    ClrRadioModule,
+    ClrDatepickerModule,
     ...DIRECTIVES,
     ...FILE_INPUT_DIRECTIVES,
-    ClarityModule,
     ...PIPES,
   ],
   selector: 'ngx-clr-form-control',
@@ -49,19 +50,13 @@ export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
   @Input() describe = true;
   @Input() hidden: Optional<boolean> = false;
   @Input() countries!: string[];
-  private _inputConfig!: InputConfigInterface;
+  private _config!: InputConfigInterface;
   @Input() set config(value: InputConfigInterface) {
-    this._inputConfig = value;
+    this._config = value;
   }
-  /** @deprecated */
-  @Input() set inputConfig(value: InputConfigInterface) {
-    this._inputConfig = value;
+  get config() {
+    return this._config;
   }
-  get inputConfig() {
-    return this._inputConfig;
-  }
-  /** @deprecated */
-  @Input({ alias: 'class' }) cssClass = 'clr-form-control';
   @Input({ alias: 'control' }) formControl!: FormControl<any>;
   @Input({ alias: 'tooltip-error' }) tooltiperror!: Optional<TemplateRef<any>>;
   @Input({ alias: 'loading-text' }) loadingText!: string;
@@ -96,7 +91,7 @@ export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
     this.subscriptions.push(
       this.formControl.valueChanges
         .pipe(
-          map((source) => ({ name: this.inputConfig.name, value: source })),
+          map((source) => ({ name: this.config.name, value: source })),
           tap((event) => {
             this.valueChange.emit(event);
             this.cdRef?.markForCheck();

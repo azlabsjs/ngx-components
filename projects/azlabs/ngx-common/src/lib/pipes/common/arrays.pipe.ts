@@ -5,9 +5,8 @@ import { Injectable, Pipe, PipeTransform } from '@angular/core';
   pure: true,
   name: 'array',
 })
-@Injectable({ providedIn: 'any' })
+@Injectable()
 export class ArrayPipe implements PipeTransform {
-  /** Returns an empty array if the provided value is null or undefined or the value else */
   transform<T>(value: undefined | T[]) {
     return typeof value === 'undefined' || value === null ? ([] as T[]) : value;
   }
@@ -18,33 +17,20 @@ export class ArrayPipe implements PipeTransform {
   pure: true,
   name: 'contains',
 })
-@Injectable({ providedIn: 'any' })
+@Injectable()
 export class ContainsPipe implements PipeTransform {
   transform<T = unknown>(value: T[], arg: T) {
     return value.includes(arg);
   }
 }
 
-/** @deprecated use isarray instead */
-@Pipe({
-  standalone: true,
-  pure: true,
-  name: 'isArray',
-})
-@Injectable({ providedIn: 'any' })
-export class IsArrayPipe implements PipeTransform {
-  /** returns an empty array if the provided value is null or undefined or the value else */
-  transform<T>(value: undefined | T[]): value is T[] {
-    return Array.isArray(value);
-  }
-}
 
 @Pipe({
   pure: true,
   standalone: true,
   name: 'isarray',
 })
-@Injectable({ providedIn: 'any' })
+@Injectable()
 export class IsarrayPipe implements PipeTransform {
   /** returns an empty array if the provided value is null or undefined or the value else */
   transform<T>(value: undefined | T[]): value is T[] {
@@ -52,30 +38,21 @@ export class IsarrayPipe implements PipeTransform {
   }
 }
 
-/** @deprecated Use `length` pipe instead */
-@Pipe({
-  standalone: true,
-  pure: true,
-  name: 'arrayLength',
-})
-@Injectable({ providedIn: 'any' })
-export class ArrayLengthPipe implements PipeTransform {
-  /** Returns an empty array if the provided value is null or undefined or the value else */
-  transform<T>(value: undefined | T[]): number {
-    return (value ?? []).length;
-  }
-}
 
 @Pipe({
   standalone: true,
   pure: true,
   name: 'length',
 })
-@Injectable({ providedIn: 'any' })
+@Injectable()
 export class LengthPipe implements PipeTransform {
-  /** Returns an empty array if the provided value is null or undefined or the value else */
-  transform<T>(value: undefined | T[]): number {
-    return (value ?? []).length;
+  transform<T>(value: undefined | T[] | string): number {
+
+    if (!value) {
+      return 0;
+    }
+
+    return value.length;
   }
 }
 
@@ -84,7 +61,7 @@ export class LengthPipe implements PipeTransform {
   pure: true,
   name: 'concat',
 })
-@Injectable({ providedIn: 'any' })
+@Injectable()
 export class ConcatPipe implements PipeTransform {
   transform<T>(value: T[], ...args: ConcatArray<T>[]) {
     return value.concat(...args);
@@ -96,14 +73,14 @@ export class ConcatPipe implements PipeTransform {
   standalone: true,
   pure: true,
 })
-export class JoinPipe implements PipeTransform {
+export class Join implements PipeTransform {
   /**
    * @description Join the list of using the provided character.
    *
    * **Note** By default it uses the `,` to join the elements
    */
-  transform<T>(values: T[], separator: string = ' ') {
-    return values.join(separator);
+  transform(character: string, ...args: unknown[]) {
+    return [...args].flat().filter(arg => typeof arg !== 'undefined' && arg !== null).join(character);
   }
 }
 
@@ -113,7 +90,11 @@ export class JoinPipe implements PipeTransform {
   pure: true,
 })
 export class InArrayPipe implements PipeTransform {
-  transform(value: unknown, values: unknown[]) {
+  transform<T>(value: T, values: T[] | undefined | null) {
+    if (!values) {
+      return false;
+    }
+
     return values.indexOf(value) !== -1;
   }
 }
@@ -127,10 +108,10 @@ export class ArrayFindPipe implements PipeTransform {
   transform<T = unknown>(values: T[], value: unknown, property?: string) {
     return values.find((item) =>
       property !== null &&
-      typeof property !== 'undefined' &&
-      typeof item === 'object' &&
-      item !== null &&
-      property in item
+        typeof property !== 'undefined' &&
+        typeof item === 'object' &&
+        item !== null &&
+        property in item
         ? item[property as keyof typeof item] === value
         : item === value
     );

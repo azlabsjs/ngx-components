@@ -1,4 +1,4 @@
-<clr-datagrid clrGridSelect [selectionConfig]="{selectable: config.selectable, singleSelection: config.singleSelection}" [(selectState)]="selected" [class]="config.class || ''" (clrDgRefresh)="onDgRefresh($event)" [clrDgPreserveSelection]="config.preserveSelection || false" [clrDgLoading]="loading" (selectStateChange)="onSelectedStateChanges($event)">
+<clr-datagrid [clrDgSelectionType]="config | gridSelectionType" [clrDgSelected]="selected"  [class]="config.class || ''" (clrDgRefresh)="onDgRefresh($event)" [clrDgPreserveSelection]="config.preserveSelection || false" [clrDgLoading]="loading" (clrDgSelectedChange)="onSelectedStateChanges($event)">
   <clr-dg-action-bar>
     <ng-container *ngTemplateOutlet="dgactionbar; context: { $implicit: selected }"></ng-container>
   </clr-dg-action-bar>
