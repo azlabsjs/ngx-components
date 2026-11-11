@@ -1,53 +1,47 @@
-import { APP_INITIALIZER, Injector, Provider, inject } from '@angular/core';
+import { Injector, Provider, inject } from '@angular/core';
 import { InterceptorFactory, LoadFormsRequestHandler } from './types';
-import {
-  API_HOST,
-  HTTP_REQUEST_CLIENT,
-  FORMS_LOADER,
-  CACHE_PROVIDER,
-} from './tokens';
+import { API_HOST, FORMS_LOADER, FORMS_COLLECTION } from './tokens';
 import { LocationStrategy, PlatformLocation } from '@angular/common';
-import { useHTTPFormLoader } from './factories';
-import { createRequestClient } from '../http';
-import { HTTPRequest } from '@azlabsjs/requests';
-import { ObservableInput, from, lastValueFrom } from 'rxjs';
-import { CacheProvider } from '@azlabsjs/smart-form-core';
+import { useHTTPFormLoader } from '../http/factories';
+import { BehaviorSubject, lastValueFrom, map, Observable } from 'rxjs';
+import { FormConfigInterface, FormsLoader } from '@azlabsjs/smart-form-core';
 
-/** @internal */
-export function preloadAppForms(service: CacheProvider, assets: string) {
-  return async () => {
-    return await lastValueFrom(
-      from(service.cache(assets) as ObservableInput<any>)
-    );
-  };
-}
-
-/** @description provides `FORM_LOADER` service implementation */
-export function provideFormsLoader(loadFormsHandler?: LoadFormsRequestHandler) {
+/** @deprecated use `{provideFormsCollection}` with `useHTTPFormLoader` as form loader or a custom forms loader implementation  */
+export function provideFormsLoader(handler?: LoadFormsRequestHandler, interceptor?: (items: { [prop: string]: unknown }[]) => FormConfigInterface[]) {
   return {
     provide: FORMS_LOADER,
-    useFactory: (
-      location: LocationStrategy,
-      platformLocation: PlatformLocation
-    ) => {
-      return useHTTPFormLoader(location, platformLocation, loadFormsHandler);
-    },
+    useFactory: (location: LocationStrategy, platform: PlatformLocation) => useHTTPFormLoader(location, platform, handler, interceptor),
     deps: [LocationStrategy, PlatformLocation],
   } as Provider;
 }
 
-/** @description provides an http or request client used when submit forms or form component is sending requests */
-export function provideHttpClient(
-  host?: string,
-  interceptor?: InterceptorFactory<HTTPRequest>
-) {
+
+/** provides an in-memory rxjs subject that act as a form collection. <br /> Note: register this a the root of the application for provide application wide forms collection instance */
+export function provideFormsCollection(loader?: FormsLoader | ((injector: Injector) => FormsLoader)) {
   return {
-    provide: HTTP_REQUEST_CLIENT,
+    provide: FORMS_COLLECTION,
     useFactory: () => {
-      return createRequestClient(inject(Injector), host, interceptor);
-    },
-    deps: [Injector],
-  };
+      const cache = new BehaviorSubject<FormConfigInterface[]>([]);
+      const formsLoader = loader ?? inject(FORMS_LOADER);
+      const injector = inject(Injector);
+
+      return {
+        get(id: string | number) {
+          return cache.asObservable().pipe(map((state) => state.find((x) => x.id && (id.toString() === x.id.toString())) as FormConfigInterface));
+        },
+
+        async init(endpoint: string, options: { [index: string]: any } = {}) {
+          const loader = typeof formsLoader === 'function' ? formsLoader(injector) : formsLoader;
+          if (!loader) {
+            return;
+          }
+
+          const values = await lastValueFrom(loader.load(endpoint, options) as Observable<FormConfigInterface[]>);
+          cache.next(values);
+        }
+      }
+    }
+  } as Provider;
 }
 
 /** @description provides forms endpoints host url */
@@ -55,16 +49,5 @@ export function provideFormsHost(host?: string) {
   return {
     provide: API_HOST,
     useValue: host,
-  } as Provider;
-}
-
-export function provideFormsInitialization(assets?: string) {
-  return {
-    provide: APP_INITIALIZER,
-    useFactory: () => {
-      const _assets = assets ?? '/assets/resources/app-forms.json';
-      return preloadAppForms(inject(CACHE_PROVIDER), _assets);
-    },
-    multi: true,
   } as Provider;
 }

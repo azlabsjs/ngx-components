@@ -1,12 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-} from '@angular/core';
-
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal as createSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 /** @internal */
@@ -24,35 +16,24 @@ type StateType = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DropdownSearchComponent {
-  // #region component outputs
   @Output() valueChange = new EventEmitter();
-  // #region component outputs
-
-  // #region component input
   @Input() placeholder: string = 'Search...';
-  // #endregion component output
 
-  private _state: StateType = {
+  protected signal = createSignal<StateType>({
     value: '',
     disabled: false,
-  };
-
-  get state() {
-    return this._state;
-  }
-
-  /** @description Search component class constructor */
-  constructor(private cdRef: ChangeDetectorRef | null) {}
+  });
 
   onInputChange(event?: Event) {
-    const { value: v } = this._state;
+    const { value: v } = this.signal();
     const value = (event?.target as HTMLInputElement).value.trim();
-    // Case the value does not change we doe not fire any change event
     if (v === value) {
       return;
     }
-    this.setState((state) => ({ ...state, value }));
+    this.signal.update((state) => ({ ...state, value }));
+
     this.dispatchValueChange();
+    
     event?.preventDefault();
     event?.stopPropagation();
   }
@@ -63,13 +44,7 @@ export class DropdownSearchComponent {
   }
 
   private dispatchValueChange() {
-    const { value } = this._state;
+    const { value } = this.signal();
     this.valueChange.emit(value);
-  }
-
-  /** @description update component state and notify ui of state changes */
-  private setState(state: (s: StateType) => StateType) {
-    this._state = state(this._state);
-    this.cdRef?.markForCheck();
   }
 }

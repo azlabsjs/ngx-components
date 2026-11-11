@@ -1,14 +1,10 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import {
-  AbstractControl,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output, signal as createSignal } from '@angular/core';
+import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { OPTIONS_DIRECTIVES } from '@azlabsjs/ngx-options-input';
 import { InputOptions, OptionsInput } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { distinctUntilChanged, tap } from 'rxjs/operators';
-import { NgxCommonModule } from '../common';
+import { SHARED_DIRECTIVES, SHARED_PIPES } from '../common';
 import { CheckboxComponent } from './checkbox.component';
 import { PIPES } from './pipes';
 
@@ -25,11 +21,12 @@ type StateType = {
 @Component({
   standalone: true,
   imports: [
-    NgxCommonModule,
     ReactiveFormsModule,
     FormsModule,
     CheckboxComponent,
     ...PIPES,
+    ...SHARED_DIRECTIVES,
+    ...SHARED_PIPES,
     ...OPTIONS_DIRECTIVES,
   ],
   selector: 'ngx-checkbox-input',
@@ -49,42 +46,34 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
     this.autoSelect(config);
 
     options = options ?? [];
-    this.setState((state) => ({ ...state, config, loaded: options.length !== 0 }));
+    this.signal.update((state) => ({ ...state, config, loaded: options.length !== 0 }));
   }
 
   @Output() configChange = new EventEmitter<OptionsInput>();
   @Output() change = new EventEmitter<unknown[]>();
 
-  private _state: StateType = {
+  protected signal = createSignal<StateType>({
     config: {} as OptionsInput,
     loaded: false,
     selection: [],
-  };
-  get state() {
-    return this._state;
-  }
-  private _destroy$ = new Subject<void>();
+  });
 
-  /** create an instance of ngx checkbox input component  */
-  constructor(private changes: ChangeDetectorRef) { }
+  private destroy = new Subject<void>();
 
   ngOnInit(): void {
     this.control.valueChanges
       .pipe(
         distinctUntilChanged(),
-        tap((v) => this.setState((state) => ({ ...state, selection: v.map((i: unknown) => ({ value: i, checked: true })) })))
+        tap((v) => this.signal.update((state) => ({ ...state, selection: v.map((i: unknown) => ({ value: i, checked: true })) })))
       ).subscribe();
   }
 
   ngOnDestroy(): void {
-    this._destroy$.next();
+    this.destroy.next();
   }
 
-  /**
-   * options change event listener
-   */
   onOptionsChange(options: InputOptions) {
-    let { config } = this._state;
+    let { config } = this.signal();
     if (!config) {
       return;
     }
@@ -92,13 +81,13 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
     config = { ...config, options };
     this.autoSelect(config);
 
-    this.setState((state) => ({ ...state, config: config, loaded: true }));
+    this.signal.update((state) => ({ ...state, config: config, loaded: true }));
     this.configChange.emit(config);
   }
 
   /** handle checkbox click of selection change event */
   onChange(e: SelectionState) {
-    const { selection } = this._state;
+    const { selection } = this.signal();
     const _index = selection.findIndex((el) => el.value === e.value);
     const items = [...selection];
     if (_index !== -1) {
@@ -107,14 +96,9 @@ export class NgxCheckBoxInputComponent implements OnInit, OnDestroy {
 
     items.push(e);
     const values = items.filter((v) => v.checked === true).map((v) => v.value);
-    this.setState((state) => ({ ...state, selection: items }));
+    this.signal.update((state) => ({ ...state, selection: items }));
     this.change.emit(values);
     this.control.setValue(values);
-  }
-
-  private setState(state: (s: StateType) => StateType) {
-    this._state = state(this._state);
-    this.changes.markForCheck();
   }
 
   private autoSelect(config: OptionsInput) {

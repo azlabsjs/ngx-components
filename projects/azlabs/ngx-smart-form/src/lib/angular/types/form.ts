@@ -1,20 +1,11 @@
 import { Observable } from 'rxjs';
-import {
-  AbstractControl,
-  FormArray,
-  FormBuilder,
-  FormGroup,
-} from '@angular/forms';
-import {
-  FormConfigInterface,
-  InputConfigInterface,
-  FormInterface,
-} from '@azlabsjs/smart-form-core';
+import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { FormConfigInterface, InputConfigInterface, FormsLoader as BaseFormsLoader } from '@azlabsjs/smart-form-core';
 
 /** @internal */
 export type Builder = FormBuilder;
 
-export interface AngularReactiveFormBuilderBridge {
+export interface ReactiveFormBuilder {
   /** @var Builder */
   readonly builder: Builder;
 
@@ -35,55 +26,22 @@ export interface AngularReactiveFormBuilderBridge {
 export interface FormsClient {
   /**
    * @description Get form definitions using the user provided id
-   * @param id
    */
   get(id: string | number): Observable<FormConfigInterface>;
-
-  /**
-   * @description Get form definitions using the list of user provided ids
-   * @param id
-   */
-  getAll(id: string[] | number[]): Observable<FormConfigInterface[]>;
 }
 
-/**
- * @description Provide implementation for preloading application form
- * into developper defined cache
- */
-export interface FormsLoader {
-  /**
-   * @descritpion Provides an abstraction for loading dynamic form definitions
-   * from an asset configuration file, a remote server
-   *
-   * @param endpoint
-   * @param options
-   */
-  load(
-    endpoint: string,
-    options?: { [index: string]: any }
-  ): Observable<FormInterface[]>;
-}
+// /** @internal */
+// export type FormsLoader = BaseFormsLoader;
 
-/**
- * Forms cache provider. 
- * For form object query efficiency, object are loaded
- * and managed by the cache provider
- */
-export interface CacheProvider {
+/**  For form object query efficiency, object are loaded and managed by the cache provider */
+export interface FormsCollection {
 
-  get(id: string | number): Observable<FormInterface>;
-
-  getList(values: (string | number)[]): Observable<FormInterface[]>;
+  /** get form from cache using form id property value */
+  get(id: string | number): Observable<FormConfigInterface>;
 
   /** provides predefined dynamic forms loader implementation */
-  cache(
-    endpoint: string,
-    options?: { [index: string]: any }
-  ): Observable<never> | Observable<FormInterface[]>;
+  init( endpoint: string, options?: { [index: string]: any } ): Promise<unknown|void>;
 }
 
 /** @internal type definition for load form request handler function */
-export type LoadFormsRequestHandler = (
-  path: string,
-  options?: Record<string, unknown>
-) => Observable<Record<string, unknown>[]>;
+export type LoadFormsRequestHandler = (path: string, options?: Record<string, unknown>) => Observable<Record<string, unknown>[]>;

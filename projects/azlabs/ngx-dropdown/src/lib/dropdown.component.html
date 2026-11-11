@@ -1,4 +1,4 @@
-@if (state) {
+@if (signal(); as state) {
   <div class="dropdown-container">
     <div class="ngx-azl-dropdown" [ngClass]="state.css.dropdown">
       <a title="dropdown toggle" href="#" id="dropdown-toggle" (click)="onToggleDropdown($event)" class="ngx-azl-dropdown-header" #dropdownHeader>

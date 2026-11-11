@@ -1,35 +1,9 @@
 
-import {
-  AfterViewInit,
-  Directive,
-  ElementRef,
-  EventEmitter,
-  Inject,
-  Input,
-  OnDestroy,
-  Optional as NgOptional,
-  Output,
-  DOCUMENT
-} from '@angular/core';
-import {
-  InputOptions,
-  isCustomURL,
-  isValidHttpUrl,
-  mapIntoInputOptions,
-  mapStringListToInputOptions,
-  OptionsConfig,
-} from '@azlabsjs/smart-form-core';
+import { AfterViewInit, Directive, ElementRef, EventEmitter, Inject, Input, OnDestroy, Optional as NgOptional, Output, DOCUMENT } from '@angular/core';
+import { InputOptions, isCustomURL, isValidHttpUrl, createOptions, extractOptionsFromString, OptionsConfig } from '@azlabsjs/smart-form-core';
 import { lastValueFrom } from 'rxjs';
 import { first, map } from 'rxjs/operators';
-import {
-  InputOptionsClient,
-  ObservableOptionsConfig,
-  OptionsConfigType,
-  Subscribable,
-  KeyType as _KeyType,
-  Subscription,
-  Optional,
-} from './types';
+import { InputOptionsClient, ObservableOptionsConfig, OptionsConfigType, Subscribable, KeyType as _KeyType, Subscription, Optional } from './types';
 import { INPUT_OPTIONS_CLIENT, OPTIONS_CACHE } from './tokens';
 import { CacheType } from './cache';
 import { isEmpty } from './utils';
@@ -50,12 +24,7 @@ function isresource(source: OptionsConfig['source']) {
   if (!source) {
     return false;
   }
-  const { resource, raw } = source;
-  return (
-    isCustomURL(resource) ||
-    isValidHttpUrl(resource) ||
-    (raw.match(/table:/) && raw.match(/keyfield:/))
-  );
+  return isCustomURL(source) || isValidHttpUrl(source);
 }
 
 function isobservable(o: OptionsConfigType): o is ObservableOptionsConfig {
@@ -187,10 +156,12 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   }
 
   private fetchSync(options: OptionsConfigType) {
+    const { source } = options;
+
     return new Promise<void>(resolve => {
       setTimeout(() => {
         this.loadingChange.emit(false);
-        this.optionsChange.emit(mapStringListToInputOptions(options.source.raw));
+        this.optionsChange.emit(extractOptionsFromString(source));
         resolve();
       }, 500);
     });
@@ -200,7 +171,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
   private async fetchAsync(options: OptionsConfigType, params: Record<string, unknown> = {}) {
     const query = typeof this.limit !== 'undefined' && this.limit !== null ? { page: 1, per_page: this.limit, ...params } : { ...params };
     const { refetch, ...rest } = options;
-    const key = {...rest, query };
+    const key = { ...rest, query };
 
     // query value from cache and dispatch options change if value is in cache
     const cached = this.cache.get(key);
@@ -228,7 +199,7 @@ export class FetchOptionsDirective implements AfterViewInit, OnDestroy {
     return lastValueFrom(
       this.client.request({ ...options, name: this.name }, params).pipe(
         first(),
-        map((state) => state ? mapIntoInputOptions(options, state as unknown as Record<string, unknown>[]) : [])
+        map((state) => state ? createOptions(options, state as unknown as Record<string, unknown>[]) : [])
       )
     );
   }

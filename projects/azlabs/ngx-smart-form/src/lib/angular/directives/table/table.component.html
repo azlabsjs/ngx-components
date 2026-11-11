@@ -6,7 +6,7 @@
         @for (item of inputs | excludeinput: ['html', 'control_group', 'hidden']; track item) {
           <th class="left text-ellipsis fit">
             <span class="text-ellipsis">{{ item.label | text }}</span>
-            @if (item.rules?.isRequired ?? (item | required)) {
+            @if (item | required) {
               <small class="required">(*)</small>
             }
           </th>

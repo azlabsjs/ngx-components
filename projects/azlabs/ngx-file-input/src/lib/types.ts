@@ -11,8 +11,6 @@ export type InputConstraints = {
   maxFilesize?: number;
 };
 
-/** @internal set state parameter type declaration  */
-export type SetStateParam<T> = (state: T) => T;
 
 /** @internal internal type definition of upload component injected options */
 export type UploadOptionsType<T, R> = Omit<

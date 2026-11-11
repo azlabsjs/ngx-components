@@ -1,56 +1,26 @@
 import { InjectionToken, inject } from '@angular/core';
-import { RequestClient } from '../http';
-import { AngularReactiveFormBuilderBridge, FormsClient } from './types/form';
-import { CacheProvider, FormsLoader } from '@azlabsjs/smart-form-core';
-import { FormsCacheProvider } from './services/cache';
-import { JSONFormsClient } from './services/client';
-import { ReactiveFormBuilder } from './services/forms';
+import { ReactiveFormBuilder, FormsClient, FormsCollection } from './types/form';
+import { FormConfigInterface, FormsLoader } from '@azlabsjs/smart-form-core';
+import { NgReactiveFormBuilder } from './services';
+import { Observable } from 'rxjs';
 
-export const FORMS_LOADER = new InjectionToken<FormsLoader>(
-  'PROVIDE DYNAMIC FORM LOADER'
-);
+/** generic forms collection loader instance */
+export const FORMS_LOADER = new InjectionToken<FormsLoader>('generic forms collection loader instance');
 
-/**
- * @description cache provider injection token
- */
-export const CACHE_PROVIDER = new InjectionToken<CacheProvider>(
-  'PROVIDES AN INSTANCE OF CacheProvider::Interface',
-  {
-    providedIn: 'root',
-    factory: () => {
-      return new FormsCacheProvider(inject(FORMS_LOADER));
-    },
-  }
-);
+/** angular injection token to build reactive form element from input config */
+export const ANGULAR_REACTIVE_FORM_BRIDGE = new InjectionToken<ReactiveFormBuilder>('angular injection token to build reactive form element from input config', { factory: () => inject(NgReactiveFormBuilder) });
 
-export const FORM_CLIENT = new InjectionToken<FormsClient>(
-  'FORM CLIENT FOR LOADING FORM THE DATA SOURCE',
-  {
-    providedIn: 'root',
-    factory: () => {
-      return inject(JSONFormsClient);
-    },
-  }
-);
+/** Forms server origin configuration */
+export const API_HOST = new InjectionToken<string>('Forms server origin configuration');
 
-export const ANGULAR_REACTIVE_FORM_BRIDGE =
-  new InjectionToken<AngularReactiveFormBuilderBridge>(
-    'PROVIDE AN INSTANCE THAT CREATE ANGULAR REACTIVE FORM ELEMENT FROM A FORM CONFIG',
-    {
-      providedIn: 'any',
-      factory: () => {
-        return inject(ReactiveFormBuilder);
-      },
-    }
-  );
+/** forms collection class injection token */
+export const FORMS_COLLECTION = new InjectionToken<FormsCollection>('forms collection class injection token');
 
-export const API_HOST = new InjectionToken<string>(
-  'API HOST FOR FORM MANAGEMENT'
-);
-
-/**
- * HTTP requests client injection token
- */
-export const HTTP_REQUEST_CLIENT = new InjectionToken<RequestClient>(
-  'CLIENT INSTANCE FOR HANDLING FORM SUBMISSION'
-);
+/** @deprecated Use `{FORMS_COLLECTION}` token instead */
+export const FORM_CLIENT = new InjectionToken<FormsClient>('client api for loading forms from provided collection', {
+  providedIn: 'root',
+  factory: () => {
+    const collections = inject(FORMS_COLLECTION);
+    return { get(id: string | number): Observable<FormConfigInterface> { return collections.get(id); } }
+  },
+});

@@ -8,6 +8,11 @@ function isDefined(value: unknown): value is AbstractControl {
   return !!value;
 }
 
+function isPromise<T = unknown>(value: unknown): value is PromiseLike<T> {
+  return (value !== null && typeof value !== 'undefined') &&
+    (typeof value === 'object' && 'then' in value && typeof value.then === 'function' && 'catch' in value && typeof value.catch === 'function')
+}
+
 // /** @description async constraint type declaration */
 export type _AsyncConstraint<T = boolean> = Omit<AsyncConstraint<T>, 'conditions'> & {
   /** provides the list of conditions applied on properties of the return value of the  `fn` function. */
@@ -122,4 +127,19 @@ export function patternValidator(pattern: string) {
     const _result = _constraint$(control.value);
     return _result ? null : { pattern };
   };
+}
+
+
+/** creates a callback contraint angular forms validator function */
+export function constraintValidator(constraint: <T>(value: unknown, input: T) => Promise<unknown> | unknown, name: string) {
+  return async (control: AbstractControl) => {
+    const result = constraint(control.value, control);
+
+    if (isPromise(result)) {
+      return { [name]: await result };
+    }
+
+    return { [name]: result };
+  };
+
 }

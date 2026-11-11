@@ -1,13 +1,15 @@
-<div fetchOptions (optionsChange)="onOptionsChange($event)" [loaded]="state.loaded" [config]="state.config.optionsConfig" [name]="state.config.name">
-  @if (state.config | hasoptions) {
-    <div class="clr-form-control">
-      <ng-content select="[label]"></ng-content>
-      <div class="clr-control-container clr-control-inline">
-        @for (item of state.config.options; track item) {
-          <ngx-checkbox [checked]="item.value | isChecked : state.selection" [text]="item.description ?? item.name" (change)="onChange({ value: item.value, checked: $event })" [disabled]="disabled"></ngx-checkbox>
-        }
+@if (signal(); as state) {
+  <div fetchOptions (optionsChange)="onOptionsChange($event)" [loaded]="state.loaded" [config]="state.config.fetch" [name]="state.config.name">
+    @if (state.config | hasoptions) {
+      <div class="clr-form-control">
+        <ng-content select="[label]"></ng-content>
+        <div class="clr-control-container clr-control-inline">
+          @for (item of state.config.options; track item) {
+            <ngx-checkbox [checked]="item.value | isChecked : state.selection" [text]="item.description ?? item.name" (change)="onChange({ value: item.value, checked: $event })" [disabled]="disabled"></ngx-checkbox>
+          }
+        </div>
       </div>
-    </div>
-    <ng-content></ng-content>
-  }
-</div>
+      <ng-content></ng-content>
+    }
+  </div>
+}

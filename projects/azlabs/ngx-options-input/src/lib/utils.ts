@@ -1,13 +1,10 @@
 import { Injector } from '@angular/core';
 import { getHttpHost, HTTPRequest, HTTPRequestMethods, HTTPResponseType, Interceptor, useRequestClient } from '@azlabsjs/requests';
-import { customToResourceURL, isCustomURL, isValidHttpUrl, OptionsConfig } from '@azlabsjs/smart-form-core';
+import { customToResourceURL, isCustomURL, isValidHttpUrl, OptionsConfig, OptionsConfigParams } from '@azlabsjs/smart-form-core';
 import { from, map, ObservableInput } from 'rxjs';
 import { InputOptionsClient, InterceptorFactory, Optional, OptionsQueryConfigType } from './types';
 
-type _OptionsRequestFunction = <T>(
-  param: string,
-  url?: string
-) => ObservableInput<T>;
+type _OptionsRequestFunction = <T>(param: string, url?: string) => ObservableInput<T>;
 
 type OptionsQueryParams = OptionsConfig & {
   url: string;
@@ -18,23 +15,19 @@ type OptionsQueryParams = OptionsConfig & {
 /**
  * function for querying options value from server
  */
-export function queryOptions(
-  optionsConfig: OptionsQueryParams,
-  injector: Injector,
-  interceptorFactory?: InterceptorFactory<HTTPRequest>
-) {
+export function queryOptions(optionsConfig: OptionsQueryParams, injector: Injector, interceptorFactory?: InterceptorFactory<HTTPRequest>) {
   const { source, url, search } = optionsConfig;
   let uri = url;
   let searchQuery = search ?? {};
   let body: Record<string, unknown> | undefined = undefined;
 
-  if (isValidHttpUrl(source.resource)) {
-    const query = new URL(source.resource).search;
+  if (isValidHttpUrl(source)) {
+    const query = new URL(source).search;
     const params = Object.fromEntries(new URLSearchParams(query).entries());
     body = { ...params, ...searchQuery };
-    uri = (url ?? source.resource).replace(`?${query}`, '');
+    uri = (url ?? source).replace(`?${query}`, '');
   } else {
-    body = { ...searchQuery, table_config: source.raw };
+    body = { ...searchQuery, table_config: source };
   }
 
   return rxRequest({
@@ -125,8 +118,7 @@ function rxRequest(
 }
 
 /** @internal */
-function createQueryURL(url: string, config: OptionsConfig) {
-  const { params } = config ?? {}
+function createQueryURL(url: string, params: OptionsConfigParams | undefined) {
   if (!params) {
     return url;
   }
@@ -146,8 +138,8 @@ function createQueryURL(url: string, config: OptionsConfig) {
 
 /** @internal */
 function createRequestURL(value: OptionsConfig, endpoint: string) {
-  const url = value.source.resource;
-  return isValidHttpUrl(url) ? createQueryURL(url, value) : `${endpoint}`;
+  const { source: url } = value;
+  return isValidHttpUrl(url) ? createQueryURL(url, value.params) : `${endpoint}`;
 }
 
 /** @internal */
@@ -195,15 +187,14 @@ export function optionsQueryClient(injector: Injector, endpoint?: string, querie
   Object.defineProperty(fn, 'request', {
     value: (config: OptionsConfig & { name?: string }, search?: Record<string, unknown>) => {
 
-      const { source, name } = config;
+      let { source: url, name } = config;
       const { queries, interceptorFactory: factory } = queriesConfig ?? {}
-      let { resource: url } = source;
 
       if (isCustomURL(url ?? '') && queriesConfig) {
         const host = queries && name ? resolveURLHost(queries, name, endpoint ?? '') : endpoint ?? '';
         url = customToResourceURL(url, host);
         url = url[0] === '/' ? url.substring(1) : url;
-        config = { ...config, source: { ...(source ?? {}), resource: url } };
+        config = { ...config, source: url };
       }
 
       const request = { ...config, url: createRequestURL(config, endpoint ?? ''), search }

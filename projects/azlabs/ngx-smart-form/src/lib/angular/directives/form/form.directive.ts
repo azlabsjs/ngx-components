@@ -1,16 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Directive,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  SimpleChange,
-  SimpleChanges,
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Directive, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChange, SimpleChanges } from '@angular/core';
 import { FormConfigInterface } from '@azlabsjs/smart-form-core';
 import { FormModel } from './form.model';
 import { filter, first, Subscription } from 'rxjs';

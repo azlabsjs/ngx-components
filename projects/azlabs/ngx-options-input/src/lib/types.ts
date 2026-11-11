@@ -5,26 +5,22 @@ import { Observable, Observer } from 'rxjs';
 
 /** @description Type declaration of option query client */
 export type InputOptionsClient = {
-  //
-  /** @description Query list of select options from forms provider database */
-  request(
-    optionsConfig: OptionsConfig & { name?: string },
-    searchParams?: Record<string, unknown>
-  ): Observable<InputOptions>;
+  /** @description request options from forms provider database */
+  request(config: OptionsConfig & { name?: string }, searchParams?: Record<string, unknown>): Observable<InputOptions>;
 };
 
 /**  @internal */
 type QueryConfigType = {
   [name: string]:
-    | string
-    | (() => string)
-    | {
-        host?: string | (() => string);
-        interceptor?: InterceptorFactory<
-          HTTPRequest,
-          HTTPResponse | Promise<HTTPResponse> | unknown | Promise<unknown>
-        >;
-      };
+  | string
+  | (() => string)
+  | {
+    host?: string | (() => string);
+    interceptor?: InterceptorFactory<
+      HTTPRequest,
+      HTTPResponse | Promise<HTTPResponse> | unknown | Promise<unknown>
+    >;
+  };
 };
 
 /** @description Options query request interceptor type definition */

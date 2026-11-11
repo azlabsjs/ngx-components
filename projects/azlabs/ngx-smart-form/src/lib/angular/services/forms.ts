@@ -1,49 +1,33 @@
 import { Injectable, inject } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import {
-  FormConfigInterface,
-  InputConfigInterface,
-} from '@azlabsjs/smart-form-core';
-import {
-  createFormGroup,
-  createFormArray,
-  createFormControl,
-} from '../helpers';
-import { AngularReactiveFormBuilderBridge } from '../types';
-import { RequestClient } from '../../http';
-import { HTTP_REQUEST_CLIENT } from '../tokens';
+import { FormConfigInterface, InputConfigInterface } from '@azlabsjs/smart-form-core';
+import { createFormGroup, createFormArray, createFormControl } from '../helpers';
+import { ReactiveFormBuilder } from '../types';
+import { RequestClient, HTTP_REQUEST_CLIENT } from '../../http';
 
-@Injectable({
-  providedIn: 'any',
-})
-export class ReactiveFormBuilder implements AngularReactiveFormBuilderBridge {
-  private _builder!: FormBuilder;
-  get builder() {
-    return this._builder;
-  }
-  private _requestClient!: RequestClient;
+@Injectable()
+export class NgReactiveFormBuilder implements ReactiveFormBuilder {
+  public readonly builder!: FormBuilder;
+  public readonly client!: RequestClient;
 
-  /** @description `ReactiveFormBuilder` class constructor */
   constructor() {
-    this._builder = inject(FormBuilder);
-    this._requestClient = inject(HTTP_REQUEST_CLIENT);
+    this.builder = inject(FormBuilder);
+    this.client = inject(HTTP_REQUEST_CLIENT);
   }
 
   group(state: FormConfigInterface | InputConfigInterface[]) {
-    let inputConfigs = [] as InputConfigInterface[];
+    let inputs = [] as InputConfigInterface[];
     if (state) {
-      inputConfigs = !Array.isArray(state)
-        ? [...(state as FormConfigInterface).controlConfigs]
-        : state;
+      inputs = !Array.isArray(state) ? [...(state as FormConfigInterface).inputs] : state;
     }
-    return createFormGroup(this._builder, inputConfigs, this._requestClient);
+    return createFormGroup(this.builder, inputs, this.client);
   }
 
   control(state: InputConfigInterface) {
-    return createFormControl(this._builder, state, this._requestClient);
+    return createFormControl(this.builder, state, this.client);
   }
 
   array(state: InputConfigInterface) {
-    return createFormArray(this._builder, state);
+    return createFormArray(this.builder, state);
   }
 }

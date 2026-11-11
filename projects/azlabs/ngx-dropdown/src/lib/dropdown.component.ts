@@ -1,17 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ContentChild,
-  ElementRef,
-  HostListener,
-  Input,
-  OnChanges,
-  SimpleChanges,
-  TemplateRef,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, ContentChild, ElementRef, HostListener, Input, OnChanges, SimpleChanges, TemplateRef, ViewChild, signal as createSignal } from '@angular/core';
 import { computeCssClass, computeMenuClass } from './helpers';
 import { Animation, Optional, Orientation } from './types';
 
@@ -33,16 +21,13 @@ type StateType = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DropdownComponent implements OnChanges {
-  _state: StateType = {
+  protected signal = createSignal<StateType>({
     active: false,
     css: {
       dropdown: {} as Record<string, boolean>,
       menu: {} as Record<string, boolean>,
     },
-  };
-  get state() {
-    return this._state;
-  }
+  });
 
   @Input() orientation: Orientation = 'right';
   @Input() animation: Animation = 'scaleY';
@@ -57,8 +42,9 @@ export class DropdownComponent implements OnChanges {
 
   @HostListener('window:click', ['$event'])
   onClick(e: MouseEvent) {
-    if (!(e.target as Element).classList.contains('dropdown-container') && this._state.active) {
-      this.setState((state) => ({
+    const { active } = this.signal();
+    if (!(e.target as Element).classList.contains('dropdown-container') && active) {
+      this.signal.update((state) => ({
         ...state,
         active: false,
         css: {
@@ -74,9 +60,6 @@ export class DropdownComponent implements OnChanges {
     }
   }
 
-  /** @description creates component instances */
-  constructor(private cdRef: ChangeDetectorRef | null) {}
-
   ngOnChanges(changes: SimpleChanges): void {
     if (
       'orientation' in changes ||
@@ -85,7 +68,7 @@ export class DropdownComponent implements OnChanges {
       'active' in changes ||
       'disabled' in changes
     ) {
-      this.setState((state) => ({
+      this.signal.update((state) => ({
         ...state,
         css: {
           menu: computeMenuClass(this.orientation, this.animation),
@@ -102,7 +85,7 @@ export class DropdownComponent implements OnChanges {
 
   onToggleDropdown(e: Event) {
     if (this.noHover && !this.disabled) {
-      this.setState((state) => ({
+      this.signal.update((state) => ({
         ...state,
         active: !state.active,
         css: {
@@ -118,11 +101,5 @@ export class DropdownComponent implements OnChanges {
     }
     e.preventDefault();
     e.stopPropagation();
-  }
-
-  /** @description update component state and notify ui of state changes */
-  private setState(state: (s: StateType) => StateType) {
-    this._state = state(this._state);
-    this.cdRef?.markForCheck();
   }
 }

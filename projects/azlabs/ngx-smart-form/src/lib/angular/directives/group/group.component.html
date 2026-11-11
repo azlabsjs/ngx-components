@@ -24,7 +24,7 @@
                 <div [class.hidden]="(config | ishidden) || (local | inarray : detached)" [innerHTML]="config.label | ngxGroupHeader | trusthtml" [hidden]="(config | ishidden) || (local | inarray : detached)"></div>
               }
             </ng-template>
-            <ng-container *ngTemplateOutlet="_recursive; context: {controls: (value | asInputGroup)!.children || [], group: local, autoupload, parent: '.' | join : parent : value.name }"></ng-container>
+            <ng-container *ngTemplateOutlet="_recursive; context: {controls: (value | asInputGroup)!.inputs || [], group: local, autoupload, parent: '.' | join : parent : value.name }"></ng-container>
           </div>
         }
       } @else {

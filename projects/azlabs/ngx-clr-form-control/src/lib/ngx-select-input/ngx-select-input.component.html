@@ -1,8 +1,8 @@
-@if (state) {
+@if (signal(); as state) {
   <ng-content select="label"></ng-content>
   @if (state.config; as config) {
     <div class="ng-select-container" style="position: relative" #optionsRef fetchOptions
-      [config]="config.optionsConfig" [loaded]="state.loaded" (optionsChange)="optionsChange($event)"
+      [config]="config.fetch" [loaded]="state.loaded" (optionsChange)="optionsChange($event)"
       (loadingChange)="loadingChange($event)" [name]="config.name">
       <ng-container *ngTemplateOutlet="input ?? _input; context: {options: config.options, config, pending: state.performingAction, loadingText, placeholder: config.placeholder, control, multiple: config.multiple ?? false, removed: removed.bind(this) | thunk: config, selected: select.bind(this) | thunk: config, bind: 'value', label: 'name', group: 'type', change: modelChange.bind(this), focus: onFocus.bind(this)}"></ng-container>
       <ng-content></ng-content>

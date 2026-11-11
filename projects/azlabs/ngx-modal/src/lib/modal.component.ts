@@ -1,28 +1,6 @@
-import {
-  animate,
-  keyframes,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
+import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ContentChild,
-  EventEmitter,
-  HostListener,
-  Inject,
-  Input,
-  OnChanges,
-  Output,
-  Renderer2,
-  SimpleChange,
-  SimpleChanges,
-  TemplateRef,
-  DOCUMENT
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, ContentChild, EventEmitter, HostListener, Inject, Input, OnChanges, Output, Renderer2, SimpleChange, SimpleChanges, TemplateRef, DOCUMENT, signal as createSignal } from '@angular/core';
 import { Optional, OutletConfig, SizeType, StateType } from './types';
 import { PIPES } from './pipes';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
@@ -99,18 +77,11 @@ import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 })
 export class ModalComponent implements OnChanges {
 
-  private _state: StateType = { opened: false, size: 'lg' };
-  get state() {
-    return this._state;
-  }
+  protected signal = createSignal<StateType>({ opened: false, size: 'lg' });
 
   @Input() opened: boolean = false;
-  private _size!: SizeType;
   @Input() set size(value: SizeType) {
-    this._size = value;
-  }
-  get size() {
-    return this._size ?? 'lg';
+    this.signal.update(state => ({...state, size: value}));
   }
   @Input() closeable: boolean = false;
   @Input() animation: 'fade' | 'scale' = 'fade';
@@ -119,21 +90,21 @@ export class ModalComponent implements OnChanges {
   @Input() actions!: TemplateRef<any>;
 
   @Output() openedChange = new EventEmitter<boolean>();
+  @Output() sizeChange = new EventEmitter<SizeType>();
 
   @ContentChild('template') template!: Optional<TemplateRef<unknown>>;
 
   @HostListener('document:keydown.escape', ['$event'])
   onEscapeKeyPress(_: Event) {
-    if (this._state.opened) {
+    if (this.signal().opened) {
       this.close();
     }
   }
 
-  constructor(private renderer: Renderer2, private _ref: ChangeDetectorRef | null, @Inject(DOCUMENT) private document: Document | null) { }
-
+  constructor(private renderer: Renderer2, @Inject(DOCUMENT) private document: Document | null) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const state = (Object.keys(this._state) as (keyof StateType)[]).reduce(
+    const state = (Object.keys(this.signal()) as (keyof StateType)[]).reduce(
       (carry, curr: keyof StateType) => {
         if (curr in changes) {
           carry[curr] = changes[curr].currentValue;
@@ -144,18 +115,9 @@ export class ModalComponent implements OnChanges {
     );
 
     // update the state on changes
-    this.setState(state);
+    this.signal.update(previous => ({...previous, ...state}));
   }
 
-  /** control or change component local state object */
-  private setState(_partial: Partial<StateType> | ((_state: StateType) => StateType)) {
-    if (typeof _partial === 'function' && _partial !== null) {
-      this._state = _partial({ ...this.state });
-    } else {
-      this._state = { ...this.state, ..._partial };
-    }
-    this._ref?.markForCheck();
-  }
 
   close() {
     this.onClose();
@@ -165,14 +127,14 @@ export class ModalComponent implements OnChanges {
   }
 
   open() {
-    this.setState({ opened: true });
+    this.signal.update((state) => ({...state,  opened: true  }));
     if (this.document && this.document.body) {
       this.renderer.setStyle(this.document.body, 'overflow', 'hidden');
     }
   }
 
   onClose() {
-    this.setState({ opened: false });
+    this.signal.update((state) => ({...state,  opened: false  }));
     this.openedChange.emit(false);
   }
 
@@ -192,6 +154,7 @@ export class ModalComponent implements OnChanges {
   }
 
   resize(size: SizeType) {
-    this.setState({ size });
+    this.signal.update((state) => ({...state,  size }));
+    this.sizeChange.emit(size);
   }
 }

@@ -1,32 +1,6 @@
-import {
-  AbstractControl,
-  AsyncValidatorFn,
-  FormBuilder,
-  FormGroup,
-  ValidatorFn,
-  Validators,
-  FormArray,
-} from '@angular/forms';
-import {
-  CustomValidators,
-  equalsValidator,
-  existsValidator,
-  uniqueValidator,
-} from '../validators';
-import {
-  DateInput,
-  NumberInput,
-  TextInput,
-  OptionsInputConfigInterface,
-  FormConfigInterface,
-  InputTypes,
-  InputGroup,
-  InputOptions,
-  InputOption,
-  InputConfigInterface,
-} from '@azlabsjs/smart-form-core';
-import { tap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ValidatorFn, Validators, FormArray } from '@angular/forms';
+import { CustomValidators, equalsValidator, existsValidator, uniqueValidator } from '../validators';
+import { DateInput, NumberInput, TextInput, OptionsInput, InputTypes, InputGroup, InputOption, InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { JSDate } from '@azlabsjs/js-datetime';
 import { RequestClient } from '../../http';
 
@@ -44,19 +18,11 @@ function nullIfEmpty<T>(value: T) {
 }
 
 function required(config: InputConfigInterface) {
-  return (
-    !!config.constraints &&
-    'required' in config.constraints &&
-    Boolean(config.constraints.required)
-  );
+  return (!!config.constraints && 'required' in config.constraints && Boolean(config.constraints.required));
 }
 
 function disabled(config: InputConfigInterface) {
-  return (
-    !!config.constraints &&
-    'disabled' in config.constraints &&
-    Boolean(config.constraints.disabled)
-  );
+  return (!!config.constraints && 'disabled' in config.constraints && Boolean(config.constraints.disabled));
 }
 
 
@@ -83,99 +49,73 @@ export class ComponentReactiveFormHelpers {
    * @param builder Angular forms reactive formbuilder
    * @param inputs dynamic input configuration
    */
-  static buildFormGroupFromInputConfig(
-    builder: FormBuilder,
-    inputs: InputConfigType[],
-    requestClient?: RequestClient
-  ) {
-    // Build the outer form group
+  static buildFormGroupFromInputConfig(builder: FormBuilder, inputs: InputConfigType[], requestClient?: RequestClient) {
     const group = builder.group({});
+
     for (const input of inputs) {
       if (input.isRepeatable) {
         const array = new FormArray<AbstractControl>([]);
         group.addControl(input.name, array);
         continue;
       }
+
       const config = input as InputGroup;
-      if (typeof config.children !== 'undefined' && Array.isArray(config.children)) {
-        const formgroup =
-          ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(
-            builder,
-            config.children,
-            requestClient
-          );
-        if (!!input?.rules?.isRequired || required(input)) {
+
+      if (typeof config.inputs !== 'undefined' && Array.isArray(config.inputs)) {
+        const formgroup = ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(builder, config.inputs, requestClient);
+
+        if (required(input)) {
           formgroup.addValidators(Validators.required);
         }
+
         group.addControl(input.name, formgroup);
         continue;
       }
-      group.addControl(
-        config.name,
-        ComponentReactiveFormHelpers.buildControl(
-          builder,
-          config,
-          requestClient
-        )
-      );
+
+      group.addControl(config.name, ComponentReactiveFormHelpers.buildControl(builder, config, requestClient));
+
     }
+
     return group;
   }
 
   public static buildGroup(builder: FormBuilder, inputs: InputConfigInterface[], requestClient?: RequestClient) {
     const group = builder.group({});
+
     for (const config of inputs) {
+
       if (config.type !== InputTypes.CHECKBOX_INPUT) {
         group.addControl(config.name, ComponentReactiveFormHelpers.buildControl(builder, config, requestClient));
       } else {
         group.addControl(config.name, ComponentReactiveFormHelpers.buildArray(builder, config));
       }
+
     }
+
     return group;
   }
 
   public static buildControl(builder: FormBuilder, config: InputConfigInterface, requestClient?: RequestClient) {
-    const validators = [!!config.rules?.isRequired || required(config) ? Validators.required : Validators.nullValidator];
+    const validators = [required(config) ? Validators.required : Validators.nullValidator];
     const asyncValidators: AsyncValidatorFn[] = [];
     let hasEqualsConstraint = false;
     let hasEmailConstraint = false;
     if (isTextInputConfig(config)) {
-      // checks if maxlength rule is set to true and apply the rule to the input
-      !!config.rules?.maxLength || config.constraints?.max
-        ? validators.push(
-          Validators.maxLength(
-            nullIfEmpty(config.maxLength) ??
-            nullIfEmpty(config.constraints?.max) ??
-            Math.pow(2, 31) - 1
-          )
-        )
-        : // tslint:disable-next-line:no-unused-expression
-        null;
-      // Checks if maxlength rule is set to true and apply the rule to the input
-      !!config.rules?.minLength || config.constraints?.min
-        ? validators.push(
-          Validators.minLength(
-            nullIfEmpty(config.minLength) ??
-            nullIfEmpty(config.constraints?.min) ??
-            1
-          )
-        )
-        : // tslint:disable-next-line:no-unused-expression
-        null;
-      !!config.rules?.email || !!config.constraints?.email
-        ? validators.push(Validators.email)
-        : // tslint:disable-next-line:no-unused-expression
-        null;
-      !!config.rules?.pattern || !!config.constraints?.pattern
-        ? validators.push(
-          Validators.pattern(
-            nullIfEmpty(config.pattern) ??
-            nullIfEmpty(config.constraints?.pattern?.fn) ??
-            ''
-          )
-        )
-        : // tslint:disable-next-line:no-unused-expression
-        null;
+      if (!!config.constraints?.max) {
+        validators.push(Validators.maxLength(nullIfEmpty(config.constraints?.max) ?? Math.pow(2, 31) - 1));
+      }
+
+      if (!!config.constraints?.min) {
+        validators.push(Validators.minLength(nullIfEmpty(config.constraints?.min) ?? 1));
+      }
+
+      if (!!config.constraints?.email) {
+        validators.push(Validators.email);
+      }
+
+      if (!!config.constraints?.pattern?.fn) {
+        validators.push(Validators.pattern(nullIfEmpty(config.constraints?.pattern?.fn) ?? ''));
+      }
     }
 
 
@@ -184,33 +124,17 @@ export class ComponentReactiveFormHelpers {
       hasEmailConstraint = true;
     }
 
-    // Check for min an max rules on number inputs and apply validation to the input
     if (isNumberConfig(config)) {
-      config.rules?.min || config.constraints?.min
-        ? validators.push(
-          Validators.min(
-            nullIfEmpty(config.min) ??
-            nullIfEmpty(config.constraints?.min) ??
-            -1
-          )
-        )
-        : // tslint:disable-next-line:no-unused-expression
-        null;
-      // Checks if maxlength rule is set to true and apply the rule to the input
-      config.rules?.max || !!config.constraints?.max
-        ? validators.push(
-          Validators.max(
-            nullIfEmpty(config.max) ??
-            nullIfEmpty(config.constraints?.max) ??
-            Math.pow(2, 31) - 1
-          )
-        )
-        : // tslint:disable-next-line:no-unused-expression
-        null;
+      if (!!config.constraints?.min) {
+        validators.push(Validators.min(nullIfEmpty(config.constraints?.min) ?? -1));
+      }
+
+      if (!!config.constraints?.max) {
+        validators.push(Validators.max(nullIfEmpty(config.constraints?.max) ?? Math.pow(2, 31) - 1));
+      }
     }
 
 
-    // Validation rules form date input
     if (isDateConfig(config)) {
 
       let format: string | ((value: unknown) => string) = 'DD/MM/YYYY';
@@ -221,71 +145,54 @@ export class ComponentReactiveFormHelpers {
 
       validators.push(CustomValidators.isValidDate);
 
-      config.rules?.minDate || !!config.constraints?.min
-        ? validators.push(CustomValidators.minDate(JSDate.format(nullIfEmpty(config.minDate) ?? nullIfEmpty(config.constraints?.min), 'YYYY-MM-DD'), format))
-        : // tslint:disable-next-line:no-unused-expression
-        null;
+      if (!!config.constraints?.min) {
+        validators.push(CustomValidators.minDate(JSDate.format(nullIfEmpty(config.constraints?.min), 'YYYY-MM-DD'), format));
+      }
 
-      // Checks if maxlength rule is set to true and apply the rule to the input
-      config.rules?.maxDate || !!config.constraints?.max
-        ? validators.push(CustomValidators.maxDate(JSDate.format(nullIfEmpty(config.maxDate) ?? nullIfEmpty(config.constraints?.max), 'YYYY-MM-DD'), format))
-        : // tslint:disable-next-line:no-unused-expression
-        null;
+      if (!!config.constraints?.max) {
+        validators.push(CustomValidators.maxDate(JSDate.format(nullIfEmpty(config.constraints?.max), 'YYYY-MM-DD'), format));
+      }
+
     }
 
-    // #region add constraint rule
     if (config.constraints && config.constraints.unique && requestClient) {
       asyncValidators.push(uniqueValidator(requestClient, config.constraints.unique));
     }
 
     if (config.constraints && config.constraints.exists && requestClient) {
-      asyncValidators.push(
-        existsValidator(requestClient, config.constraints.exists)
-      );
+      asyncValidators.push(existsValidator(requestClient, config.constraints.exists));
     }
 
     if (config.constraints && config.constraints.equals) {
       validators.push(equalsValidator(config.constraints.equals.fn));
       hasEqualsConstraint = true;
     }
-    // #endregion
 
-    // add form control to the form group with the generated validation rules
-    const control = builder.control(
-      {
-        value: config.value,
-        disabled: disabled(config) ?? config.disabled,
-      },
-      {
-        validators: Validators.compose(validators),
-        updateOn:
-          // Case the control is an email or the control is a date input or the control has equals constraint
-          // or the control has async validators, we update only on blur else, we update on submit
-          asyncValidators.length > 0 || config.type === InputTypes.DATE_INPUT || hasEqualsConstraint || hasEmailConstraint ? 'blur' : 'change',
-        asyncValidators,
-      }
-    );
+    // TODO: Add unsupported constraints
+
+    const control = builder.control({
+      value: config.value,
+      disabled: disabled(config),
+    }, {
+      validators: Validators.compose(validators),
+      updateOn: asyncValidators.length > 0 || config.type === InputTypes.DATE_INPUT || hasEqualsConstraint || hasEmailConstraint ? 'blur' : 'change',
+      asyncValidators,
+    });
+
+
     return control;
   }
 
   public static buildArray(builder: FormBuilder, config: InputConfigInterface) {
     const array = new FormArray<AbstractControl>([]);
-    of((config as OptionsInputConfigInterface).options)
-      .pipe(
-        tap((options) => {
-          (options as InputOptions).map(
-            (current: InputOption, index: number) => {
-              // Added validation rule to checkbox array
-              (array as FormArray<AbstractControl>).push(builder.control(current.selected));
-            }
-          );
-        })
-      )
-      .subscribe();
+    (config as OptionsInput).options.forEach(
+      (current: InputOption) => array.push(builder.control(current.selected))
+    );
 
-    if (!!config.rules?.isRequired || required(config)) {
+    if (required(config)) {
       array.setValidators(Validators.required);
     }
+
     return array;
   }
 
@@ -311,9 +218,10 @@ export class ComponentReactiveFormHelpers {
   public static clearControlValidators(control?: AbstractControl): void {
     if (control instanceof FormGroup) {
       for (const prop in control.controls) {
-        ComponentReactiveFormHelpers.clearControlValidators(
-          control.get(prop) || undefined
-        );
+        const item = control.get(prop);
+        if (item) {
+          ComponentReactiveFormHelpers.clearControlValidators(item);
+        }
       }
     } else if (control instanceof FormArray) {
       for (const item of control.controls) {
@@ -342,7 +250,7 @@ export class ComponentReactiveFormHelpers {
     }
   }
 
-  public static setValidators(control?: AbstractControl,validators?: ValidatorFn | ValidatorFn[]): void {
+  public static setValidators(control?: AbstractControl, validators?: ValidatorFn | ValidatorFn[]): void {
     if (control) {
       control.setValidators(validators || null);
       control.updateValueAndValidity();
@@ -352,8 +260,8 @@ export class ComponentReactiveFormHelpers {
 
 
 /** @description create angular form group instance from input configurations */
-export function createFormGroup(builder: FormBuilder, inputConfigs?: InputConfigInterface[], requestClient?: RequestClient) {
-  return ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(builder, inputConfigs ?? [], requestClient);
+export function createFormGroup(builder: FormBuilder, inputs?: InputConfigInterface[], requestClient?: RequestClient) {
+  return ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(builder, inputs ?? [], requestClient);
 }
 
 /** @description Creates angular form control instance from input configuration */
@@ -364,9 +272,6 @@ export function createFormControl(builder: FormBuilder, inputConfig: InputConfig
 /**
  * Creates angular form control instance from input configuration
  */
-export function createFormArray(
-  builder: FormBuilder,
-  inputConfig: InputConfigInterface
-) {
+export function createFormArray(builder: FormBuilder, inputConfig: InputConfigInterface) {
   return ComponentReactiveFormHelpers.buildArray(builder, inputConfig);
 }

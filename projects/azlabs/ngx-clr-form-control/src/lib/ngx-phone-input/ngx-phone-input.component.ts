@@ -1,20 +1,10 @@
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  Output,
-  TemplateRef,
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, Output, TemplateRef, signal as createSignal } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { distinctUntilChanged, Subscription, tap } from 'rxjs';
-import { NgxCommonModule } from '../common';
+import { SHARED_DIRECTIVES, SHARED_PIPES } from '../common';
 import { INTL_TEL_INPUT_DIRECTIVES } from '@azlabsjs/ngx-intl-tel-input';
-import { PIPES } from '../pipes';
+import { CommonModule } from '@angular/common';
 
 /** @internal */
 type SetStateParam<T> = (state: T) => T;
@@ -27,7 +17,7 @@ type StateType = {
 
 @Component({
   standalone: true,
-  imports: [NgxCommonModule, ...INTL_TEL_INPUT_DIRECTIVES, ...PIPES],
+  imports: [CommonModule, ...SHARED_PIPES, ...SHARED_DIRECTIVES, ...INTL_TEL_INPUT_DIRECTIVES],
   selector: 'ngx-phone-input',
   templateUrl: './ngx-phone-input.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,25 +31,18 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
   @Input('class') cssClass!: string;
   @Input('countries') preferredCountries!: string[];
   @Input() set disabled(value: boolean) {
-    const { _state: state } = this;
-    this._state = { ...state, disabled: value };
+    this.signal.update(state => ({ ...state, disabled: value }));
   }
-  
+
   @Output() focus = new EventEmitter<FocusEvent>();
   @Output() blur = new EventEmitter<FocusEvent>();
 
-  _state: StateType = {
+  protected signal = createSignal<StateType>({
     disabled: false,
     value: undefined as string | undefined,
-  };
-  get state() {
-    return this._state;
-  }
+  });
 
   private subscriptions: Subscription[] = [];
-
-  /** phone input component class constructor */
-  constructor(private cdRef: ChangeDetectorRef) {}
 
   onBlur(event: FocusEvent) {
     this.control?.markAsTouched();
@@ -73,26 +56,17 @@ export class NgxPhoneInputComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.subscriptions.push(
-      this.control.valueChanges
-        .pipe(distinctUntilChanged(),tap((value: string | undefined) => this.setState((state) => ({ ...state, value })))).subscribe(),
-
-      this.control.statusChanges
-        .pipe(tap((status) => {this.setState((state) => ({ ...state, disabled: status.toLowerCase() === 'disabled' }))})).subscribe()
+      this.control.valueChanges.pipe(distinctUntilChanged(), tap((value: string | undefined) => this.signal.update((state) => ({ ...state, value })))).subscribe(),
+      this.control.statusChanges.pipe(tap((status) => { this.signal.update((state) => ({ ...state, disabled: status.toLowerCase() === 'disabled' })) })).subscribe()
     );
 
-    // set the current state based on the control value
-    this.setState((state) => ({...state, disabled: this.control.status.toLocaleLowerCase() === 'disabled', value: this.control.value }));
+    this.signal.update((state) => ({ ...state, disabled: this.control.status.toLocaleLowerCase() === 'disabled', value: this.control.value }));
   }
 
   onError(_: boolean, value: unknown) {
     if (_ === true) {
       this.control.setErrors({ phone: value });
     }
-  }
-
-  setState(state: SetStateParam<StateType>) {
-    this._state = state(this._state);
-    this.cdRef?.markForCheck();
   }
 
   ngOnDestroy(): void {

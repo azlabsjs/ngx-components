@@ -1,96 +1,98 @@
-<clr-datagrid [clrDgSelectionType]="config | gridSelectionType" [clrDgSelected]="selected"  [class]="config.class || ''" (clrDgRefresh)="onDgRefresh($event)" [clrDgPreserveSelection]="config.preserveSelection || false" [clrDgLoading]="loading" (clrDgSelectedChange)="onSelectedStateChanges($event)">
-  <clr-dg-action-bar>
-    <ng-container *ngTemplateOutlet="dgactionbar; context: { $implicit: selected }"></ng-container>
-  </clr-dg-action-bar>
+@if(signal(); as state) {
+  <clr-datagrid [clrDgSelectionType]="config | gridSelectionType" [clrDgSelected]="selected"  [class]="config.class || ''" (clrDgRefresh)="onDgRefresh($event)" [clrDgPreserveSelection]="config.preserveSelection || false" [clrDgLoading]="loading" (clrDgSelectedChange)="onSelectedStateChanges($event)">
+    <clr-dg-action-bar>
+      <ng-container *ngTemplateOutlet="dgactionbar; context: { $implicit: selected }"></ng-container>
+    </clr-dg-action-bar>
 
-  @for (column of columns; track column) {
-    <clr-dg-column [ngClass]="config.columnHeadersClass" [clrDgColType]="column.type" [clrDgField]="column.field" [clrDgSortBy]="column.sort || ''">
-      @if (column.title | transform : (column.transformTitle || config.transformColumnTitle) | pipeResult; as result) {
-        @if (result.value | isAsync) {
-          <ng-container *ngTemplateOutlet="title ?? _title; context: {$implicit: result.value | async, value: result.value | async, capitalize: config.capitalizeColumnTitle}"></ng-container>
-        } @else {
-          <ng-container *ngTemplateOutlet="title ?? _title; context: {$implicit: result.value, value: result.value, capitalize: config.capitalizeColumnTitle}"></ng-container>
-        }
-        <ng-template #_title let-value let-capitalize="capitalize">{{ capitalize ? (value | uppercase) : value }}</ng-template>
-      }
-      @if (config.useCustomFilters) {
-        <clr-dg-filter> <ng-content select=".dg-filter"></ng-content> </clr-dg-filter>
-      }
-    </clr-dg-column>
-  }
-
-  @if (config.useServerPagination) {
-    @for (item of state.data || []; track item) {
-      <ng-container *ngTemplateOutlet="dgrow ?? _row; context: { $implicit: item }" ngProjectAs="clr-dg-row"></ng-container>
-    }
-  } @else {
-    <ng-container *clrDgItems="let item of state.data || []">
-      <ng-container *ngTemplateOutlet="dgrow ?? _row; context: { $implicit: item }" ngProjectAs="clr-dg-row"></ng-container>
-    </ng-container>
-  }
-
-
-  <ng-template #_row let-current>
-    <clr-dg-row [class]="config|gridRowClass:current" [clrDgItem]="current" [clrDgSelectable]="current[config.selectableProp || ''] || true">
-      @if (config.hasActionOverflow && !!dgoverflow) {
-        <clr-dg-action-overflow>
-          <ng-container *ngTemplateOutlet=" dgoverflow; context: { $implicit: current }"></ng-container>
-        </clr-dg-action-overflow>
-      }
-      @for (column of columns; track column) {
-        <clr-dg-cell (click)="onItemClick($event, current)">
-          @if (current|propValue:column.property | transform: column.transform | pipeResult; as result) {
-            @if (result.value | isAsync) {
-              <ng-container *ngTemplateOutlet="cell ?? _cell; context: {$implicit: result.value | async, column, item: current}"></ng-container>
-            } @else {
-              <ng-container *ngTemplateOutlet="cell ?? _cell; context: {$implicit: result.value, column, item: current}"></ng-container>
-            }
-            <ng-template #_cell let-value let-column="column" let-item="item">
-              <span class="cell-value" [ngClass]="column.style.class | cssclass:value:item" [style]="column.style.styles | cssstyle:value:item">{{ value }}</span>
-            </ng-template>
+    @for (column of columns; track column) {
+      <clr-dg-column [ngClass]="config.columnHeadersClass" [clrDgColType]="column.type" [clrDgField]="column.field" [clrDgSortBy]="column.sort || ''">
+        @if (column.title | transform : (column.transformTitle || config.transformColumnTitle) | pipeResult; as result) {
+          @if (result.value | isAsync) {
+            <ng-container *ngTemplateOutlet="title ?? _title; context: {$implicit: result.value | async, value: result.value | async, capitalize: config.capitalizeColumnTitle}"></ng-container>
+          } @else {
+            <ng-container *ngTemplateOutlet="title ?? _title; context: {$implicit: result.value, value: result.value, capitalize: config.capitalizeColumnTitle}"></ng-container>
           }
-        </clr-dg-cell>
-      }
-
-      @if (config.hasExpandableRows && !!dgrowdetail) {
-        <ng-container ngProjectAs="clr-dg-row-detail">
-          <clr-dg-row-detail *clrIfExpanded>
-            <ng-container *ngTemplateOutlet="dgrowdetail; context: { $implicit: current }"></ng-container>
-          </clr-dg-row-detail>
-        </ng-container>
-      }
-
-    </clr-dg-row>
-  </ng-template>
-
-
-  <ng-container ngProjectAs="clr-dg-placeholder" *ngTemplateOutlet="dgplaceholder || _placeholder"></ng-container>
-  <ng-template #_placeholder>
-    @if (placeholder) {
-      <clr-dg-placeholder>{{ placeholder || 'we couldn\'t find any data!'}}</clr-dg-placeholder>
+          <ng-template #_title let-value let-capitalize="capitalize">{{ capitalize ? (value | uppercase) : value }}</ng-template>
+        }
+        @if (config.useCustomFilters) {
+          <clr-dg-filter> <ng-content select=".dg-filter"></ng-content> </clr-dg-filter>
+        }
+      </clr-dg-column>
     }
-  </ng-template>
+
+    @if (config.useServerPagination) {
+      @for (item of state.data || []; track item) {
+        <ng-container *ngTemplateOutlet="dgrow ?? _row; context: { $implicit: item }" ngProjectAs="clr-dg-row"></ng-container>
+      }
+    } @else {
+      <ng-container *clrDgItems="let item of state.data || []">
+        <ng-container *ngTemplateOutlet="dgrow ?? _row; context: { $implicit: item }" ngProjectAs="clr-dg-row"></ng-container>
+      </ng-container>
+    }
 
 
-  @if (config.hasDetails && !!dgdetail) {
-    <ng-container ngProjectAs="clr-dg-detail">
-      <ng-template clrIfDetail let-detail (clrIfDetailChange)="detailChange.emit($event)">
-        <clr-dg-detail>
-          <clr-dg-detail-header>
-            <ng-content select=".dg-detail-header"></ng-content>
-          </clr-dg-detail-header>
-          <clr-dg-detail-body>
-            <ng-container *ngTemplateOutlet="dgdetail; context: { $implicit: detail }"></ng-container>
-          </clr-dg-detail-body>
-        </clr-dg-detail>
-      </ng-template>
-    </ng-container>
-  }
+    <ng-template #_row let-current>
+      <clr-dg-row [class]="config|gridRowClass:current" [clrDgItem]="current" [clrDgSelectable]="current[config.selectableProp || ''] || true">
+        @if (config.hasActionOverflow && !!dgoverflow) {
+          <clr-dg-action-overflow>
+            <ng-container *ngTemplateOutlet=" dgoverflow; context: { $implicit: current }"></ng-container>
+          </clr-dg-action-overflow>
+        }
+        @for (column of columns; track column) {
+          <clr-dg-cell (click)="onItemClick($event, current)">
+            @if (current|propValue:column.property | transform: column.transform | pipeResult; as result) {
+              @if (result.value | isAsync) {
+                <ng-container *ngTemplateOutlet="cell ?? _cell; context: {$implicit: result.value | async, column, item: current}"></ng-container>
+              } @else {
+                <ng-container *ngTemplateOutlet="cell ?? _cell; context: {$implicit: result.value, column, item: current}"></ng-container>
+              }
+              <ng-template #_cell let-value let-column="column" let-item="item">
+                <span class="cell-value" [ngClass]="column.style.class | cssclass:value:item" [style]="column.style.styles | cssstyle:value:item">{{ value }}</span>
+              </ng-template>
+            }
+          </clr-dg-cell>
+        }
 
-  <clr-dg-footer>
-    {{ state.total || state.data.length }} {{ config.totalItemLabel }}
-    <clr-dg-pagination [clrDgPageSize]="config.pageSize" #pagination [clrDgTotalItems]="state.total || state.data.length">
-      <clr-dg-page-size [clrPageSizeOptions]="config.sizeOptions"></clr-dg-page-size>
-    </clr-dg-pagination>
-  </clr-dg-footer>
-</clr-datagrid>
+        @if (config.hasExpandableRows && !!dgrowdetail) {
+          <ng-container ngProjectAs="clr-dg-row-detail">
+            <clr-dg-row-detail *clrIfExpanded>
+              <ng-container *ngTemplateOutlet="dgrowdetail; context: { $implicit: current }"></ng-container>
+            </clr-dg-row-detail>
+          </ng-container>
+        }
+
+      </clr-dg-row>
+    </ng-template>
+
+
+    <ng-container ngProjectAs="clr-dg-placeholder" *ngTemplateOutlet="dgplaceholder || _placeholder"></ng-container>
+    <ng-template #_placeholder>
+      @if (placeholder) {
+        <clr-dg-placeholder>{{ placeholder || 'we couldn\'t find any data!'}}</clr-dg-placeholder>
+      }
+    </ng-template>
+
+
+    @if (config.hasDetails && !!dgdetail) {
+      <ng-container ngProjectAs="clr-dg-detail">
+        <ng-template clrIfDetail let-detail (clrIfDetailChange)="detailChange.emit($event)">
+          <clr-dg-detail>
+            <clr-dg-detail-header>
+              <ng-content select=".dg-detail-header"></ng-content>
+            </clr-dg-detail-header>
+            <clr-dg-detail-body>
+              <ng-container *ngTemplateOutlet="dgdetail; context: { $implicit: detail }"></ng-container>
+            </clr-dg-detail-body>
+          </clr-dg-detail>
+        </ng-template>
+      </ng-container>
+    }
+
+    <clr-dg-footer>
+      {{ state.total || state.data.length }} {{ config.totalItemLabel }}
+      <clr-dg-pagination [clrDgPageSize]="config.pageSize" #pagination [clrDgTotalItems]="state.total || state.data.length">
+        <clr-dg-page-size [clrPageSizeOptions]="config.sizeOptions"></clr-dg-page-size>
+      </clr-dg-pagination>
+    </clr-dg-footer>
+  </clr-datagrid>
+}

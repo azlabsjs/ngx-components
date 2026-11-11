@@ -1,8 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {
-  InputConfigInterface,
-  OptionsInputConfigInterface,
-} from '@azlabsjs/smart-form-core';
+import { InputConfigInterface, OptionsInput } from '@azlabsjs/smart-form-core';
 
 @Pipe({
   standalone: true,
@@ -11,6 +8,6 @@ import {
 })
 export class SelectInputPipe implements PipeTransform {
   transform(value: InputConfigInterface) {
-    return value as OptionsInputConfigInterface;
+    return value as OptionsInput;
   }
 }

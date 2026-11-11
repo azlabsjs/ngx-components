@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { OptionsInputConfigInterface } from '@azlabsjs/smart-form-core';
+import { OptionsInput } from '@azlabsjs/smart-form-core';
 
 /** @ionternal */
 type ElementType = { value: unknown; checked: boolean };
@@ -28,7 +28,7 @@ export class IsCheckedPipe implements PipeTransform {
   standalone: true,
 })
 export class HasOptionsPipe implements PipeTransform {
-  transform(config: OptionsInputConfigInterface) {
+  transform(config: OptionsInput) {
     return config.options && config.options.length > 0;
   }
 }

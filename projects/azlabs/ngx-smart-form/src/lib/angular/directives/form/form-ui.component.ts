@@ -1,13 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ContentChild,
-  EventEmitter,
-  Input,
-  Output,
-  TemplateRef,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Input, Output, TemplateRef } from '@angular/core';
 import { NgxSmartFormArrayComponent } from '../array';
 import { NgxSmartFormGroupHeaderPipe } from '../group';
 import { NgxSmartFormControlArrayComponent } from '../control-array';

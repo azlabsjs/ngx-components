@@ -1,25 +1,15 @@
-import {
-  AfterContentInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  Output,
-  TemplateRef,
-} from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, Output, TemplateRef } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
 import { Subscription } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { InputEventArgs } from './types';
 import { FILE_INPUT_DIRECTIVES } from '@azlabsjs/ngx-file-input';
-import { NgxCommonModule } from './common';
+import { SHARED_DIRECTIVES, SHARED_PIPES } from './common';
 import { ClrRadioModule, ClrDatepickerModule } from '@clr/angular';
 import { ClarityIcons, eyeHideIcon, eyeIcon, ClrIcon } from '@clr/angular/icon';
 import { DIRECTIVES } from './directives';
-import { PIPES } from './pipes';
+import { CommonModule } from '@angular/common';
 
 // Register clarity eye icons
 ClarityIcons.addIcons(eyeHideIcon, eyeIcon);
@@ -30,15 +20,16 @@ type Optional<T> = T | null | undefined;
 @Component({
   standalone: true,
   imports: [
+    CommonModule,
     ClrIcon,
-    NgxCommonModule,
     FormsModule,
     ReactiveFormsModule,
     ClrRadioModule,
     ClrDatepickerModule,
+    ...SHARED_DIRECTIVES,
+    ...SHARED_PIPES,
     ...DIRECTIVES,
     ...FILE_INPUT_DIRECTIVES,
-    ...PIPES,
   ],
   selector: 'ngx-clr-form-control',
   templateUrl: './control.component.html',
@@ -65,7 +56,7 @@ export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
   @Input() textview!: Optional<TemplateRef<any>>;
   @Input() date: Optional<TemplateRef<any>>;
   @Input() select: Optional<TemplateRef<any>>;
-  
+
   @Output() valueChange = new EventEmitter<InputEventArgs>();
   @Output('item-removed') remove = new EventEmitter<any>();
   @Output('item-selected') selected = new EventEmitter<InputEventArgs>();
@@ -76,12 +67,12 @@ export class NgxFormControlComponent implements OnDestroy, AfterContentInit {
   @Output('keyup') keyup = new EventEmitter<InputEventArgs>();
   @Output('keypress') keypress = new EventEmitter<InputEventArgs>();
   @Output('blur') blur = new EventEmitter<InputEventArgs>();
-  
+
   private subscriptions: Subscription[] = [];
   readonly inputTypes = InputTypes;
 
   /** @description creates an instance of Form Control Component */
-  constructor(private cdRef: ChangeDetectorRef) {}
+  constructor(private cdRef: ChangeDetectorRef) { }
 
   ngAfterContentInit() {
     if (!this.formControl) {

@@ -1,11 +1,12 @@
 import { Component, Input, TemplateRef, ChangeDetectionStrategy } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { NumberInput } from '@azlabsjs/smart-form-core';
-import { NgxCommonModule } from '../common';
+import { SHARED_DIRECTIVES, SHARED_PIPES } from '../common';
+import { CommonModule } from '@angular/common';
 
 @Component({
   standalone: true,
-  imports: [NgxCommonModule],
+  imports: [CommonModule, ...SHARED_DIRECTIVES, ...SHARED_PIPES],
   selector: 'ngx-number-input',
   templateUrl: './ngx-number-input.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

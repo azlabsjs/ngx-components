@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { PIPES as _PIPES } from '../../pipes';
-import { InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
+import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { JSObject } from '@azlabsjs/js-object';
 import { FormGroup } from '@angular/forms';
 

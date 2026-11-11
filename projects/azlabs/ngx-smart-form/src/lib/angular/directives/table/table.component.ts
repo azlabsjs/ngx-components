@@ -215,23 +215,23 @@ export class NgxTableForm implements ViewRefFactory<EmbeddedViewRef<any>>, OnDes
   private disableControls(formgroup: FormGroup, inputs: InputConfigInterface[]) {
 
     for (const input of inputs) {
-      if (input.disabled || ('constraints' in input && input.constraints && 'disabled' in input.constraints && Boolean(input.constraints['disabled']))) {
+      if ('constraints' in input && input.constraints && 'disabled' in input.constraints && Boolean(input.constraints['disabled'])) {
         const current = formgroup.get(input.name);
 
         if (!current) {
           continue;
         }
 
-        if (current instanceof FormGroup && 'children' in input && Array.isArray(input.children)) {
-          this.disableControls(current, input.children);
+        if (current instanceof FormGroup && 'inputs' in input && Array.isArray(input.inputs)) {
+          this.disableControls(current, input.inputs);
           continue;
         }
 
-        if (current instanceof FormArray && input.isRepeatable && 'children' in input && Array.isArray(input.children)) {
+        if (current instanceof FormArray && input.isRepeatable && 'inputs' in input && Array.isArray(input.inputs)) {
           for (let index = 0; index < current.length; index++) {
             const element = current.at(index);
             if (element && element instanceof FormGroup) {
-              this.disableControls(element, input.children);
+              this.disableControls(element, input.inputs);
             }
           }
           continue;

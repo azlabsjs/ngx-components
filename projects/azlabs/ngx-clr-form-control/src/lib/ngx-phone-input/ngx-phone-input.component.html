@@ -1,8 +1,8 @@
-@if (state) {
+@if (signal(); as state) {
   @if (control) {
     <ngx-intl-tel-input [input]="_input" [description]="_error" [disabled]="state.disabled" (error)="onError($event, control.value)"
       (valueChange)="control.setValue($event)" [value]="state.value ?? ''" (blur)="onBlur($event)"
-      (focus)="onFocus($event)" [class]="cssClass" [required]="config.rules?.isRequired ?? (config | required)"
+      (focus)="onFocus($event)" [class]="cssClass" [required]="config | required"
       [preferredCountries]="preferredCountries" [country]="'tg'" [name]="config.name">
       <ng-template #_input let-keypress="keypress" let-selected="selected" let-change="change" let-required="required" let-disabled="disabled" let-value="value">
         <ng-container *ngTemplateOutlet="input; context: {value,keypress,selected,required,disabled,config,change: change,onBlur: onBlur.bind(this),onFocus: onFocus.bind(this)}"></ng-container>

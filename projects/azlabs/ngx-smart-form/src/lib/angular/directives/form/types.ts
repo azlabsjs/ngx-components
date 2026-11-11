@@ -3,7 +3,7 @@ import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Observable } from 'rxjs';
 
 // @internal
-export type FormConfigType = { controlConfigs: InputConfigInterface[] };
+export type FormConfigType = { inputs: InputConfigInterface[] };
 
 /** @internal */
 export type FormGroupState = {

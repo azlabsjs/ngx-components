@@ -13,7 +13,7 @@ export class AcceptFilePipe implements PipeTransform {
         return config?.constraints?.pattern?.fn.split(',').map((x) => x.trim());
       }
     }
-    return config.pattern ? config.pattern.split(',').map((x) => x.trim()) : [];
+    return config.constraints && 'pattern' in config.constraints && config.constraints.pattern && config.constraints.pattern.fn ? config.constraints.pattern.fn.split(',').map((x) => x.trim()) : [];
   }
 }
 
@@ -36,9 +36,30 @@ export class RequiredPipe implements PipeTransform {
 })
 export class IsDisabled implements PipeTransform {
   transform(value: InputConfigInterface) {
-    return value.disabled || ( !!value.constraints && 'disabled' in value.constraints && !!value.constraints.disabled);
+    return !!value.constraints && 'disabled' in value.constraints && !!value.constraints.disabled;
+  }
+}
+
+@Pipe({
+  standalone: true,
+  pure: true,
+  name: 'intmax'
+})
+export class IntMax implements PipeTransform {
+  transform(n0: number) {
+    return Math.pow(2, 31) - n0;
   }
 
 }
 
-export const PIPES = [AcceptFilePipe, RequiredPipe, IsDisabled] as const;
+@Pipe({
+  standalone: true,
+  pure: true,
+  name: 'isObject',
+})
+export class IsObjectPipe implements PipeTransform {
+  /** @description return true if the provided value is a javascript object and is not null*/
+  transform(value: unknown) {
+    return typeof value === 'object' && value !== null;
+  }
+}

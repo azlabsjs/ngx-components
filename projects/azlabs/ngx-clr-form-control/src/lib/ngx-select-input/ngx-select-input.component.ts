@@ -1,24 +1,10 @@
 
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Inject,
-  Input,
-  Output,
-  TemplateRef,
-  ViewChild,
-  DOCUMENT
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Inject, Input, Output, TemplateRef, ViewChild, DOCUMENT, signal as createSignal, ChangeDetectorRef } from '@angular/core';
 import { FormControl, FormsModule } from '@angular/forms';
 import { InputOptions, OptionsInput } from '@azlabsjs/smart-form-core';
 import { InputEventArgs } from '../types';
-import {
-  FetchOptionsDirective,
-  OPTIONS_DIRECTIVES,
-} from '@azlabsjs/ngx-options-input';
-import { NgxCommonModule } from '../common';
+import { FetchOptionsDirective, OPTIONS_DIRECTIVES } from '@azlabsjs/ngx-options-input';
+import { SHARED_DIRECTIVES, SHARED_PIPES } from '../common';
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select';
 import { Thunk } from './pipes';
 
@@ -35,11 +21,12 @@ type StateType = {
 @Component({
   standalone: true,
   imports: [
-    NgxCommonModule,
     FormsModule,
     NgSelectModule,
     Thunk,
     ...OPTIONS_DIRECTIVES,
+    ...SHARED_DIRECTIVES,
+    ...SHARED_PIPES
   ],
   selector: 'ngx-select-input',
   templateUrl: './ngx-select-input.component.html',
@@ -47,14 +34,12 @@ type StateType = {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxSelectInputComponent {
-  _state: StateType = {
+  protected signal = createSignal<StateType>({
     performingAction: false,
     config: null,
     loaded: false,
-  };
-  get state() {
-    return this._state;
-  }
+  });
+
   private fetchOnFocus: boolean = false;
 
   @Input() control!: FormControl<any>;
@@ -69,7 +54,7 @@ export class NgxSelectInputComponent {
     this.autoSelect(config);
 
     options = options ?? [];
-    this.setState((state) => ({...state, config, loaded: options.length !== 0 }));
+    this.signal.update((state) => ({ ...state, config, loaded: options.length !== 0 }));
   }
   @Input({ alias: 'loading-text' }) loadingText!: string;
   @Input() parent: string | null | undefined = 'body';
@@ -84,7 +69,7 @@ export class NgxSelectInputComponent {
 
   @ViewChild('ngselect', { static: false }) ngselect: NgSelectComponent | null | undefined;
 
-  constructor(@Inject(DOCUMENT) private document: Document, private cdRef: ChangeDetectorRef) {
+  constructor(@Inject(DOCUMENT) private document: Document, private cdRef: ChangeDetectorRef | null) {
     const { defaultView: view } = this.document;
 
     if (!view) {
@@ -102,11 +87,11 @@ export class NgxSelectInputComponent {
   }
 
   loadedChange(loaded: boolean) {
-    this.setState((v) => ({ ...v, loaded }));
+    this.signal.update((v) => ({ ...v, loaded }));
   }
 
   optionsChange(options: InputOptions) {
-    let { config } = this._state;
+    let { config } = this.signal();
 
     if (!config) {
       return;
@@ -114,11 +99,11 @@ export class NgxSelectInputComponent {
 
     config = {
       ...config,
-      options: options.map((state) => ({...state, name: state?.name?.toUpperCase(), description: state.description?.toUpperCase()})),
+      options: options.map((state) => ({ ...state, name: state?.name?.toUpperCase(), description: state.description?.toUpperCase() })),
     };
 
     this.autoSelect(config);
-    this.setState((state) => ({ ...state, performingAction: false, config: config }));
+    this.signal.update((state) => ({ ...state, performingAction: false, config: config }));
   }
 
   modelChange(value: any) {
@@ -128,12 +113,7 @@ export class NgxSelectInputComponent {
   }
 
   loadingChange(value: boolean) {
-    this.setState((v) => ({ ...v, performingAction: value, loaded: !value }));
-  }
-
-  setState(state: (state: StateType) => StateType) {
-    this._state = state(this._state);
-    this.cdRef?.markForCheck();
+    this.signal.update((v) => ({ ...v, performingAction: value, loaded: !value }));
   }
 
   removed(config: OptionalConfig, e?: unknown) {

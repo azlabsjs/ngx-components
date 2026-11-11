@@ -1,30 +1,9 @@
 import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
-import {
-  AngularReactiveFormBuilderBridge,
-  Condition,
-  ComputedInputValueConfigType,
-} from '../../types';
-import {
-  useCondition,
-  ComponentReactiveFormHelpers,
-  createComputableDepencies,
-  pickcontrol,
-  flatteninputs,
-  setFormValue,
-  useSupportedAggregations,
-  withRefetchObservable,
-} from '../../helpers';
+import { ReactiveFormBuilder, Condition, ComputedInputValueConfigType } from '../../types';
+import { useCondition, ComponentReactiveFormHelpers, createComputableDepencies, pickcontrol, flatteninputs, setFormValue, useSupportedAggregations, withRefetchObservable } from '../../helpers';
 import { memoize } from '@azlabsjs/functional';
-import {
-  BehaviorSubject,
-  distinctUntilChanged,
-  map,
-  Subject,
-  Subscription,
-  takeUntil,
-  tap,
-} from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, map, Subject, Subscription, takeUntil, tap } from 'rxjs';
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
 import { FormConfigType, FormModelState } from './types';
 import { InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
@@ -62,24 +41,22 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
     return { formGroup: this.group, detached: this._detached.asObservable().pipe(map(value => Array.from(value.values()))), form: this.form };
   }
 
-  constructor(@Inject(ANGULAR_REACTIVE_FORM_BRIDGE) private builder: AngularReactiveFormBuilderBridge) { }
+  constructor(@Inject(ANGULAR_REACTIVE_FORM_BRIDGE) private builder: ReactiveFormBuilder) { }
 
   update(config: T, formgroup?: FormGroup) {
-    const { controlConfigs: inputs } = config;
     const initialized = !formgroup;
-    this.computed = memoizedComputeProperties(inputs, aggregations);
+    this.computed = memoizedComputeProperties(config.inputs, aggregations);
 
     if (!formgroup) {
       const { builder } = this;
-      const { controlConfigs } = config;
-      formgroup = builder.group(controlConfigs);
+      formgroup = builder.group(config.inputs);
     }
 
     this.unsubscribe();
 
     this.setFormState(config, formgroup);
 
-    const { controlConfigs: values } = this.form;
+    const { inputs } = this.form;
 
     this.required = useCondition('requiredIf', (control, name, parent, path) => {
       if (parent && !parent.get(name) && control) {
@@ -93,7 +70,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
       }
 
       this.detach(path, control);
-    }, (name) => this._detached.getValue().get(name) ?? null)(values ?? []);
+    }, (name) => this._detached.getValue().get(name) ?? null)(inputs ?? []);
 
 
     this.disabled = useCondition('disabledIf', (control, name) => {
@@ -118,7 +95,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
       } else {
         control.enable({ emitEvent: true });
       }
-    })(values ?? []);
+    })(inputs ?? []);
 
     this.trackComputedValues(Object.entries(this.computed ?? {}));
 
@@ -150,7 +127,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
   }
 
   setValue(value: { [k: string]: unknown }): void {
-    const { controlConfigs: inputs } = this.form;
+    const { inputs } = this.form;
     setFormValue(this.builder, this.group, value, inputs ?? []);
 
     this.addConditions(flatteninputs(this.group), (control, name, conditions) => {
@@ -165,7 +142,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
   }
 
   getValue(): { [k: string]: unknown } {
-    const { controlConfigs: inputs } = this.form;
+    const { inputs } = this.form;
     if (!this.group) {
       return {};
     }
@@ -190,7 +167,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
 
   reset() {
     this.group.reset();
-    let { controlConfigs: inputs } = this.form;
+    let { inputs } = this.form;
     inputs ??= [];
     for (const control of inputs) {
       this.group.get(control.name)?.setValue(control.value);
@@ -582,9 +559,7 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
 
   private setFormState(config: T, formgroup: FormGroup) {
     const form = this.form ? { ...this.form, ...config } : config;
-    const { controlConfigs } = config;
-    const inputs = withRefetchObservable(controlConfigs, formgroup);
-    this.form = { ...form, controlConfigs: inputs };
+    this.form = { ...form, inputs: withRefetchObservable(config.inputs, formgroup) };
     this.group = formgroup;
     this._detectChanges$.next();
   }
@@ -615,10 +590,10 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
     for (const item of items) {
       if (item.type === InputTypes.HTML_INPUT) {
         delete value[item.name];
-      } else if ('children' in item && Array.isArray(item.children) && item.children.length > 0) {
+      } else if ('inputs' in item && Array.isArray(item.inputs) && item.inputs.length > 0) {
         const nested = value[item.name];
         if (nested && typeof nested === 'object') {
-          this.scrubHtmlProperties(item.children, nested as { [prop: string]: unknown });
+          this.scrubHtmlProperties(item.inputs, nested as { [prop: string]: unknown });
         }
       }
     }

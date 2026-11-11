@@ -1,10 +1,5 @@
 import { Injector } from '@angular/core';
-import {
-  HTTPRequest,
-  HTTPRequestMethods,
-  HTTPResponseType,
-  getHttpHost,
-} from '@azlabsjs/requests';
+import { HTTPRequest, HTTPRequestMethods, HTTPResponseType, getHttpHost } from '@azlabsjs/requests';
 import { isValidHttpUrl } from '@azlabsjs/smart-form-core';
 import { ObservableInput } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -54,8 +49,8 @@ export function createSubmitHttpHandler(
     const url = isValidHttpUrl(path)
       ? path
       : host
-      ? `${host}/${path.startsWith('/') ? path.slice(1) : path}`
-      : path;
+        ? `${host}/${path.startsWith('/') ? path.slice(1) : path}`
+        : path;
 
     // provides at least HTTP request options if none provided
     // by the library user
@@ -123,8 +118,8 @@ export function createRequestClient(
     let _url = isValidHttpUrl(url)
       ? url
       : host
-      ? `${host}/${url.startsWith('/') ? url.slice(1) : url}`
-      : url;
+        ? `${host}/${url.startsWith('/') ? url.slice(1) : url}`
+        : url;
 
     // Provides at least HTTP request options if none provided
     // by the library user

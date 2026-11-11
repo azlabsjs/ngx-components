@@ -1,11 +1,11 @@
 import { Component, Input, TemplateRef, ChangeDetectionStrategy } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { TextAreaInput } from '@azlabsjs/smart-form-core';
-import { NgxCommonModule } from '../common';
+import { SHARED_DIRECTIVES, SHARED_PIPES } from '../common';
 
 @Component({
   standalone: true,
-  imports: [NgxCommonModule],
+  imports: [...SHARED_DIRECTIVES, ...SHARED_PIPES],
   selector: 'ngx-textarea-input',
   templateUrl: './ngx-textarea-input.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush

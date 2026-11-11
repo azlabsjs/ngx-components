@@ -1,16 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, TemplateRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, TemplateRef, signal as createSignal } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { TextInput } from '@azlabsjs/smart-form-core';
-import { NgxCommonModule } from '../common';
-
-/** @internal */
-type StateType = {
-  showPassword: boolean;
-};
+import { SHARED_DIRECTIVES, SHARED_PIPES } from '../common';
 
 @Component({
   standalone: true,
-  imports: [NgxCommonModule],
+  imports: [...SHARED_DIRECTIVES, ...SHARED_PIPES],
   selector: 'ngx-password-input',
   templateUrl: './ngx-password-input.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,21 +16,10 @@ export class NgxPasswordInputComponent {
   @Input() config!: TextInput;
   @Input() input!: TemplateRef<any>;
 
-  Mt = Math;
-  _state: StateType = { showPassword: false };
-  get state() {
-    return this._state;
-  }
+  protected signal = createSignal({ showPassword: false });
 
   public toggle() {
-    this.setState(({ showPassword }) => ({ showPassword: !showPassword }));
+    this.signal.update(({ showPassword }) => ({ showPassword: !showPassword }));
   }
 
-  constructor(private cdRef: ChangeDetectorRef) { }
-
-  /** update component state and notify ui of state changes */
-  private setState(state: (s: StateType) => StateType) {
-    this._state = state(this._state);
-    this.cdRef?.markForCheck();
-  }
 }

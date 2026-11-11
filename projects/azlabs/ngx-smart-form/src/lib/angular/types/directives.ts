@@ -1,13 +1,5 @@
-import {
-  AbstractControl,
-  AsyncValidatorFn,
-  FormGroup,
-  ValidatorFn,
-} from '@angular/forms';
-import {
-  FormConfigInterface,
-  InputConfigInterface,
-} from '@azlabsjs/smart-form-core';
+import { AbstractControl, AsyncValidatorFn, FormGroup, ValidatorFn } from '@angular/forms';
+import { FormConfigInterface, InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Observable, ObservableInput } from 'rxjs';
 
 export type ControlsStateMap = {
@@ -153,11 +145,14 @@ export interface FormComponentInterface {
   setComponentForm(value: FormConfigInterface): void;
 
   /**
-   *
-   * @param config
-   * @param name
+   * @deprecated use `{setInput} instead`
    */
   setControlConfig(config?: InputConfigInterface, name?: string): void;
+
+  /**
+   * Set input configuration value
+   */
+  setInput(config?: InputConfigInterface, name?: string): void;
 
   /**
    * @deprecated call the curren function to validate the internal formgroup object
@@ -169,6 +164,4 @@ export interface FormComponentInterface {
  * Provides extended interface of the base {@see FormComponentInterface} type for
  * angular reactive form based components
  */
-export interface ReactiveFormComponentInterface
-  extends FormComponentInterface,
-    ReactiveFormDirectiveInterface {}
+export interface ReactiveFormComponentInterface extends FormComponentInterface, ReactiveFormDirectiveInterface { }

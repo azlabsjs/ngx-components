@@ -1,5 +1,5 @@
 <ng-content select="label"></ng-content>
-@if (state) {
+@if (signal(); as state) {
   <div [ngClass]="{ error: state | haserror }" class="flex-files-input">
     <input #input fileinput type="file" [placeholder]="placeholder" [class]="cssClass ?? ''" [max-size]="maxFilesize || 10" [max]="multiple ? maxFiles : 1" [multiple]="multiple" (sizeError)="sizeError($event)" [accept]="accept" (acceptedFiles)="accepted($event)" (unAcceptedFiles)="notAccepted($event)" (reset)="onReset()" />
     @if (state.uploading) {

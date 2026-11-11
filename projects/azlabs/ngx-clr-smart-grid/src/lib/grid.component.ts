@@ -1,34 +1,10 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ContentChild,
-  EventEmitter,
-  Input,
-  Output,
-  TemplateRef,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Input, Output, TemplateRef, signal as createSignal } from '@angular/core';
 import { ClrDatagridModule, ClrDatagridSortOrder, selectionTypeAttribute } from '@clr/angular';
-import {
-  PaginateResult,
-  ProjectPaginateQueryParamType,
-  GridColumnType,
-  GridConfigType,
-  DatagridColumnType,
-} from './core';
+import { PaginateResult, ProjectPaginateQueryParamType, GridColumnType, GridConfigType, DatagridColumnType } from './core';
+import { AsyncPipe, CurrencyPipe, DecimalPipe, JsonPipe, LowerCasePipe, PercentPipe, SlicePipe, UpperCasePipe } from '@angular/common';
+import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 import { CommonModule } from '@angular/common';
 import { PIPES } from './pipes';
-import {
-  AsyncPipe,
-  CurrencyPipe,
-  DecimalPipe,
-  JsonPipe,
-  LowerCasePipe,
-  PercentPipe,
-  SlicePipe,
-  UpperCasePipe,
-} from '@angular/common';
-import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 
 /** @internal */
 const GRID_CONFIG: Required<GridConfigType> = {
@@ -88,29 +64,21 @@ type Optional<T> = T | null | undefined;
 export class NgxClrSmartGridComponent {
 
   public readonly defaultSort = ClrDatagridSortOrder.DESC;
-  _state: StateType = {
+  protected signal = createSignal<StateType>({
     data: [] as { [index: string]: any }[],
     total: 0 as number,
-  };
-
-  get state() {
-    return this._state;
-  }
+  });
 
   @Input() set pageResult(result: PaginateResult<any> | undefined | null) {
     if (result) {
-      this.setState((state) => ({
-        ...state,
-        data: result.data ?? [],
-        total: result.total ?? result.data.length,
-      }));
+      this.signal.update((state) => ({ ...state, data: result.data ?? [], total: result.total ?? result.data.length }));
     }
   }
   @Input() set data(values: { [index: string]: any }[]) {
-    this.setState((state) => ({ ...state, data: values }));
+    this.signal.update((state) => ({ ...state, data: values }));
   }
   @Input() set total(total: number) {
-    this.setState((state) => ({ ...state, total }));
+    this.signal.update((state) => ({ ...state, total }));
   }
   @Input() selected!: unknown[] | any;
   @Input() loading: boolean = false;
@@ -165,9 +133,6 @@ export class NgxClrSmartGridComponent {
   @Output() detailChange = new EventEmitter<unknown>();
   @Output() dgItemClick = new EventEmitter<unknown>();
 
-  /** @description smart grid class constructor */
-  constructor(private cdRef: ChangeDetectorRef) { }
-
   onSelectedStateChanges(state: unknown[] | unknown) {
     this.selectedChange.emit(state);
   }
@@ -181,9 +146,4 @@ export class NgxClrSmartGridComponent {
     event?.preventDefault();
   }
 
-  /** @description update component state and notify ui of state changes */
-  private setState(state: (s: StateType) => StateType) {
-    this._state = state(this._state);
-    this.cdRef?.markForCheck();
-  }
 }

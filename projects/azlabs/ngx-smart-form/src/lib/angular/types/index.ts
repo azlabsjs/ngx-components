@@ -1,21 +1,8 @@
-export { Condition, DetachedInputType } from './bindings';
 
-export {
-  ControlsStateMap,
-  FormComponentInterface,
-  ReactiveFormComponentInterface,
-  ReactiveFormDirectiveInterface,
-} from './directives';
-
-export {
-  CacheProvider,
-  FormsClient,
-  FormsLoader,
-  LoadFormsRequestHandler,
-  AngularReactiveFormBuilderBridge,
-  Builder,
-} from './form';
+export { ControlsStateMap, FormComponentInterface, ReactiveFormComponentInterface, ReactiveFormDirectiveInterface } from './directives';
+export { FormsCollection, FormsClient, LoadFormsRequestHandler, ReactiveFormBuilder, Builder } from './form';
 export { InputEventArgs } from './input';
-export { InterceptorFactory } from './interceptors';
 export { InputOptionsClient } from './options';
+export { InterceptorFactory } from './interceptors';
 export { ComputedInputValueConfigType } from './compute';
+export { Condition, DetachedInputType } from './bindings';

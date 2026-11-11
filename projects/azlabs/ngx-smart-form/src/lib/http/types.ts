@@ -1,11 +1,6 @@
 import { ObservableInput } from 'rxjs';
 import { Injector } from '@angular/core';
-import {
-  Interceptor,
-  HTTPRequestMethods,
-  HTTPResponseType,
-  HTTPRequest,
-} from '@azlabsjs/requests';
+import { Interceptor, HTTPRequestMethods, HTTPResponseType, HTTPRequest } from '@azlabsjs/requests';
 
 export type InterceptorFactory<T> = (injector: Injector) => Interceptor<T>;
 

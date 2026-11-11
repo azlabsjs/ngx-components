@@ -1,15 +1,5 @@
 
-import {
-  Component,
-  ComponentRef,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  Output,
-  TemplateRef,
-  ViewChild,
-  ViewContainerRef,
-} from '@angular/core';
+import { Component, ComponentRef, EventEmitter, Input, OnDestroy, Output, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { PIPES } from '../../pipes';
 import { RefType, ViewRefFactory } from '../types';
 import { AbstractControl } from '@angular/forms';
@@ -40,7 +30,7 @@ export class NgxFormControlArrayOutletComponent implements OnDestroy, ViewRefFac
   @Input() set config(value: InputConfigInterface) {
     this._config = value;
     for (const ref of this.componentRefs) {
-      ref.instance.config = {...value};
+      ref.instance.config = { ...value };
       ref.changeDetectorRef.markForCheck();
     }
   }

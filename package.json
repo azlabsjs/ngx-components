@@ -27,7 +27,7 @@
     "@azlabsjs/js-object": "^0.2.10",
     "@azlabsjs/requests": ">=0.2.0 | <0.4.0",
     "@azlabsjs/rx-query": "^0.3.0",
-    "@azlabsjs/smart-form-core": "^0.2.72",
+    "@azlabsjs/smart-form-core": "^0.3.2",
     "@azlabsjs/uploader": ">=0.2.0 | <0.4.0",
     "@azlabsjs/utilities": "^0.2.10",
     "@clr/angular": "^18.4.0",
@@ -58,5 +58,17 @@
     "karma-jasmine-html-reporter": "^1.7.0",
     "ng-packagr": "^21.2.7",
     "typescript": "^5.4.5"
+  },
+  "overrides": {
+    "deepmerge": "^4.3.1",
+    "minimatch": "^11.0.5",
+    "glob": "14.0.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "deepmerge": "^4.3.1",
+      "minimatch": "^11.0.5",
+      "glob": "14.0.4"
+    }
   }
 }

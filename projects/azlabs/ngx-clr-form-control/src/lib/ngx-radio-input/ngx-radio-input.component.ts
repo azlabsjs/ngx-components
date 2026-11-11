@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, TemplateRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, TemplateRef, signal as createSignal } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { InputOptions, OptionsInput } from '@azlabsjs/smart-form-core';
-import { NgxCommonModule } from '../common';
+import { SHARED_DIRECTIVES, SHARED_PIPES } from '../common';
 import { OPTIONS_DIRECTIVES } from '@azlabsjs/ngx-options-input';
 
 /** @interal */
@@ -12,7 +12,7 @@ type StateType = {
 
 @Component({
   standalone: true,
-  imports: [NgxCommonModule, ...OPTIONS_DIRECTIVES],
+  imports: [...SHARED_DIRECTIVES, ...OPTIONS_DIRECTIVES, ...SHARED_PIPES],
   selector: 'ngx-radio-input',
   templateUrl: './ngx-radio-input.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,27 +28,21 @@ export class NgxRadioInputComponent {
     this.autoSelect(config);
 
     options = options ?? [];
-    this.setState((state) => ({ ...state, config, loaded: options.length !== 0 }));
+    this.signal.update((state) => ({ ...state, config, loaded: options.length !== 0 }));
   }
   @Input() describe = true;
   @Input() input!: TemplateRef<any>;
 
   @Output() configChange = new EventEmitter<OptionsInput>();
 
-  private _state: StateType = {
+  protected signal = createSignal<StateType>({
     config: null,
     loaded: false,
-  };
+  });
 
-  get state() {
-    return this._state;
-  }
-
-  /** @description radion input component class constructor */
-  constructor(private cdRef: ChangeDetectorRef) { }
 
   onOptionsChange(options: InputOptions) {
-    let { config } = this._state;
+    let { config } = this.signal();
     if (!config) {
       return;
     }
@@ -56,14 +50,10 @@ export class NgxRadioInputComponent {
     config = { ...config, options };
     this.autoSelect(config);
 
-    this.setState((state) => ({ ...state, config: config, loaded: true }));
+    this.signal.update((state) => ({ ...state, config: config, loaded: true }));
     this.configChange.emit(config);
   }
 
-  setState(state: (state: StateType) => StateType) {
-    this._state = state(this._state);
-    this.cdRef?.markForCheck();
-  }
 
   private autoSelect(config: OptionsInput) {
     const { autoselect, options: items } = config;

@@ -1,6 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { InputGroup, InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
-import { AbstractControl } from '@angular/forms';
 
 /**
  * @description checks if input has `hidden` property set to true or is of type `hidden`
@@ -14,14 +13,9 @@ import { AbstractControl } from '@angular/forms';
   pure: false,
   standalone: true,
 })
-export class IsHiddenPipe implements PipeTransform {
+export class IsHidden implements PipeTransform {
   transform(value: InputConfigInterface) {
-    return (
-      (typeof value !== 'undefined' &&
-        value !== null &&
-        Boolean(value.hidden) === true) ||
-      value?.type === InputTypes.HIDDEN_INPUT
-    );
+    return (typeof value !== 'undefined' && value !== null && Boolean(value.type === InputTypes.HIDDEN_INPUT) === true) || value?.type === InputTypes.HIDDEN_INPUT;
   }
 }
 
@@ -30,16 +24,9 @@ export class IsHiddenPipe implements PipeTransform {
   pure: true,
   standalone: true,
 })
-export class HasChildrenPipe implements PipeTransform {
+export class HasChildren implements PipeTransform {
   transform(value: InputGroup) {
-    return (
-      typeof value !== 'undefined' &&
-      value !== null &&
-      typeof value.children !== 'undefined' &&
-      value.children !== null &&
-      Array.isArray(value.children) &&
-      value.children.length > 0
-    );
+    return typeof value !== 'undefined' && value !== null && typeof value.inputs !== 'undefined' && value.inputs !== null && Array.isArray(value.inputs) && value.inputs.length > 0;
   }
 }
 
@@ -48,13 +35,9 @@ export class HasChildrenPipe implements PipeTransform {
   pure: true,
   standalone: true,
 })
-export class IsRepeatablePipe implements PipeTransform {
+export class IsRepeatable implements PipeTransform {
   transform(value: InputConfigInterface) {
-    return (
-      typeof value !== 'undefined' &&
-      value !== null &&
-      Boolean(value.isRepeatable)
-    );
+    return typeof value !== 'undefined' &&value !== null &&Boolean(value.isRepeatable);
   }
 }
 
@@ -63,7 +46,7 @@ export class IsRepeatablePipe implements PipeTransform {
   pure: true,
   standalone: true,
 })
-export class AsInputsPipe implements PipeTransform {
+export class AsInputs implements PipeTransform {
   transform(value: unknown) {
     return value as InputConfigInterface[];
   }
@@ -74,7 +57,7 @@ export class AsInputsPipe implements PipeTransform {
   pure: true,
   standalone: true,
 })
-export class AsInputGroupPipe implements PipeTransform {
+export class AsInputGroup implements PipeTransform {
   transform(value: unknown) {
     return value as InputGroup;
   }
@@ -98,11 +81,7 @@ export class KeysPipe implements PipeTransform {
 })
 export class AsInputConfigArray implements PipeTransform {
   transform(value: InputConfigInterface | InputConfigInterface[]) {
-    return Array.isArray(value)
-      ? value
-      : [value].filter(
-        (current) => typeof current !== 'undefined' && current !== null
-      );
+    return Array.isArray(value) ? value : [value].filter((current) => typeof current !== 'undefined' && current !== null);
   }
 }
 
@@ -113,21 +92,17 @@ export class AsInputConfigArray implements PipeTransform {
 })
 export class RequiredPipe implements PipeTransform {
   transform(value: InputConfigInterface) {
-    return (
-      !!value.constraints &&
-      'required' in value.constraints &&
-      !!value.constraints.required
-    );
+    return !!value.constraints && 'required' in value.constraints && !!value.constraints.required;
   }
 }
 
 /** @description exported pipes */
 export const PIPES = [
-  IsRepeatablePipe,
-  HasChildrenPipe,
-  IsHiddenPipe,
-  AsInputsPipe,
-  AsInputGroupPipe,
+  IsRepeatable,
+  HasChildren,
+  IsHidden,
+  AsInputs,
+  AsInputGroup,
   KeysPipe,
   AsInputConfigArray,
   RequiredPipe,

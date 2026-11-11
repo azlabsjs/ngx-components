@@ -1,37 +1,12 @@
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ContentChild,
-  EventEmitter,
-  HostListener,
-  Inject,
-  Input,
-  OnChanges,
-  OnDestroy,
-  Optional as ngOptional,
-  Output,
-  SimpleChanges,
-  TemplateRef,
-} from '@angular/core';
-import {
-  AbstractControl,
-  AsyncValidatorFn,
-  FormGroup,
-  ValidatorFn,
-} from '@angular/forms';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, EventEmitter, HostListener, Inject, Input, OnChanges, OnDestroy, Optional as ngOptional, Output, SimpleChanges, TemplateRef } from '@angular/core';
+import { AbstractControl, AsyncValidatorFn, FormGroup, ValidatorFn } from '@angular/forms';
 import { HTTPRequestMethods } from '@azlabsjs/requests';
-import {
-  FormConfigInterface,
-  InputConfigInterface,
-} from '@azlabsjs/smart-form-core';
+import { FormConfigInterface, InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { EMPTY, from, lastValueFrom, Observable, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { RequestClient } from '../../../http';
+import { RequestClient, HTTP_REQUEST_CLIENT } from '../../../http';
 import { collectErrors } from '../../helpers';
 import { ControlsStateMap, ReactiveFormComponentInterface } from '../../types';
-import { HTTP_REQUEST_CLIENT } from '../../tokens';
 import { CommonModule } from '@angular/common';
 import { PIPES } from '../../pipes';
 import { FormModel } from './form.model';
@@ -103,7 +78,7 @@ export class NgxSmartFormComponent implements ReactiveFormComponentInterface, Af
   private subscriptions: Subscription[] = [];
   private changeSubscription: Subscription | null = null;
 
-  public constructor(protected readonly model: FormModel<FormConfigInterface>, private cdRef: ChangeDetectorRef | null, @Inject(HTTP_REQUEST_CLIENT) @ngOptional() private client?: RequestClient) {
+  public constructor(protected readonly model: FormModel<FormConfigInterface>, private cdRef: ChangeDetectorRef | null, @Inject(HTTP_REQUEST_CLIENT) @ngOptional() private client: RequestClient | null) {
     const subscription = this.model.detectChanges$.subscribe(() => this.cdRef?.detectChanges());
     this.subscriptions.push(subscription);
   }
@@ -198,7 +173,7 @@ export class NgxSmartFormComponent implements ReactiveFormComponentInterface, Af
     }
 
     const errors = collectErrors(this.formGroup);
-    
+
     if (!this.model.isValid() && errors.length > 0) {
       return;
     }
@@ -224,14 +199,13 @@ export class NgxSmartFormComponent implements ReactiveFormComponentInterface, Af
 
   setComponentForm(value: FormConfigInterface): void {
     if (value) {
-      const controls = (value.controlConfigs ?? []).map((current) => ({
+      const controls = (value.inputs ?? []).map((current) => ({
         ...current,
         containerClass: current.containerClass ?? 'input-col-md-12',
         isRepeatable: current.isRepeatable ?? false,
       }));
 
-      const form = { ...value, controlConfigs: controls };
-      this.updateModel(form, this.formGroup);
+      this.updateModel({ ...value, inputs: controls }, this.formGroup);
     }
   }
 
@@ -244,7 +218,8 @@ export class NgxSmartFormComponent implements ReactiveFormComponentInterface, Af
     this.model.reset();
   }
 
-  setControlConfig(config?: InputConfigInterface, name?: string) {
+
+  setInput(config?: InputConfigInterface, name?: string) {
     if (!this.form) {
       return;
     }
@@ -253,15 +228,20 @@ export class NgxSmartFormComponent implements ReactiveFormComponentInterface, Af
       return;
     }
     name = name ?? config.name;
-    const { controlConfigs: inputs } = this.form ?? {};
+    const { inputs } = this.form ?? {};
     const index = inputs?.findIndex((current) => current.name === name);
     if (!index) {
       return;
     }
 
     inputs?.splice(index, 1, config);
-    const form = { ...this.form, controlConfigs: inputs };
+    const form = { ...this.form, inputs };
     this.updateModel(form, this.formGroup);
+    
+  }
+
+  setControlConfig(config?: InputConfigInterface, name?: string) {
+    this.setInput(config, name);
   }
 
   ngOnDestroy(): void {

@@ -4,10 +4,11 @@ The `ngx-clr-form-control` library provide angular UI component for rendering in
 
 ## Dependencies
 
-| @azlabsjs/ngx-clr-form-control | @azlabsjs/smart-form-core | @azlabsjs/ngx-intl-tel-input | @azlabsjs/ngx-options-input | @azlabsjs/ngx-file-input | Angular |
-| ------------------------------ | ------------------------- | ---------------------------- | --------------------------- | ------------------------ | ------- |
-| ^0.15.x                        | ^0.2.0                    | ^0.15.x                      | ^0.15.x                     | ^0.15.x                  | ^15.0   |
-| ^0.17.x                        | ^0.2.0                    | ^0.17.x                      | ^0.17.x                     | ^0.17.x                  | ^17.0   |
+| @azlabsjs/ngx-clr-form-control | @azlabsjs/smart-form-core | @azlabsjs/ngx-intl-tel-input | @azlabsjs/ngx-options-input | @azlabsjs/ngx-file-input | Angular           |
+| ------------------------------ | ------------------------- | ---------------------------- | --------------------------- | ------------------------ | ------------------|
+| ^0.15.x                        | ^0.2.0                    | ^0.15.x                      | ^0.15.x                     | ^0.15.x                  | ^15.0             |
+| ^0.17.x                        | ^0.2.0                    | ^0.17.x                      | ^0.17.x                     | ^0.17.x                  | ^17.0             |
+| ^0.18.x                        | ^0.3.0                    | ^0.18.x                      | ^0.18.x                     | ^0.18.x                  | >=21.0 | < 23.0   |
 
 ## Installation
 

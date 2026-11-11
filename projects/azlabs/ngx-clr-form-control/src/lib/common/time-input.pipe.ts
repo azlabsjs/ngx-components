@@ -1,8 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {
-  InputConfigInterface,
-  TimeInput,
-} from '@azlabsjs/smart-form-core';
+import { InputConfigInterface, TimeInput } from '@azlabsjs/smart-form-core';
 
 @Pipe({
   standalone: true,

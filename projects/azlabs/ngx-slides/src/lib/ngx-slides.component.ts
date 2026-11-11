@@ -1,15 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  Input,
-  ContentChild,
-  TemplateRef,
-  ChangeDetectionStrategy,
-  inject,
-  ChangeDetectorRef,
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, ContentChild, TemplateRef, ChangeDetectionStrategy, inject, signal as createSignal } from '@angular/core';
 import { interval, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { SLIDES, Slide } from './types';
@@ -28,7 +18,7 @@ type StateType = {
   imports: [CommonModule],
   selector: 'ngx-slides',
   template: `
-    @if (state) {
+    @if (signal(); as state) {
       <div class="carousel">
         @for (slide of state.slides; track slide; let i = $index) {
           @if (i === state.current) {
@@ -39,24 +29,14 @@ type StateType = {
             </div>
           }
         }
-        <ng-container
-        *ngTemplateOutlet="
-          previousRef ?? prevButton;
-          context: { $implicit: previous.bind(this) }
-        "
-        ></ng-container>
-        <ng-container
-        *ngTemplateOutlet="
-          nextRef ?? nextButton;
-          context: { $implicit: next.bind(this) }
-        "
-        ></ng-container>
-        <ng-template #prevButton let-click>
+        <ng-container *ngTemplateOutlet="previousRef ?? _previous; context: { $implicit: previous.bind(this) }"></ng-container>
+        <ng-container *ngTemplateOutlet="nextRef ?? _next; context: { $implicit: next.bind(this) }"></ng-container>
+        <ng-template #_previous let-click>
           <button class="control prev" (click)="click()">
             <span class="arrow left"></span>
           </button>
         </ng-template>
-        <ng-template #nextButton let-click>
+        <ng-template #_next let-click>
           <button class="control next" (click)="click()">
             <span class="arrow right"></span>
           </button>
@@ -100,43 +80,35 @@ type StateType = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NgxSlidesComponent implements OnInit, OnDestroy {
-  //#region Component properties
   private _destroy$ = new Subject<void>();
-  _state: StateType = {
+  protected signal = createSignal<StateType>({
     timer: 0,
     slides: [],
     current: 0,
     direction: 'right',
-  };
+  });
 
-  get state() {
-    return this._state;
-  }
-  //#endregion Component properties
 
-  //#region Component inputs
   @Input({ alias: 'timer' }) timer: number = 1000;
   @Input({ alias: 'slides' }) setSlides(values: Slide[]) {
-    this.setState((state) => ({ ...state, slides: values }));
+    this.signal.update((state) => ({ ...state, slides: values }));
   }
   @Input({ alias: 'current' }) setCurrent(value: number) {
-    this.setState((state) => ({ ...state, current: value }));
+    this.signal.update((state) => ({ ...state, current: value }));
   }
   @Input() autostart = false;
   @ContentChild('ngxSlide') templateRef!: TemplateRef<any>;
-  @ContentChild('next') nextRef!: TemplateRef<any>;
-  @ContentChild('previous') previousRef!: TemplateRef<any>;
-  //#endregion Component inputs
+  @ContentChild('next') nextRef!: TemplateRef<any> | null | undefined;
+  @ContentChild('previous') previousRef!: TemplateRef<any> | null | undefined;
 
-  /** @description slides component class constructor */
-  constructor(private cdRef: ChangeDetectorRef) {
+  constructor() {
     inject(SLIDES)?.pipe(
       takeUntil(this._destroy$),
       tap(({ timer, slides: _slides }) => {
-        const { slides } = this._state;
+        const { slides } = this.signal();
         if (slides.length <= 0) {
           this.timer = timer;
-          this.setState((state) => ({ ...state, slides: _slides }));
+          this.signal.update((state) => ({ ...state, slides: _slides }));
         }
       })
     );
@@ -158,24 +130,16 @@ export class NgxSlidesComponent implements OnInit, OnDestroy {
   }
 
   previous() {
-    const { slides, current } = this._state;
+    const { slides, current } = this.signal();
     const previous = current - 1;
-    this.setState((state) => ({
-      ...state,
-      direction: 'left',
-      current: previous < 0 ? slides.length - 1 : previous,
-    }));
+    this.signal.update((state) => ({ ...state, direction: 'left', current: previous < 0 ? slides.length - 1 : previous }));
     this.restartLoop();
   }
 
   next() {
-    const { slides, current } = this._state;
+    const { slides, current } = this.signal();
     const next = current + 1;
-    this.setState((state) => ({
-      ...state,
-      direction: 'right',
-      current: next === slides.length ? 0 : next,
-    }));
+    this.signal.update((state) => ({ ...state, direction: 'right', current: next === slides.length ? 0 : next }));
     this.restartLoop();
   }
 
@@ -186,11 +150,5 @@ export class NgxSlidesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this._destroy$.next();
-  }
-
-  /** @description change component local state and request ui update */
-  setState(state: (s: StateType) => StateType) {
-    this._state = state(this._state);
-    this.cdRef?.markForCheck();
   }
 }

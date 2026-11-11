@@ -1,21 +1,9 @@
-import {
-  AfterContentInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Inject,
-  Input,
-  OnDestroy,
-  Output,
-  TemplateRef,
-  ViewChild,
-} from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Inject, Input, OnDestroy, Output, TemplateRef, ViewChild, } from '@angular/core';
 import { AbstractControl, FormArray } from '@angular/forms';
 import { InputConfigInterface } from '@azlabsjs/smart-form-core';
 import { Subject } from 'rxjs';
 import { distinctUntilChanged, takeUntil, tap } from 'rxjs/operators';
-import { AngularReactiveFormBuilderBridge } from '../../types';
+import { ReactiveFormBuilder } from '../../types';
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
 import { CommonModule } from '@angular/common';
 import { BUTTON_DIRECTIVES } from '../buttons';
@@ -67,7 +55,7 @@ export class NgxSmartFormControlArrayComponent implements AfterContentInit, OnDe
   private destroy$ = new Subject<void>();
   protected capacity = 0;
 
-  constructor(private cdRef: ChangeDetectorRef | null, @Inject(ANGULAR_REACTIVE_FORM_BRIDGE) private builder: AngularReactiveFormBuilderBridge) { }
+  constructor(private cdRef: ChangeDetectorRef | null, @Inject(ANGULAR_REACTIVE_FORM_BRIDGE) private builder: ReactiveFormBuilder) { }
 
   ngAfterContentInit(): void {
     if (this.array) {

@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Inject, Input, LOCALE_ID, OnDestroy, Output, TemplateRef } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
 import { DateInput } from '@azlabsjs/smart-form-core';
-import { NgxCommonModule } from '../common';
+import { SHARED_DIRECTIVES, SHARED_PIPES } from '../common';
 import { distinctUntilChanged, Subscription } from 'rxjs';
 import { JSDate } from '@azlabsjs/js-datetime';
 
 @Component({
   standalone: true,
-  imports: [NgxCommonModule],
+  imports: [...SHARED_DIRECTIVES, ...SHARED_PIPES],
   selector: 'ngx-date-input',
   templateUrl: './ngx-date-input.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

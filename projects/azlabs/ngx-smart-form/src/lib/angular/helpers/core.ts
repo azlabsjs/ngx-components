@@ -1,22 +1,9 @@
-import {
-  AbstractControl,
-  FormGroup,
-  FormArray,
-  ValidationErrors,
-} from '@angular/forms';
-import {
-  InputConfigInterface,
-  InputGroup,
-  Conditional,
-  OptionsInput,
-  RequiredIfConstraint,
-  DisabledIfConstraint,
-  OptionsConfig,
-} from '@azlabsjs/smart-form-core';
+import { AbstractControl, FormGroup, FormArray, ValidationErrors } from '@angular/forms';
+import { InputConfigInterface, InputGroup, Conditional, OptionsInput, RequiredIfConstraint, DisabledIfConstraint, OptionsConfig } from '@azlabsjs/smart-form-core';
 import { deepEqual, isNumber } from '@azlabsjs/utilities';
-import { AngularReactiveFormBuilderBridge, Condition, ComputedInputValueConfigType } from '../types';
+import { ReactiveFormBuilder, Condition, ComputedInputValueConfigType } from '../types';
 import { cloneAbstractControl } from './clone';
-import { Observable, Subject, Subscription, tap } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { ClauseFn, CONDITION_PROPERTIES, ConditionProperty } from './types';
 import { JSDate } from '@azlabsjs/js-datetime';
 
@@ -42,16 +29,12 @@ function after(haystack: string, char: string) {
 
 /** @internal */
 function isinputgroup(input: InputConfigInterface): input is InputGroup {
-  return (typeof input === 'object' && input !== null && ((input as InputGroup).children ?? []).length > 0);
+  return (typeof input === 'object' && input !== null && ((input as InputGroup).inputs ?? []).length > 0);
 }
 
 /** @internal */
 function isoptionsinput(config: InputConfigInterface): config is Required<OptionsInput> {
-  return (
-    'optionsConfig' in config &&
-    typeof (config as OptionsInput).optionsConfig === 'object' &&
-    (config as OptionsInput).optionsConfig !== null
-  );
+  return ('fetch' in config && typeof (config as OptionsInput).fetch === 'object' && (config as OptionsInput).fetch !== null);
 }
 
 /** @internal */
@@ -69,8 +52,8 @@ function isrepeatableinput(input: InputConfigInterface) {
 }
 
 function getinputgroupinputs(input: InputGroup) {
-  const { children } = input;
-  return Array.isArray(children) ? children : [children].filter((current) => typeof current !== 'undefined' && current !== null);
+  const { inputs } = input;
+  return Array.isArray(inputs) ? inputs : [inputs].filter((current) => typeof current !== 'undefined' && current !== null);
 }
 
 /** @internal */
@@ -103,7 +86,7 @@ export function findcontrol<T extends AbstractControl | null>(g: FormGroup, key:
 }
 
 /** @internal set value for formgroup form controls */
-export function setFormValue(builder: AngularReactiveFormBuilderBridge, formgroup: FormGroup, values: { [index: string]: any }, inputs?: InputConfigInterface[] | InputConfigInterface) {
+export function setFormValue(builder: ReactiveFormBuilder, formgroup: FormGroup, values: { [index: string]: any }, inputs?: InputConfigInterface[] | InputConfigInterface) {
   const fn = createSetValue(builder);
   for (const [key, value] of Object.entries(values)) {
     const input = Array.isArray(inputs) ? inputs?.find((config) => config.name === key) : inputs;
@@ -129,7 +112,7 @@ function safeSetValue<T = unknown>(a: Optional<AbstractControl>, value: T) { // 
 }
 
 /** @internal */
-export function setFormGroupValue(formgroup: FormGroup, values: { [index: string]: any }, inputs: InputConfigInterface[], builder: AngularReactiveFormBuilderBridge) {
+export function setFormGroupValue(formgroup: FormGroup, values: { [index: string]: any }, inputs: InputConfigInterface[], builder: ReactiveFormBuilder) {
 
   const d = inputs.reduce((carry, current) => {
     carry[current.name] = current;
@@ -173,7 +156,7 @@ export function setFormGroupValue(formgroup: FormGroup, values: { [index: string
 
 
 /** @internal */
-function setFormArrayValue(a: Optional<FormArray>, parent: FormGroup, key: string, config: InputConfigInterface, value: unknown, builder: AngularReactiveFormBuilderBridge) {
+function setFormArrayValue(a: Optional<FormArray>, parent: FormGroup, key: string, config: InputConfigInterface, value: unknown, builder: ReactiveFormBuilder) {
   const items = Array.isArray(value) ? value : [];
   const array = a ?? new FormArray<any>([]);
   const values = array.getRawValue();
@@ -230,7 +213,7 @@ function setFormArrayValue(a: Optional<FormArray>, parent: FormGroup, key: strin
 }
 
 /** @description creates a factory function that set the  */
-export function createSetValue(builder: AngularReactiveFormBuilderBridge) {
+export function createSetValue(builder: ReactiveFormBuilder) {
   return (formgroup: FormGroup<any>, key: string, value: any, config: InputConfigInterface) => {
     const result = formgroup.get(key);
     if (result && value) {
@@ -248,13 +231,7 @@ export function createSetValue(builder: AngularReactiveFormBuilderBridge) {
 
 function hasleaf(input: InputConfigInterface): input is InputGroup {
   const x = input as InputGroup;
-  return (
-    typeof x === 'object' &&
-    'children' in x &&
-    x !== null &&
-    x.children &&
-    x.children.length > 0
-  );
+  return (typeof x === 'object' && 'inputs' in x && x !== null && x.inputs && x.inputs.length > 0);
 }
 
 // @internal
@@ -270,18 +247,13 @@ function findconditions(inputs: InputConfigInterface[], prop: ConditionProperty)
   function search(property: ConditionProperty, values: InputConfigInterface[], parent?: string, repeatable: boolean = false) {
     for (const current of values) {
       if (hasleaf(current)) {
-        search(property, current.children, parent ? `${parent}.${current.name}` : current.name, current.isRepeatable ?? false);
+        search(property, current.inputs, parent ? `${parent}.${current.name}` : current.name, current.isRepeatable ?? false);
       }
 
       let cond: Conditional | Conditional[] | undefined | null;
       if (current.constraints) {
         const { constraints } = current;
         cond = isconditional(property, constraints) ? (constraints[property] as Conditional) : undefined;
-      }
-
-      if (!cond) {
-        const { [property]: condition } = current;
-        cond = condition;
       }
 
       if (cond) {
@@ -676,7 +648,7 @@ export function pickconfig(
       result = null;
       break;
     }
-    items = [...((input as InputGroup).children ?? [])];
+    items = [...((input as InputGroup).inputs ?? [])];
     result = input;
   }
 
@@ -904,7 +876,7 @@ export function createComputableDepencies(items: InputConfigInterface[], aggrega
   const decorated = (values: InputConfigInterface[], parent?: string) => {
     for (const input of values) {
       if (hasleaf(input)) {
-        decorated(input.children, parent ? `${!!input.isRepeatable ? `${parent}.${input.name}.*` : `${parent}.${input.name}`}` : `${!!input.isRepeatable ? `${input.name}.*` : `${input.name}`}`);
+        decorated(input.inputs, parent ? `${!!input.isRepeatable ? `${parent}.${input.name}.*` : `${parent}.${input.name}`}` : `${!!input.isRepeatable ? `${input.name}.*` : `${input.name}`}`);
         continue;
       }
 
@@ -1154,12 +1126,12 @@ function createRefetchObservable(formgroup: FormGroup | FormArray, refetch: Opti
 export function withRefetchObservable(inputs: InputConfigInterface[], formgroup: FormGroup, parent?: string): InputConfigInterface[] {
   return inputs.map(item => {
     if (isinputgroup(item) && !!!item.isRepeatable) {
-      return { ...item, children: withRefetchObservable(item.children, formgroup) } as InputGroup;
+      return { ...item, inputs: withRefetchObservable(item.inputs, formgroup) } as InputGroup;
     }
 
-    if (isoptionsinput(item) && 'refetch' in item.optionsConfig && Array.isArray(item.optionsConfig['refetch'])) {
-      const { optionsConfig: { refetch } } = item;
-      return { ...item, optionsConfig: { ...item.optionsConfig, refetch: createRefetchObservable(formgroup, refetch, parent) } };
+    if (isoptionsinput(item) && 'refetch' in item.fetch && Array.isArray(item.fetch['refetch'])) {
+      const { fetch: { refetch } } = item;
+      return { ...item, fetch: { ...item.fetch, refetch: createRefetchObservable(formgroup, refetch, parent) } };
     }
 
     return item;

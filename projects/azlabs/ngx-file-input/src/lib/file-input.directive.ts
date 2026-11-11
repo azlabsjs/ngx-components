@@ -1,16 +1,5 @@
 
-import {
-  AfterContentInit,
-  Directive,
-  ElementRef,
-  EventEmitter,
-  HostListener,
-  Inject,
-  Input,
-  OnDestroy,
-  Output,
-  DOCUMENT
-} from '@angular/core';
+import { AfterContentInit, Directive, ElementRef, EventEmitter, HostListener, Inject, Input, OnDestroy, Output, DOCUMENT } from '@angular/core';
 import { EventType } from './types';
 
 @Directive({

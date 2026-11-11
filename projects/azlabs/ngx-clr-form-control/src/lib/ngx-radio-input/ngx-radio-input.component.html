@@ -1,9 +1,11 @@
-@if (state && state.config) {
-  <div fetchOptions (optionsChange)="onOptionsChange($event)" [loaded]="state.loaded" [config]="state.config.optionsConfig" [name]="state.config.name">
-    @if (state.config.options; as options) {
-      @if (options!.length > 0) {
-        <ng-container *ngTemplateOutlet="input; context: { options: options, config: state.config, control }"></ng-container>
+@if (signal(); as state) {
+  @if (state && state.config) {
+    <div fetchOptions (optionsChange)="onOptionsChange($event)" [loaded]="state.loaded" [config]="state.config.fetch" [name]="state.config.name">
+      @if (state.config.options; as options) {
+        @if (options!.length > 0) {
+          <ng-container *ngTemplateOutlet="input; context: { options: options, config: state.config, control }"></ng-container>
+        }
       }
-    }
-  </div>
+    </div>
+  }
 }

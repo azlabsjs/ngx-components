@@ -94,7 +94,6 @@ export class AppComponent implements OnInit {
   formControl = new FormControl<string | undefined>(undefined);
   input: FileInput = {
     uploadUrl: 'https://storagev2.lik.tg/api/storage/object/upload',
-    pattern: 'image/*',
     multiple: false,
     maxFileSize: 40,
     autoupload: true,
@@ -105,6 +104,7 @@ export class AppComponent implements OnInit {
     classes: 'clr-input',
     isRepeatable: false,
     containerClass: 'clr-col-sm-12',
+    constraints: { pattern: { fn: 'image/*', } }
   };
   //
   _state$ = new BehaviorSubject<FormConfigInterface | undefined>(undefined);
