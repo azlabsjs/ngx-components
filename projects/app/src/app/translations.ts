@@ -1,15 +1,7 @@
 import { Injector } from '@angular/core';
 import { JSObject } from '@azlabsjs/js-object';
 import { TranslateService } from '@ngx-translate/core';
-import {
-  Observable,
-  Subscriber,
-  Subscription,
-  filter,
-  map,
-  mergeMap,
-  take,
-} from 'rxjs';
+import { Observable, Subscriber, Subscription, filter, map, mergeMap, take } from 'rxjs';
 
 export function useTranslationsFactory<T extends { [k: string]: any }>() {
   // creates a singleton observable in the context of the factory function

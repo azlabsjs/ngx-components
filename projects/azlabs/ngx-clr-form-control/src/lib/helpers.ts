@@ -2,7 +2,7 @@ import { Injector } from '@angular/core';
 import { HTTPRequest, HTTPResponse, NextFunction } from '@azlabsjs/requests';
 
 /**
- * Checks if a given value is a promise value
+ * checks if a given value is a promise value
  *
  * @internal
  */
@@ -18,12 +18,7 @@ function isPromise<T>(value: unknown): value is Promise<T> {
  * Provide a default interceptor function that resolves selectable values using `data` keyword if it exist
  * in the response body or return the entire response body if the data object does not exists
  */
-export function useOptionsInterceptor(
-  cloneReq?: (
-    request: HTTPRequest,
-    injector: Injector
-  ) => HTTPRequest | Promise<HTTPRequest>
-) {
+export function useOptionsInterceptor(cloneReq?: (request: HTTPRequest, injector: Injector) => HTTPRequest | Promise<HTTPRequest>) {
   return (injector: Injector) => {
     // Replace the interceptor function by using the injector
     return async (

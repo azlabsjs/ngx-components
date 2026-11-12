@@ -34,14 +34,14 @@ export interface FormsClient {
 // export type FormsLoader = BaseFormsLoader;
 
 /**  For form object query efficiency, object are loaded and managed by the cache provider */
-export interface FormsCollection {
+export interface FormsCollection<T> {
 
   /** get form from cache using form id property value */
-  get(id: string | number): Observable<FormConfigInterface>;
+  get(id: string | number): Observable<T>;
 
   /** provides predefined dynamic forms loader implementation */
-  init( endpoint: string, options?: { [index: string]: any } ): Promise<unknown|void>;
+  init(options?: { [index: string]: any } ): Promise<unknown|void>;
 }
 
 /** @internal type definition for load form request handler function */
-export type LoadFormsRequestHandler = (path: string, options?: Record<string, unknown>) => Observable<Record<string, unknown>[]>;
+export type LoadFormsRequestHandler = (options?: Record<string, unknown>) => Observable<Record<string, unknown>[]> | Promise<Record<string, unknown>[]>;

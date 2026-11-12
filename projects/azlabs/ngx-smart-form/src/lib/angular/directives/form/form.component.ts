@@ -199,12 +199,7 @@ export class NgxSmartFormComponent implements ReactiveFormComponentInterface, Af
 
   setComponentForm(value: FormConfigInterface): void {
     if (value) {
-      const controls = (value.inputs ?? []).map((current) => ({
-        ...current,
-        containerClass: current.containerClass ?? 'input-col-md-12',
-        isRepeatable: current.isRepeatable ?? false,
-      }));
-
+      const controls = (value.inputs ?? []).map((current) => ({...current, containerClass: current.containerClass ?? 'input-col-md-12', isRepeatable: current.isRepeatable ?? false }));
       this.updateModel({ ...value, inputs: controls }, this.formGroup);
     }
   }

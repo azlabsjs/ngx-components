@@ -1,16 +1,16 @@
 import { Injector, Provider, inject } from '@angular/core';
-import { InterceptorFactory, LoadFormsRequestHandler } from './types';
+import { FormsCollection, LoadFormsRequestHandler } from './types';
 import { API_HOST, FORMS_LOADER, FORMS_COLLECTION } from './tokens';
 import { LocationStrategy, PlatformLocation } from '@angular/common';
 import { useHTTPFormLoader } from '../http/factories';
-import { BehaviorSubject, lastValueFrom, map, Observable } from 'rxjs';
+import { BehaviorSubject, map } from 'rxjs';
 import { FormConfigInterface, FormsLoader } from '@azlabsjs/smart-form-core';
 
 /** @deprecated use `{provideFormsCollection}` with `useHTTPFormLoader` as form loader or a custom forms loader implementation  */
-export function provideFormsLoader(handler?: LoadFormsRequestHandler, interceptor?: (items: { [prop: string]: unknown }[]) => FormConfigInterface[]) {
+export function provideFormsLoader(url: string, handler?: LoadFormsRequestHandler, interceptor?: (items: { [prop: string]: unknown }[]) => FormConfigInterface[]) {
   return {
     provide: FORMS_LOADER,
-    useFactory: (location: LocationStrategy, platform: PlatformLocation) => useHTTPFormLoader(location, platform, handler, interceptor),
+    useFactory: (location: LocationStrategy, platform: PlatformLocation) => useHTTPFormLoader(location, platform, { url, handler, interceptor }),
     deps: [LocationStrategy, PlatformLocation],
   } as Provider;
 }
@@ -27,27 +27,24 @@ export function provideFormsCollection(loader?: FormsLoader | ((injector: Inject
 
       return {
         get(id: string | number) {
-          return cache.asObservable().pipe(map((state) => state.find((x) => x.id && (id.toString() === x.id.toString())) as FormConfigInterface));
+          return cache.asObservable().pipe(map((state) => state.find((x) => x.id && (id.toString() === x.id.toString()))));
         },
 
-        async init(endpoint: string, options: { [index: string]: any } = {}) {
+        async init(options: { [index: string]: any } = {}) {
           const loader = typeof formsLoader === 'function' ? formsLoader(injector) : formsLoader;
           if (!loader) {
             return;
           }
 
-          const values = await lastValueFrom(loader.load(endpoint, options) as Observable<FormConfigInterface[]>);
-          cache.next(values);
+          cache.next(await loader.load(options));
         }
-      }
+
+      } as FormsCollection<FormConfigInterface>
     }
   } as Provider;
 }
 
 /** @description provides forms endpoints host url */
 export function provideFormsHost(host?: string) {
-  return {
-    provide: API_HOST,
-    useValue: host,
-  } as Provider;
+  return { provide: API_HOST, useValue: host } as Provider;
 }

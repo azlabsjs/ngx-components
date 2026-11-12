@@ -14,7 +14,7 @@ export const ANGULAR_REACTIVE_FORM_BRIDGE = new InjectionToken<ReactiveFormBuild
 export const API_HOST = new InjectionToken<string>('Forms server origin configuration');
 
 /** forms collection class injection token */
-export const FORMS_COLLECTION = new InjectionToken<FormsCollection>('forms collection class injection token');
+export const FORMS_COLLECTION = new InjectionToken<FormsCollection<FormConfigInterface>>('forms collection class injection token');
 
 /** @deprecated Use `{FORMS_COLLECTION}` token instead */
 export const FORM_CLIENT = new InjectionToken<FormsClient>('client api for loading forms from provided collection', {

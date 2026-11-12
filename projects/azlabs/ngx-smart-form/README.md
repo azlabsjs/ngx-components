@@ -367,7 +367,7 @@ export class AppModule {
 <!-- HTML code below uses the ngx-clr-form-control component for previewing input elements -->
 <ngx-smart-form [template]="controlTemplate">
   <ng-template #controlTemplate let-config="value" let-control="control">
-    <ngx-clr-form-control [class]="'ngx-smart-form-control ' + config.containerClass" [hidden]="config.hidden" [control]="control" [inputConfig]="config"></ngx-clr-form-control>
+    <ngx-clr-form-control [class]="'ngx-smart-form-control ' + config.containerClass ?? ''" [hidden]="config.hidden" [control]="control" [inputConfig]="config"></ngx-clr-form-control>
   </ng-template>
 </ngx-smart-form>
 ```

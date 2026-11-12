@@ -27,7 +27,7 @@
     "@azlabsjs/js-object": "^0.2.10",
     "@azlabsjs/requests": ">=0.2.0 | <0.4.0",
     "@azlabsjs/rx-query": "^0.3.0",
-    "@azlabsjs/smart-form-core": "^0.3.2",
+    "@azlabsjs/smart-form-core": "^0.3.5",
     "@azlabsjs/uploader": ">=0.2.0 | <0.4.0",
     "@azlabsjs/utilities": "^0.2.10",
     "@clr/angular": "^18.4.0",

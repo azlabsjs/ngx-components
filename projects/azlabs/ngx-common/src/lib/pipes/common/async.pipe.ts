@@ -1,12 +1,4 @@
-import {
-  Injectable,
-  Injector,
-  Optional,
-  Pipe,
-  PipeTransform,
-  ɵisPromise,
-  ɵisSubscribable,
-} from '@angular/core';
+import { Injectable, Injector, Optional, Pipe, PipeTransform, ɵisPromise, ɵisSubscribable } from '@angular/core';
 import { from, isObservable, of } from 'rxjs';
 
 

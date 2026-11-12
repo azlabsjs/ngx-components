@@ -3,8 +3,7 @@ import { Component, signal as createSignal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CLR_FORM_CONTROL_DIRECTIVES, NgxInputErrorComponent } from '@azlabsjs/ngx-clr-form-control';
 import { FORM_DIRECTIVES } from '@azlabsjs/ngx-smart-form';
-// import { FormConfigInterface, InputConfigInterface, OptionsInput, OptionsInputConfigInterface } from '@azlabsjs/smart-form-core';
-import { ClrIconModule } from '@clr/angular';
+import { ClrIcon } from '@clr/angular/icon';
 import { COMMON_PIPES } from '@azlabsjs/ngx-common';
 import { RequiredPipe } from '../pipes';
 import { createFormConfig } from './config';
@@ -24,7 +23,7 @@ function subtractYears(date: string | number | Date, years: number) {
     FormsModule,
     ReactiveFormsModule,
     NgxInputErrorComponent,
-    ClrIconModule,
+    ClrIcon,
     RequiredPipe,
     CLR_FORM_CONTROL_DIRECTIVES,
     ...FORM_DIRECTIVES,

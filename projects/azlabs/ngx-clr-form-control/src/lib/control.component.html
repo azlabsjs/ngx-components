@@ -10,7 +10,7 @@
             [autoupload]="config.autoupload ?? false"
             [upload-as]="config.uploadAs"
             [placeholder]="config.placeholder"
-            [class]="config.classes"
+            [class]="config.classes ?? ''"
             [multiple]="config.multiple"
             [description]="config.description"
             [max-file-size]="config.maxFileSize"
@@ -39,7 +39,7 @@
       @case (inputTypes.HTML_INPUT) {
         <ng-container *ngTemplateOutlet="textview ?? _textview; context: { $implicit: config, value: config.value, config: config }"></ng-container>
         <ng-template #_textview let-config let-value="value">
-          <div [ngClass]="config.classes" [innerHTML]="value | trustHtml"></div>
+          <div [ngClass]="config.classes ?? ''" [innerHTML]="value | trustHtml"></div>
         </ng-template>
       }
 
@@ -83,7 +83,7 @@
             }
             <ngx-phone-input [input]="phoneinput" [error]="err" [control]="formControl" [config]="config" [describe]="describe" [class]="'clr-input'" [countries]="countries">
               <ng-template #phoneinput let-config="config" let-onBlur="onBlur" let-onFocus="onFocus" let-keypress="keypress" let-selected="selected" let-change="change" let-required="required" let-disabled="disabled" let-value="value">
-                <input noAutoComplete [value]="value" [required]="required" [class]="'effect-24 ' + config!.classes" (blur)="onBlur($event)" (focus)="onFocus($event)" (keypress)="keypress($event)" (change)="change($event)" (input)="change($event)" [disabled]="disabled" placeholder="{{ selected?.placeHolder }}" type="tel" />
+                <input noAutoComplete [value]="value" [required]="required" [class]="'effect-24 ' + (config!.classes ?? '')" (blur)="onBlur($event)" (focus)="onFocus($event)" (keypress)="keypress($event)" (change)="change($event)" (input)="change($event)" [disabled]="disabled" placeholder="{{ selected?.placeHolder }}" type="tel" />
               </ng-template>
               <ng-container *ngTemplateOutlet="description; context: { text: config.description } "></ng-container>
               <ng-template #err let-control>
@@ -134,7 +134,7 @@
                     }
                   </label>
                 }
-                <input noAutoComplete (keyup)="onKeyUp($event, config!.name)" (keydown)="onKeyDown($event, config!.name)" (keypress)="onKeyPress($event, config!.name)" (blur)="onBlur($event, config!.name)" type="time" [max]="config!.max || max" [min]="config!.min ? config!.min : 0" [class]="config!.classes" [formControl]="control" placeholder="{{config!.placeholder ? config!.placeholder : ''}}" />
+                <input noAutoComplete (keyup)="onKeyUp($event, config!.name)" (keydown)="onKeyDown($event, config!.name)" (keypress)="onKeyPress($event, config!.name)" (blur)="onBlur($event, config!.name)" type="time" [max]="config!.max || max" [min]="config!.min ? config!.min : 0" [class]="config!.classes ?? ''" [formControl]="control" placeholder="{{config!.placeholder ? config!.placeholder : ''}}" />
                 
                 <ng-container *ngTemplateOutlet="description; context: { text: config.description } "></ng-container>
                 <ng-container *ngTemplateOutlet="error ?? _error; context: { touched: formControl.touched, $implicit: formControl.errors, errors: formControl.errors }"></ng-container>
@@ -165,7 +165,7 @@
                       (keydown)="onKeyDown($event, config!.name)"
                       (keypress)="onKeyPress($event, config!.name)"
                       (blur)="onBlur($event, config!.name)"
-                      [class]="config!.classes"
+                      [class]="config!.classes ?? ''"
                       [formControl]="control"
                       placeholder="{{config!.placeholder ? config!.placeholder : ''}}" [rows]="config!.rows"></textarea>
                     <cds-icon class="clr-validate-icon" shape="exclamation-circle"></cds-icon>
@@ -205,7 +205,7 @@
                   type="number"
                   [max]="config!.max || max"
                   [min]="config!.min ? config!.min : 0"
-                  [class]="config!.classes"
+                  [class]="config!.classes ?? ''"
                   [formControl]="control"
                   placeholder="{{config!.placeholder ? config!.placeholder : ''}}" />
 
@@ -294,7 +294,7 @@
                   [type]="!state.showPassword ? 'password' : 'text'"
                   [maxLength]="config!.maxLength ? config!.maxLength : defaultMaxLength"
                   [minLength]="config!.minLength ? config!.minLength : 0"
-                  [class]="config!.classes + ' password-input'"
+                  [class]="(config!.classes ?? '') + ' password-input'"
                   [formControl]="control"
                   placeholder="{{ config!.placeholder ? config!.placeholder : '' }}" />
                   @if (state.showPassword) {
@@ -341,7 +341,7 @@
             [type]="config!.type === inputTypes.EMAIL_INPUT ? 'email' : 'text'"
             [maxLength]="config!.maxLength ? config!.maxLength : maxLength"
             [minLength]="config!.minLength ? config!.minLength : 0"
-            [class]="'clr-input ' + (config!.classes || '')"
+            [class]="'clr-input ' + (config!.classes ?? '')"
             [formControl]="control"
             placeholder="{{ config!.placeholder ? config!.placeholder : '' }}" />
 

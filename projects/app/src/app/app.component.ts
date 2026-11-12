@@ -1,26 +1,10 @@
 import { AsyncPipe, CurrencyPipe, DecimalPipe, JsonPipe, LowerCasePipe, PercentPipe, SlicePipe, UpperCasePipe } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  Inject,
-  OnInit,
-  Optional,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, Optional, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { GridColumnType, GridConfigType } from '@azlabsjs/ngx-clr-smart-grid';
 import { COMMON_PIPES, createPipeTransform } from '@azlabsjs/ngx-common';
 import { createSlide } from '@azlabsjs/ngx-slides';
-import {
-  FormsClient,
-  FORM_CLIENT,
-  HTTP_REQUEST_CLIENT,
-  RequestClient,
-  existsValidator,
-  ReactiveFormDirectiveInterface,
-  ModalDirective,
-} from '@azlabsjs/ngx-smart-form';
+import { FormsClient, FORM_CLIENT, HTTP_REQUEST_CLIENT, RequestClient, existsValidator, ReactiveFormDirectiveInterface, ModalDirective } from '@azlabsjs/ngx-smart-form';
 import {
   FileInput,
   FormConfigInterface,

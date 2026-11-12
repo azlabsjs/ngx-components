@@ -12,6 +12,7 @@ export class HiddenCssClassPipe implements PipeTransform {
     if (hidden) {
       values.push('hidden');
     }
+    
     return values.join(' ');
   }
 }
@@ -22,8 +23,8 @@ export class HiddenCssClassPipe implements PipeTransform {
   name: 'containercssclass',
 })
 export class ContainerCssClassPipe implements PipeTransform {
-  transform(nogrid: boolean, value: string) {
-    return nogrid ? 'ngx-form-no-grid' : value;
+  transform(nogrid: boolean, value: string | null | undefined) {
+    return nogrid ? 'ngx-form-no-grid' : value ?? '';
   }
 }
 

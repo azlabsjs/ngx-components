@@ -1,6 +1,6 @@
 import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ValidatorFn, Validators, FormArray } from '@angular/forms';
 import { CustomValidators, equalsValidator, existsValidator, uniqueValidator } from '../validators';
-import { DateInput, NumberInput, TextInput, OptionsInput, InputTypes, InputGroup, InputOption, InputConfigInterface } from '@azlabsjs/smart-form-core';
+import { isRequired, isDateConfig, isNumberConfig, isTextInputConfig, OptionsInput, InputTypes, InputGroup, InputOption, InputConfigInterface, isDisabled } from '@azlabsjs/smart-form-core';
 import { JSDate } from '@azlabsjs/js-datetime';
 import { RequestClient } from '../../http';
 
@@ -15,30 +15,6 @@ function nullIfEmpty<T>(value: T) {
   }
 
   return value as T;
-}
-
-function required(config: InputConfigInterface) {
-  return (!!config.constraints && 'required' in config.constraints && Boolean(config.constraints.required));
-}
-
-function disabled(config: InputConfigInterface) {
-  return (!!config.constraints && 'disabled' in config.constraints && Boolean(config.constraints.disabled));
-}
-
-
-/** @internal */
-function isDateConfig(input: InputConfigInterface): input is DateInput {
-  return input.type === InputTypes.DATE_INPUT;
-}
-
-/** @internal */
-function isNumberConfig(input: InputConfigInterface): input is NumberInput {
-  return input.type === InputTypes.NUMBER_INPUT;
-}
-
-/** @internal */
-function isTextInputConfig(input: InputConfigInterface): input is TextInput {
-  return input.type === InputTypes.TEXT_INPUT || input.type === InputTypes.EMAIL_INPUT || input.type === InputTypes.PASSWORD_INPUT;
 }
 
 /** @description Helper class for generating angular reactive form controls with errors validation */
@@ -64,7 +40,7 @@ export class ComponentReactiveFormHelpers {
       if (typeof config.inputs !== 'undefined' && Array.isArray(config.inputs)) {
         const formgroup = ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(builder, config.inputs, requestClient);
 
-        if (required(input)) {
+        if (isRequired(input)) {
           formgroup.addValidators(Validators.required);
         }
 
@@ -96,7 +72,7 @@ export class ComponentReactiveFormHelpers {
   }
 
   public static buildControl(builder: FormBuilder, config: InputConfigInterface, requestClient?: RequestClient) {
-    const validators = [required(config) ? Validators.required : Validators.nullValidator];
+    const validators = [isRequired(config) ? Validators.required : Validators.nullValidator];
     const asyncValidators: AsyncValidatorFn[] = [];
     let hasEqualsConstraint = false;
     let hasEmailConstraint = false;
@@ -170,10 +146,7 @@ export class ComponentReactiveFormHelpers {
 
     // TODO: Add unsupported constraints
 
-    const control = builder.control({
-      value: config.value,
-      disabled: disabled(config),
-    }, {
+    const control = builder.control({ value: config.value, disabled: isDisabled(config) }, {
       validators: Validators.compose(validators),
       updateOn: asyncValidators.length > 0 || config.type === InputTypes.DATE_INPUT || hasEqualsConstraint || hasEmailConstraint ? 'blur' : 'change',
       asyncValidators,
@@ -185,11 +158,9 @@ export class ComponentReactiveFormHelpers {
 
   public static buildArray(builder: FormBuilder, config: InputConfigInterface) {
     const array = new FormArray<AbstractControl>([]);
-    (config as OptionsInput).options.forEach(
-      (current: InputOption) => array.push(builder.control(current.selected))
-    );
+    (config as OptionsInput).options.forEach((current: InputOption) => array.push(builder.control(current.selected)));
 
-    if (required(config)) {
+    if (isRequired(config)) {
       array.setValidators(Validators.required);
     }
 

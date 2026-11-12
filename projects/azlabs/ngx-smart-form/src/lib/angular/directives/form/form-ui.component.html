@@ -42,7 +42,7 @@
               <ng-container *ngTemplateOutlet="formarray; context: {name: '.' | join : parent : value.name}"></ng-container>
               <ng-template #formarray let-name="name">
                 <ngx-smart-form-array [class.hidden]="(value | ishidden) || (local | inarray : state.detached)"
-                  [detached]="state.detached" [class]="value.classes" [no-grid-layout]="nogridlayout" [formArray]="local"
+                  [detached]="state.detached" [class]="value.classes ?? ''" [no-grid-layout]="nogridlayout" [formArray]="local"
                   [controls]="(value | asInputGroup).inputs || [] | inputConfigArray" [template]="template"
                   [add-button]="addgroup" [name]="value.name" [title]="value.label"
                   [autoupload]="autoupload" [hidden]="(value | ishidden) || (local | inarray : state.detached)"

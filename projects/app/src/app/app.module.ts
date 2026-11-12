@@ -1,55 +1,29 @@
 import { inject, Injector, LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
-import {
-  HttpClient,
-  provideHttpClient as ngProvideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
+import { HttpClient, provideHttpClient as ngProvideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DIRECTIVES } from '@azlabsjs/ngx-clr-smart-grid';
 import { NgxDropzoneModule } from '@azlabsjs/ngx-dropzone';
-import {
-  providePreferredCountries,
-  provideSupportedCountries,
-} from '@azlabsjs/ngx-intl-tel-input';
-import {
-  FORM_DIRECTIVES,
-  provideFormsInitialization,
-  provideFormsLoader,
-  provideHttpClient,
-} from '@azlabsjs/ngx-smart-form';
+import { providePreferredCountries, provideSupportedCountries } from '@azlabsjs/ngx-intl-tel-input';
+import { FORM_DIRECTIVES, provideHttpClient, provideFormsCollection, useHTTPFormLoader } from '@azlabsjs/ngx-smart-form';
 import { ClarityIcons, uploadCloudIcon } from '@clr/angular/icon';
 import { AppComponent } from './app.component';
 import { FORM_CONTROL_DIRECTIVES, useOptionsInterceptor } from '@azlabsjs/ngx-clr-form-control';
 import { FormControlComponent } from './form-control/form-control.component';
-import {
-  COMMON_PIPES,
-  CommonTextPipe,
-  provideTranslations,
-  providePipes,
-  AsyncTextPipe,
-} from '@azlabsjs/ngx-common';
+import { COMMON_PIPES, CommonTextPipe, provideTranslations, providePipes, AsyncTextPipe } from '@azlabsjs/ngx-common';
 import { RouterModule } from '@angular/router';
 import { HTTPValuePipe, AsyncTranslatePipe, RequiredPipe, TestPipe } from './pipes';
-import {
-  OPTIONS_DIRECTIVES,
-  provideCacheConfig,
-  provideQueryClient,
-} from '@azlabsjs/ngx-options-input';
+import { OPTIONS_DIRECTIVES, provideCacheConfig, provideQueryClient } from '@azlabsjs/ngx-options-input';
 import { provideUploadOptions } from '@azlabsjs/ngx-file-input';
 import { ClarityModule } from '@clr/angular';
-import {
-  TranslateLoader,
-  TranslateModule,
-  TranslatePipe,
-} from '@ngx-translate/core';
+import { TranslateLoader, TranslateModule, TranslatePipe } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { useTranslationsFactory } from './translations';
 import { MODAL_DIRECTIVES } from '@azlabs/ngx-modal';
 import localeFr from '@angular/common/locales/fr';
-import { registerLocaleData } from '@angular/common';
+import { LocationStrategy, PlatformLocation, registerLocaleData } from '@angular/common';
+import { isFormConfig } from '@azlabsjs/smart-form-core';
 
 registerLocaleData(localeFr);
 
@@ -108,7 +82,6 @@ export const createAppTranslator = createTranslate((values) => {
         asyncText: AsyncTextPipe,
       },
     }),
-    provideFormsLoader(),
     provideQueryClient({
       interceptorFactory: useOptionsInterceptor((request) => request.clone({})),
       queries: {
@@ -139,8 +112,7 @@ export const createAppTranslator = createTranslate((values) => {
         };
       },
     }),
-    provideFormsInitialization('/assets/forms.json'),
-    /* injector: Injector */
+    provideFormsCollection((injector) => useHTTPFormLoader(injector.get(LocationStrategy), injector.get(PlatformLocation), { url: '/assets/forms.json', interceptor: (items) => items.filter(isFormConfig) })),
     provideHttpClient('http://localhost:4000', () => {
       return (request, next) => {
         request = request.clone({

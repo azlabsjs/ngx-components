@@ -1,7 +1,7 @@
 @if (signal(); as _signal) {
   <div #formRef="ngxform" [ngxform]="form" [value]="_signal.value">
     @if (formRef.formGroup) {
-      <ngx-form-ui #formui [no-grid-layout]="false" [autoupload]="true" [template]="template" [label]="label1" [state]="{ formGroup: formRef.formGroup, detached: formRef.state.detached | async }" [inputs]="formRef.form.controlConfigs">
+      <ngx-form-ui #formui [no-grid-layout]="false" [autoupload]="true" [template]="template" [label]="label1" [state]="{ formGroup: formRef.formGroup, detached: formRef.state.detached | async }" [inputs]="formRef.form.inputs">
         <ng-template #template let-config="value" let-control="control" let-describe="describe">
           <ngx-clr-form-control [date]="date" class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control" [config]="config" [describe]="describe ?? true" [error]="error" [label]="label2">
             <ng-template #label2 let-label>
