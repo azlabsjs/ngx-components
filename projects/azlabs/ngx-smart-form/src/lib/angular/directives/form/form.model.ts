@@ -27,7 +27,7 @@ import {
 } from 'rxjs';
 import { ANGULAR_REACTIVE_FORM_BRIDGE } from '../../tokens';
 import { FormConfigType, FormModelState } from './types';
-import { InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
+import { FormConfigInterface, InputConfigInterface, InputTypes } from '@azlabsjs/smart-form-core';
 import { deepEqual } from '@azlabsjs/utilities';
 
 /** @internal */
@@ -42,7 +42,14 @@ type Hook = (control: AbstractControl, name: string, conditions: Condition[]) =>
 @Injectable()
 export class FormModel<T extends FormConfigType> implements OnDestroy {
   _detectChanges$ = new Subject<void>();
+  /** @deprecated */
   readonly detectChanges$ = this._detectChanges$.asObservable();
+
+
+  private formChanged = new Subject<T>();
+  public readonly formChanged$ = this.formChanged.asObservable();
+  private formGroupChanged = new Subject<FormGroup<any>>();
+  public readonly formGroupChanged$ = this.formGroupChanged.asObservable();
 
   private computed: { [prop: string]: ComputedInputValueConfigType<any>; } | null = null;
   private _trackedArrayValues: { [prop: string]: unknown[] } = {};
@@ -581,11 +588,21 @@ export class FormModel<T extends FormConfigType> implements OnDestroy {
   }
 
   private setFormState(config: T, formgroup: FormGroup) {
+    const formgroup1 = this.group;
+
     const form = this.form ? { ...this.form, ...config } : config;
     const { controlConfigs } = config;
     const inputs = withRefetchObservable(controlConfigs, formgroup);
     this.form = { ...form, controlConfigs: inputs };
     this.group = formgroup;
+
+    if (formgroup1 !== this.group) {
+      this.formGroupChanged.next(this.group);
+    }
+
+    this.formChanged.next(this.form);
+
+    // TODO: remove this call in future release
     this._detectChanges$.next();
   }
 

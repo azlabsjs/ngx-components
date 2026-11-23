@@ -287,6 +287,8 @@ export class AppComponent implements OnInit {
   control = new FormControl<string | undefined>(undefined);
   haserror = false;
   formValue: { [k: string]: unknown } | null = null;
+  formGroup: FormGroup<any> | null = null;
+  formConfig: FormConfigInterface | null = null;
 
   public constructor(
     @Inject(FORM_CLIENT) private client: FormsClient,
@@ -438,5 +440,16 @@ export class AppComponent implements OnInit {
 
       this.cdRef?.detectChanges();
     }
+  }
+
+  formChange(e: FormConfigInterface) {
+    console.log(e);
+    this.formConfig = e;
+  }
+
+  formGroupChanged(e: FormGroup<any>) {
+    console.log('Formgroup: ', e);
+    this.formGroup = e;
+
   }
 }

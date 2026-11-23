@@ -85,8 +85,8 @@
     </ngx-smart-form> -->
 
 
-    <!-- <div #formRef="ngxform" [ngxform]="form" [value]="formValue">
-      <ngx-form-ui #formui *ngIf="formRef.formGroup" [no-grid-layout]="false" [autoupload]="true" [template]="template" [label]="label" [state]="{ formGroup: formRef.formGroup, detached: formRef.state.detached }" [inputs]="formRef.form.controlConfigs" (item-removed)="onRemoved($event)">
+    <div #formRef="ngxform" [ngxform]="form" [value]="formValue" (formChange)="formConfig = $event" (formGroupChange)="formGroup = $event">
+      <ngx-form-ui #formui *ngIf="formGroup" [no-grid-layout]="false" [autoupload]="true" [template]="template" [label]="label" [state]="{ formGroup: formGroup, detached: formRef.state.detached | async }" [inputs]="form.controlConfigs" (item-removed)="onRemoved($event, formGroup)">
           <ng-template #template let-config="value" let-control="control" let-describe="describe">
             <ngx-clr-form-control [date]="date" class="ngx-smart-form-control" [hidden]="config.hidden" [control]="control" [inputConfig]="config" [describe]="describe ?? true" [error]="error" [label]="label">
               <ng-template #label let-label>
@@ -147,7 +147,7 @@
             </button>
           </div>
       </ngx-form-ui>
-    </div> -->
+    </div>
   </ng-container>
 </div>
 <div class="container">

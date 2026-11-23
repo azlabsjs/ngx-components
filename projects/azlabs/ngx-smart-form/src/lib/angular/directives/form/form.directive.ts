@@ -1,22 +1,10 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Directive,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  SimpleChange,
-  SimpleChanges,
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Directive, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChange, SimpleChanges } from '@angular/core';
 import { FormConfigInterface } from '@azlabsjs/smart-form-core';
 import { FormModel } from './form.model';
 import { filter, first, Subscription } from 'rxjs';
-import { AsyncValidatorFn, ValidatorFn } from '@angular/forms';
+import { AsyncValidatorFn, FormGroup, ValidatorFn } from '@angular/forms';
 import { ReactiveFormDirectiveInterface } from '../../types';
-import { Optional } from './types';
+import { FormModelState, Optional } from './types';
 import { collectErrors } from '../../helpers';
 import { deepEqual } from '@azlabsjs/utilities';
 
@@ -30,63 +18,74 @@ export class NgxFormDirective implements ReactiveFormDirectiveInterface, OnDestr
 
   private subscriptions: Subscription[] = [];
   private changeSubscription: Subscription | null = null;
-  private init: boolean = false;
 
+  /** @deprecated use event `formGroupChange` binding instead to have proper dependency changes */
   get formGroup() {
     return this.model.state.formGroup;
   }
+
+  /** @deprecated use event `formChange` binding instead to have proper dependency changes */
   get form() {
     return this.model.state.form;
   }
+
+  /** @deprecated use event `stateChange` binding instead to have proper dependency changes */
   get state() {
     return this.model.state;
   }
 
-  private _value!: { [k: string]: unknown };
-  @Input({ alias: 'value' }) set value(value: Optional<{ [k: string]: unknown }>) {
+  private formValue: { [k: string]: unknown } | null = null;
+  @Input() set value(value: Optional<{ [k: string]: unknown }>) {
     if (typeof value !== 'undefined' && value !== null) {
-      this._value = value;
+      this.formValue = value;
     }
   }
   get value() {
     return this.model.getValue();
   }
 
-  private _form!: FormConfigInterface;
+  private formConfig!: Optional<FormConfigInterface>;
   @Input() set ngxform(value: Optional<FormConfigInterface>) {
-    if (value) {
-      this._form = value;
-    }
+    this.formConfig = value;
   }
 
   @Input() set form(value: FormConfigInterface) {
-    if (value) {
-      this._form = value;
-    }
+    this.formConfig = value;
   }
 
   @Output() valueChanges = new EventEmitter<unknown>();
   @Output() ready = new EventEmitter<void>();
   @Output() submitted = new EventEmitter<{ [k: string]: unknown }>();
 
+  @Output() formChange = new EventEmitter<FormConfigInterface>();
+  @Output() formGroupChange = new EventEmitter<FormGroup>();
+  @Output() stateChange = new EventEmitter<Required<FormModelState<FormConfigInterface>>>();
+
   public constructor(private model: FormModel<FormConfigInterface>, private cdRef: ChangeDetectorRef | null) {
-    this.subscriptions.push(this.model.detectChanges$.subscribe(() => this.cdRef?.detectChanges()));
+    const subscription1 = this.model.formGroupChanged$.subscribe((e) => {
+      this.formGroupChange.emit(e);
+      this.stateChange.emit(this.model.state);
+    });
+
+    const subscription2 = this.model.formChanged$.subscribe((e) => {
+      this.formChange.emit(e);
+      this.stateChange.emit(this.model.state);
+    });
+
+    this.subscriptions.push(subscription1, subscription2);
   }
 
   setValue(state: { [k: string]: unknown }): void {
-    if (!this.form || !this.formGroup) {
+    if (!this.model.state.form || !this.model.state.formGroup) {
       return;
     }
 
-    // set or update the form state of the current component
     if (!state) {
       return;
     }
 
     this.model.setValue(state);
-
-    // notify ui for value changes
-    this.cdRef?.detectChanges();
+    this.cdRef?.markForCheck();
   }
 
   addAsyncValidator(validator: AsyncValidatorFn, control?: string): void {
@@ -98,8 +97,8 @@ export class NgxFormDirective implements ReactiveFormDirectiveInterface, OnDestr
 
 
   ngOnInit() {
-    if (this._form) {
-      this.updateModel(this._form, this._value ?? {});
+    if (this.formConfig) {
+      this.updateModel(this.formConfig, this.formValue ?? {});
     }
   }
 
@@ -124,10 +123,14 @@ export class NgxFormDirective implements ReactiveFormDirectiveInterface, OnDestr
   ngOnChanges(changes: SimpleChanges): void {
     if ('value' in changes && this.hasChanged(changes['value']) && 'form' in changes && this.hasChanged(changes['form']) && changes['form'].currentValue) {
       this.updateModel(changes['form'].currentValue, changes['value'].currentValue);
+    } else if ('value' in changes && this.hasChanged(changes['value']) && 'ngxform' in changes && this.hasChanged(changes['ngxform']) && changes['ngxform'].currentValue) {
+      this.updateModel(changes['ngxform'].currentValue, changes['value'].currentValue);
     } else if ('value' in changes && this.hasChanged(changes['value'])) {
       this.setValue(changes['value'].currentValue);
     } else if ('form' in changes && this.hasChanged(changes['form']) && changes['form'].currentValue) {
       this.updateModel(changes['form'].currentValue);
+    } else if ('ngxform' in changes && this.hasChanged(changes['ngxform']) && changes['ngxform'].currentValue) {
+      this.updateModel(changes['ngxform'].currentValue);
     }
   }
 
@@ -143,12 +146,12 @@ export class NgxFormDirective implements ReactiveFormDirectiveInterface, OnDestr
   }
 
   submit() {
-    if (!this.formGroup) {
+    if (!this.model.state.formGroup) {
       return;
     }
 
     this.validate();
-    const errors = collectErrors(this.formGroup);
+    const errors = collectErrors(this.model.state.formGroup);
     if (!this.model.isValid() && errors.length > 0) {
       return;
     }
@@ -167,18 +170,18 @@ export class NgxFormDirective implements ReactiveFormDirectiveInterface, OnDestr
   }
 
   private updateModel(config: FormConfigInterface, value?: { [prop: string]: unknown }) {
-    const formgroup = this.formGroup;
-    const oldValue = this.formGroup?.getRawValue();
+    const formgroup = this.model.state.formGroup;
+    const oldValue = this.model.state.formGroup?.getRawValue();
 
     // update model configuration
     this.model.update(config);
 
     // if current directive model formgroup value is undefined, we drop from the execution context
-    if (!this.formGroup) {
+    if (!this.model.state.formGroup) {
       return;
     }
 
-    if (this.formGroup !== formgroup) {
+    if (this.model.state.formGroup !== formgroup) {
       if (this.changeSubscription) {
         this.changeSubscription.unsubscribe();
       }

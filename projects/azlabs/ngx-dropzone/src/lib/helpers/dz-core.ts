@@ -13,9 +13,8 @@ export function createDropzone(
   return new Dropzone(container, options);
 }
 
-export const autoDiscover = (value: boolean = true) => {
-  Dropzone.autoDiscover = value;
-};
+/** @deprecated */
+export const autoDiscover = (value: boolean = true) => { };
 
 /**
  * Creates the default dropzone preview template string
