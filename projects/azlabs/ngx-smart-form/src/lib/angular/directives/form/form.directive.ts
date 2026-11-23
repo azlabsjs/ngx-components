@@ -19,7 +19,6 @@ export class NgxFormDirective implements ReactiveFormDirectiveInterface, OnDestr
   private subscriptions: Subscription[] = [];
   private changeSubscription: Subscription | null = null;
 
-  /** @deprecated use event `formGroupChange` binding instead to have proper dependency changes */
   get formGroup() {
     return this.model.state.formGroup;
   }
@@ -32,6 +31,11 @@ export class NgxFormDirective implements ReactiveFormDirectiveInterface, OnDestr
   /** @deprecated use event `stateChange` binding instead to have proper dependency changes */
   get state() {
     return this.model.state;
+  }
+
+  /** an observable of detached inputs */
+  get detached() {
+    return this.model.state.detached;
   }
 
   private formValue: { [k: string]: unknown } | null = null;
